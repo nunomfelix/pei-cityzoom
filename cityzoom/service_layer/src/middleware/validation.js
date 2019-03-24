@@ -9,7 +9,7 @@ function validationMiddleware(method, object, message) {
     return function(req, res, next) {
         const { error } = method(req[object])
         if(error) {
-            validationDebug(`An error occurred while validating ${JSON.stringify(req[object])} on the endpoint ${req.originalUrl} with the function ${method}`)
+            validationDebug(`Error occurred while validating ${JSON.stringify(req[object])} on the endpoint ${req.originalUrl} with the function ${method.name}:\n${error.message}`)
             res.status(400).send(message)
         } else {
             next()

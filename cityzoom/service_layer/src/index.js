@@ -29,4 +29,3 @@ app.use('/resource', resourceRouter)
 app.listen(port, () => {
     expressDebug('Service Layer up on port ' + port)
 })
-
