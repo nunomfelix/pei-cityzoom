@@ -14,9 +14,14 @@
     "nodemon": "^1.18.10"
   },
   "dependencies": {
+    "debug": "^4.1.1",
     "express": "^4.16.4",
+    "helmet": "^3.16.0",
+    "joi": "^14.3.1",
+    "joi-objectid": "^2.0.0",
     "mongoose": "^5.4.19",
     "mongoose-unique-validator": "^2.0.2",
+    "morgan": "^1.9.1",
     "validator": "^10.11.0"
   }
 }

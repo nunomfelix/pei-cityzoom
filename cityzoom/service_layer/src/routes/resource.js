@@ -3,10 +3,8 @@ const router = new express.Router()
 
 /* Contains all resources endpoints */
 
-router.get('/resource', (req, res) => {
+router.get('', (req, res) => {
     res.send('From resource file')
 })
-
-
 
 module.exports = router

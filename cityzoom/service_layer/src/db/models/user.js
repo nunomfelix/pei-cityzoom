@@ -24,8 +24,8 @@ const userSchema = new mongoose.Schema({
         minlength: 5 //Password must have at least 5 characters
     },
 }, {
-        versionKey: false
-    })
+    versionKey: false
+})
 
 userSchema.plugin(uniqueValidator)
 

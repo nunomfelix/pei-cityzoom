@@ -3,7 +3,7 @@ const router = new express.Router()
 
 /* Contains all alert endpoints */
 
-router.get('/alert', (req, res) => {
+router.get('', (req, res) => {
     res.send('From alert file')
 })
 

@@ -1,0 +1,2 @@
+DEBUG=app:[* ou User ou Express ou ... (qualquer debug que exista, o * imprime todos), tambem da com array] nodemon
+Ver exemplo do endpoint /user/:id para ver como o middleware de validacao funciona
