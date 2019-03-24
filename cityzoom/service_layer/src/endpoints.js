@@ -6,10 +6,13 @@ const express = require('express')
 const accountRouter = require('./routers/account')
 const alertRouter = require('./routers/alert')
 const resourceRouter = require('./routers/resource')
+
 //Uses the express framework
 const app = express()
+
 //Uses specified port in env variable. Uses port 3000 as if none is given
 const port = process.env.PORT || 3000
+
 //Sets up all routes
 app.use(express.json())
 app.use(accountRouter)
