@@ -11,7 +11,7 @@ const router = new express.Router()
 /* 
     Login user
     req:{
-        username: 'pirukamc'
+        username: 'pirukamc',
         password: '1234567'
     }
     returns: the session token
@@ -37,7 +37,8 @@ router.post('/login',
             userDebug(e)
             res.status(500).send(e.message)
         }
-    })
+    }
+)
 
 /*
     Gets the authenticated user
@@ -181,8 +182,9 @@ router.delete('/:id',
         [500] Internal server error
 */
 router.patch('/:id',
-    [validationMiddleware(validateId, 'params', 'User not found'),
-    validationMiddleware(validatePatch, 'body', 'Not allowed to update')],
+    [authentication,
+        validationMiddleware(validateId, 'params', 'User not found'),
+        validationMiddleware(validatePatch, 'body', 'Not allowed to update')],
     async (req, res) => {
 
         try {
