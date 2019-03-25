@@ -3,18 +3,67 @@ const userDebug = require('debug')('app:user')
 const express = require('express')
 require('../db/mongoose')
 const { validateId, validatePatch } = require('../validation')
-const { validationMiddleware } = require('../middleware/validation')
+const { validationMiddleware, authentication } = require('../middleware/validation')
 
 const router = new express.Router()
 
-/*  Creates a user
+/* 
+    Login user
+    req:{
+        username: 'pirukamc'
+        password: '1234567'
+    }
+    returns: the session token
+    codes:
+        [200] Login successful
+        [400] Bad request
+        [401] Unauthorized (if invalid credentials)
+        [500] Internal server error
+*/
+router.post('/login',
+    async (req, res) => {
+        try {
+            const user = await User.findByCredentials(req.body.username, req.body.password)
+            const token = await user.generateAuthToken()
+            userDebug(user)
+            userDebug(`User ${user.name} logged in successfully `)
+            return res.send({ token })
+        } catch (e) {
+            userDebug(e)
+            res.status(500).send(e.message)
+        }
+    })
+
+/*
+    Gets the authenticated user
+    req: no req
+    return: the authenticated user
+    codes:
+        [200] Success
+        [401] Unauthorized (no user is logged in)
+        [500] Internal server error
+*/
+router.get('/me',
+    authentication,
+    async (req, res) => {
+        try {
+            userDebug(`The autenticated user is ${JSON.stringify(req.user.username)}`)
+            res.send(req.user)
+        } catch (e) {
+            userDebug(e)
+            res.status(401).send({ code: 401, message: e.message })
+        }
+    }
+)
+
+/*  Create a user
     req:{
         name: 'André Oliveira',
         username: 'pirukamc',
         email: 'pirukamc@gmail.com',
         password: '1234567'
     }
-    returns: the inserted user with id
+    returns: authentication token
     codes:
         [201] Created user
         [400] Bad request
@@ -25,7 +74,8 @@ router.post('', async (req, res) => {
         const user = new User(req.body)
         await user.save()
         userDebug(`User ${user.name} successfully created`)
-        res.status(201).send(user)
+        const token = await user.generateAuthToken()
+        res.status(201).send({ token })
     } catch (e) {
         userDebug(e)
         res.status(500).send(e.message)
@@ -42,16 +92,18 @@ router.post('', async (req, res) => {
         [200] Successfully returned users
         [500] Internal server error
 */
-router.get('', async (req, res) => {
-    try {
-        const result = await User.find(req.query)
-        userDebug(`Users loaded with query ${JSON.stringify(req.query)}`)
-        res.send(result)
-    } catch (e) {
-        userDebug(e)
-        res.status(500).send(e.message)
+router.get('',
+    async (req, res) => {
+        try {
+            const result = await User.find(req.query)
+            userDebug(`Users loaded with query ${JSON.stringify(req.query)}`)
+            res.send(result)
+        } catch (e) {
+            userDebug(e)
+            res.status(500).send(e.message)
+        }
     }
-})
+)
 
 /*  Gets a user by it's id
 
@@ -103,7 +155,7 @@ router.delete('/:id',
             }
             res.status(200).send(user)
         } catch (e) {
-            console.log(e)
+            userDebug(e)
             res.status(500).send({
                 code: 500,
                 message: 'Internal Server Error'
@@ -131,6 +183,7 @@ router.patch('/:id',
         try {
             const user = await User.findById(req.params.id)
             if (!user) {
+                userDebug(`Could not find user with username: ${user.username}`)
                 return res.status(404).send({
                     code: 404,
                     message: 'User not found'
@@ -139,10 +192,10 @@ router.patch('/:id',
             //Used this instead of FindOneAndModify because that function does not run the password hashing code
             Object.keys(req.body).forEach((update) => user[update] = req.body[update])
             await user.save()
-
+            userDebug(`User ${user.name} successfully updated`)
             res.status(200).send(user)
         } catch (e) {
-            console.log(e)
+            userDebug(e)
             res.status(500).send({
                 code: 500,
                 message: 'Internal Server Error'

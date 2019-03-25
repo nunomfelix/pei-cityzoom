@@ -3,6 +3,9 @@ const helmet = require('helmet')
 const morgan = require('morgan')
 
 /* Server setup configurations */
+//Token generation secret. TODO: CHANGE TO ENVIRONMENT VARIABLE LATER
+const TOKEN_GENERATION_SECRET = 'cityzoomsecret'
+module.exports = { TOKEN_GENERATION_SECRET }
 
 //Imports routes
 const accountRouter = require('./routes/user')
