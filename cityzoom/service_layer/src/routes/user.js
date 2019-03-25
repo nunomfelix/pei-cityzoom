@@ -9,9 +9,10 @@ const router = new express.Router()
 
 /*  Creates a user
     req:{
-        name: 'myname',
-        email: 'email',
-        password: ''
+        name: 'André Oliveira',
+        username: 'pirukamc',
+        email: 'pirukamc@gmail.com',
+        password: '1234567'
     }
     returns: the inserted user with id
     codes:

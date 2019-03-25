@@ -7,6 +7,11 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true
+    }, username: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true
     }, email: {
         type: String,
         required: true,
@@ -24,8 +29,9 @@ const userSchema = new mongoose.Schema({
         minlength: 5 //Password must have at least 5 characters
     },
 }, {
-    versionKey: false
-})
+        versionKey: false
+    }
+)
 
 userSchema.plugin(uniqueValidator)
 
