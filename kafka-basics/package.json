@@ -1,0 +1,15 @@
+{
+  "name": "kafka-basics",
+  "version": "1.0.0",
+  "description": "kafka tutorials for the team",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "ZePaiva",
+  "license": "MIT",
+  "dependencies": {
+    "kafka-node": "^4.0.2",
+    "kafkajs": "^1.5.1"
+  }
+}
