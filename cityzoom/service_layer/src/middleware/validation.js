@@ -5,12 +5,12 @@ const validationDebug = require('debug')('app:ValidationMiddleware')
     object: The key attribute of the request to validate (params, body...)
     message: Message to display to the user
 */
-function validationMiddleware(method, object, message = null) {
-    return function(req, res, next) {
+function validationMiddleware(method, object, message = null, code = 400) {
+    return function (req, res, next) {
         const { error } = method(req[object])
-        if(error) {
+        if (error) {
             validationDebug(`Error occurred while validating ${JSON.stringify(req[object])} on the endpoint ${req.originalUrl} with the function ${method.name}:\n${error.message}`)
-            res.status(400).send(message ? message : error.message)
+            res.status(code).send(message ? message : error.message)
         } else {
             next()
         }

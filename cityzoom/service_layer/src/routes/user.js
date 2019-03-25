@@ -25,7 +25,7 @@ router.post('', async (req, res) => {
         await user.save()
         userDebug(`User ${user.name} successfully created`)
         res.status(201).send(user)
-    } catch(e) {
+    } catch (e) {
         userDebug(e)
         res.status(500).send(e.message)
     }
@@ -46,7 +46,7 @@ router.get('', async (req, res) => {
         const result = await User.find(req.query)
         userDebug(`Users loaded with query ${JSON.stringify(req.query)}`)
         res.send(result)
-    } catch(e) {
+    } catch (e) {
         userDebug(e)
         res.status(500).send(e.message)
     }
@@ -61,22 +61,53 @@ router.get('', async (req, res) => {
         [404] User not found
         [500] Internal server error
 */
-router.get('/:id', 
-    validationMiddleware(validateId, 'params', 'User not found'), 
+router.get('/:id',
+    validationMiddleware(validateId, 'params', 'User not found'),
     async (req, res) => {
         try {
             const user = await User.findById(req.params.id)
-            if(!user) {
+            if (!user) {
                 userDebug(`User with ID: ${req.params.id} not found!`)
-                res.status(404).send('User not found')
+                return res.status(404).send('User not found')
             }
             userDebug(`User with ID: ${req.params.id} sent.`)
             res.send(user)
-        } catch(e) {
+        } catch (e) {
             userDebug(e)
             res.status(500).send()
         }
-    }   
+    }
 )
+
+/* Deletes a user by it's id
+    req: no req
+    returns: the user with the specified id
+    codes:
+        [200] Successfully deleted user
+        [404] User not found
+        [500] Internal server error
+*/
+router.delete('/:id',
+    validationMiddleware(validateId, 'params', 'User not found'),
+    async (req, res) => {
+        const user = await User.deleteOne({ _id: req.params.id })
+        try {
+            if (!user) {
+                return res.status(404).send({
+                    code: 404,
+                    message: 'User not found'
+                })
+            }
+            res.status(200).send(user)
+        } catch (e) {
+            console.log(e)
+            res.status(500).send({
+                code: 500,
+                message: 'Internal Server Error'
+            })
+        }
+    }
+)
+
 
 module.exports = router
