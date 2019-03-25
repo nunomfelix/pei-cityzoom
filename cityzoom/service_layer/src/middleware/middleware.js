@@ -26,12 +26,12 @@ const authentication = async (req, res, next) => {
         const decoded = jwt.verify(token, TOKEN_GENERATION_SECRET)
         const user = await User.findOne({ username: decoded.username, 'tokens.token': token })
         if (!user) {
-            throw new Error()
+            return res.status(401).send('Please authenticate.')
         }
         req.user = user
         next()
     } catch (e) {
-        res.status(401).send({ error: 'Please authenticate.' })
+        res.status(500).send('Internal server error')
     }
 }
 

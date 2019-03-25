@@ -46,23 +46,9 @@ userSchema.plugin(uniqueValidator)
 userSchema.methods.generateAuthToken = async function () {
     const user = this
     const token = jwt.sign({ username: user.username }, TOKEN_GENERATION_SECRET, { expiresIn: '1 day' })
-
     user.tokens = user.tokens.concat({ token })
     await user.save()
     return token
-}
-
-//Finds a user by credentials and verifies the credentials
-userSchema.statics.findByCredentials = async (username, password) => {
-    const user = await User.findOne({ username })
-    if (!user) {
-        throw new Error('Invalid credentials')
-    }
-    const isMatch = await bcrypt.compare(password, user.password)
-    if (!isMatch) {
-        throw new Error('Invalid credentials')
-    }
-    return user
 }
 
 //Hash the plain text password

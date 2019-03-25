@@ -1,9 +1,10 @@
 const User = require('../db/models/user')
 const userDebug = require('debug')('app:user')
 const express = require('express')
+const bcrypt = require('bcryptjs')
 require('../db/mongoose')
 const { validateId, validatePatch } = require('../validation')
-const { validationMiddleware, authentication } = require('../middleware/validation')
+const { validationMiddleware, authentication } = require('../middleware/middleware')
 
 const router = new express.Router()
 
@@ -23,7 +24,11 @@ const router = new express.Router()
 router.post('/login',
     async (req, res) => {
         try {
-            const user = await User.findByCredentials(req.body.username, req.body.password)
+            const user = await User.findOne({ username: req.body.username })
+            if (!user) return res.status(400).send('Invalid Credentials')
+            const isMatch = await bcrypt.compare(req.body.password, user.password)
+            if (!isMatch) return res.status(400).send('Invalid Credentials')
+
             const token = await user.generateAuthToken()
             userDebug(user)
             userDebug(`User ${user.name} logged in successfully `)
