@@ -8,6 +8,18 @@ function validateId(object) {
     return Joi.validate(object, schema)
 }
 
+function validatePatch(object) {
+    console.log(object)
+    const updates = Object.keys(object)
+    const allowedUpdates = ['name', 'password']
+    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+    if (!isValidOperation) {
+        return false
+    }
+    return true
+}
+
 module.exports = {
-    validateId
+    validateId,
+    validatePatch
 }

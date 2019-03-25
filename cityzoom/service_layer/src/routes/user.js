@@ -2,7 +2,7 @@ const User = require('../db/models/user')
 const userDebug = require('debug')('app:user')
 const express = require('express')
 require('../db/mongoose')
-const { validateId } = require('../validation')
+const { validateId, validatePatch } = require('../validation')
 const { validationMiddleware } = require('../middleware/validation')
 
 const router = new express.Router()
@@ -59,6 +59,7 @@ router.get('', async (req, res) => {
     returns: the user with the specified id
     codes:
         [200] Successfully returned user
+        [400] Bad request
         [404] User not found
         [500] Internal server error
 */
@@ -85,6 +86,7 @@ router.get('/:id',
     returns: the user with the specified id
     codes:
         [200] Successfully deleted user
+        [400] Bad request
         [404] User not found
         [500] Internal server error
 */
@@ -110,5 +112,43 @@ router.delete('/:id',
     }
 )
 
+/* Changes a user's attributes
+    req: {
+        password: 'abcDe123!.'
+    }
+    returns: changes the user's password to abcDe123!.
+    codes:
+        [200] Successfully modified user
+        [400] Bad request
+        [404] User not found
+        [500] Internal server error
+*/
+router.patch('/:id',
+    [validationMiddleware(validateId, 'params', 'User not found'),
+    validationMiddleware(validatePatch, 'body', 'Not allowed to update')],
+    async (req, res) => {
+
+        try {
+            const user = await User.findById(req.params.id)
+            if (!user) {
+                return res.status(404).send({
+                    code: 404,
+                    message: 'User not found'
+                })
+            }
+            //Used this instead of FindOneAndModify because that function does not run the password hashing code
+            Object.keys(req.body).forEach((update) => user[update] = req.body[update])
+            await user.save()
+
+            res.status(200).send(user)
+        } catch (e) {
+            console.log(e)
+            res.status(500).send({
+                code: 500,
+                message: 'Internal Server Error'
+            })
+        }
+    }
+)
 
 module.exports = router
