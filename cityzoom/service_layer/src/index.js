@@ -1,6 +1,8 @@
 const express = require('express')
+require('express-async-errors')
 const helmet = require('helmet')
 const morgan = require('morgan')
+const { error } = require('./middleware')
 
 /* Server setup configurations */
 //Token generation secret. TODO: CHANGE TO ENVIRONMENT VARIABLE LATER
@@ -28,6 +30,7 @@ app.use(express.json())
 app.use('/user', accountRouter)
 app.use('/alert', alertRouter)
 app.use('/resource', resourceRouter)
+app.use(error)
 
 app.listen(port, () => {
     expressDebug('Service Layer up on port ' + port)
