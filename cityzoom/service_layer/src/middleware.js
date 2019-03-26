@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken')
 const User = require('./db/models/user')
 const { TOKEN_GENERATION_SECRET } = require('./index')
 const validationDebug = require('debug')('app:Validation')
-const errorDebug = require('debug')('app:error')
+const errorDebug = require('debug')('app:Error')
 const fs = require('fs');
 
 /*  Middleware to ease the validation of user inputs

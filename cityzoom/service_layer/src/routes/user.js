@@ -1,7 +1,8 @@
 const User = require('../db/models/user')
 const userDebug = require('debug')('app:user')
 const express = require('express')
-const { validateId, validatePatch } = require('../validation')
+const bcrypt = require('bcryptjs')
+const { validateId, validatePatch, validateCreateUser, validateLogin } = require('../validation')
 const { validationMiddleware, authentication } = require('../middleware')
 
 const router = new express.Router()
@@ -9,7 +10,7 @@ const router = new express.Router()
 /* 
     Login user
     req:{
-        username: 'pirukamc'
+        username: 'pirukamc',
         password: '1234567'
     }
     returns: the session token
@@ -20,15 +21,38 @@ const router = new express.Router()
         [500] Internal server error
 */
 router.post('/login',
+    validationMiddleware(validateLogin, 'body'),
     async (req, res) => {
-        const user = await User.findOne( req.body.username )
-        if (!user) res.send(400).send('Invalid credentials')
+        const user = await User.findOne({ username: req.body.username })
+        if (!user) return res.status(400).send('Invalid Credentials')
         const isMatch = await bcrypt.compare(req.body.password, user.password)
-        if (!isMatch) res.send(400).send('Invalid credentials')
+        if (!isMatch) return res.status(400).send('Invalid Credentials')
+
         const token = await user.generateAuthToken()
         userDebug(`User ${user.name} logged in successfully `)
         return res.send({ token })
-    })
+    }
+)
+
+/* 
+    Logout user
+    req: no req
+    returns: the user
+    codes:
+        [200] Login successful
+        [401] Unauthorized (if not logged in)
+        [500] Internal server error
+*/
+router.get('/logout',
+    authentication,
+    async (req, res) => {
+        const user = await User.findById(req.user._id)
+        user.token = '' //Deletes the session token
+        await user.save()
+        userDebug(`User ${user.name} logged out successfully `)
+        return res.send(user)
+    }
+)
 
 /*
     Gets the authenticated user
@@ -42,13 +66,8 @@ router.post('/login',
 router.get('/me',
     authentication,
     async (req, res) => {
-        try {
-            userDebug(`The autenticated user is ${JSON.stringify(req.user.username)}`)
-            res.send(req.user)
-        } catch (e) {
-            userDebug(e)
-            res.status(401).send({ code: 401, message: e.message })
-        }
+        userDebug(`The autenticated user is ${JSON.stringify(req.user.username)}`)
+        res.send(req.user)
     }
 )
 
@@ -59,19 +78,21 @@ router.get('/me',
         email: 'pirukamc@gmail.com',
         password: '1234567'
     }
-    returns: authentication token
+    returns: Created user
     codes:
         [201] Created user
         [400] Bad request
         [500] Internal server error
 */
-router.post('', async (req, res) => {
-    const user = new User(req.body)
-    await user.save()
-    userDebug(`User ${user.name} successfully created`)
-    const token = await user.generateAuthToken()
-    res.status(201).send({ token })
-})
+router.post('',
+    validationMiddleware(validateCreateUser, 'body'),
+    async (req, res) => {
+        const user = new User(req.body)
+        await user.save()
+        userDebug(`User ${user.name} successfully created`)
+        res.status(201).send(user)
+    }
+)
 
 /*  Gets the list of users whose attributes match the ones in the queries
     Returns the list of all users, if no query is provided
