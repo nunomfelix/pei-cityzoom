@@ -1,32 +1,65 @@
 const axios = require('axios')
 
-async function get_ipma_data(){
+const city_codes = {
+    'Aveiro'            : 'AVR',
+    'Beja'              : 'BJA',
+    'Braga'             : 'BRG',
+    'Braganca'          : 'BGC',
+    'Coimbra'           : 'CBO',
+    'Castelo Branco'    : 'CBR',
+    'Evora'             : 'EVR',
+    'Faro'              : 'FAR',
+    'Guarda'            : 'GDA',
+    'Leiria'            : 'LRA',
+    'Lisboa'            : 'LSB',
+    'Portalegre'        : 'PTG',
+    'Porto'             : 'PTO',
+    'Santarem'          : 'STM',
+    'Setubal'           : 'STB',
+    'Viana do Castelo'  : 'VCT',
+    'Vila Real'         : 'VRL',
+    'Viseu'             : 'VIS',
+    'Funchal'           : 'MCS',
+    'Porto Santo'       : 'MPS',
+    'Acores Oriente'    : 'AOR',
+    'Acores Centro'     : 'ACE',
+    'Acores Ocidente'   : 'AOC'
+}
+
+/*Receives a list of cities as argument
+  Returns most recent data of each city in cities
+*/
+async function get_ipma_data(cities){
 
     //Get city ids
     var city_ids = new Map()
     const districts = await axios.get('http://api.ipma.pt/open-data/distrits-islands.json')
-    await districts.data.data.forEach(e => {
+    districts.data.data.forEach(e => {
         city_ids.set(e.idAreaAviso, e.globalIdLocal)
     })
-    //console.log(city_ids)
     
-    //Get data of city
+    //Get data of cities
     var data = {}
-    const globalIdLocal = city_ids.get('AVR') //Data of Aveiro
-    data['Distrito'] = 'Aveiro'
-    const city_info = await axios.get('http://api.ipma.pt/open-data/forecast/meteorology/cities/daily/' + globalIdLocal + '.json')
 
-    data['Temperature'] = (parseFloat(city_info.data.data[0].tMin) + parseFloat(city_info.data.data[0].tMax))/2
-    data['PrecipProbability'] = parseFloat(city_info.data.data[0].precipitaProb)
+    for(i=0; i<cities.length; i++){
+        var tmp = {}
+        var globalIdLocal = city_ids.get(city_codes[cities[i]])
+        var city_info = await axios.get('http://api.ipma.pt/open-data/forecast/meteorology/cities/daily/' + globalIdLocal + '.json')
+        tmp['Temperature'] = (parseFloat(city_info.data.data[0].tMin) + parseFloat(city_info.data.data[0].tMax))/2
+        tmp['PrecipProbability'] = parseFloat(city_info.data.data[0].precipitaProb)
 
-    send_ipma_data(JSON.stringify(data))
+        data[cities[i]] = tmp
+    }
+
+    send_ipma_data(data)
+
 }
 
 async function send_ipma_data(data){
-    
+    console.log(data)
     //Broker uri
 
     //Post data
 }
  
-get_ipma_data()
+get_ipma_data(['Aveiro', 'Coimbra', 'Viseu', 'Funchal'])
