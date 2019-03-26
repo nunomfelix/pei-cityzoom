@@ -17,7 +17,7 @@ const expressDebug = require('debug')('app:express')
 const app = express()
 
 //Uses specified port in env variable. Uses port 3000 as if none is given
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 8002
 
 //Middleware
 app.use(morgan('dev'))

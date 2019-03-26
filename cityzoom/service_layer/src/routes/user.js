@@ -3,7 +3,7 @@ const userDebug = require('debug')('app:user')
 const express = require('express')
 const bcrypt = require('bcryptjs')
 require('../db/mongoose')
-const { validateId, validatePatch } = require('../validation')
+const { validateId, validatePatch, validateCreateUser, validateLogin } = require('../validation')
 const { validationMiddleware, authentication } = require('../middleware/middleware')
 
 const router = new express.Router()
@@ -22,6 +22,7 @@ const router = new express.Router()
         [500] Internal server error
 */
 router.post('/login',
+    validationMiddleware(validateLogin, 'body'),
     async (req, res) => {
         try {
             const user = await User.findOne({ username: req.body.username })
@@ -30,9 +31,33 @@ router.post('/login',
             if (!isMatch) return res.status(400).send('Invalid Credentials')
 
             const token = await user.generateAuthToken()
-            userDebug(user)
             userDebug(`User ${user.name} logged in successfully `)
             return res.send({ token })
+        } catch (e) {
+            userDebug(e)
+            res.status(500).send(e.message)
+        }
+    }
+)
+
+/* 
+    Logout user
+    req: no req
+    returns: the user
+    codes:
+        [200] Login successful
+        [401] Unauthorized (if not logged in)
+        [500] Internal server error
+*/
+router.get('/logout',
+    authentication,
+    async (req, res) => {
+        try {
+            const user = await User.findById(req.user._id)
+            user.token = '' //Deletes the session token
+            await user.save()
+            userDebug(`User ${user.name} logged out successfully `)
+            return res.send(user)
         } catch (e) {
             userDebug(e)
             res.status(500).send(e.message)
@@ -69,24 +94,26 @@ router.get('/me',
         email: 'pirukamc@gmail.com',
         password: '1234567'
     }
-    returns: authentication token
+    returns: Created user
     codes:
         [201] Created user
         [400] Bad request
         [500] Internal server error
 */
-router.post('', async (req, res) => {
-    try {
-        const user = new User(req.body)
-        await user.save()
-        userDebug(`User ${user.name} successfully created`)
-        const token = await user.generateAuthToken()
-        res.status(201).send({ token })
-    } catch (e) {
-        userDebug(e)
-        res.status(500).send(e.message)
+router.post('',
+    validationMiddleware(validateCreateUser, 'body'),
+    async (req, res) => {
+        try {
+            const user = new User(req.body)
+            await user.save()
+            userDebug(`User ${user.name} successfully created`)
+            res.status(201).send(user)
+        } catch (e) {
+            userDebug(e)
+            res.status(500).send(e.message)
+        }
     }
-})
+)
 
 /*  Gets the list of users whose attributes match the ones in the queries
     Returns the list of all users, if no query is provided
@@ -182,7 +209,7 @@ router.delete('/:id',
         [500] Internal server error
 */
 router.patch('/:id',
-    [authentication,
+    [
         validationMiddleware(validateId, 'params', 'User not found'),
         validationMiddleware(validatePatch, 'body', 'Not allowed to update')],
     async (req, res) => {
