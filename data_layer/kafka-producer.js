@@ -19,7 +19,7 @@ const producer = kafka.producer()
 
 const pushData = async payload => {
   return producer.send(payload)
-                 .then(console.log('Data logged into kafka'))
+                 .then(console.log('Data sent'))
                  .catch(e => console.log('Error pushing data to kafka broker: ', e))
 }
 
@@ -30,35 +30,57 @@ const run = async payload => {
   await producer.disconnect()
 }
 
-var payload = {
-  topic: 'temperature',
-  messages: [
-    {
-        key: 'key0',
-        value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key0'}),
-    },
-    {
-        key: 'key1',
-        value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key1'}),
-    },
-    {
-        key: 'key2',
-        value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key2'}),
-    },
-    {
-        key: 'key3',
-        value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key3'}),
-    },
-    {
-        key: 'key4',
-        value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key4'}),
-    },
-    {
-        key: 'key4',
-        value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key4'}),
-    },
-  ]
+// 
+// var payload = {
+//   topic: 'temp',
+//   messages: [
+//     {
+//         key: 'key0',
+//         value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key0'}),
+//     },
+//     {
+//         key: 'key1',
+//         value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key1'}),
+//     },
+//     {
+//         key: 'key2',
+//         value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key2'}),
+//     },
+//     {
+//         key: 'key3',
+//         value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key3'}),
+//     },
+//     {
+//         key: 'key4',
+//         value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key4'}),
+//     },
+//     {
+//         key: 'key5',
+//         value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key5'}),
+//     },
+//     {
+//         key: 'key6',
+//         value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key6'}),
+//     },
+//     {
+//         key: 'key7',
+//         value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key7'}),
+//     },
+//     {
+//         key: 'key8',
+//         value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key8'}),
+//     },
+//     {
+//         key: 'key9',
+//         value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key9'}),
+//     },
+//   ]
+// }
+// 
+// run(payload).catch(e => console.error(JSON.parse(e)))
+// 
+// 
+
+module.exports = {
+    run
 }
-
-run(payload).catch(e => console.error(JSON.parse(e)))
-

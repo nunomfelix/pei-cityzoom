@@ -16,7 +16,6 @@ const kafka = new Kafka({
 
 // kafka admin
 const admin = kafka.admin()
-console.log(admin)
 
 const createType = async type => {
     await admin.connect()
@@ -26,16 +25,16 @@ const createType = async type => {
         topics: [{
             topic: type,
             numPartitions: 5,
-            replicationFactor: 4
+            replicationFactor: 1
         }]
     })
       .catch(console.log('error on creating topics!'))
     admin.disconnect()
 }
 
-var topic_to_create = 'temperature_'+Number(new Date())
-
-// createType(topic_to_create)
+//var topic_to_create = 'temperature_'+Number(new Date())
+//
+//createType('temp')
 //     .then(e => console.log('Topic ', topic_to_create, ' created: ', e))
 //     .catch(e => console.log('Error creating topic: ', e))
 
