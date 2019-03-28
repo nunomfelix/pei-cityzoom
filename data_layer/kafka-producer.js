@@ -16,20 +16,6 @@ const kafka = new Kafka({
 
 // kafka clients (admin, producer) 
 const producer = kafka.producer()
-const admin = kafka.admin()
-
-const createType = async type => {
-    await admin.connect()
-    await admin.createTopics({
-        timeout: 30000,
-        topics: [{
-            topic: type,
-            numPartitions: 5,
-            replicationFactor: 4
-        }]
-    })
-    await admin.disconnect()
-}
 
 const pushData = async payload => {
   return producer.send(payload)
@@ -45,26 +31,34 @@ const run = async payload => {
 }
 
 var payload = {
-  topic: 'topic1',
+  topic: 'temperature',
   messages: [
     {
-      key: 'key1',
-      value: JSON.stringify({data: 'This message is in JSON data-type'}),
-      partition: 0
+        key: 'key0',
+        value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key0'}),
     },
     {
-      key: 'key1',
-      value: JSON.stringify({data: 'This message is in partition 0'}),
-      partition: 0
+        key: 'key1',
+        value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key1'}),
     },
     {
-      key: 'key2',
-      value: JSON.stringify({data: 'This message is in partition 2'}),
-      partition: 2
-    }
+        key: 'key2',
+        value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key2'}),
+    },
+    {
+        key: 'key3',
+        value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key3'}),
+    },
+    {
+        key: 'key4',
+        value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key4'}),
+    },
+    {
+        key: 'key4',
+        value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key4'}),
+    },
   ]
 }
 
-createType('temperature')
-//run(payload).catch(e => console.error(JSON.parse(e)))
+run(payload).catch(e => console.error(JSON.parse(e)))
 
