@@ -1,5 +1,5 @@
 
-// npm modules
+const mongoose = require('mongoose')
 const express = require('express')
 // my modules
 const parser = require('./parser')
