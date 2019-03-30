@@ -1,6 +1,6 @@
-const { createType }= require('./kafka-admin')
-const producer = require('./kafka-producer')
-const consumer = require('./kafka-consumer')
+const { createType }= require('../src/kafka-admin')
+const producer = require('../src/kafka-producer')
+const consumer = require('../src/kafka-consumer')
 
 log = (...args) => console.log('\n', ...args)
 

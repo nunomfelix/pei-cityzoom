@@ -19,22 +19,23 @@ const admin = kafka.admin()
 
 const createType = async type => {
     await admin.connect()
-                .catch(console.log('error connecting to kafka!'))
+                .then(console.log('Connection to kafka established succesfully'))
     await admin.createTopics({
         timeout: 30000,
         topics: [{
             topic: type,
             numPartitions: 5,
-            replicationFactor: 1
+            replicationFactor: 5
         }]
     })
-      .catch(console.log('error on creating topics!'))
+      .then(e => console.log(`Topic ${type} ` + ( e ? 'created' : 'already exists!' )))
+      .catch(e => console.log(`Error @ creating topic ${type}, exit status: ${e}`))
     admin.disconnect()
 }
 
 //var topic_to_create = 'temperature_'+Number(new Date())
 //
-//createType('temp')
+createType('temp')
 //     .then(e => console.log('Topic ', topic_to_create, ' created: ', e))
 //     .catch(e => console.log('Error creating topic: ', e))
 
