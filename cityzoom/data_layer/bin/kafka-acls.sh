@@ -1,3 +1,4 @@
+#!/bin/bash
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
 # this work for additional information regarding copyright ownership.
@@ -12,10 +13,5 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# the directory where the snapshot is stored.
-#dataDir=/home/zero/.logs/kafka_logs
-dataDir=../../logs/zookeeper.logs
-# the port at which the clients will connect
-clientPort=2181
-# disable the per-ip limit on the number of connections since this is a non-production config
-maxClientCnxns=0
+
+exec $(dirname $0)/kafka-run-class.sh kafka.admin.AclCommand "$@"
