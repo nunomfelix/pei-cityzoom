@@ -1,0 +1,5 @@
+#!/bin/bash
+mkdir kafka
+wget http://mirrors.up.pt/pub/apache/kafka/2.1.1/kafka-2.1.1-src.tgz
+tar -xvf kafka-2.1.1-src.tgz -C kafka
+rm -r *.tgz
