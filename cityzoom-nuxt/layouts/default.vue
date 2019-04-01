@@ -1,15 +1,20 @@
+import middleware from '../.nuxt/middleware';
 <template>
-  <div style="background-color: darkgray">
+  <div v-if="$store.state.jwt != ''" style="background-color: darkgray">
     <Navbar />
     <Header />
     <div style="margin-top: 100px; margin-left: 100px;">
       <nuxt />
     </div>
   </div>
+  <div v-else>
+    <nuxt />
+  </div>
 </template>
 
 <script>
 export default {
+  middleware: 'auth'
 }
 </script>
 

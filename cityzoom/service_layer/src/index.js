@@ -10,8 +10,9 @@ require('./db/mongoose')
 
 /* Server setup configurations */
 //Token generation secret. TODO: CHANGE TO ENVIRONMENT VARIABLE LATER
-const TOKEN_GENERATION_SECRET = 'cityzoomsecret'
-module.exports = { TOKEN_GENERATION_SECRET }
+process.env = {
+    jwtPrivateKey: "cityzoomsecret"
+}
 
 //Imports routes
 const accountRouter = require('./routes/user')
@@ -34,6 +35,19 @@ process.on('unhandledRejection', (ex) => {
     fs.appendFileSync('uncaught.log', new Date().toISOString() + " - unhandledRejection - " + ex + '\n');
     uncaughtDebug(ex)
 })
+
+app.use((req, res, next) => {
+    var allowedOrigins = ['http://127.0.0.1:8020', 'http://localhost:8020', 'http://127.0.0.1:3000', 'http://localhost:3000'];
+    var origin = req.headers.origin;
+    if (allowedOrigins.indexOf(origin) > -1) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    }
+    //res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:8020');
+    res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.header('Access-Control-Allow-Credentials', true);
+    return next();
+});
 
 app.use(morgan('dev'))
 app.use(helmet())

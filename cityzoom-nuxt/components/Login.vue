@@ -1,9 +1,8 @@
 <template>
     <form>
-        <input v-model="email" type="text">
+        <input v-model="username" type="text">
         <input v-model="pw" type="password">
         <button type="button" v-on:click="login">login</button>
-        <lasterror :error="error"/>
       </form>
 </template>
 
@@ -11,20 +10,16 @@
 export default {
     data() {
         return {
-            email: 'test2@gmail.com',
-            pw: 'test123',
-            error: ''
+            username: 'skrt2',
+            pw: '12345',
         }
     },
     methods: {
         async login() {
             const res = await this.$store.dispatch('user_login',{
-                email: this.email,
+                username: this.username,
                 password: this.pw
             })
-            if(res && res.response) { 
-                this.error = res.response.data ? res.response.data : res.response
-            }
         },
     }
 }

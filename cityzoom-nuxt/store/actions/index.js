@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 function getUrl(){
-    return process.client ? process.env.expressApi : process.env.serverside;
+    return process.client ? "http://localhost:8002" : "http://localhost:8002";
 }
 
 export default{
@@ -19,11 +19,12 @@ export default{
 
         try {
             const token = payload;
+            console.log(token)
             const res = await axios({
                 method: 'get',
-                url: getUrl() + '/user/renewdata',
+                url: getUrl() + '/user/me',
                 headers: {
-                    'x-auth-token': token
+                    'Authorization': token
                 }
             })
             dispatch('userdata_store', { data: res.data })
@@ -62,12 +63,18 @@ export default{
             if (process.client && state.socket) {
                 state.socket.emit('login', { jwt: state.jwt })
             }
-            this.$router.push('/')
+            this.$router.push('/homepage')
 
         } catch (err) {
             console.error('Error', err.message)
             return err
         }
 
-    }
+    },
+    userdata_store: function ({ commit, state }, payload) {
+
+        const {token} = payload.data
+        commit('SET_STORE', { jwt:token });
+
+    },
 }

@@ -1,3 +1,4 @@
+import Vuex from 'vuex'
 import Vue from 'vue'
 import state from './state'
 import mutations from './mutations'
