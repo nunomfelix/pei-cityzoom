@@ -46,6 +46,6 @@ const createType = async stream_name => {
 //     .catch(e => console.log('Error creating topic: ', e))
 
 module.exports = {
-  createType,
+  createStream,
   admin
 }
