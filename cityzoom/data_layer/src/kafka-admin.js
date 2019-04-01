@@ -18,19 +18,25 @@ const kafka = new Kafka({
 const admin = kafka.admin()
 
 const createStream = async stream_name => {
-    await admin.connect()
-                .then(console.log('Connection to kafka established succesfully'))
-    await admin.createTopics({
-        timeout: 30000,
-        topics: [{
-            topic: stream_name,
-            numPartitions: 5,
-            replicationFactor: 2
-        }]
+  var createdTopic = false;
+  await admin.connect()
+              .then(console.log('Connection to kafka established succesfully'))
+  await admin.createTopics({
+      timeout: 30000,
+      topics: [{
+          topic: stream_name,
+          numPartitions: 5,
+          replicationFactor: 2
+      }]
+  })
+    .then(e => {
+      console.log(`Topic ${stream_name} ` + ( e ? 'created' : 'already exists!' ))
+      createdTopic = e;
     })
-      .then(e => console.log(`Topic ${stream_name} ` + ( e ? 'created' : 'already exists!' )))
-      .catch(e => console.log(`Error @ creating topic ${type}, exit status: ${e}`))
-    admin.disconnect()
+    .catch(e => console.log(`Error @ creating topic ${type}, exit status: ${e}`))
+  admin.disconnect()
+
+  return e
 }
 
 //var topic_to_create = 'temperature_'+Number(new Date())
