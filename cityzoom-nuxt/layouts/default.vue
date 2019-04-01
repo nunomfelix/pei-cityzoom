@@ -3,7 +3,7 @@ import middleware from '../.nuxt/middleware';
   <div v-if="$store.state.jwt != ''" style="background-color: darkgray">
     <Navbar />
     <Header />
-    <div style="margin-top: 100px; margin-left: 100px;">
+    <div style="margin-top: 120px; margin-left: 120px; margin-right: 40px;">
       <nuxt />
     </div>
   </div>
