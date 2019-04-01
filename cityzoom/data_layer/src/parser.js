@@ -7,7 +7,9 @@
  * delete stream         -> localhost:8000/czb/stream (DELETE)
  * 
  */
-const joi = require('joi')
+const {run,genDataCreationPayload}= require('./kafka-producer')
+const create = require('./kafka-admin')
+const Joi = require('joi')
 const mongoose = require('mongoose')
 const express = require('express')
 const router = express.Router()
@@ -30,7 +32,7 @@ const streamSchema = new mongoose.Schema({
     type:{
         type: String,
         required: true,
-        minlength: 5,
+        minlength: 4,
         maxlength: 30
     },
     ttl:{
@@ -42,26 +44,43 @@ const streamSchema = new mongoose.Schema({
         type: Number,
          min: 10,
          max: 200
+    },
+    timestamp: {
+         type: Number
     }
 })
+
 
 const Stream = mongoose.model('Stream',streamSchema)
 
 router.post('/', async (req,res) => {
-    const { error} = validatePutData(req.body);
+    const {error} = validateCreate(req.body);
     if(error) return res.status(400).send(error.details[0].message);
-   
+    //temp
+    var account = 'user_1'
+    //kafka
+    var create = create.createType(req.body.name)
     console.log(req.body)
+    console.log(create)
+    const stream = new Stream(req.body)
+    await stream.save()
    
-    let stream = new Stream({
-        name: req.body.name
-    })
-   
-    stream = await stream.save()
-   
+    if( req.body.periodicity !=0){
+        req.body.periodicity 
+    }
+    else {
+        req.body.periodicity = 1200
+    }
+    
     res.send({
-        status: 'create stream OK'
+        status:'read data in stream OK' ,       
+        name: req.body.name,
+        account,
+        periodicity:req.body.periodicity 
     })
+    
+    
+    res.send()
 })
 
 router.get('/', (req,res) => {
@@ -113,8 +132,13 @@ function validatePutData(stream){
 }
 
 function validateCreate(stream){
-    const schema = { name: Joi.string().min(4).required(),
-                     type: Joi.string().min(4).required()                
+    const schema = { 
+        name:        Joi.string().min(4).required(),
+        type:        Joi.string().min(4).required(),
+        description: Joi.string(),
+        mobile:      Joi.boolean(),
+        periodicity: Joi.number().integer().positive(),
+        ttl:         Joi.number().integer().positive()
     }
     return Joi.validate(stream,schema)
 }

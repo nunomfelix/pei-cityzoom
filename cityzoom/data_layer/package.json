@@ -4,8 +4,8 @@
   "description": "data layer API",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
     "test": "node test-modules.js"
   },
   "author": "ZePaiva",
@@ -15,7 +15,7 @@
     "joi": "^14.3.1",
     "kafka-node": "^4.0.3",
     "kafkajs": "^1.5.1",
-    "mongoose": "^5.4.20"
+    "mongoose": "^5.0.1"
   },
   "devDependencies": {
     "nodemon": "^1.18.10"

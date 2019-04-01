@@ -17,11 +17,16 @@ const kafka = new Kafka({
 const topic = 'temp'
 const consumer = kafka.consumer({ groupId: 'test-group' })
 
-const run = async () => {
+const run = async (stream_name) => {
   await consumer.connect()
-  await consumer.subscribe({ topic })
+  await consumer.subscribe({ stream_name })
   await consumer.run({
     eachBatch: async ({ batch }) => {
+      /* TO DO:
+       *  -> stop consumer after a certain amount of time 
+       *  -> send the last committed offset to data layer database
+       *  -> send the batch to data layer with the offset 
+      */
       console.log(`${batch.messages}`)
     },
     // eachMessage: async ({ topic, partition, message }) => {
