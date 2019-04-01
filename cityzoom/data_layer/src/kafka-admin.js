@@ -17,7 +17,7 @@ const kafka = new Kafka({
 // kafka admin
 const admin = kafka.admin()
 
-const createType = async stream_name => {
+const createStream = async stream_name => {
     await admin.connect()
                 .then(console.log('Connection to kafka established succesfully'))
     await admin.createTopics({
@@ -35,11 +35,11 @@ const createType = async stream_name => {
 
 //var topic_to_create = 'temperature_'+Number(new Date())
 //
-createType('temp')
+//createType('temp')
 //     .then(e => console.log('Topic ', topic_to_create, ' created: ', e))
 //     .catch(e => console.log('Error creating topic: ', e))
 
 module.exports = {
-  createType,
+  createStream,
   admin
 }

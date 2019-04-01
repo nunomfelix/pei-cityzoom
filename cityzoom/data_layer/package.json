@@ -4,9 +4,9 @@
   "description": "data layer API",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
-    "test": "node test-modules.js"
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "node test/test-modules.js"
   },
   "author": "ZePaiva",
   "license": "MIT",

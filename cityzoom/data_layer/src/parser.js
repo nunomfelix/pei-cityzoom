@@ -54,10 +54,16 @@ router.post('/', async (req,res) => {
     console.log(req.body)
    
     let stream = new Stream({
-        name: req.body.name
+        name: req.body.name,
+        type: req.body.type
     })
    
     stream = await stream.save()
+    .then((result) => {
+        console.log('saved: ', result)    
+    }).catch((err) => {
+        console.log('error: ', err)
+    });
    
     res.send({
         status: 'create stream OK'
