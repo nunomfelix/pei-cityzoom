@@ -42,6 +42,7 @@ module.exports = {
   ** Nuxt.js modules
   */
   modules: [
+    "nuxt-svg",
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
     // Doc: https://bootstrap-vue.js.org/docs/

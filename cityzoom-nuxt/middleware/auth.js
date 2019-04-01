@@ -19,6 +19,5 @@ export default async function(context) {
             const error = await context.store.dispatch('renew_data', jwt )
             if(!error) return;
         } 
-        console.log(jwt)
     } 
 }
