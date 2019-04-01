@@ -45,7 +45,7 @@ async function get_ipma_data(cities){
         var tmp = {}
         var globalIdLocal = city_ids.get(city_codes[cities[i]])
         var city_info = await axios.get('http://api.ipma.pt/open-data/forecast/meteorology/cities/daily/' + globalIdLocal + '.json')
-        tmp['Temperature'] = (parseFloat(city_info.data.data[0].tMin) + parseFloat(city_info.data.data[0].tMax))/2
+        tmp['Temperature'] = ((parseFloat(city_info.data.data[0].tMin) + parseFloat(city_info.data.data[0].tMax))/2).toFixed(2)
         tmp['PrecipProbability'] = parseFloat(city_info.data.data[0].precipitaProb)
 
         data[cities[i]] = tmp
