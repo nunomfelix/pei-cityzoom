@@ -35,6 +35,7 @@ module.exports = {
   */
   plugins: [
     '~/plugins/core-components.js',
+    {src: "~/plugins/vue-grid.js", ssr: false}
   ],
 
   /*

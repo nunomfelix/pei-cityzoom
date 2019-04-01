@@ -82,7 +82,7 @@ export default {
     methods: {
         changeTab(path) {
             this.currentTab = path
-            this.router.navigate(['/' + path])
+            this.$router.push('/' + path)
         },
         toggleSidebar(bool) { 
             if(this.timeout)
@@ -119,6 +119,7 @@ $sidebar-right-size: 180px;
   display: flex;
   width: $sidebar-size;
   height: 100%;
+  top: 0;
   z-index: 4444;
 
   &.collapsed {

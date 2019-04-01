@@ -2,7 +2,9 @@
   <div style="background-color: darkgray">
     <Navbar />
     <Header />
-    <nuxt />
+    <div style="margin-top: 100px; margin-left: 100px;">
+      <nuxt />
+    </div>
   </div>
 </template>
 
