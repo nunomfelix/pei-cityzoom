@@ -37,9 +37,6 @@ async function get_ipma_data(cities){
     districts.data.data.forEach(e => {
         city_ids.set(e.idAreaAviso, e.globalIdLocal)
     })
-    
-    //Get data of cities
-    var data = {}
 
     for(i=0; i<cities.length; i++){
         var tmp = {}
@@ -47,19 +44,37 @@ async function get_ipma_data(cities){
         var city_info = await axios.get('http://api.ipma.pt/open-data/forecast/meteorology/cities/daily/' + globalIdLocal + '.json')
         tmp['Temperature'] = ((parseFloat(city_info.data.data[0].tMin) + parseFloat(city_info.data.data[0].tMax))/2).toFixed(2)
         tmp['PrecipProbability'] = parseFloat(city_info.data.data[0].precipitaProb)
+        location = {'lat': city_info.data.data[0].latitude,
+                    'long': city_info.data.data[0].longitude}
 
-        data[cities[i]] = tmp
+        
+        send_ipma_data(tmp, location)
+        
     }
 
-    send_ipma_data(data)
-
 }
 
-async function send_ipma_data(data){
+async function send_ipma_data(data, location){
     console.log(data)
-    //Broker uri
+    //Make a post
+    axios.post('192.136.93.14:3000', {
+        'name': 'ipma_stream',
+        'description': 'ipma_stream',
+        'mobile': false,
+        'type': 'ipma_post',
+        'ttl': 120000,
+        'periodicity': 1200
+    }).catch( ()=> {console.log('Failed to post to 192.136.93.14:3000')})
 
-    //Post data
+    //Make a put
+    axios.put('192.136.93.14:8001', {
+        'stream_name': 'ipma_stream',
+        'value': data,
+        'location': {
+            'latitude' : location['lat'],
+            'longitude' : location['long']
+        }
+    }).catch( ()=> {console.log('Failed to put to 192.136.93.14:3000')})
 }
  
-//get_ipma_data(['Aveiro', 'Coimbra', 'Viseu', 'Funchal'])
+get_ipma_data(['Aveiro'])
