@@ -28,6 +28,8 @@ module.exports = {
   ** Global CSS
   */
   css: [
+    { src: '~/assets/global.scss', lang: 'scss' },
+    { src: '~/node_modules/dc/style/dc.scss', lang: 'scss' },
   ],
 
   /*

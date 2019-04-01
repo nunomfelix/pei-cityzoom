@@ -11,9 +11,6 @@
           <img @click="homeButton()" src="~/static/icons/sidebar/big_logo.png">
         </div>
         <div class="sidebar_row_left">
-          <!-- <div class="small_logo">
-            <img @click="homeButton()" src="~/static/icons/sidebar/logo.png">
-          </div> -->
         </div>
         <div class="sidebar_row_right">
         </div>
@@ -41,32 +38,32 @@ export default {
       sidebarTabs: [
         {
           path: "dominios/metrica",
-          img: 'dominios.png',
+          img: 'dominios.svg',
           name: "Domínios"
         },
         {
           path: "dispositivos",
-          img: "dispositivos.png",
+          img: "dispositivos.svg",
           name: "Dispositivos"
         },
         {
           path: "operacoes",
-          img: "operacoes.png",
+          img: "operacoes.svg",
           name: "Operações"
         },
         {
           path: "notificacoes",
-          img: "notificacoes.png",
+          img: "notificacoes.svg",
           name: "Notificações"
         },
         {
           path: "equipa",
-          img: "equipa.png",
+          img: "equipa.svg",
           name: "Equipa"
         },
         {
           path: "definicoes",
-          img: "settings.png",
+          img: "settings.svg",
           name: "Definições"
         }
       ],
@@ -107,7 +104,7 @@ export default {
 </script>
 
 <style lang="scss">
-$sidebar-size: 260px;
+$sidebar-size: 205px;
 $sidebar-left-size: 80px;
 $sidebar-right-size: 180px;
 @import "~/assets/mixins.scss";
@@ -144,7 +141,7 @@ $sidebar-right-size: 180px;
       background-color: transparent;
 
       &.sidebar_header {
-        height: 100px !important;
+        height: 90px !important;
         background: linear-gradient(to bottom, #0f589c, #147bdb) white;
         background-position-x: -3px;
         background-repeat-y: no-repeat;
@@ -157,10 +154,7 @@ $sidebar-right-size: 180px;
           & img {
             &:hover {
               cursor: pointer;
-              transform: scale(1.05);
-              &:active {
-                transform: scale(1);
-              }
+              transform: scale(1.03);
             }
             height: 90px;
             width: 220px;
@@ -169,7 +163,7 @@ $sidebar-right-size: 180px;
 
       &:not(.sidebar_header) {
         &:not(.selected) {
-          @include clickable(rgba(0, 176, 207, 0.527));
+          @include clickable(rgba(0, 2, 121, 0.527));
         }
         height: 55px;
         font-size: 1.1rem;
@@ -186,12 +180,6 @@ $sidebar-right-size: 180px;
         height: 100%;
         & img {
           transform: scale(1.4);
-        }
-        & .small_logo {
-          & img {
-            height: 40px;
-            width: 40px;
-          }
         }
       }
 
