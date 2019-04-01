@@ -1,0 +1,30 @@
+{
+  "name": "service_layer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^1.18.10"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "debug": "^4.1.1",
+    "express": "^4.16.2",
+    "express-async-errors": "^3.1.1",
+    "helmet": "^3.16.0",
+    "joi": "^14.3.1",
+    "joi-objectid": "^2.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.4.19",
+    "mongoose-unique-validator": "^2.0.2",
+    "morgan": "^1.9.1",
+    "validator": "^10.11.0"
+  }
+}
