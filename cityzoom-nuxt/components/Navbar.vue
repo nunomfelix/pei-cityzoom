@@ -6,7 +6,7 @@
     @mouseleave="toggleSidebar(true)"
   >
     <div class="sidebar">
-      <div class="sidebar_row header" :class="{'collapsed': collapsed}">
+      <div class="sidebar_row sidebar_header" :class="{'collapsed': collapsed}">
         <div class="sidebar_row_left"></div>
         <div class="sidebar_row_right">
           <div class="logo_aveiro">
@@ -38,39 +38,39 @@ export default {
             sidebarTabs: [
                 {
                 path: 'dominios/metrica',
-                img: 'assets/icons/sidebar/dominios.svg',
+                img: '~/assets/icons/sidebar/dominios.svg',
                 name: 'Domínios'
                 }, {
                 path: 'dispositivos',
-                img: 'assets/icons/sidebar/dispositivos.svg',
+                img: '~/assets/icons/sidebar/dispositivos.svg',
                 name: 'Dispositivos'
                 }, {
                 path: 'operacoes',
-                img: 'assets/icons/sidebar/operacoes.svg',
+                img: '~/assets/icons/sidebar/operacoes.svg',
                 name: 'Operações'
                 }, {
                 path: 'notificacoes',
-                img: 'assets/icons/sidebar/notificacoes.svg',
+                img: '~/assets/icons/sidebar/notificacoes.svg',
                 name: 'Notificações'
                 }, {
                 path: 'comunicacao',
-                img: 'assets/icons/sidebar/comunicacao.svg',
+                img: '~/assets/icons/sidebar/comunicacao.svg',
                 name: 'Comunicação'
                 }, {
                 path: 'reportes',
-                img: 'assets/icons/sidebar/reports.svg',
+                img: '~/assets/icons/sidebar/reports.svg',
                 name: 'Indicadores ISO'
                 }, {
                 path: 'market',
-                img: 'assets/icons/sidebar/market.svg',
+                img: '~/assets/icons/sidebar/market.svg',
                 name: 'Market'
                 }, {
                 path: 'equipa',
-                img: 'assets/icons/sidebar/equipa.svg',
+                img: '~/assets/icons/sidebar/equipa.svg',
                 name: 'Equipa'
                 }, {
                 path: 'definicoes',
-                img: 'assets/icons/sidebar/settings.svg',
+                img: '~/assets/icons/sidebar/settings.svg',
                 name: 'Definições'
                 }
             ],
@@ -109,7 +109,7 @@ export default {
 $sidebar-size: 260px;
 $sidebar-left-size: 80px;
 $sidebar-right-size: 180px;
-@import "~/assets/mixins";
+@import "~/assets/mixins.scss";
 
 .sidebarWrapper {
   @include transition(width, 0.3s, ease, 0.005s);
@@ -128,9 +128,9 @@ $sidebar-right-size: 180px;
     }
   }
 
-  box-shadow: 3px 3px 10px 0px #c9c9c9;
-  -webkit-box-shadow: 3px 3px 10px 0px #c9c9c9;
-  -moz-box-shadow: 3px 3px 10px 0px #c9c9c9;
+  box-shadow: 3px 3px 10px 0px #4d4c4c;
+  -webkit-box-shadow: 3px 3px 10px 0px #4d4c4c;
+  -moz-box-shadow: 3px 3px 10px 0px #4d4c4c;
 
   & .sidebar {
     position: relative;
@@ -141,10 +141,9 @@ $sidebar-right-size: 180px;
       @include flex(center, center);
       background-color: transparent;
 
-      &.header {
-        height: 157px;
-        background: linear-gradient(to bottom, #0024f185, #0024f1),
-          url("/assets/icons/sidebar/padrao2.jpg");
+      &.sidebar_header {
+        height: 157px !important;
+        background: linear-gradient(to bottom, #0024f18e, #0024f1) white;
         background-position-x: -3px;
         background-repeat-y: no-repeat;
       }
