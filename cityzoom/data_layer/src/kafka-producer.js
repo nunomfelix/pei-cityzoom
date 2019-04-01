@@ -92,16 +92,33 @@ const run = async payload => {
   await producer.disconnect()
 }
 
+const genDataCreationPayload = (account_name, stream_name, value, timestamp, location=[180.0,90.0]) => {
+  return {
+    acks: 1,
+    topic: stream_name,
+    messages: [
+      {
+        key: account_name,
+        value: JSON.stringify({
+          value,
+          location,
+          timestamp,
+        })
+      }
+    ]
+  }
+}
+
 // test payload
-const payload = {
-  acks: 1,
-  timeout: 1000,
-  topic: 'temp',
-  messages: [
-    {
-        key: 'con',
-        value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key0'}),
-    },
+// const payload = {
+//   acks: 1,
+//   timeout: 1000,
+//   topic: 'temp',
+//   messages: [
+//     {
+//         key: 'con',
+//         value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key0'}),
+//     },
 //    {
 //        key: 'key1',
 //        value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key1'}),
@@ -138,14 +155,14 @@ const payload = {
 //        key: 'key9',
 //        value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key9'}),
 //    }
-  ]
-}
-
-run(payload).catch(e => console.error(JSON.parse(e)))
-
-
+//   ]
+// }
+// 
+// run(payload).catch(e => console.error(JSON.parse(e)))
+// 
+// 
 
 module.exports = {
     run,
-    payload
-}// 
+    genDataCreationPayload
+}
