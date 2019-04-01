@@ -7,7 +7,7 @@
  * delete stream         -> localhost:8000/czb/stream (DELETE)
  * 
  */
-const joi = require('joi')
+const Joi = require('joi')
 const mongoose = require('mongoose')
 const express = require('express')
 const router = express.Router()
@@ -48,7 +48,7 @@ const streamSchema = new mongoose.Schema({
 const Stream = mongoose.model('Stream',streamSchema)
 
 router.post('/', async (req,res) => {
-    const { error} = validatePutData(req.body);
+    const { error} = validateCreate(req.body);
     if(error) return res.status(400).send(error.details[0].message);
    
     console.log(req.body)
@@ -113,8 +113,13 @@ function validatePutData(stream){
 }
 
 function validateCreate(stream){
-    const schema = { name: Joi.string().min(4).required(),
-                     type: Joi.string().min(4).required()                
+    const schema = { 
+        name:        Joi.string().min(4).required(),
+        type:        Joi.string().min(4).required(),
+        description: Joi.string(),
+        mobile:      Joi.boolean(),
+        periodicity: Joi.number().integer().positive(),
+        ttl:         Joi.number().integer().positive()
     }
     return Joi.validate(stream,schema)
 }
