@@ -6,14 +6,16 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "test": "node test/test-modules.js"
+    "consumer": "node test/test_consumer.js",
+    "creator": "node test/test_create.js",
+    "producer": "node test/test_produce.js",
+    "test": "node test/test_all.js"
   },
   "author": "ZePaiva",
   "license": "MIT",
   "dependencies": {
     "express": "^4.16.4",
     "joi": "^14.3.1",
-    "kafka-node": "^4.0.4",
     "kafkajs": "^1.5.1",
     "mongoose": "^5.0.1"
   },

@@ -61,7 +61,7 @@ router.post('/', async (req, res) => {
     var account = 'user_1'
     //kafka
 
-    await create.createStream(req.body.name)
+    var created = await create.createStream(req.body.name)
 
     console.log(req.body)
 
@@ -81,7 +81,7 @@ router.post('/', async (req, res) => {
         req.body.periodicity = 1200
     }
 
-    res.send({
+    res.status(201).send({
         status: 'Created data stream',
         name: req.body.name,
         account,
@@ -93,19 +93,15 @@ router.post('/', async (req, res) => {
 
 router.get('/values', async (req, res) => {
 
-    //const {error} = validateQueryString(req.body);
-    // if(error) return res.status(400).send(error.details[0].message);
+    const { error } = validateQueryString(req.query);
+    if (error) return res.status(400).send(error.details[0].message);
 
     const query = await Stream
-        .find(req.query)
+        .findOne(req.query)
 
-    console.log('caralho')
-    console.log(query.name)
-
-    const c = consumer.readData(query.name)
-
+    console.log(req.query)
+    const c = consumer.readData(query.stream)
     console.log(c)
-    //console.log(req.query) 
     res.send(
         console.log(query)
     )
@@ -126,13 +122,13 @@ router.put('/', async (req, res) => {
 
     if (!stream_name) return res.status(404).send('The stream with the given name was not found');
 
+    console.log(req.body)
     var payload = prod.genDataCreationPayload('user_1', req.body.stream_name, req.body.value, Number(new Date()), req.body.location)
+    console.log(payload)
     prod.putData(payload)
 
     //console.log(req)
-    res.send({
-        status: 'put data in stream OK'
-    })
+    res.status(200)
 })
 
 
@@ -146,10 +142,11 @@ router.delete('/', async (req, res) => {
     })
 })
 
-function validateQueryString(strean) {
+function validateQueryString(stream) {
     const schema = {
-        stream_name: Joi.string().min(4).required(),
-        interval: Joi.number()
+        stream: Joi.string().min(4).required(),
+        interval_start: Joi.number(),
+        interval_end: Joi.number()
     }
     return Joi.validate(stream, schema)
 }

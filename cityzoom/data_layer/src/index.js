@@ -4,9 +4,6 @@ mongooseDebug = require('debug')('app:Mongoose')
 
 // my modules
 const parser = require('./parser')
-const producer = require('./kafka-producer')
-const consumer = require('./kafka-producer')
-const admin = require('./kafka-admin')
 
 const app = express()
 app.use(express.json())
@@ -20,7 +17,6 @@ mongoose.connect('mongodb://localhost/city_zoom_data_layer', )
 //     console.log(v)
 // })
 app.use('/czb/stream', parser)
-
 const connectionURL = 'mongodb://127.0.0.1:27017/'
 const databaseName = 'city_zoom_service_layer'
 
