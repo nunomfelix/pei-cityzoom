@@ -1,0 +1,8 @@
+{
+    "app": {
+        "protocol": "http",
+        "host": "localhost",
+        "port": 8002
+    },
+    "TOKEN_GENERATION_SECRET": "cityzoomsecret"
+}
