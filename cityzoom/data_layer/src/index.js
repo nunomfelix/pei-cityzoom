@@ -1,19 +1,22 @@
-
 const mongoose = require('mongoose')
 const express = require('express')
+const { fetch } = require('./fetcher')
+const config = require('config')
 mongooseDebug = require('debug')('app:Mongoose')
 
 // my modules
 const parser = require('./parser')
-const producer = require('./kafka-producer')
-const consumer = require('./kafka-producer')
-const admin = require('./kafka-admin')
 
 const app = express()
-
 app.use(express.json())
 
-app.use('/czb/stream', parser)
+    .then(() => {
+        console.log('Connected to MongoDB...')
+        fetch(config.get('FETCHING_PERIOD'))
+    })
+    .catch(() => console.log('Could not connect to MongoDB...'))
+
+app.use('/czb/stream', parser.router)
 
 const connectionURL = 'mongodb://127.0.0.1:27017/'
 const databaseName = 'city_zoom_service_layer'
@@ -23,4 +26,6 @@ mongoose.connect(connectionURL + databaseName, {
     useCreateIndex: true
 }, () => mongooseDebug("Connected to mongo database!"))
 
-app.listen(8001, () => { console.log('listen in port 8001') })
+app.listen(8001, () => {
+    console.log('listen in port 8001')
+})
