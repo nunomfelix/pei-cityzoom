@@ -25,6 +25,8 @@ router.post('/login',
     async (req, res) => {
         const user = await User.findOne({ username: req.body.username })
         if (!user) return res.status(400).send('Invalid Credentials')
+        userDebug(req.body.password)
+        userDebug(user.password)
         const isMatch = await bcrypt.compare(req.body.password, user.password)
         if (!isMatch) return res.status(400).send('Invalid Credentials')
 
@@ -85,7 +87,7 @@ router.get('/me',
         [500] Internal server error
 */
 router.post('',
-    validationMiddleware(validateCreateUser, 'body'),
+    [validationMiddleware(validateCreateUser, 'body')],
     async (req, res) => {
         const user = new User(req.body)
         await user.save()
@@ -124,7 +126,7 @@ router.get('',
         [500] Internal server error
 */
 router.get('/:id',
-    validationMiddleware(validateId, 'params', 'Invalid ID'),
+    [authentication, validationMiddleware(validateId, 'params', 'Invalid ID')],
     async (req, res) => {
         const user = await User.findById(req.params.id)
         if (!user) {
@@ -146,7 +148,7 @@ router.get('/:id',
         [500] Internal server error
 */
 router.delete('/:id',
-    validationMiddleware(validateId, 'params', 'User not found'),
+    [authentication, validationMiddleware(validateId, 'params', 'User not found')],
     async (req, res) => {
         const user = await User.deleteOne({ _id: req.params.id })
         if (!user) {
@@ -171,9 +173,10 @@ router.delete('/:id',
         [500] Internal server error
 */
 router.patch('/:id', [
-        validationMiddleware(validateId, 'params', 'User not found'),
-        validationMiddleware(validatePatch, 'body', 'Not allowed to update')
-    ],
+    authentication,
+    validationMiddleware(validateId, 'params', 'User not found'),
+    validationMiddleware(validatePatch, 'body', 'Not allowed to update')
+],
     async (req, res) => {
         const user = await User.findById(req.params.id)
         if (!user) {
@@ -181,7 +184,7 @@ router.patch('/:id', [
             return res.status(404).send('User not found')
         }
         //Used this instead of FindOneAndModify because that function does not run the password hashing code
-        user = {...user, ...req.body}
+        user = { ...user, ...req.body }
         await user.save()
         userDebug(`User ${user.name} successfully updated`)
         res.status(200).send(user)

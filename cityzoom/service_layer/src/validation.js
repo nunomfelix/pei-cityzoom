@@ -34,9 +34,36 @@ function validateLogin(object) {
     return Joi.validate(object, schema)
 }
 
+function validateGetAllStreams(object) {
+    const schema = Joi.object().keys({
+        interval_start: Joi.number().integer(),
+        interval_end: Joi.number().integer()
+    })
+    return Joi.validate(object, schema)
+}
+
+function validateGetStreamByID(object) {
+    const schema = Joi.object().keys({
+        stream_name: Joi.string().required()
+    })
+    return Joi.validate(object, schema)
+}
+
+function validateGetDataFromStream(object) {
+    const schema = Joi.object().keys({
+        stream_name: Joi.string().required(),
+        interval_start: Joi.number().integer(),
+        interval_end: Joi.number().integer()
+    })
+    return Joi.validate(object, schema)
+}
+
 module.exports = {
     validateId,
     validatePatch,
     validateCreateUser,
-    validateLogin
+    validateLogin,
+    validateGetAllStreams,
+    validateGetDataFromStream,
+    validateGetStreamByID
 }

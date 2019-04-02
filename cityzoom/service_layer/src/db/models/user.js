@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const uniqueValidator = require('mongoose-unique-validator')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const { TOKEN_GENERATION_SECRET } = require('../../index')
+const config = require('config')
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -35,7 +35,7 @@ userSchema.plugin(uniqueValidator)
 
 userSchema.methods.generateAuthToken = async function () {
     const user = this
-    const token = jwt.sign({ username: user.username }, TOKEN_GENERATION_SECRET, { expiresIn: '1 day' })
+    const token = jwt.sign({ username: user.username }, config.get('TOKEN_GENERATION_SECRET'), { expiresIn: '1 day' })
     user.token = token
     await user.save()
     return token
