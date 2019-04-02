@@ -5,7 +5,7 @@ const localhost = process.env.HOST || '127.0.0.1'
 // logger
 const fixedLogs = logLevel => ({ namespace, level, label, log }) => {
     const { timestamp, logger, message, ...others } = log 
-    console.log(`[${timestamp}] ${label} [${namespace}]: ${message} Failure: ${others.error}`)
+    console.log(`{ERROR GENERATED @ KAFKA-CONSUMER} [${timestamp}] ${label} [${namespace}]: ${message} Failure: ${others.error}`)
 }
 
 const kafka = new Kafka({
@@ -14,29 +14,57 @@ const kafka = new Kafka({
   logCreator: fixedLogs
 })
 
-const topic = 'temp'
 const consumer = kafka.consumer({ groupId: 'test-group' })
 
-const run = async (stream_name) => {
-  await consumer.connect()
-  await consumer.subscribe({ stream_name })
-  await consumer.run({
-    eachBatch: async ({ batch }) => {
-      /* TO DO:
-       *  -> stop consumer after a certain amount of time 
-       *  -> send the last committed offset to data layer database
-       *  -> send the batch to data layer with the offset 
-      */
-      console.log(`${batch.messages}`)
-    },
-    // eachMessage: async ({ topic, partition, message }) => {
-    //   const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`
-    //   console.log(`- ${prefix} ${message.key}#${message.value}`)
-    // },
+const readData = async stream_name => {
+  new Promise((resolve, reject) => {
+    consumer.connect()
+    console.log(stream_name)
+    consumer.subscribe({ topic: stream_name })
+        .catch(e => {
+          console.log('failed to subscribe to topic', stream_name)
+          console.log('err: ', e)
+          reject(e)
+        })
+    consumer.run({
+      // eachBatch: async ({ batch }) => {
+      //   /* TO DO:
+      //    *  -> stop consumer after a certain amount of time 
+      //    *  -> send the last committed offset to data layer database
+      //    *  -> send the batch to data layer with the offset 
+      //   */
+      //   console.log(`${batch.messages}`)
+      // },
+      eachMessage: async ({ topic, partition, message }) => {
+        const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`
+        console.log(`- ${prefix} ${message.key}#${message.value}`)
+        resolve(`- ${prefix} ${message.key}#${message.value}`)
+      },
+    })
+      .then(e => {
+        console.log('reading')
+        resolve('read')
+      })
+      .catch(e => {
+        console.log('fudeu a ler', e)
+        reject('fail')
+      })
   })
+  setTimeout(() => {
+    console.log('egging')
+    process.exit(0)
+  }, 10000)
 }
 
-run().catch(e => console.error(`[example/consumer] ${e.message}`, e))
+
+// const stream = 'stream_' + Number(new Date())
+module.exports = {
+  readData
+}
+
+//console.log('stream: t_topic1554163799665', '\n')
+//run('t_topic1554163799665').catch(e => console.error(`[example/consumer] ${e.message}`, e))
+
 // 
 // const errorTypes = ['unhandledRejection', 'uncaughtException']
 // const signalTraps = ['SIGTERM', 'SIGINT', 'SIGUSR2']
