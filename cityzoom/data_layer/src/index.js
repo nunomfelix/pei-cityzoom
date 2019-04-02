@@ -20,8 +20,6 @@ mongoose.connect('mongodb://localhost/city_zoom_data_layer', )
 //     console.log(v)
 // })
 app.use('/czb/stream', parser)
-<<<<<<< HEAD
-
 const connectionURL = 'mongodb://127.0.0.1:27017/'
 const databaseName = 'city_zoom_service_layer'
 
@@ -31,7 +29,3 @@ mongoose.connect(connectionURL + databaseName, {
 }, () => mongooseDebug("Connected to mongo database!"))
 
 app.listen(8001, () => { console.log('listen in port 8001') })
-=======
-app.listen(8001, () => { console.log('listen in port 8001') })
-
->>>>>>> lucas

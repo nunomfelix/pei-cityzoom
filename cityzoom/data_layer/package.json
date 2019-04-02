@@ -6,11 +6,7 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-<<<<<<< HEAD
     "test": "node test/test-modules.js"
-=======
-    "test": "node test-modules.js"
->>>>>>> lucas
   },
   "author": "ZePaiva",
   "license": "MIT",

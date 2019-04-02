@@ -10,6 +10,7 @@
 const {run,genDataCreationPayload}= require('./kafka-producer')
 const create = require('./kafka-admin')
 const prod = require('./kafka-producer')
+const consumer = require('./kafka-consumer')
 const Joi = require('joi')
 const mongoose = require('mongoose')
 const express = require('express')
@@ -60,15 +61,15 @@ router.post('/', async (req,res) => {
     var account = 'user_1'
     //kafka
 
-    await create.createType(req.body.name)
+    await create.createStream(req.body.name)
    
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> b1bfd1ed1828056aad6573ec28b08577f2fe5b1a
     console.log(req.body)
    
-    let stream = new Stream({
-        name: req.body.name,
-        type: req.body.type
-    })
+    let stream = new Stream(req.body)
    
     stream = await stream.save()
     .then((result) => {
@@ -76,10 +77,13 @@ router.post('/', async (req,res) => {
     }).catch((err) => {
         console.log('error: ', err)
     });
+<<<<<<< HEAD
 =======
     const stream = new Stream(req.body)
     await stream.save()
 >>>>>>> lucas
+=======
+>>>>>>> b1bfd1ed1828056aad6573ec28b08577f2fe5b1a
    
     if( req.body.periodicity !=0){
         req.body.periodicity 
@@ -105,6 +109,13 @@ router.get('/values', async (req,res) => {
 
     const query = await Stream
         .find(req.query)
+    
+    console.log('caralho')
+    console.log(query.name)
+    
+    const c = consumer.readData(query.name)
+    
+    console.log(c)
     //console.log(req.query) 
     res.send(
         console.log(query) 
@@ -122,12 +133,12 @@ router.put('/',async (req,res) => {
     const {error} = validatePutData(req.body);
     if(error) return res.status(400).send(error.details[0].message);
 
-    const stream_name = await Stream.findOne(req.body.name)
+    const stream_name = await Stream.findOneAndUpdate(req.body.name)
 
     if(!stream_name) return res.status(404).send('The stream with the given name was not found');
     
     var payload = prod.genDataCreationPayload('user_1', req.body.name, req.body.value, Number(new Date()), req.body.location)
-    prod.run(payload)
+    prod.putData(payload)
 
     //console.log(req)
     res.send({

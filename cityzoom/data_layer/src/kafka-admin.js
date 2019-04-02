@@ -16,8 +16,6 @@ const kafka = new Kafka({
 
 // kafka admin
 const admin = kafka.admin()
-
-<<<<<<< HEAD
 const createStream = async stream_name => {
   return new Promise((resolve, reject) => {
     var createdTopic = true;
@@ -50,30 +48,7 @@ const createStream = async stream_name => {
           })
     resolve(createdTopic)
   })
-=======
-const createType = async stream_name => {
-
-    var created = false;
-    await admin.connect()
-                .then(console.log('Connection to kafka established succesfully'))
-    await admin.createTopics({
-        timeout: 30000,
-        topics: [{
-            topic: stream_name,
-            numPartitions: 5,
-            replicationFactor: 2
-        }]
-    })
-      .then(e => {
-          console.log(`Topic ${stream_name} ` + ( e ? 'created' : 'already exists!' ))
-          created = e
-      })
-      .catch(e => console.log(`Error @ creating topic ${type}, exit status: ${e}`))
-    admin.disconnect()
-    return created;
->>>>>>> lucas
 }
-
 const deleteStream = async stream_name => {
   return new Promise((resolve, reject) => {
     var deleteTopic = true;
