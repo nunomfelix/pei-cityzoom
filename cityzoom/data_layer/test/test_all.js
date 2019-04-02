@@ -21,8 +21,9 @@ const produce_test = async stream => {
 }
 
 const consumer_test = async stream => {
+    const recv = (arg) => console.log('Read message: ', arg)
     try {
-        const a = await consumer.readData(stream)
+        const a = await consumer.readData(recv, stream)
     } catch (err) {
         console.log('err', err)
     }
@@ -35,6 +36,6 @@ const delete_test = async stream => {
 }
 
 createStream_test(stream)
-produce_test(stream)
-setTimeout(() => {consumer_test(stream)}, 2000)
-setTimeout(() => {delete_test(stream)}, 50000)
+setTimeout(() => produce_test(stream), 2000)
+setTimeout(() => {consumer_test(stream)}, 10000)
+setTimeout(() => {delete_test(stream); setTimeout(() => process.exit(0), 1000)}, 50000)

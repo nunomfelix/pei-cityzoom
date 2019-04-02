@@ -47,14 +47,16 @@ const readData = async (receiver, stream_name) => {
         resolve('read')
       })
       .catch(e => {
-        console.log('fudeu a ler', e)
+        console.log('fucked up', e)
         reject('fail')
       })
+    setTimeout(() => {
+      console.log('egging')
+      return 0
+    }, 10000)
   })
 }
 
-
-// const stream = 'stream_' + Number(new Date())
 module.exports = {
   readData
 }

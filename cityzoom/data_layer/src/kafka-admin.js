@@ -31,12 +31,12 @@ const createStream = async stream_name => {
             })
               .then(e => {
                 if (e) {
-                  console.log('Topic created')
+                  console.log('Stream created')
                 }
                 createdTopic = e
               })
               .catch(e => {
-                console.log('Exited kafka Successfully');
+                console.log('Exited kafka Successfully \x1b[31m(No Stream Created!!!)');
                 admin.disconnect()
                 reject(e)
               })            
