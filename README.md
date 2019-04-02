@@ -10,3 +10,5 @@ PORTS:
 
   front-end: 3000 (?)
 
+Postman:
+  Find in postman collection utility requests for tests
