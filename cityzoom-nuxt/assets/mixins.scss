@@ -1,0 +1,30 @@
+
+@mixin transition($target, $seconds, $type, $delay) {
+    -webkit-transition: $target $seconds $type $delay;
+    -moz-transition: $target $seconds $type $delay;
+    -ms-transition: $target $seconds $type $delay;
+    -o-transition: $target $seconds $type $delay;
+    transition: $target $seconds $type $delay;
+}
+  
+@mixin clickable($color) {
+    &:hover {
+        cursor: pointer;
+        background-color: $color;
+    }
+}
+
+@mixin unselectable() {
+    user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
+}
+
+@mixin flex($just, $align, $dir: row) {
+    display: flex;
+    justify-content: $just;
+    align-items: $align;
+    flex-direction: $dir;
+}
