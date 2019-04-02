@@ -89,6 +89,7 @@ const valueSchema = new mongoose.Schema({
 const Stream = mongoose.model('Stream',streamSchema)
 const Values = mongoose.model('Value',valueSchema)
 
+// create stream
 router.post('/', async (req,res) => {
     const {error} = validateCreate(req.body);
     if(error) return res.status(400).send(error.details[0].message);
@@ -97,18 +98,17 @@ router.post('/', async (req,res) => {
     var account = 'user_1'
 
     //kafka
-    var exist = Stream.findOne({name: req.body.name})
+    var exist;
+    await Stream.findOne({name: req.body.name}, (err, stream) => {
+        exist = stream
+    })
     if (exist !== null) {
         return res.status(409).send({
             "status": "Stream " + req.body.name + " already exists!"
         })
     }
     await create.createStream(req.body.name)
-    console.log(req.body)
-    console.log(created)
-
     var tstamp = Number(new Date())
-
     var new_stream = {
         name: req.body.name,
         description: req.body.description || '',
@@ -128,13 +128,6 @@ router.post('/', async (req,res) => {
         }).catch((err) => {
             console.log('error: ', err)
         });
-   
-    if( req.body.periodicity !=0){
-        req.body.periodicity 
-    }
-    else {
-        req.body.periodicity = 1200
-    }
 
     res.status(201).send({
         status:'read data in stream OK' ,       

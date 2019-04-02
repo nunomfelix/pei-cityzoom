@@ -14,11 +14,10 @@ const kafka = new Kafka({
   logCreator: fixedLogs
 })
 
-// kafka admin
 const admin = kafka.admin()
-const createStream = async (stream_name) => {
+const createStream = async stream_name => {
   return new Promise((resolve, reject) => {
-    var createdTopic;
+    var createdTopic = true;
     admin.connect()
           .then(() => {
             admin.createTopics({
@@ -31,31 +30,25 @@ const createStream = async (stream_name) => {
               waitForLeaders: true
             })
               .then(e => {
-                console.log('admin: ', e)
                 if (e) {
-                  resolve(true)
                   console.log('Topic created')
-                } else {
-                  resolve(false)
-                  console.log('Topic already created')
                 }
-                resolve(createdTopic)
+                createdTopic = e
               })
               .catch(e => {
                 console.log('Exited kafka Successfully');
-                resolve(false)
                 admin.disconnect()
-                reject(false)
+                reject(e)
               })            
           })
           .catch(e => {
-            console.log('err: ', e)
             console.log('Can\'t connect to kafka')      
-            reject(false)
+            reject(e)
           })
     resolve(createdTopic)
   })
 }
+
 const deleteStream = async stream_name => {
   return new Promise((resolve, reject) => {
     var deleteTopic = true;
