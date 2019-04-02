@@ -40,7 +40,7 @@ module.exports = {
   */
   plugins: [
     '~/plugins/core-components.js',
-    { src: "~/plugins/vue-grid.js", ssr: false }
+    {src: "~/plugins/vue-grid.js", ssr: false}
   ],
 
   /*
@@ -67,7 +67,7 @@ module.exports = {
     ** You can extend webpack config here
     */
     extend(config, ctx) {
-
+      
     }
   }
 }

@@ -19,7 +19,7 @@
           :w="item.w"
           :h="item.h"
           :i="item.i"
-          :minW="4"
+          :minW="6"
           :minH="14"
           :maxH="14"
           drag-allow-from=".widget_handle"
@@ -31,6 +31,9 @@
             <div v-if="item.type=='series'">
               <SeriesGraph :name="item.i"/>
             </div>
+            <div v-if="item.type=='stacked'">
+              <StackedBar :name="item.i"/>
+            </div>
           </div>
         </grid-item>
       </grid-layout>
@@ -40,8 +43,8 @@
 
 <script>
 var testLayout = [
-  { x: 0, y: 0, w: 4, h: 14, i: "series_a", type: 'series' },
-  { x: 8, y: 0, w: 4, h: 14, i: "series_b", type: 'series' },
+  { x: 0, y: 0, w: 6, h: 14, i: "series_a", type: 'series' },
+  { x: 6, y: 0, w: 6, h: 14, i: "series_b", type: 'stacked' },
   { x: 0, y: 14, w: 13, h: 14, i: "series_c", type: 'series' }
 ];
 

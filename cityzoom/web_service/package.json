@@ -21,6 +21,7 @@
     "js-cookie": "^2.2.0",
     "node-sass": "^4.11.0",
     "nuxt": "^2.4.0",
+    "sass": "^1.17.3",
     "sass-loader": "^7.1.0",
     "vue-grid-layout": "^2.3.4"
   },

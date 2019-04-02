@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div v-bind:id="name+'wrapper'" class="dc_wrapper rowc" :class="{'show': show}">
+  <div v-bind:id="name+'wrapper'">
+    <div class="dc_wrapper rowc" :class="{'show': show}">
       <div v-bind:id="name"></div>
       <div v-bind:id="name + 'overview'"></div>
       <button class="btn btn-danger" style="margin-right:30px" @click="reset()">reset</button>
@@ -55,23 +55,6 @@ export default {
       focusChart: null,
       overviewChart: null
     };
-  },
-  computed: {
-    getWidth() {
-      return document.getElementById(this.name + 'wrapper') ? document.getElementById(this.name + 'wrapper').clientWidth : 0
-    },
-    getHeight() {
-      return document.getElementById(this.name + 'wrapper') ? document.getElementById(this.name + 'wrapper').clientHeight : 0
-    }
-  },
-  watch: {
-    getWidth(e) {
-      console.log(e)
-      this.onResize()
-    },
-    getHeight(e) {
-      this.onResize()
-    }
   },
   created() {
     window.addEventListener("resize", this.onResize);
@@ -170,8 +153,6 @@ export default {
       this.overviewChart.render();
       this.focusChart.focus([i * 0.45, i * 0.55]);
       this.onResize();
-
-
     }, 100);
   },
   methods: {
@@ -180,27 +161,28 @@ export default {
     },
 
     onResize() {
-      console.log(this.getWidth)
-      this.focusChart.width(this.getWidth);
-      this.overviewChart.width(this.getWidth*.8);
+      const w = document.getElementById(this.name + "wrapper").offsetWidth;
+      const h = document.getElementById(this.name + "wrapper").offsetHeight;
+
+      this.focusChart.width(w);
+      this.overviewChart.width(w * 0.8);
       this.focusChart.legend(
         this.dc
           .legend()
-          .x(this.getWidth - 80)
-          .y(this.getHeight / 2 - (24 * this.tmpNames.length) / 2)
+          .x(w - 80)
+          .y(h / 2 - (24 * this.tmpNames.length) / 2)
           .itemHeight(13)
           .horizontal(false)
           .gap(15)
-          .legendWidth(1000)
-          .itemWidth(150)
+          .legendWidth(100)
+          .itemWidth(100)
       );
-
       const tmp = this.focusChart.filters()[0]
         ? [this.focusChart.filters()[0][0], this.focusChart.filters()[0][1]]
         : null;
+      this.overviewChart.render();
       this.focusChart.redraw();
       this.focusChart.focus(tmp);
-      this.overviewChart.render();
     }
   }
 };
