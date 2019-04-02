@@ -63,10 +63,6 @@ router.post('/', async (req,res) => {
 
     await create.createStream(req.body.name)
    
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> b1bfd1ed1828056aad6573ec28b08577f2fe5b1a
     console.log(req.body)
    
     let stream = new Stream(req.body)
@@ -77,13 +73,6 @@ router.post('/', async (req,res) => {
     }).catch((err) => {
         console.log('error: ', err)
     });
-<<<<<<< HEAD
-=======
-    const stream = new Stream(req.body)
-    await stream.save()
->>>>>>> lucas
-=======
->>>>>>> b1bfd1ed1828056aad6573ec28b08577f2fe5b1a
    
     if( req.body.periodicity !=0){
         req.body.periodicity 
@@ -137,7 +126,9 @@ router.put('/',async (req,res) => {
 
     if(!stream_name) return res.status(404).send('The stream with the given name was not found');
     
-    var payload = prod.genDataCreationPayload('user_1', req.body.name, req.body.value, Number(new Date()), req.body.location)
+    console.log(req.body)
+    var payload = prod.genDataCreationPayload('user_1', req.body.stream_name, req.body.value, Number(new Date()), req.body.location)
+    console.log(payload)
     prod.putData(payload)
 
     //console.log(req)
