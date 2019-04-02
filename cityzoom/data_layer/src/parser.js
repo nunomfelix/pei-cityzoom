@@ -40,13 +40,11 @@ const streamSchema = new mongoose.Schema({
     },
     ttl: {
         type: Number,
-        min: 10,
-        max: 200
+        min: 10
     },
     periodicity: {
         type: Number,
-        min: 10,
-        max: 200
+        min: 10
     },
     creation: {
         type: Number,
@@ -158,12 +156,12 @@ router.get('/values', async (req, res) => {
 
     console.log(req.query.stream)
 
-    const c = consumer.readData(query.stream)
+    //const c = consumer.readData(insertValueInDB, req.query.stream)
 
     //console.log(c)
     //console.log(req.query) 
     res.send(
-        console.log(query)
+        req.query
     )
 })
 
@@ -230,7 +228,7 @@ router.put('/', async (req, res) => {
     prod.putData(payload)
 
     //console.log(req)
-    res.status(200)
+    res.status(200).send(payload)
 })
 
 router.delete('/', async (req, res) => {
