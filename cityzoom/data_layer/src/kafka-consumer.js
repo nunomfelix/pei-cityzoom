@@ -19,7 +19,6 @@ const consumer = kafka.consumer({ groupId: 'test-group' })
 const readData = async (receiver, stream_name) => {
   return new Promise((resolve, reject) => {
     consumer.connect()
-    console.log(stream_name)
     consumer.subscribe({ topic: stream_name })
         .catch(e => {
           console.log('failed to subscribe to topic', stream_name)
@@ -47,18 +46,16 @@ const readData = async (receiver, stream_name) => {
         resolve('read')
       })
       .catch(e => {
-        console.log('fudeu a ler', e)
+        console.log('fucked up', e)
         reject('fail')
       })
+    setTimeout(() => {
+      console.log('egging')
+      return 0
+    }, 10000)
   })
-  setTimeout(() => {
-    console.log('egging')
-    process.exit(0)
-  }, 10000)
 }
 
-
-// const stream = 'stream_' + Number(new Date())
 module.exports = {
   readData
 }

@@ -93,7 +93,8 @@ const pushData = async payload => {
 const putData = async payload => {
   console.log('Connecting to kafka server...')
   await producer.connect()
-  pushData(payload).catch(e => console.error(JSON.parse(e)))
+  const a = await pushData(payload)
+  console.log(a)
   await producer.disconnect()
 }
 

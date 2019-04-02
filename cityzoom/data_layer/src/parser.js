@@ -89,7 +89,7 @@ const valueSchema = new mongoose.Schema({
 const Stream = mongoose.model('Stream',streamSchema)
 const Values = mongoose.model('Value',valueSchema)
 
-// create stream
+// create stream -- Passing
 router.post('/', async (req,res) => {
     const {error} = validateCreate(req.body);
     if(error) return res.status(400).send(error.details[0].message);

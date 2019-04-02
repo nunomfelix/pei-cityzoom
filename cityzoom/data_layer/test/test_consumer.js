@@ -12,7 +12,7 @@ const rcv = (arg) => {
 var consumer_test = async (rcv, stream) => {
     try {
         const a = await consumer.readData(rcv, stream)
-        console.log('e-', a)
+        console.log('e-',a)
     } catch (err) {
         console.log('err', err)
     }
