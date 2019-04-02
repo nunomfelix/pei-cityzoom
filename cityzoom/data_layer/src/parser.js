@@ -62,8 +62,24 @@ router.post('/', async (req,res) => {
 
     await create.createType(req.body.name)
    
+<<<<<<< HEAD
     const stream = new Stream(req.body)
     await stream.save()
+=======
+    console.log(req.body)
+   
+    let stream = new Stream({
+        name: req.body.name,
+        type: req.body.type
+    })
+   
+    stream = await stream.save()
+    .then((result) => {
+        console.log('saved: ', result)    
+    }).catch((err) => {
+        console.log('error: ', err)
+    });
+>>>>>>> 357b345192e0490a96a8595c8b5571655813e2ed
    
     if( req.body.periodicity !=0){
         req.body.periodicity 

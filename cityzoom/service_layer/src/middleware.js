@@ -24,10 +24,10 @@ function validationMiddleware(method, object, message = null, code = 400) {
 }
 
 async function authentication(req, res, next) {
-    if(!('Authorization' in req.header)) return res.sendStatus(401)
+    if(req.header('Authorization') == null) return res.sendStatus(401)
     const token = req.header('Authorization').replace('Bearer ', '')
-    const decoded = jwt.verify(token, TOKEN_GENERATION_SECRET)
-    const user = await User.findOne({ username: decoded.username, 'tokens.token': token })
+    const decoded = jwt.verify(token, process.env.jwtPrivateKey)
+    const user = await User.findOne({ username: decoded.username, /*'tokens.token': token*/ })
     if (!user) return res.sendStatus(401)
     req.user = user
     next()

@@ -1,63 +1,60 @@
-const { createType }= require('../src/kafka-admin')
+const admin= require('../src/kafka-admin')
 const producer = require('../src/kafka-producer')
 const consumer = require('../src/kafka-consumer')
 
 log = (...args) => console.log('\n', ...args)
 
 // topics for types
-var type = 'temperature_'+Number(new Date())
+const stream = 't_temp'
+const stream_2 = 't_topic'+Number(new Date())
 
-createType(type)
-    .then(e => log('Type ', type, ' created. Exit: ', e))
-    .catch(e => log('Error', e))
-
-// payload data to topic n
-var payload = {
-  topic: type,
-  messages: [
-    {
-        key: 'key0',
-        value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key0'}),
-    },
-    {
-        key: 'key1',
-        value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key1'}),
-    },
-    {
-        key: 'key2',
-        value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key2'}),
-    },
-    {
-        key: 'key3',
-        value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key3'}),
-    },
-    {
-        key: 'key4',
-        value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key4'}),
-    },
-    {
-        key: 'key5',
-        value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key5'}),
-    },
-    {
-        key: 'key6',
-        value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key6'}),
-    },
-    {
-        key: 'key7',
-        value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key7'}),
-    },
-    {
-        key: 'key8',
-        value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key8'}),
-    },
-    {
-        key: 'key9',
-        value: JSON.stringify({data: 'This message is in JSON data-type', key: 'key9'}),
-    },
-  ]
+var createStream_test = async stream => {
+    const res = await admin.createStream(stream)
+    log(`Stream ${stream} created `, res)
 }
 
-producer.run(payload)
-    .then(e => log('Data logged succesfully', e))
-    .catch(e => console.error(JSON.parse(e)))
+var produce_test = async stream => {
+    const payload = producer.genDataCreationPayload('user_1', stream, 20, Number(new Date()), [20, 20])
+    log('payload: ', payload)
+
+    const res = await producer.putData(payload)
+    log('Data logged succesfully ', res)
+}
+
+var delete_test = async stream => {
+    const res = await admin.deleteStream([stream])
+    log(`Stream ${stream} deleted`, res)   
+}
+
+var consumer_test = async stream => {
+    try {
+        const a = await consumer.readData(stream)
+    } catch (err) {
+        console.log('err', err)
+    }
+    log(`Stream ${stream} read`)
+}
+
+//admin.createStream(stream)
+//    .then(e => log("It's ", e, //e ? 'bad':'good'))
+//    .catch(e => log('Error', e)//)
+
+//admin.deleteStream([stream])
+//    .then(e => log("It's ", e, e ? 'bad':'good'))
+//    .catch(e => log('Error', e))
+// payload data to topic  
+//const payload = producer.genDataCreationPayload('user_1', 't_topic1554163799665', '20', Number(new Date()), [20, 20])
+//log('payload: ', payload)
+//
+//producer.run(payload)
+//    .then(e => log('Data logged succesfully', e))
+//    .catch(e => console.error(JSON.parse(e)))
+
+// consumer.run(stream)
+//     .then(e => console.log('Data consumed!', e))
+//     .catch(e => console.error(`[example/consumer] ${e.message}`, e))
+
+//createStream_test(stream)
+//produce_test(stream)
+consumer_test(stream)
+//delete_test(stream_2)
