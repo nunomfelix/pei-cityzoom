@@ -10,7 +10,6 @@ const parser = require('./parser')
 const app = express()
 app.use(express.json())
 
-mongoose.connect('mongodb://localhost/city_zoom_data_layer')
     .then(() => {
         console.log('Connected to MongoDB...')
         fetch(config.get('FETCHING_PERIOD'))
