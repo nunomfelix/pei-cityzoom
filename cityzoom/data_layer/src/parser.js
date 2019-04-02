@@ -39,13 +39,11 @@ const streamSchema = new mongoose.Schema({
     },
     ttl:{
         type: Number,
-         min: 10,
-         max: 200
+         min: 10
     },
     periodicity:{
         type: Number,
-         min: 10,
-         max: 200
+         min: 10
     },
     timestamp: {
          type: Number
@@ -60,19 +58,24 @@ router.post('/', async (req,res) => {
     //temp
     var account = 'user_1'
     //kafka
-
-    await create.createStream(req.body.name)
-   
+    var created = await create.createStream(req.body.name)
+    console.log(created)
+//    if (!created) {
+//        return res.status(409).send({
+//            "status": "Stream " + req.body.name + " already exists"
+//        })
+//    }
     console.log(req.body)
+    console.log(created)
    
     let stream = new Stream(req.body)
    
     stream = await stream.save()
-    .then((result) => {
-        console.log('saved: ', result)    
-    }).catch((err) => {
-        console.log('error: ', err)
-    });
+        .then((result) => {
+            console.log('saved: ', result)    
+        }).catch((err) => {
+            console.log('error: ', err)
+        });
    
     if( req.body.periodicity !=0){
         req.body.periodicity 
@@ -81,7 +84,7 @@ router.post('/', async (req,res) => {
         req.body.periodicity = 1200
     }
     
-    res.send({
+    res.status(201).send({
         status:'read data in stream OK' ,       
         name: req.body.name,
         account,
@@ -93,18 +96,17 @@ router.post('/', async (req,res) => {
 
 router.get('/values', async (req,res) => {
   
-    //const {error} = validateQueryString(req.body);
-   // if(error) return res.status(400).send(error.details[0].message);
+    const {error} = validateQueryString(req.query);
+    if(error) return res.status(400).send(error.details[0].message);
 
     const query = await Stream
-        .find(req.query)
+        .findOne(req.query)
     
-    console.log('caralho')
-    console.log(query.name)
+    console.log(req.query)
     
-    const c = consumer.readData(query.name)
+    //const c = consumer.readData(query.stream)
     
-    console.log(c)
+    //console.log(c)
     //console.log(req.query) 
     res.send(
         console.log(query) 
@@ -132,9 +134,7 @@ router.put('/',async (req,res) => {
     prod.putData(payload)
 
     //console.log(req)
-    res.send({
-        status: 'put data in stream OK'
-    })
+    res.status(200)
 })
 
 
@@ -148,9 +148,10 @@ router.delete('/', async (req, res) => {
     })
 })
 
-function validateQueryString(strean){
-    const schema = { stream_name : Joi.string().min(4).required(),
-                     interval    : Joi.number()                
+function validateQueryString(stream){
+    const schema = { stream         : Joi.string().min(4).required(),
+                     interval_start : Joi.number(),
+                     interval_end   : Joi.number()                
     }
     return Joi.validate(stream,schema) 
 }

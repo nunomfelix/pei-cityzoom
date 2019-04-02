@@ -11,6 +11,7 @@ var produce_test = async stream => {
 
     const res = await producer.putData(payload)
     log('Data logged succesfully ', res)
+    process.exit(0)
 }
 
 produce_test(stream)

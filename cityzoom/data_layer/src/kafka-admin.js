@@ -18,7 +18,7 @@ const kafka = new Kafka({
 const admin = kafka.admin()
 const createStream = async stream_name => {
   return new Promise((resolve, reject) => {
-    var createdTopic = true;
+    var createdTopic = false;
     admin.connect()
           .then(() => {
             admin.createTopics({
@@ -32,9 +32,9 @@ const createStream = async stream_name => {
             })
               .then(e => {
                 if (e) {
+                  createdTopic = true
                   console.log('Topic created')
                 }
-                createdTopic = e
               })
               .catch(e => {
                 console.log('Exited kafka Successfully');

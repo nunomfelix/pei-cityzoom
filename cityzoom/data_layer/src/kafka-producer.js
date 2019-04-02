@@ -80,7 +80,7 @@ const pushData = async payload => {
             .then( e => {
               console.log('Data sent: ', e)
               resolve(e)
-              process.exit(0)
+              return
             })
             .catch(e => {
               console.log('Error pushing data to kafka broker:\n', e)

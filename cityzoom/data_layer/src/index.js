@@ -4,9 +4,6 @@ mongooseDebug = require('debug')('app:Mongoose')
 
 // my modules
 const parser = require('./parser')
-const producer = require('./kafka-producer')
-const consumer = require('./kafka-producer')
-const admin = require('./kafka-admin')
 
 const app = express()
 app.use(express.json())

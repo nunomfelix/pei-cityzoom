@@ -5,9 +5,13 @@ log = (...args) => console.log('\n', ...args)
 // topics for types
 const stream = 't_temp'
 
-var consumer_test = async stream => {
+const rcv = (arg) => {
+    console.log('ptinting in main consumer ', arg)
+}
+
+var consumer_test = async (rcv, stream) => {
     try {
-        const a = await consumer.readData(stream)
+        const a = await consumer.readData(rcv, stream)
         console.log('e-', a)
     } catch (err) {
         console.log('err', err)
@@ -15,4 +19,4 @@ var consumer_test = async stream => {
     log(`Stream ${stream} read`)
 }
 
-consumer_test(stream)
+consumer_test(rcv, stream)

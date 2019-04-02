@@ -6,14 +6,10 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-<<<<<<< HEAD
     "consumer": "node test/test_consumer.js",
     "creator": "node test/test_create.js",
     "producer": "node test/test_produce.js",
     "test": "node test/test_all.js"
-=======
-    "test": "node test/test-modules.js"
->>>>>>> lucas
   },
   "author": "ZePaiva",
   "license": "MIT",
