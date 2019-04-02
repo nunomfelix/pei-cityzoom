@@ -82,8 +82,7 @@ const valueSchema = new mongoose.Schema({
 })
 
 const Stream = mongoose.model('Stream',streamSchema)
-const Value = mongoose.model('Value',valueSchema)
-//var loadDB = 
+const Values = mongoose.model('Value',valueSchema)
 
 router.post('/', async (req,res) => {
     const {error} = validateCreate(req.body);

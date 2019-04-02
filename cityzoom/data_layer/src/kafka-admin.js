@@ -14,11 +14,10 @@ const kafka = new Kafka({
   logCreator: fixedLogs
 })
 
-// kafka admin
 const admin = kafka.admin()
 const createStream = async stream_name => {
   return new Promise((resolve, reject) => {
-    var createdTopic = false;
+    var createdTopic = true;
     admin.connect()
           .then(() => {
             admin.createTopics({
@@ -32,9 +31,9 @@ const createStream = async stream_name => {
             })
               .then(e => {
                 if (e) {
-                  createdTopic = true
                   console.log('Topic created')
                 }
+                createdTopic = e
               })
               .catch(e => {
                 console.log('Exited kafka Successfully');
@@ -49,6 +48,7 @@ const createStream = async stream_name => {
     resolve(createdTopic)
   })
 }
+
 const deleteStream = async stream_name => {
   return new Promise((resolve, reject) => {
     var deleteTopic = true;
@@ -77,11 +77,6 @@ const deleteStream = async stream_name => {
     resolve(deleteTopic)
   })
 }
-//var topic_to_create = 'temperature_'+Number(new Date())
-//
-//createType('temp')
-//     .then(e => console.log('Topic ', topic_to_create, ' created: ', e))
-//     .catch(e => console.log('Error creating topic: ', e))
 
 module.exports = {
   createStream,
