@@ -20,7 +20,7 @@ const streamSchema = new mongoose.Schema({
         type: String,
         required: true,
         minlength: 5,
-        maxlength: 30
+        maxlength: 256
     },
     description:{
         type: String,
@@ -51,17 +51,56 @@ const streamSchema = new mongoose.Schema({
     }
 })
 
+const latSchema = new mongoose.Schema({
+    latitude: {
+        type: Number,
+        required: true
+    },
+    longitude: {
+        type: Number,
+        required: true
+    }
+})
+
+const valueSchema = new mongoose.Schema({
+    stream_name:{
+        type: String,
+        required: true,
+        minlength: 5,
+        maxlength: 256
+    },
+    timestamp: {
+        type: Number,
+        required: true
+    },
+    value: {
+        type: String,
+        required: true
+    },
+    location: [latSchema]
+
+})
+
 const Stream = mongoose.model('Stream',streamSchema)
+const Value = mongoose.model('Value',valueSchema)
+//var loadDB = 
 
 router.post('/', async (req,res) => {
     const {error} = validateCreate(req.body);
     if(error) return res.status(400).send(error.details[0].message);
     //temp
     var account = 'user_1'
+
     //kafka
+    if (req.body.type !== 'temperature' && req.body.type !== 'pressure' && req.body.type !== 'waste' && req.body.type !== 'wind' && req.body.type !== )
 
     await create.createType(req.body.name)
-   
+    var payload = {
+        name: req.body.name,
+        description: req.body.description || '',
+        mobile: req.body.mobile || false,
+        type: 
+    }
     const stream = new Stream(req.body)
     await stream.save()
    

@@ -18,6 +18,7 @@ const consumer = kafka.consumer({ groupId: 'test-group' })
 
 const readData = async stream_name => {
   new Promise((resolve, reject) => {
+    var messages = []
     consumer.connect()
     console.log(stream_name)
     consumer.subscribe({ topic: stream_name })
@@ -38,8 +39,9 @@ const readData = async stream_name => {
       eachMessage: async ({ topic, partition, message }) => {
         const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`
         console.log(`- ${prefix} ${message.key}#${message.value}`)
-        resolve(`- ${prefix} ${message.key}#${message.value}`)
-      },
+        messages.push(`- ${prefix} ${message.key}#${message.value}`)
+        resolve(messages)
+      }
     })
       .then(e => {
         console.log('reading')
