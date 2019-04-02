@@ -1,8 +1,5 @@
 {
-    "app": {
-        "protocol": "http",
-        "host": "localhost",
-        "port": 8002
-    },
+    "SERVICE_LAYER_URL": "http://localhost:8002",
+    "DATA_LAYER_URL": "http://localhost:8001",
     "TOKEN_GENERATION_SECRET": "cityzoomsecret"
 }

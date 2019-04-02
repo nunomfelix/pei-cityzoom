@@ -1,10 +1,10 @@
 
 const jwt = require('jsonwebtoken')
 const User = require('./db/models/user')
-const { TOKEN_GENERATION_SECRET } = require('./index')
 const validationDebug = require('debug')('app:Validation')
 const errorDebug = require('debug')('app:Error')
-const fs = require('fs');
+const fs = require('fs')
+const config = require('config')
 
 /*  Middleware to ease the validation of user inputs
     method: Validation function to run
@@ -24,10 +24,10 @@ function validationMiddleware(method, object, message = null, code = 400) {
 }
 
 async function authentication(req, res, next) {
-    if(!('Authorization' in req.header)) return res.sendStatus(401)
+    if (req.header('Authorization') == null) return res.sendStatus(401)
     const token = req.header('Authorization').replace('Bearer ', '')
-    const decoded = jwt.verify(token, TOKEN_GENERATION_SECRET)
-    const user = await User.findOne({ username: decoded.username, 'tokens.token': token })
+    const decoded = jwt.verify(token, config.get('TOKEN_GENERATION_SECRET'))
+    const user = await User.findOne({ username: decoded.username })
     if (!user) return res.sendStatus(401)
     req.user = user
     next()

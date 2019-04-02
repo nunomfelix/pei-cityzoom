@@ -9,11 +9,6 @@ uncaughtDebug = require('debug')('app:Uncaught')
 
 require('./db/mongoose')
 
-/* Server setup configurations */
-const TOKEN_GENERATION_SECRET = config.get('TOKEN_GENERATION_SECRET')
-const URL = config.get('app.protocol') + '://' + config.get('app.host') + ':' + config.get('app.port')
-module.exports = { TOKEN_GENERATION_SECRET, URL }
-
 //Imports routes
 const accountRouter = require('./routes/user')
 const alertRouter = require('./routes/alert')
@@ -24,7 +19,7 @@ const expressDebug = require('debug')('app:express')
 const app = express()
 
 //Uses specified port in env variable. Uses port 8002 as if none is given
-const port = process.env.PORT || config.get('app.port')
+const port = process.env.PORT || 8002
 
 //Fica a ouvir excessoes ou promessas globais que nao sao apanhadas e da log para o ficheiro uncaught
 process.on('uncaughtException', (ex) => {
