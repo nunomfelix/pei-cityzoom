@@ -1,0 +1,17 @@
+// /* You can add global styles to this file, and also import other style files */
+
+@import './mixins.scss';
+
+.rowc {
+    @include row();
+    flex-direction: column;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+.rowr {
+    @include row();
+    flex-direction: row;
+    justify-content: center !important;
+    align-items: center !important;
+}
