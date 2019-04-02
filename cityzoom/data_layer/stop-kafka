@@ -1,7 +1,0 @@
-#!/bin/bash
-kafka/kafka-2.1.1-src/bin/kafka-server-stop.sh configs/server_0.properties &
-kafka/kafka-2.1.1-src/bin/kafka-server-stop.sh configs/server_1.properties &
-kafka/kafka-2.1.1-src/bin/kafka-server-stop.sh configs/server_2.properties &
-kafka/kafka-2.1.1-src/bin/kafka-server-stop.sh configs/server_3.properties &
-kafka/kafka-2.1.1-src/bin/kafka-server-stop.sh configs/server_4.properties &
-kafka/kafka-2.1.1-src/bin/zookeeper-server-stop.sh configs/zookeeper.properties &

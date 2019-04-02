@@ -1,0 +1,163 @@
+{
+	"info": {
+		"_postman_id": "db4ad69a-1bef-49e2-9730-69265d2c4367",
+		"name": "Data_Layer_PEI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "get stream by name",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8001/czb/stream/values?stream=Stream",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8001",
+					"path": [
+						"czb",
+						"stream",
+						"values"
+					],
+					"query": [
+						{
+							"key": "stream",
+							"value": "Stream"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list all streams",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8001/czb/stream/list",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8001",
+					"path": [
+						"czb",
+						"stream",
+						"list"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get stream description",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8001/czb/stream/Stream",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8001",
+					"path": [
+						"czb",
+						"stream",
+						"Stream"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create stream",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Stream4\",\n\t\"description\": \"description\",\n\t\"mobile\": \"true\",\n\t\"type\": \"temperature\",\n\t\"ttl\": 1000,\n\t\"periodicity\": 10\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8001/czb/stream",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8001",
+					"path": [
+						"czb",
+						"stream"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "put data in stream",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"stream_name\": \"Stream\",\n\t\"values\": \"aaaaa111\",\n\t\"location\":[180, 90]\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8001/czb/stream",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8001",
+					"path": [
+						"czb",
+						"stream"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

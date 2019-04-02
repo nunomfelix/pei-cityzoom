@@ -5,7 +5,7 @@ const localhost = process.env.HOST || '127.0.0.1'
 // logger
 const fixedLogs = logLevel => ({ namespace, level, label, log }) => {
     const { timestamp, logger, message, ...others } = log 
-    console.log(`[${timestamp}] ${label} [${namespace}]: ${message} Failure: ${others.error}`)
+    console.log(`{ERROR GENERATED @ KAFKA-ADMIN} [${timestamp}] ${label} [${namespace}]: ${message} Failure: ${JSON.parse(others)}`)
 }
 
 const kafka = new Kafka({
@@ -14,32 +14,72 @@ const kafka = new Kafka({
   logCreator: fixedLogs
 })
 
-// kafka admin
 const admin = kafka.admin()
-
-const createType = async type => {
-    await admin.connect()
-                .then(console.log('Connection to kafka established succesfully'))
-    await admin.createTopics({
-        timeout: 30000,
-        topics: [{
-            topic: type,
-            numPartitions: 5,
-            replicationFactor: 5
-        }]
-    })
-      .then(e => console.log(`Topic ${type} ` + ( e ? 'created' : 'already exists!' )))
-      .catch(e => console.log(`Error @ creating topic ${type}, exit status: ${e}`))
-    admin.disconnect()
+const createStream = async stream_name => {
+  return new Promise((resolve, reject) => {
+    var createdTopic = true;
+    admin.connect()
+          .then(() => {
+            admin.createTopics({
+              timeout: 30000,
+              topics: [{
+                  topic: stream_name,
+                  numPartitions: 5,
+                  replicationFactor: 2
+              }],
+              waitForLeaders: true
+            })
+              .then(e => {
+                if (e) {
+                  console.log('Stream created')
+                }
+                createdTopic = e
+              })
+              .catch(e => {
+                console.log('Exited kafka Successfully \x1b[31m(No Stream Created!!!)');
+                admin.disconnect()
+                reject(e)
+              })            
+          })
+          .catch(e => {
+            console.log('Can\'t connect to kafka')      
+            reject(e)
+          })
+    resolve(createdTopic)
+  })
 }
 
-//var topic_to_create = 'temperature_'+Number(new Date())
-//
-createType('temp')
-//     .then(e => console.log('Topic ', topic_to_create, ' created: ', e))
-//     .catch(e => console.log('Error creating topic: ', e))
+const deleteStream = async stream_name => {
+  return new Promise((resolve, reject) => {
+    var deleteTopic = true;
+    admin.connect()
+                .then(() => {
+                  admin.deleteTopics({
+                    topics: stream_name,
+                    timeout: 1000
+                  })
+                    .then(e => {
+                      if (e) {
+                        console.log(`Topic ${stream_name} deleted`)
+                      }
+                      deleteTopic = e;
+                    })
+                    .catch(e => {
+                      admin.disconnect()
+                        .then(console.log('Exited kafka successfully'))      
+                      reject(e)
+                    })
+                })
+                .catch(e => {
+                  console.log('Can\'t connect to kafka')      
+                  reject(e)
+                })
+    resolve(deleteTopic)
+  })
+}
 
 module.exports = {
-  createType,
+  createStream,
+  deleteStream,
   admin
 }
