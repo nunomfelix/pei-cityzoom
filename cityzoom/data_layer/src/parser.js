@@ -46,11 +46,43 @@ const streamSchema = new mongoose.Schema({
          min: 10
     },
     timestamp: {
-         type: Number
+         type: Number,
+         required: true
     }
 })
 
+const latSchema = new mongoose.Schema({
+    latitude: {
+        type: Number,
+        required: true
+    },
+    longitude: {
+        type: Number,
+        required: true
+    }
+})
+
+const valueSchema = new mongoose.Schema({
+    stream_name:{
+        type: String,
+        required: true,
+        minlength: 5,
+        maxlength: 256
+    },
+    timestamp: {
+        type: Number,
+        required: true
+    },
+    value: {
+        type: String,
+        required: true
+    },
+    location: [latSchema]
+
+})
+
 const Stream = mongoose.model('Stream',streamSchema)
+const Values = mongoose.model('Value',valueSchema)
 
 router.post('/', async (req,res) => {
     const {error} = validateCreate(req.body);
@@ -92,19 +124,19 @@ router.post('/', async (req,res) => {
     })
     
 })
-//query string
 
+// get values of stream with stream ID
 router.get('/values', async (req,res) => {
   
-    const {error} = validateQueryString(req.query);
+    const {error} = validateQueryGetDataString(req.query)
     if(error) return res.status(400).send(error.details[0].message);
 
     const query = await Stream
         .findOne(req.query)
     
-    console.log(req.query)
+    console.log(req.query.stream)
     
-    //const c = consumer.readData(query.stream)
+    const c = consumer.readData(query.stream)
     
     //console.log(c)
     //console.log(req.query) 
@@ -112,6 +144,26 @@ router.get('/values', async (req,res) => {
         console.log(query) 
     )
 })
+
+// get all streams
+router.get('/list', async (req,res) => {
+  
+    const {error} = validateQueryGetStreamsString(req.query);
+    if(error) return res.status(400).send(error.details[0].message);
+
+    console.log(req.query)
+
+    var query = await Stream.find()
+
+    //console.log(req.query.stream)
+    res.status(200).send(
+        {
+            "total_streams": query.length,
+            "user_streams": query
+        } 
+    )
+})
+
 
 router.get('/', (req,res) => {
     //console.log(req.query)
@@ -148,13 +200,21 @@ router.delete('/', async (req, res) => {
     })
 })
 
-function validateQueryString(stream){
+function validateQueryGetDataString(stream){
     const schema = { stream         : Joi.string().min(4).required(),
                      interval_start : Joi.number(),
                      interval_end   : Joi.number()                
     }
     return Joi.validate(stream,schema) 
 }
+
+function validateQueryGetStreamsString(stream){
+    const schema = { interval_start : Joi.number(),
+                     interval_end   : Joi.number()                
+    }
+    return Joi.validate(stream,schema) 
+}
+
 
 function validateDataStream(stream){
    const schema = { stream_name : Joi.string().min(4).required() }
