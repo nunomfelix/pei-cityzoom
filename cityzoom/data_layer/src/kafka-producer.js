@@ -78,9 +78,8 @@ const pushData = async payload => {
   return new Promise((resolve, reject) => {
     producer.send(payload)
             .then( e => {
-              console.log('Data sent: ', e)
               resolve(e)
-              return 0
+              process.exit(0)
             })
             .catch(e => {
               console.log('Error pushing data to kafka broker:\n', e)
@@ -94,7 +93,7 @@ const putData = async payload => {
   console.log('Connecting to kafka server...')
   await producer.connect()
   const a = await pushData(payload)
-  console.log(a)
+  console.log('Data sent: ', a)
   await producer.disconnect()
 }
 
@@ -114,6 +113,19 @@ const genDataCreationPayload = (account_name, stream_name, value, timestamp, loc
     ]
   }
 }
+
+const signalTraps = ['SIGTERM', 'SIGINT', 'SIGUSR2']
+signalTraps.map(type => {
+  process.once(type, async () => {
+    console.log(type)
+    try {
+      console.log('hello')
+      await producer.disconnect()
+    } finally {
+      process.kill(process.pid, type)
+    }
+  })
+})
 
 module.exports = {
     putData,
