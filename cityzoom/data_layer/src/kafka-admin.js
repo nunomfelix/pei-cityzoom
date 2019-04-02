@@ -16,7 +16,6 @@ const kafka = new Kafka({
 
 // kafka admin
 const admin = kafka.admin()
-
 const createStream = async stream_name => {
   return new Promise((resolve, reject) => {
     var createdTopic = true;
@@ -50,7 +49,6 @@ const createStream = async stream_name => {
     resolve(createdTopic)
   })
 }
-
 const deleteStream = async stream_name => {
   return new Promise((resolve, reject) => {
     var deleteTopic = true;
