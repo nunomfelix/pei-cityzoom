@@ -21,7 +21,8 @@ const streamSchema = new mongoose.Schema({
         type: String,
         required: true,
         minlength: 5,
-        maxlength: 30
+        maxlength: 30,
+        unique: true
     },
     description:{
         type: String,
@@ -29,7 +30,7 @@ const streamSchema = new mongoose.Schema({
         maxlength: 200
     },
     mobile:{
-        isMobile: Boolean,
+        type: Boolean,
     },
     type:{
         type: String,
@@ -45,9 +46,13 @@ const streamSchema = new mongoose.Schema({
         type: Number,
          min: 10
     },
-    timestamp: {
+    creation: {
          type: Number,
          required: true
+    },
+    lastUpdate: {
+        type: Number,
+        required: true
     }
 })
 
@@ -87,20 +92,35 @@ const Values = mongoose.model('Value',valueSchema)
 router.post('/', async (req,res) => {
     const {error} = validateCreate(req.body);
     if(error) return res.status(400).send(error.details[0].message);
+    
     //temp
     var account = 'user_1'
+
     //kafka
-    var created = await create.createStream(req.body.name)
-    console.log(created)
-//    if (!created) {
-//        return res.status(409).send({
-//            "status": "Stream " + req.body.name + " already exists"
-//        })
-//    }
+    var exist = Stream.findOne({name: req.body.name})
+    if (exist !== null) {
+        return res.status(409).send({
+            "status": "Stream " + req.body.name + " already exists!"
+        })
+    }
+    await create.createStream(req.body.name)
     console.log(req.body)
     console.log(created)
+
+    var tstamp = Number(new Date())
+
+    var new_stream = {
+        name: req.body.name,
+        description: req.body.description || '',
+        mobile: req.body.mobile || false,
+        type: req.body.type,
+        ttl: req.body.ttl || 12000,
+        periodicity: req.body.periodicity || 1200,
+        creation: tstamp,
+        lastUpdate: tstamp
+    }
    
-    let stream = new Stream(req.body)
+    let stream = new Stream(new_stream)
    
     stream = await stream.save()
         .then((result) => {
@@ -115,7 +135,7 @@ router.post('/', async (req,res) => {
     else {
         req.body.periodicity = 1200
     }
-    
+
     res.status(201).send({
         status:'read data in stream OK' ,       
         name: req.body.name,
@@ -164,12 +184,34 @@ router.get('/list', async (req,res) => {
     )
 })
 
+// get details from a stream 
+router.param(['stream'], async (req,res, next, stream) => {
+    var query = await Stream.findOne({name:stream})
+    var query_v = await Values.find({stream_name:stream}) 
+    console.log(query)
+    if (query !== null) {
+        res.status(200).send({
+            "stream_name": stream,
+            "created_at": query.creation || 0,
+            "last_updated_at": query.lastUpdate || 0,
+            "values" : query_v.length || 0,
+            "type": query.type,
+            "mobile_stream": query.isMobile || false,
+            "description": query.description || '',
+            "periodicity": query.periodicity,
+            "ttl": query.ttl
+        })
+    } else {
+        res.status(404).send({
+            "status": "Stream "+stream+" not found"
+        })
+    }
+    next()
+})
+router.get('/:stream', (req,res, stream) => {
 
-router.get('/', (req,res) => {
-    //console.log(req.query)
-    res.send({
-        status: 'read data in stream OK'
-    })
+    console.log('stream:', stream)
+    res.end()
 })
 
 router.put('/',async (req,res) => {
@@ -188,7 +230,6 @@ router.put('/',async (req,res) => {
     //console.log(req)
     res.status(200)
 })
-
 
 router.delete('/', async (req, res) => {
     const stream_name = await Stream.findOneAndDelete(req.body.name)
@@ -215,11 +256,11 @@ function validateQueryGetStreamsString(stream){
     return Joi.validate(stream,schema) 
 }
 
-
 function validateDataStream(stream){
    const schema = { stream_name : Joi.string().min(4).required() }
    return Joi.validate(stream,schema) 
 }
+
 function validatePutData(stream){
     const schema = { stream_name : Joi.string().min(4).required(),
                      values     : Joi.string().min(4).required(),
@@ -239,4 +280,8 @@ function validateCreate(stream){
     }
     return Joi.validate(stream,schema)
 }
-module.exports = router
+module.exports = {
+    router,
+    Stream,
+    Values
+}

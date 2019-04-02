@@ -16,9 +16,9 @@ const kafka = new Kafka({
 
 // kafka admin
 const admin = kafka.admin()
-const createStream = async stream_name => {
+const createStream = async (stream_name) => {
   return new Promise((resolve, reject) => {
-    var createdTopic = false;
+    var createdTopic;
     admin.connect()
           .then(() => {
             admin.createTopics({
@@ -31,20 +31,27 @@ const createStream = async stream_name => {
               waitForLeaders: true
             })
               .then(e => {
+                console.log('admin: ', e)
                 if (e) {
-                  createdTopic = true
+                  resolve(true)
                   console.log('Topic created')
+                } else {
+                  resolve(false)
+                  console.log('Topic already created')
                 }
+                resolve(createdTopic)
               })
               .catch(e => {
                 console.log('Exited kafka Successfully');
+                resolve(false)
                 admin.disconnect()
-                reject(e)
+                reject(false)
               })            
           })
           .catch(e => {
+            console.log('err: ', e)
             console.log('Can\'t connect to kafka')      
-            reject(e)
+            reject(false)
           })
     resolve(createdTopic)
   })
@@ -77,11 +84,6 @@ const deleteStream = async stream_name => {
     resolve(deleteTopic)
   })
 }
-//var topic_to_create = 'temperature_'+Number(new Date())
-//
-//createType('temp')
-//     .then(e => console.log('Topic ', topic_to_create, ' created: ', e))
-//     .catch(e => console.log('Error creating topic: ', e))
 
 module.exports = {
   createStream,

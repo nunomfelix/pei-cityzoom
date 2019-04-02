@@ -12,11 +12,8 @@ mongoose.connect('mongodb://localhost/city_zoom_data_layer', )
     .then(()=> console.log('Connected to MongoDB...'))
     .catch(()=> console.log('Could not connect to MongoDB...'))
 
-// var Person = mongoose.model('User', {});
-// Person.find().then(v => {
-//     console.log(v)
-// })
-app.use('/czb/stream', parser)
+app.use('/czb/stream', parser.router)
+
 const connectionURL = 'mongodb://127.0.0.1:27017/'
 const databaseName = 'city_zoom_service_layer'
 
