@@ -1,3 +1,4 @@
+const config = require('config')
 const express = require('express')
 require('express-async-errors')
 const helmet = require('helmet')
@@ -9,21 +10,21 @@ uncaughtDebug = require('debug')('app:Uncaught')
 require('./db/mongoose')
 
 /* Server setup configurations */
-//Token generation secret. TODO: CHANGE TO ENVIRONMENT VARIABLE LATER
-const TOKEN_GENERATION_SECRET = 'cityzoomsecret'
-module.exports = { TOKEN_GENERATION_SECRET }
+const TOKEN_GENERATION_SECRET = config.get('TOKEN_GENERATION_SECRET')
+const URL = config.get('app.protocol') + '://' + config.get('app.host') + ':' + config.get('app.port')
+module.exports = { TOKEN_GENERATION_SECRET, URL }
 
 //Imports routes
 const accountRouter = require('./routes/user')
 const alertRouter = require('./routes/alert')
-const resourceRouter = require('./routes/resource')
+const streamRouter = require('./routes/stream')
 const expressDebug = require('debug')('app:express')
 
 //Uses the express framework
 const app = express()
 
-//Uses specified port in env variable. Uses port 3000 as if none is given
-const port = process.env.PORT || 8002
+//Uses specified port in env variable. Uses port 8002 as if none is given
+const port = process.env.PORT || config.get('app.port')
 
 //Fica a ouvir excessoes ou promessas globais que nao sao apanhadas e da log para o ficheiro uncaught
 process.on('uncaughtException', (ex) => {
@@ -42,7 +43,7 @@ app.use(express.json())
 //Sets up all routes
 app.use('/user', accountRouter)
 app.use('/alert', alertRouter)
-app.use('/resource', resourceRouter)
+app.use('/stream', streamRouter)
 
 //Error middleware, para excessoes causadas em funcoes assincronas do express
 app.use(error)
