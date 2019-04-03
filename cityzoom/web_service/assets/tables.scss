@@ -1,0 +1,10 @@
+// Para as datatables, nao funcionava no css do proprio componente
+.page_button {
+    padding: 0px 4px !important;
+    &_current {
+        cursor: default !important;
+        &:active {
+            border: none;
+        }
+    }
+}

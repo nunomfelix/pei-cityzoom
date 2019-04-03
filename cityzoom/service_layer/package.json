@@ -8,7 +8,7 @@
     "dev": "ENV DEBUG=app:* nodemon src/index.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "André Mourato",
   "license": "ISC",
   "devDependencies": {
     "nodemon": "^1.18.10"

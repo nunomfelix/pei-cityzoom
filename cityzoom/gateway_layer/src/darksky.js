@@ -18,25 +18,25 @@ async function get_darksky_data(lat, long){
 }
 
 async function create_darksky_stream(){
-    axios.post('192.136.93.14:8001/cbz/stream', {
+    axios.post('193.136.93.14:8001/cbz/stream', {
         'name': 'darksky_stream',
         'description': 'darksky_stream',
         'mobile': false,
         'type': 'darksky_post',
         'ttl': 120000,
         'periodicity': 1200
-    }).catch( ()=> {console.log('Failed to post to 192.136.93.14:3000')})
+    }).catch( ()=> {console.log('Failed to post to 193.136.93.14:8001')})
 }
 
 async function put_darksky_data(data, location){
-    axios.put('192.136.93.14:8001/cbz/stream', {
+    axios.put('193.136.93.14:8001/cbz/stream', {
         'stream_name': 'darksky_stream',
         'value': data,
         'location': {
             'latitude' : location['lat'],
             'longitude' : location['long']
         }
-    }).catch( ()=> {console.log('Failed to put to 192.136.93.14:8001')})
+    }).catch( ()=> {console.log('Failed to put to 19.136.93.14:8001')})
 }
 
 function main(){

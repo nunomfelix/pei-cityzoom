@@ -1,0 +1,31 @@
+{
+  "name": "cityzoom-nuxt",
+  "version": "1.0.0",
+  "description": "My super-excellent Nuxt.js project",
+  "author": "Felix, GV",
+  "private": true,
+  "scripts": {
+    "dev": "nuxt",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "generate": "nuxt generate"
+  },
+  "dependencies": {
+    "@nuxtjs/axios": "^5.3.6",
+    "bootstrap": "^4.1.3",
+    "bootstrap-vue": "^2.0.0-rc.11",
+    "cross-env": "^5.2.0",
+    "crossfilter2": "^1.4.6",
+    "d3": "^5.9.2",
+    "dc": "^3.0.12",
+    "js-cookie": "^2.2.0",
+    "node-sass": "^4.11.0",
+    "nuxt": "^2.4.0",
+    "sass": "^1.17.3",
+    "sass-loader": "^7.1.0",
+    "vue-grid-layout": "^2.3.4"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.9"
+  }
+}
