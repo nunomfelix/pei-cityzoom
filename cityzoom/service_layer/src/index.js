@@ -4,6 +4,7 @@ require('express-async-errors')
 const helmet = require('helmet')
 const morgan = require('morgan')
 const { error } = require('./middleware')
+const fs = require('fs')
 
 uncaughtDebug = require('debug')('app:Uncaught')
 
