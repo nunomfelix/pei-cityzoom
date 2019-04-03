@@ -127,9 +127,7 @@ $sidebar-right-size: 180px;
     }
   }
 
-  box-shadow: 3px 3px 10px 0px #4d4c4c;
-  -webkit-box-shadow: 3px 3px 10px 0px #4d4c4c;
-  -moz-box-shadow: 3px 3px 10px 0px #4d4c4c;
+  @include shadow(3px, 3px, 10px, 0px, #4d4c4c);
 
   & .sidebar {
     position: relative;
@@ -141,7 +139,7 @@ $sidebar-right-size: 180px;
       background-color: transparent;
 
       &.sidebar_header {
-        height: 140px !important;
+        height: 135px !important;
         background: linear-gradient(to bottom, #0f589c, #147bdb) white;
         background-position-x: -3px;
         background-repeat-y: no-repeat;

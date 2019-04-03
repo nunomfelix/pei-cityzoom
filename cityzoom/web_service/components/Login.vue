@@ -6,10 +6,21 @@
         <label for="username">Enter your username</label>
         <input class="input_cancel" name="username" v-model="username" type="text" required>
         <label for="password">Enter your password</label>
-        <input class="input_cancel" name="password" v-model="pw" type="password" required>
-        <button class="btn btn-success" type="submit">LOGIN</button>
-        <button v-on:click="currentForm = 1; $store.commit('SET_STORE', {errorMessage: ''});" class="btn btn-danger" type="button">CREATE ACCOUNT</button>
-        <div :class="{'show':errorMessage != ''}" class="alert">{{errorMessage}}</div>
+        <input
+          id="username_focus"
+          class="input_cancel"
+          name="password"
+          v-model="pw"
+          type="password"
+          required
+        >
+        <button class="btn btn-success mt-4" type="submit">LOGIN</button>
+        <button
+          v-on:click="currentForm = 1; message='';"
+          class="btn btn-primary"
+          type="button"
+        >CREATE ACCOUNT</button>
+        <div :class="{'show':message != ''}" class="alert">{{message}}</div>
       </form>
       <form :class="{'show': currentForm}" v-on:submit.prevent="register" class="rowc register">
         <label for="name">Enter your name</label>
@@ -20,9 +31,13 @@
         <input class="input_cancel" name="email" v-model="email" type="email" required>
         <label for="password_r">Enter a password</label>
         <input class="input_cancel" name="password_r" v-model="pw_r" type="password" required>
-        <button class="btn btn-success" type="submit">REGISTER</button>
-        <button v-on:click="currentForm = 0; $store.commit('SET_STORE', {errorMessage: ''})" class="btn btn-danger" type="button">SIGN IN</button>
-        <div :class="{'show':errorMessage != ''}" class="alert">{{errorMessage}}</div>
+        <button class="btn btn-success mt-4" type="submit">REGISTER</button>
+        <button
+          v-on:click="currentForm = 0; message='';"
+          class="btn btn-primary"
+          type="button"
+        >SIGN IN</button>
+        <div :class="{'show':message != ''}" class="alert">{{message}}</div>
       </form>
     </div>
   </div>
@@ -38,6 +53,8 @@ export default {
       pw_r: "12345",
       email: "teste@gmail.com",
 
+      message: "",
+
       show: false,
       currentForm: 0
     };
@@ -48,6 +65,11 @@ export default {
         username: this.username,
         password: this.pw
       });
+      this.message = res;
+      const alerts = document.getElementsByClassName("alert");
+      for (var i of alerts) {
+        i.style.backgroundColor = "red";
+      }
     },
     async register() {
       const res = await this.$store.dispatch("user_register", {
@@ -56,25 +78,39 @@ export default {
         email: this.email,
         password: this.pw
       });
+      if (res.content) {
+        this.currentForm = 0;
+        setTimeout(() => {
+          this.message = res.content;
+        }, 300);
+        this.username = res.username;
+        this.pw = "";
+        const alerts = document.getElementsByClassName("alert");
+        for (var i of alerts) {
+          i.style.backgroundColor = "darkblue";
+        }
+        document.getElementById("username_focus").focus();
+      } else {
+        this.message = res;
+        const alerts = document.getElementsByClassName("alert");
+        for (var i of alerts) {
+          i.style.backgroundColor = "red";
+        }
+      }
     },
     loaded() {
       this.show = true;
     }
   },
-  computed: {
-    errorMessage() {
-      return this.$store.state.errorMessage;
-    }
-  },
+  computed: {},
   mounted() {
-      const inputs = document.getElementsByClassName('input_cancel')
-      for(var i of inputs) {
-        i.addEventListener('input', () => {
-          if(this.errorMessage)
-            this.$store.commit('SET_STORE', {errorMessage: ''})
-        })
-      }
+    const inputs = document.getElementsByClassName("input_cancel");
+    for (var i of inputs) {
+      i.addEventListener("input", () => {
+        this.message = "";
+      });
     }
+  }
 };
 </script> 
 
@@ -98,6 +134,21 @@ export default {
     @include transition(transform, 0.25s, ease-out, 0s);
 
     & .alert {
+      text-align: center;
+      width: 380px;
+      @include shadow(0px, 0px, 10px, 0px, #4d4c4c);
+      border-radius: 10px;
+      font-weight: 700;
+      color: white;
+      opacity: 0;
+      margin-top: 35px;
+      &.show {
+        @include transition(opacity, 0.25s, ease-out, 0s);
+        opacity: 1;
+      }
+    }
+
+    & .alert {
       border-radius: 10px;
       font-weight: 700;
       color: white;
@@ -105,41 +156,27 @@ export default {
       background-color: red;
       margin-top: 20px;
       &.show {
-      @include transition(opacity, 0.25s, ease-out, 0s);
-        opacity: 1;
+        position: absolute;
+        left: 50%;
+        transform: translate(-50%, 0%);
+        &:not(.show) {
+          transform: translate(-50%, 0%) translateX(calc(-100vw));
+        }
       }
-    }
 
-    &.register {
-      position: absolute;
-      left: 50%;
-      transform: translate(-50%, 0%);
-      &:not(.show) {
-        transform: translate(-50%, 0%) translateX(calc(100vw));
+      & label {
+        font-weight: 700;
+        color: white;
+        margin-top: 15px;
+        margin-bottom: 0;
       }
-    }
-
-    &.login {
-      position: absolute;
-      left: 50%;
-      transform: translate(-50%, 0%);
-      &:not(.show) {
-        transform: translate(-50%, 0%) translateX(calc(-100vw));
+      & input {
+        text-align: center;
+        margin-bottom: 15px;
       }
-    }
-
-    & label {
-      font-weight: 700;
-      color: white;
-      margin-top: 15px;
-      margin-bottom: 0;
-    }
-    & input {
-      text-align: center;
-      margin-bottom: 15px;
-    }
-    & button {
-      margin-top: 10px;
+      & button {
+        margin-top: 10px;
+      }
     }
   }
 }
