@@ -4,7 +4,7 @@
 
 <head>
     <meta charset=utf-8>
-    <title>Architecture</title>
+    <title>Developer Area</title>
     <meta name=viewport content="width=device-width,initial-scale=1">
     <meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1">
     <meta name=description content="this is meta description">
@@ -81,11 +81,39 @@
                         <div class="block shadow">
                             <div class=faq-item>
                                 <div class=faq-item-title>
-                                    <h2></h2>
+                                    <h2>Technologies</h2>
                                 </div>
                                 <div>
                                     <span>
-                                        
+                                        The project is currently using the following technologies/devices:
+                                    </span>
+                                    <ul>
+                                        <li>A real sensor</li>
+                                        <li>LoRa</li>
+                                        <li>External data API's</li>
+                                        <li>Apache Kafka</li>
+                                        <li>MongoDB</li>
+                                        <li>Node.js</li>
+                                        <li>JSON Web Token</li>
+                                        <li>Nuxt and Vue.js</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class=faq-item>
+                                <div class=faq-item-title>
+                                    <h2>Implementation</h2>
+                                </div>
+                                <div>
+                                    <span>
+                                            <p>Nodejs is the language used throughout the backend. The communication with the external API's
+                                                is done using that same resource. The sensor, on the other hand, makes use of the LoRa protocol
+                                                to send data to our broker.</p>
+                                            <p>Our broker is built with Apache Kafka, making use of a Nodejs library (kafkajs) to facilitate the 
+                                                usage of Kafka. The broker makes use of a database built with MongoDB to save it's data permanently.</p>
+                                            <p>The communication between the broker and the client side is also built making use of Nodejs. 
+                                                There is another database to save clients' information, also made in MongoDB. The needed 
+                                                authentication for user actions are supported with JSON Web Tokens.</p>
+                                            <p>The website the client interacts with uses both Nuxt and Vue.js.</p>
                                     </span>
                                 </div>
                             </div>
