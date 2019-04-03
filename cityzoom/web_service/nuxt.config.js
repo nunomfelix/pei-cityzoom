@@ -28,6 +28,11 @@ module.exports = {
   ** Global CSS
   */
   css: [
+    { src: '~/assets/global.scss', lang: 'scss' },
+    { src: '~/assets/charts.scss', lang: 'scss' },
+    { src: '~/assets/animations.scss', lang: 'scss' },
+    { src: '~/assets/tables.scss', lang: 'scss' },
+    { src: '~/node_modules/dc/style/dc.scss', lang: 'scss' },
   ],
 
   /*
@@ -46,7 +51,6 @@ module.exports = {
     '@nuxtjs/axios',
     // Doc: https://bootstrap-vue.js.org/docs/
     'bootstrap-vue/nuxt',
-    '@nuxtjs/pwa',
   ],
   /*
   ** Axios module configuration

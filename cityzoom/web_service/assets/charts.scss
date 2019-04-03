@@ -1,0 +1,19 @@
+@import './mixins.scss';
+
+.dc_wrapper {
+    background-color: white;
+    border-radius: 10px;
+    opacity: 0;
+    height: 100%;
+    @include transition(opacity, .5s, ease, 0s);
+    
+    &.show {
+        opacity: 1;
+        height: auto;
+    }
+}
+
+// 
+.vue-resizable-handle {
+    padding: 10px !important;
+}

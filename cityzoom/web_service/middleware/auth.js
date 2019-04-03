@@ -18,6 +18,8 @@ export default async function(context) {
         if(jwt) {
             const error = await context.store.dispatch('renew_data', jwt )
             if(!error) return;
-        } 
+        } else {
+            context.redirect('/')
+        }
     } 
 }

@@ -1,27 +1,29 @@
 import middleware from '../.nuxt/middleware';
 <template>
-  <div v-if="$store.state.jwt != ''" style="background-color: darkgray">
-    <Navbar />
-    <Header />
-    <div style="margin-top: 120px; margin-left: 120px; margin-right: 40px;">
-      <nuxt />
+  <div>
+    <div v-if="$store.state.jwt != ''" style="background-color: darkgray">
+      <Navbar/>
+      <Header/>
+      <div style="margin-top: 120px; margin-left: 120px; margin-right: 40px;">
+        <nuxt/>
+      </div>
     </div>
-  </div>
-  <div v-else>
-    <nuxt />
+    <div v-else  style="background-color: darkgray">
+      <nuxt/>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
-  middleware: 'auth'
-}
+  middleware: ['auth']
+};
 </script>
 
 <style>
 html {
-  font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
   font-size: 16px;
   word-spacing: 1px;
   -ms-text-size-adjust: 100%;
