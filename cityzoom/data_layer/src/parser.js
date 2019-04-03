@@ -14,8 +14,8 @@ const consumer = require('./kafka-consumer')
 const Joi = require('joi')
 const mongoose = require('mongoose')
 const express = require('express')
-const thread = require('worker_threads')
-const process = require('child_process');
+//const thread = require('worker_threads')
+//const process = require('child_process');
 const router = express.Router()
 
 const streamSchema = new mongoose.Schema({
