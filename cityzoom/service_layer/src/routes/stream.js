@@ -21,9 +21,15 @@ const router = new express.Router()
 router.get('',
     [authentication, validationMiddleware(validateGetAllStreams, 'query')],
     async (req, res) => {
-        result = await axios.get(config.get('DATA_LAYER_URL') + '/cbz/stream/list', { params: req.query })
+        var result = {}
+        try {
+            result = await axios.get(config.get('DATA_LAYER_URL') + '/czb/stream/list', { params: req.query })
+        } catch (e) {
+            streamDebug(e)
+            res.status(500).send('Internal Server Error')
+        }
         streamDebug(`Streams loaded with query ${JSON.stringify(req.query)}`)
-        res.send(result)
+        res.send(result.data)
     }
 )
 
@@ -40,9 +46,15 @@ router.get('',
 router.get('/:stream_name',
     [authentication, validationMiddleware(validateGetStreamByID, 'params')],
     async (req, res) => {
-        result = await axios.get(config.get('DATA_LAYER_URL') + '/cbz/stream/' + req.params.stream_name)
-        streamDebug(`Stream loaded with name ${JSON.stringify(req.params.stream_name)}`)
-        res.send(result)
+        try {
+            result = await axios.get(config.get('DATA_LAYER_URL') + '/czb/stream/' + req.params.stream_name)
+            console.log('res: ', result.status)
+            streamDebug(`Stream loaded with name ${JSON.stringify(req.params.stream_name)}`)
+            res.send(result.data)
+        } catch (e) {
+            streamDebug(e)
+            res.status(500).send('Internal Server Error')
+        }
     }
 )
 
@@ -56,12 +68,20 @@ router.get('/:stream_name',
         [404] Stream not found
         [500] Internal server error
 */
-router.get('/:stream_name/values',
+router.get('/:stream/values',
     [authentication, validationMiddleware(validateGetDataFromStream, 'params')],
     async (req, res) => {
-        result = await axios.get(config.get('DATA_LAYER_URL') + '/cbz/stream/values', { params: req.params.stream_name })
-        streamDebug(`Retrieved values from stream ${JSON.stringify(req.params.stream_name)}`)
-        res.send(result)
+        try {
+            console.log('req query: ',req.params)
+    
+            const result = await axios.get(config.get('DATA_LAYER_URL') + '/czb/stream/values', { params : req.params})
+            console.log('res:', result.status)
+            streamDebug(`Retrieved values from stream ${JSON.stringify(req.params.stream_name)}`)
+            res.send(result.data)    
+        } catch (e) {
+            streamDebug(e)
+            res.status(500).send('Internal Server Error')
+        }
     }
 )
 

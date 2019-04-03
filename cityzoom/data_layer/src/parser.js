@@ -14,6 +14,8 @@ const consumer = require('./kafka-consumer')
 const Joi = require('joi')
 const mongoose = require('mongoose')
 const express = require('express')
+const thread = require('worker_threads')
+const process = require('child_process');
 const router = express.Router()
 
 const streamSchema = new mongoose.Schema({
@@ -81,9 +83,7 @@ const valueSchema = new mongoose.Schema({
     value: {
         type: String,
         required: true
-    },
-    location: [latSchema]
-
+    }
 })
 
 const Stream = mongoose.model('Stream', streamSchema)
@@ -153,15 +153,24 @@ router.put('/',async (req,res) => {
 
     const stream_name = await Stream.findOne({name: req.body.stream_name})
 
-    if(stream_name === null) return res.status(404).send('The stream with the given name was not found');
+    if(stream_name === null) return res.status(404).send({
+        "Error": `Stream ${req.body.stream_name} not found`
+    });
     
-    console.log(req.body)
-    var payload = prod.genDataCreationPayload('user_1', req.body.stream_name, req.body.value, Number(new Date()), req.body.location)
-    console.log(payload)
-    prod.putData(payload)
+    //var payload = prod.genDataCreationPayload('user_1', req.body.stream_name, req.body.value, Number(new Date()), req.body.location)
+    //console.log(payload)
+    //setTimeout(() => prod.putData(payload), 0)
 
-    //console.log(req)
-    res.status(200)
+    var tstamp = Number(new Date())
+    const v = new Values({
+        stream_name: req.body.stream_name,
+        timestamp: tstamp,
+        value: req.body.values
+    })
+    await v.save()
+
+    await Stream.updateOne({name: req.body.stream_name}, {lastUpdate: tstamp})
+    res.status(200).send()
 })
 
 // get values of stream with stream ID -- Passing
@@ -205,13 +214,13 @@ router.get('/list', async (req,res) => {
 })
 
 // get details from a stream --Passing
-router.param(['stream'], async (req, res, next, stream) => {
-    var query = await Stream.findOne({ name: stream })
-    var query_v = await Values.find({ stream_name: stream })
+router.get('/:stream', async (req, res) => {
+    var query = await Stream.findOne({ name: req.params.stream })
+    var query_v = await Values.find({ stream_name: req.params.stream })
     console.log(query)
     if (query !== null) {
         res.status(200).send({
-            "stream_name": stream,
+            "stream_name": req.params.stream,
             "created_at": query.creation || 0,
             "last_updated_at": query.lastUpdate || 0,
             "values": query_v.length || 0,
@@ -226,10 +235,6 @@ router.param(['stream'], async (req, res, next, stream) => {
             "status": "Stream " + stream + " not found"
         })
     }
-    next()
-})
-router.get('/:stream', (req, res, stream) => {
-
     console.log('stream:', stream)
     res.end()
 })
