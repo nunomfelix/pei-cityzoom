@@ -44,11 +44,11 @@
 <script>
 var testLayout = [
   { x: 0, y: 0, w: 6, h: 14, i: "series_a", type: 'series' },
-  { x: 6, y: 0, w: 6, h: 14, i: "series_b", type: 'stacked' },
   { x: 0, y: 14, w: 13, h: 14, i: "series_c", type: 'series' }
 ];
 
 export default {
+  middleware: ["auth"],
   data() {
     return {
       layout: testLayout,

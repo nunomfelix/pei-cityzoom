@@ -104,8 +104,8 @@ export default {
 </script>
 
 <style lang="scss">
-$sidebar-size: 205px;
-$sidebar-left-size: 80px;
+$sidebar-size: 250px;
+$sidebar-left-size: 100px;
 $sidebar-right-size: 180px;
 @import "~/assets/mixins.scss";
 
@@ -141,7 +141,7 @@ $sidebar-right-size: 180px;
       background-color: transparent;
 
       &.sidebar_header {
-        height: 90px !important;
+        height: 140px !important;
         background: linear-gradient(to bottom, #0f589c, #147bdb) white;
         background-position-x: -3px;
         background-repeat-y: no-repeat;
@@ -149,15 +149,15 @@ $sidebar-right-size: 180px;
 
       & .big_logo {
           position: absolute;
-          left: -9px;
+          left: -7px;
           z-index: 5555;
           & img {
             &:hover {
               cursor: pointer;
               transform: scale(1.03);
             }
-            height: 90px;
-            width: 220px;
+            height: 100px;
+            width: 260px;
           }
         }
 
@@ -165,8 +165,8 @@ $sidebar-right-size: 180px;
         &:not(.selected) {
           @include clickable(rgba(0, 2, 121, 0.527));
         }
-        height: 55px;
-        font-size: 1.1rem;
+        height: 60px;
+        font-size: 1.3rem;
         font-weight: 700;
         white-space: nowrap;
         & .sidebar_row_right {
@@ -179,7 +179,7 @@ $sidebar-right-size: 180px;
         width: $sidebar-left-size;
         height: 100%;
         & img {
-          transform: scale(1.4);
+          transform: scale(1.8);
         }
       }
 

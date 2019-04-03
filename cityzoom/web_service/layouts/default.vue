@@ -4,11 +4,11 @@ import middleware from '../.nuxt/middleware';
     <div v-if="$store.state.jwt != ''" style="background-color: darkgray">
       <Navbar/>
       <Header/>
-      <div style="margin-top: 120px; margin-left: 120px; margin-right: 40px;">
+      <div class="mainMargin">
         <nuxt/>
       </div>
     </div>
-    <div v-else  style="background-color: darkgray">
+    <div v-else style="background-color: darkgray">
       <nuxt/>
     </div>
   </div>
@@ -16,11 +16,21 @@ import middleware from '../.nuxt/middleware';
 
 <script>
 export default {
-  middleware: ['auth']
 };
 </script>
 
 <style>
+.mainMargin {
+  margin-top: 120px;
+  margin-left: 140px;
+  margin-right: 40px;
+}
+
+.horizontalMargin {
+  margin-left: 140px;
+  margin-right: 58px;
+}
+
 html {
   font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, "Helvetica Neue", Arial, sans-serif;
