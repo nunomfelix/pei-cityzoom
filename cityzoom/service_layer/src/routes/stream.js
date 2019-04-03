@@ -60,23 +60,9 @@ router.get('/:stream_name',
 router.get('/:stream/values',
     [authentication, validationMiddleware(validateGetDataFromStream, 'params')],
     async (req, res) => {
-<<<<<<< HEAD
-        const result = await axios.get(config.get('DATA_LAYER_URL') + '/czb/stream/values', { params: req.query })
-        streamDebug(`Retrieved values from stream ${JSON.stringify(req.params.stream_name)}`)
+        const result = await axios.get(config.get('DATA_LAYER_URL') + '/czb/stream/values', { params: req.params })
+        streamDebug(`Retrieved values from stream ${JSON.stringify(req.params.stream)}`)
         res.send(result.data)
-=======
-        try {
-            console.log('req query: ',req.params)
-
-            const result = await axios.get(config.get('DATA_LAYER_URL') + '/czb/stream/values', { params : req.params})
-            console.log('res:', result.status)
-            streamDebug(`Retrieved values from stream ${JSON.stringify(req.params.stream_name)}`)
-            res.send(result.data)
-        } catch (e) {
-            streamDebug(e)
-            res.status(500).send('Internal Server Error')
-        }
->>>>>>> develop
     }
 )
 
