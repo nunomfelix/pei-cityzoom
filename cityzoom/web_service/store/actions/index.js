@@ -38,20 +38,11 @@ export default{
         try {
 
             const res = await axios.post(getUrl() + '/user', payload)
-
-            commit('SET_STORE', { jwt: res.data.token });
-
-            console.log('LOGIN')
-
-            if (state.socket) {
-                state.socket.emit('login', { jwt: state.jwt })
-            }
-            this.$router.push('/homepage')
+            return {content:'Succesfuly registered, you can now login', username: payload.username}
 
         } catch (error) {
-            commit('SET_STORE', { errorMessage:'Username or email already in use!' });
             console.error('Error', error)
-            return { error: error.response }
+            return 'Username or email already in use!'
         }
 
     },
@@ -67,9 +58,7 @@ export default{
             this.$router.push('/homepage')
 
         } catch (err) {
-            commit('SET_STORE', { errorMessage:'Invalid username or password!' });
-            console.error('Error', err)
-            return err
+            return 'Invalid username or password!';
         }
 
     },
