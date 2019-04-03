@@ -214,13 +214,13 @@ router.get('/list', async (req,res) => {
 })
 
 // get details from a stream --Passing
-router.param(['stream'], async (req, res, next, stream) => {
-    var query = await Stream.findOne({ name: stream })
-    var query_v = await Values.find({ stream_name: stream })
+router.get('/:stream', async (req, res) => {
+    var query = await Stream.findOne({ name: req.params.stream })
+    var query_v = await Values.find({ stream_name: req.params.stream })
     console.log(query)
     if (query !== null) {
         res.status(200).send({
-            "stream_name": stream,
+            "stream_name": req.params.stream,
             "created_at": query.creation || 0,
             "last_updated_at": query.lastUpdate || 0,
             "values": query_v.length || 0,
@@ -235,10 +235,6 @@ router.param(['stream'], async (req, res, next, stream) => {
             "status": "Stream " + stream + " not found"
         })
     }
-    next()
-})
-router.get('/:stream', (req, res, stream) => {
-
     console.log('stream:', stream)
     res.end()
 })
