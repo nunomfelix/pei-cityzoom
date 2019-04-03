@@ -20,7 +20,7 @@ export default {
         state.modifier++;
         Object.keys(transObject).forEach(key => { 
             
-            if(!process.server && ['jwt','priviledge'].includes(key)) {
+            if(!process.server && ['jwt'].includes(key)) {
                 Cookie.set(key, transObject[key])
                 localStorage.setItem(key,transObject[key])
             }

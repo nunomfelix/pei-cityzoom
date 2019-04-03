@@ -10,7 +10,7 @@
 export default {
   methods: {
     async logout() {
-      await this.$store.dispatch("user_logout");
+        await this.$store.dispatch('user_logout')
     }
   }
 };
@@ -31,7 +31,9 @@ export default {
   @include row();
   justify-content: flex-end;
 
-  @include shadow(3px, 2px, 5px, 0px, #4d4c4c);
+  box-shadow: 3px 2px 5px 0px #4d4c4c;
+  -webkit-box-shadow: 3px 2px 5px 0px #4d4c4c;
+  -moz-box-shadow: 3px 2px 5px 0px #4d4c4c;
 
   &_buttons {
     & img {
