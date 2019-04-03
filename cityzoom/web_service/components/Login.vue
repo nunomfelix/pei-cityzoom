@@ -8,7 +8,7 @@
         <label for="password">Enter your password</label>
         <input class="input_cancel" name="password" v-model="pw" type="password" required>
         <button class="btn btn-success mt-4" type="submit">LOGIN</button>
-        <button v-on:click="currentForm = 1; $store.commit('SET_STORE', {errorMessage: ''});" class="btn btn-danger" type="button">CREATE ACCOUNT</button>
+        <button v-on:click="currentForm = 1; $store.commit('SET_STORE', {errorMessage: ''});" class="btn btn-primary" type="button">CREATE ACCOUNT</button>
         <div :class="{'show':errorMessage != ''}" class="alert">{{errorMessage}}</div>
       </form>
       <form :class="{'show': currentForm}" v-on:submit.prevent="register" class="rowc register">
@@ -21,7 +21,7 @@
         <label for="password_r">Enter a password</label>
         <input class="input_cancel" name="password_r" v-model="pw_r" type="password" required>
         <button class="btn btn-success mt-4" type="submit">REGISTER</button>
-        <button v-on:click="currentForm = 0; $store.commit('SET_STORE', {errorMessage: ''})" class="btn btn-danger" type="button">SIGN IN</button>
+        <button v-on:click="currentForm = 0; $store.commit('SET_STORE', {errorMessage: ''})" class="btn btn-primary" type="button">SIGN IN</button>
         <div :class="{'show':errorMessage != ''}" class="alert">{{errorMessage}}</div>
       </form>
     </div>
@@ -98,6 +98,7 @@ export default {
     @include transition(transform, 0.25s, ease-out, 0s);
 
     & .alert {
+      @include shadow(0px, 0px, 10px, 0px, #4d4c4c);
       border-radius: 10px;
       font-weight: 700;
       color: white;
