@@ -44,14 +44,14 @@ function validateGetAllStreams(object) {
 
 function validateGetStreamByID(object) {
     const schema = Joi.object().keys({
-        stream_name: Joi.string().required()
+        stream: Joi.string().required()
     })
     return Joi.validate(object, schema)
 }
 
 function validateGetDataFromStream(object) {
     const schema = Joi.object().keys({
-        stream_name: Joi.string().required(),
+        stream: Joi.string().required(),
         interval_start: Joi.number().integer(),
         interval_end: Joi.number().integer()
     })

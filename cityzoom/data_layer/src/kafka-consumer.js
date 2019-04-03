@@ -27,18 +27,9 @@ const readData = async (receiver, stream_name) => {
         reject(e)
       })
     consumer.run({
-      // eachBatch: async ({ batch }) => {
-      //   /* TO DO:
-      //    *  -> stop consumer after a certain amount of time 
-      //    *  -> send the last committed offset to data layer database
-      //    *  -> send the batch to data layer with the offset 
-      //   */
-      //   console.log(`${batch.messages}`)
-      // },
-      eachMessage: async ({ topic, partition, message }) => {
-        const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`
-        console.log(`- ${prefix} ${message.key}#${message.value}`)
-        receiver(`- ${prefix} ${message.key}#${message.value}`)
+      eachMessage: async ({ topic, message }) => {
+        console.log(`- ${topic} ${message.timestamp} ${message.key}#${message.value}`)
+        receiver(`- ${topic} ${message.timestamp} ${message.key}#${message.value}`)
         resolve('ok')
       }
     })

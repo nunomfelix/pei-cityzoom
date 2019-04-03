@@ -139,7 +139,11 @@ $sidebar-right-size: 180px;
       background-color: transparent;
 
       &.sidebar_header {
+<<<<<<< HEAD
+        height: 140px !important;
+=======
         height: 135px !important;
+>>>>>>> 6f6655d3e3f55b16bad8db5d9325536f247389a6
         background: linear-gradient(to bottom, #0f589c, #147bdb) white;
         background-position-x: -3px;
         background-repeat-y: no-repeat;

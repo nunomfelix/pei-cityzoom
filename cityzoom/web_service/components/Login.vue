@@ -134,9 +134,9 @@ export default {
     @include transition(transform, 0.25s, ease-out, 0s);
 
     & .alert {
+      @include shadow(0px, 0px, 10px, 0px, #4d4c4c);
       text-align: center;
       width: 380px;
-      @include shadow(0px, 0px, 10px, 0px, #4d4c4c);
       border-radius: 10px;
       font-weight: 700;
       color: white;

@@ -20,8 +20,13 @@ export default async function(context) {
         if(jwt) {
             const error = await context.store.dispatch('renew_data', jwt)
             if(!error) {
+<<<<<<< HEAD
+                if(context.route.path = '/')
+                    conrext.redirect('/homepage')
+=======
                 if(context.route.path == '/')
                     context.redirect('/homepage')
+>>>>>>> 6f6655d3e3f55b16bad8db5d9325536f247389a6
                 return
             }
         } 
