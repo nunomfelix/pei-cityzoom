@@ -48,12 +48,13 @@ router.get('/:stream_name',
     async (req, res) => {
         try {
             result = await axios.get(config.get('DATA_LAYER_URL') + '/czb/stream/' + req.params.stream_name)
+            console.log('res: ', result.status)
+            streamDebug(`Stream loaded with name ${JSON.stringify(req.params.stream_name)}`)
+            res.send(result.data)
         } catch (e) {
             streamDebug(e)
             res.status(500).send('Internal Server Error')
         }
-        streamDebug(`Stream loaded with name ${JSON.stringify(req.params.stream_name)}`)
-        res.send(result.data)
     }
 )
 
@@ -72,13 +73,15 @@ router.get('/:stream_name/values',
     async (req, res) => {
         const result = null
         try {
+            console.log(req.query)
             result = await axios.get(config.get('DATA_LAYER_URL') + '/czb/stream/values', { params: req.query })
+            console.log('res:', result.status)
+            streamDebug(`Retrieved values from stream ${JSON.stringify(req.params.stream_name)}`)
+            res.send(result.data)    
         } catch (e) {
             streamDebug(e)
             res.status(500).send('Internal Server Error')
         }
-        streamDebug(`Retrieved values from stream ${JSON.stringify(req.params.stream_name)}`)
-        res.send(result.data)
     }
 )
 
