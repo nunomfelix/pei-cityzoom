@@ -1,7 +1,7 @@
 <template>
   <div class="rowc forms" :class="{show}">
     <img @load="loaded()" src="icons/sidebar/big_logo.png" :class="{show}">
-    <div style="position: relative;">
+    <div style="position: relative; width: 100%; height: 600px; overflow-x: hidden;">
       <form :class="{'show': !currentForm}" v-on:submit.prevent="login" class="rowc login">
         <label for="username">Enter your username</label>
         <input class="input_cancel" name="username" v-model="username" type="text" required>

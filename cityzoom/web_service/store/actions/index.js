@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 function getUrl(){
-    return process.client ? "http://193.136.93.14:8002" : "http://localhost:8002";
+    return process.client ? "http://localhost:8002" : "http://localhost:8002";
 }
 
 export default{
@@ -92,4 +92,36 @@ export default{
         commit('SET_STORE', { jwt:token });
 
     },
+    get_streams: async function ({ commit, state }, payload) {
+        try {
+            const res = await axios({
+                method: 'get',
+                url: getUrl() + '/stream',
+                headers: {
+                    'Authorization': state.jwt
+                }
+            })
+            commit('STREAMS_UPDATE', res)
+
+        } catch (err) {
+            console.error('Error', err.message)
+            return err
+        }
+    },
+    get_stream_value: async function ({ commit, state }, payload) {
+        try {
+            const res = await axios({
+                method: 'get',
+                url: getUrl() + '/stream/' + payload.name+'/values',
+                headers: {
+                    'Authorization': state.jwt
+                }
+            })
+            console.log(res)
+
+        } catch (err) {
+            console.error('Error', err.message)
+            return err
+        }
+    }
 }

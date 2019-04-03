@@ -1,7 +1,7 @@
 <template>
   <div class="header">
     <div class="rowr header_buttons horizontalMargin">
-      <img src="icons/header/logout.jpg" @click="logout()">
+      <img src="icons/header/logout.png" @click="logout()">
     </div>
   </div>
 </template>

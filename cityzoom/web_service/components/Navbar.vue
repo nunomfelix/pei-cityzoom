@@ -104,9 +104,9 @@ export default {
 </script>
 
 <style lang="scss">
-$sidebar-size: 250px;
+$sidebar-size: 300px;
 $sidebar-left-size: 100px;
-$sidebar-right-size: 180px;
+$sidebar-right-size: 200px;
 @import "~/assets/mixins.scss";
 
 .sidebarWrapper {
@@ -164,7 +164,7 @@ $sidebar-right-size: 180px;
           @include clickable(rgba(0, 2, 121, 0.527));
         }
         height: 60px;
-        font-size: 1.3rem;
+        font-size: 1.5rem;
         font-weight: 700;
         white-space: nowrap;
         & .sidebar_row_right {
@@ -177,7 +177,7 @@ $sidebar-right-size: 180px;
         width: $sidebar-left-size;
         height: 100%;
         & img {
-          transform: scale(1.8);
+          transform: scale(2);
         }
       }
 

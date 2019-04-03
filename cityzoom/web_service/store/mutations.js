@@ -69,5 +69,8 @@ export default {
     socket_update(state, message) {
         console.log('socket_update', message);
         state.modifier++;
-    }   
+    },
+    STREAMS_UPDATE(state, streams) {
+        console.log(streams)
+    }
 }
