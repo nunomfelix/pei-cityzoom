@@ -33,31 +33,33 @@ export default{
         }
 
     },
-    user_register: async function ({ dispatch, state }, payload) {
+    user_register: async function ({ commit, state }, payload) {
 
         try {
 
-            const res = await axios.post(getUrl() + '/user/register', payload)
+            const res = await axios.post(getUrl() + '/user', payload)
 
-            await dispatch('userdata_store', { data: res.data })
+            commit('SET_STORE', { jwt: res.data.token });
 
             console.log('LOGIN')
 
             if (state.socket) {
                 state.socket.emit('login', { jwt: state.jwt })
             }
+            this.$router.push('/homepage')
 
         } catch (error) {
+            commit('SET_STORE', { errorMessage:'Username or email already in use!' });
             console.error('Error', error)
             return { error: error.response }
         }
 
     },
-    user_login: async function ({ dispatch, state }, payload) {
+    user_login: async function ({ commit, state }, payload) {
 
         try {
             const res = await axios.post(getUrl() + '/user/login', payload)
-            await dispatch('userdata_store', { data: res.data })
+            commit('SET_STORE', { jwt: res.data.token });
 
             if (process.client && state.socket) {
                 state.socket.emit('login', { jwt: state.jwt })
@@ -65,9 +67,33 @@ export default{
             this.$router.push('/homepage')
 
         } catch (err) {
+            commit('SET_STORE', { errorMessage:'Invalid username or password!' });
+            console.error('Error', err)
+            return err
+        }
+
+    },
+    user_logout: async function ({ commit, state }, payload) {
+
+        try {
+            const res = await axios({
+                method: 'get',
+                url: getUrl() + '/user/logout',
+                headers: {
+                    'Authorization': state.jwt
+                }
+            })
+            console.log(res)
+            commit('SET_STORE', {
+                jwt: '',
+            })
+            this.$router.push('/')
+        } catch (err) {
             console.error('Error', err.message)
             return err
         }
+        // this.$router.push('/')
+        // //some logic here, DELETE COOKIES AND LOCALSTORAGE, also invalidate token
 
     },
     userdata_store: function ({ commit, state }, payload) {

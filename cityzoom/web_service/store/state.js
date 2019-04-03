@@ -1,3 +1,4 @@
 export default () => ({
-    jwt: ''
+    jwt: '',
+    errorMessage: ''
 })
