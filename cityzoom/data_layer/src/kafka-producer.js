@@ -79,7 +79,6 @@ const pushData = async payload => {
     producer.send(payload)
             .then( e => {
               resolve(e)
-              process.exit(0)
             })
             .catch(e => {
               console.log('Error pushing data to kafka broker:\n', e)
@@ -95,6 +94,7 @@ const putData = async payload => {
   const a = await pushData(payload)
   console.log('Data sent: ', a)
   await producer.disconnect()
+  //process.abort()
 }
 
 const genDataCreationPayload = (account_name, stream_name, value, timestamp, location=[180.0,90.0]) => {

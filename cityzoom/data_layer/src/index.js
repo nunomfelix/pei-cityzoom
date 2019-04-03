@@ -13,7 +13,7 @@ app.use(express.json())
 mongoose.connect('mongodb://localhost/city_zoom_data_layer', {useNewUrlParser: true})
     .then(() => {
         console.log('Connected to MongoDB...')
-        fetch(config.get('FETCHING_PERIOD'))
+        //fetch(config.get('FETCHING_PERIOD'))
     })
     .catch(() => console.log('Could not connect to MongoDB...'))
 
