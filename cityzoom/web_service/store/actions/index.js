@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 function getUrl(){
-    return process.client ? "http://localhost:8002" : "http://localhost:8002";
+    return process.client ? "http://193.136.93.14:8002" : "http://localhost:8002";
 }
 
 export default{
