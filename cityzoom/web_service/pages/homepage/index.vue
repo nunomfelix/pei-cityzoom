@@ -19,7 +19,7 @@
           :w="item.w"
           :h="item.h"
           :i="item.i"
-          :minW="6"
+          :minW="4"
           :minH="14"
           :maxH="14"
           drag-allow-from=".widget_handle"
@@ -29,7 +29,7 @@
               <img src="icons/widgets/handler.png">
             </div>
             <div v-if="item.type=='series'">
-              <SeriesGraph :name="item.i"/>
+              <SeriesGraph :data="item.data && item.data == 'fake' ? null : data" :name="item.i"/>
             </div>
             <div v-if="item.type=='stacked'">
               <StackedBar :name="item.i"/>
@@ -43,8 +43,9 @@
 
 <script>
 var testLayout = [
-  { x: 0, y: 0, w: 6, h: 14, i: "series_a", type: 'series' },
-  { x: 0, y: 14, w: 13, h: 14, i: "series_c", type: 'series' }
+  { x: 0, y: 0, w: 4, h: 14, i: "series_a", type: 'series', data:'normal' },
+  { x: 4, y: 0, w: 8, h: 14, i: "series_c", type: 'series', data: 'fake' },
+  { x: 0, y: 14, w: 13, h: 14, i: "series_b", type: 'series', data: 'fake' },
 ];
 
 export default {
@@ -52,10 +53,25 @@ export default {
   data() {
     return {
       layout: testLayout,
+      data: []
     };
   }, 
-  mounted() {
-  }
+  mounted: async function() {
+    const data = []
+    const res = await this.$store.dispatch('get_streams');
+    for(let i in res) {
+      const values = await this.$store.dispatch('get_stream_values', {name: res[i].name})
+      for(let v in values) {
+        data.push({
+          dataset: res[i].name,
+          key: values[v].timestamp,
+          value: values[v].value
+        })
+      }
+    }
+    this.data = data
+    console.log(this.data)
+  },
 };
 </script>
 

@@ -102,13 +102,14 @@ export default{
                 }
             })
             commit('STREAMS_UPDATE', res)
+            return res.data.user_streams
 
         } catch (err) {
             console.error('Error', err.message)
             return err
         }
     },
-    get_stream_value: async function ({ commit, state }, payload) {
+    get_stream_values: async function ({ commit, state }, payload) {
         try {
             const res = await axios({
                 method: 'get',
@@ -117,7 +118,8 @@ export default{
                     'Authorization': state.jwt
                 }
             })
-            console.log(res)
+            commit('STREAMS_UPDATE_VALUES', { name: payload.name, values: res.data.values })
+            return res.data.values
 
         } catch (err) {
             console.error('Error', err.message)

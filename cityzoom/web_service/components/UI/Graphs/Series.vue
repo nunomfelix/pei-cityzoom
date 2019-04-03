@@ -26,17 +26,18 @@
 import * as crossfilter from "crossfilter2";
 export default {
   props: {
-    name: String
+    name: String,
+    data: Array
   },
   data() {
     return {
-      data: [],
       filteredKeys: [],
 
       ndx: null,
       max: 0,
       min: 999,
-      i: 0,
+      xMin: 99999999999999,
+      xMax: 0,
 
       tmpNames: [
         "temperature",
@@ -70,22 +71,36 @@ export default {
       var dimension, group;
       //this.dc.d3.csv("morley.csv", function(error, experiments) {
 
-      for (var i = 0; i < 250; i++) {
-        for (var j = 0; j < 3; j++) {
-          const x = Math.random() * 100000;
-          const val = {
-            dataset: this.tmpNames[j],
-            key: this.i,
-            value: x
-          };
-          if (x > this.max) this.max = x;
-          if (x < this.min) this.min = x;
-          this.data.push(val);
+      console.log(this.data)
+      if (this.data) {
+        for (let v in this.data) {
+          if (this.data[v].value > this.max) this.max = this.data[v].value;
+          else if (this.data[v].value < this.min) this.min = this.data[v].value;
+          if (this.data[v].key < this.xMin) this.xMin = Number(this.data[v].key);
+          else if (this.data[v].key > this.xMax) this.xMax = Number(this.data[v].key);
         }
-        this.i++;
+      } else {
+        this.data = []
+        for (var i = 0; i < 250; i++) {
+          for (var j = 0; j < 5; j++) {
+            const x = Math.random() * 100;
+            const val = {
+              dataset: this.tmpNames[j],
+              key: i,
+              value: x
+            };
+            if (x > this.max) this.max = x;
+            if (x < this.min) this.min = x;
+            this.data.push(val);
+          }
+        }
+        this.xMin = -5;
+        this.xMax = i + 10;
+        console.log(this.data)
       }
-      this.min = this.min - this.max * 0.15;
-      this.max = this.max + this.max * 0.15;
+
+      this.min = Number(this.min) - Number(this.max) * 0.15;
+      this.max = Number(this.max) + Number(this.max) * 0.15;
 
       this.ndx = crossfilter(this.data);
       dimension = this.ndx.dimension(function(d) {
@@ -98,7 +113,8 @@ export default {
       this.focusChart
         .height(480)
         //.chart(function (c) { returnthis.dc.lineChart(c).curve(this.dc.d3.curveCardinal); })
-        .x(this.dc.d3.scaleLinear().domain([0, 6]))
+        .x(this.dc.d3.scaleLinear().domain([this.xMin, this.xMax]))
+        .y(this.dc.d3.scaleLinear().domain([this.min, this.max]))
         .brushOn(false)
         .yAxisLabel("Values")
         .yAxisPadding(5)
@@ -118,8 +134,6 @@ export default {
         .valueAccessor(function(d) {
           return +d.value;
         });
-      this.focusChart.x(this.dc.d3.scaleLinear().domain([-1, this.i]));
-      this.focusChart.y(this.dc.d3.scaleLinear().domain([this.min, this.max]));
       //this.focusChart.yAxis().tickFormat(function (d) { return this.dc.d3.format(',d')(d + 299500); });
       this.focusChart.margins().left += 20;
       this.focusChart.margins().right += 45;
@@ -127,14 +141,12 @@ export default {
       this.overviewChart
         .height(150)
         //.chart(function (c) { returnthis.dc.lineChart(c).curve(this.dc.d3.curveCardinal); })
-        .x(this.dc.d3.scaleLinear().domain([0, 6]))
         .brushOn(true)
         .xAxisLabel("Time")
         .clipPadding(10)
         .dimension(dimension)
-        .group(group);
-      this.overviewChart.x(this.dc.d3.scaleLinear().domain([-1, this.i]));
-      this.overviewChart
+        .group(group)
+        .x(this.dc.d3.scaleLinear().domain([this.xMin, this.xMax]))
         .y(this.dc.d3.scaleLinear().domain([this.min, this.max]))
         .seriesAccessor(function(d) {
           return "Subscription: " + d.key[0];
@@ -151,9 +163,10 @@ export default {
 
       this.focusChart.render();
       this.overviewChart.render();
-      this.focusChart.focus([i * 0.45, i * 0.55]);
+      this.focusChart.focus([this.xMax - (this.xMax - this.xMin) * .66, this.xMax - (this.xMax - this.xMin) * .44]);
+      console.log(this.focusChart.filters())
       this.onResize();
-    }, 100);
+    }, 1000);
   },
   methods: {
     reset() {

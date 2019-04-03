@@ -14,6 +14,8 @@ const consumer = require('./kafka-consumer')
 const Joi = require('joi')
 const mongoose = require('mongoose')
 const express = require('express')
+//const thread = require('worker_threads')
+//const process = require('child_process');
 const router = express.Router()
 
 const streamSchema = new mongoose.Schema({
@@ -54,7 +56,9 @@ const streamSchema = new mongoose.Schema({
         type: Number,
         required: true
     }
-})
+}, {
+        versionKey: false
+    })
 
 const latSchema = new mongoose.Schema({
     latitude: {
@@ -65,7 +69,9 @@ const latSchema = new mongoose.Schema({
         type: Number,
         required: true
     }
-})
+}, {
+        versionKey: false
+    })
 
 const valueSchema = new mongoose.Schema({
     stream_name: {
@@ -81,19 +87,19 @@ const valueSchema = new mongoose.Schema({
     value: {
         type: String,
         required: true
-    },
-    location: [latSchema]
-
-})
+    }
+}, {
+        versionKey: false
+    })
 
 const Stream = mongoose.model('Stream', streamSchema)
 const Values = mongoose.model('Value', valueSchema)
 
 // create stream -- Passing
-router.post('/', async (req,res) => {
-    const {error} = validateCreate(req.body);
-    if(error) return res.status(400).send(error.details[0].message);
-    
+router.post('/', async (req, res) => {
+    const { error } = validateCreate(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
+
     //temp
     var account = 'user_1'
 
@@ -147,37 +153,46 @@ router.post('/', async (req,res) => {
 })
 
 // put data into stream
-router.put('/',async (req,res) => {
-    const {error} = validatePutData(req.body);
-    if(error) return res.status(400).send(error.details[0].message);
+router.put('/', async (req, res) => {
+    const { error } = validatePutData(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
 
-    const stream_name = await Stream.findOne({name: req.body.stream_name})
+    const stream_name = await Stream.findOne({ name: req.body.stream_name })
 
-    if(stream_name === null) return res.status(404).send('The stream with the given name was not found');
-    
-    console.log(req.body)
-    var payload = prod.genDataCreationPayload('user_1', req.body.stream_name, req.body.value, Number(new Date()), req.body.location)
-    console.log(payload)
-    prod.putData(payload)
+    if (stream_name === null) return res.status(404).send({
+        "Error": `Stream ${req.body.stream_name} not found`
+    });
 
-    //console.log(req)
-    res.status(200)
+    //var payload = prod.genDataCreationPayload('user_1', req.body.stream_name, req.body.value, Number(new Date()), req.body.location)
+    //console.log(payload)
+    //setTimeout(() => prod.putData(payload), 0)
+
+    var tstamp = Number(new Date())
+    const v = new Values({
+        stream_name: req.body.stream_name,
+        timestamp: tstamp,
+        value: req.body.values
+    })
+    await v.save()
+
+    await Stream.updateOne({ name: req.body.stream_name }, { lastUpdate: tstamp })
+    res.status(200).send()
 })
 
 // get values of stream with stream ID -- Passing
-router.get('/values', async (req,res) => {
-  
-    const {error} = validateQueryGetDataString(req.query)
-    if(error) return res.status(400).send(error.details[0].message);
+router.get('/values', async (req, res) => {
 
-    const exist = await Stream.findOne({name: req.query.stream})
+    const { error } = validateQueryGetDataString(req.query)
+    if (error) return res.status(400).send(error.details[0].message);
+
+    const exist = await Stream.findOne({ name: req.query.stream })
     if (exist === null) {
         return res.status(404).send({
-            "status": "Stream "+req.body.stream+" not found"
+            "status": "Stream " + req.body.stream + " not found"
         })
     }
-    const query = await Values.find({stream_name: req.query.stream})
-        
+    const query = await Values.find({ stream_name: req.query.stream })
+
     res.status(200).send({
         "stream_name": req.query.stream,
         "total": query.length,
@@ -186,10 +201,10 @@ router.get('/values', async (req,res) => {
 })
 
 // get all streams -- Passing
-router.get('/list', async (req,res) => {
-  
-    const {error} = validateQueryGetStreamsString(req.query);
-    if(error) return res.status(400).send(error.details[0].message);
+router.get('/list', async (req, res) => {
+
+    const { error } = validateQueryGetStreamsString(req.query);
+    if (error) return res.status(400).send(error.details[0].message);
 
     console.log(req.query)
 
@@ -205,13 +220,13 @@ router.get('/list', async (req,res) => {
 })
 
 // get details from a stream --Passing
-router.param(['stream'], async (req, res, next, stream) => {
-    var query = await Stream.findOne({ name: stream })
-    var query_v = await Values.find({ stream_name: stream })
+router.get('/:stream', async (req, res) => {
+    var query = await Stream.findOne({ name: req.params.stream })
+    var query_v = await Values.find({ stream_name: req.params.stream })
     console.log(query)
     if (query !== null) {
         res.status(200).send({
-            "stream_name": stream,
+            "stream_name": req.params.stream,
             "created_at": query.creation || 0,
             "last_updated_at": query.lastUpdate || 0,
             "values": query_v.length || 0,
@@ -226,10 +241,6 @@ router.param(['stream'], async (req, res, next, stream) => {
             "status": "Stream " + stream + " not found"
         })
     }
-    next()
-})
-router.get('/:stream', (req, res, stream) => {
-
     console.log('stream:', stream)
     res.end()
 })
@@ -246,36 +257,39 @@ router.delete('/', async (req, res) => {
 })
 
 // validate /values query string
-function validateQueryGetDataString(stream){
-    const schema = { stream         : Joi.string().min(4).required(),
-                     interval_start : Joi.number(),
-                     interval_end   : Joi.number()                
+function validateQueryGetDataString(stream) {
+    const schema = {
+        stream: Joi.string().min(4).required(),
+        interval_start: Joi.number(),
+        interval_end: Joi.number()
     }
     return Joi.validate(stream, schema)
 }
 
 // validate /list query string
-function validateQueryGetStreamsString(stream){
-    const schema = { interval_start : Joi.number(),
-                     interval_end   : Joi.number()                
+function validateQueryGetStreamsString(stream) {
+    const schema = {
+        interval_start: Joi.number(),
+        interval_end: Joi.number()
     }
     return Joi.validate(stream, schema)
 }
 
 // validate PUT / request body
-function validatePutData(stream){
-    const schema = { stream_name : Joi.string().min(4).required(),
-                     values     : Joi.string().min(4).required(),
-                     location   : Joi.array().items( Joi.number().required() , Joi.number().required())
+function validatePutData(stream) {
+    const schema = {
+        stream_name: Joi.string().min(4).required(),
+        values: Joi.string().min(4).required(),
+        location: Joi.array().items(Joi.number().required(), Joi.number().required())
     }
     return Joi.validate(stream, schema)
 }
 
 // validate POST / request body
-function validateCreate(stream){
-    const schema = { 
-        name:        Joi.string().min(4).required(),
-        type:        Joi.string().min(4).required(),
+function validateCreate(stream) {
+    const schema = {
+        name: Joi.string().min(4).required(),
+        type: Joi.string().min(4).required(),
         description: Joi.string(),
         mobile: Joi.boolean(),
         periodicity: Joi.number().integer().positive(),

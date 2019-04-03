@@ -71,6 +71,9 @@ export default {
         state.modifier++;
     },
     STREAMS_UPDATE(state, streams) {
-        console.log(streams)
+        state.streams = [...streams.data.user_streams]
+    },
+    STREAMS_UPDATE_VALUES(state, data) {
+        state.streams.find(s => s.name == data.name)['values'] = data.values
     }
 }
