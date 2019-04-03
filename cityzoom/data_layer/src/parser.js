@@ -151,9 +151,9 @@ router.put('/',async (req,res) => {
     const {error} = validatePutData(req.body);
     if(error) return res.status(400).send(error.details[0].message);
 
-    const stream_name = await Stream.findOneAndUpdate(req.body.name)
+    const stream_name = await Stream.findOne({name: req.body.stream_name})
 
-    if(!stream_name) return res.status(404).send('The stream with the given name was not found');
+    if(stream_name === null) return res.status(404).send('The stream with the given name was not found');
     
     console.log(req.body)
     var payload = prod.genDataCreationPayload('user_1', req.body.stream_name, req.body.value, Number(new Date()), req.body.location)
@@ -204,7 +204,7 @@ router.get('/list', async (req,res) => {
     )
 })
 
-// get details from a stream 
+// get details from a stream --Passing
 router.param(['stream'], async (req, res, next, stream) => {
     var query = await Stream.findOne({ name: stream })
     var query_v = await Values.find({ stream_name: stream })

@@ -1,0 +1,6 @@
+{
+    "SERVICE_LAYER_URL": "http://193.136.93.14:8002",
+    "DATA_LAYER_URL": "http://193.136.93.14:8001",
+    "TOKEN_GENERATION_SECRET": "cityzoomsecret",
+    "FETCHING_PERIOD": 10
+}

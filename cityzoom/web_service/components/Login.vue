@@ -6,9 +6,20 @@
         <label for="username">Enter your username</label>
         <input class="input_cancel" name="username" v-model="username" type="text" required>
         <label for="password">Enter your password</label>
-        <input id="username_focus" class="input_cancel" name="password" v-model="pw" type="password" required>
+        <input
+          id="username_focus"
+          class="input_cancel"
+          name="password"
+          v-model="pw"
+          type="password"
+          required
+        >
         <button class="btn btn-success mt-4" type="submit">LOGIN</button>
-        <button v-on:click="currentForm = 1; message='';" class="btn btn-primary" type="button">CREATE ACCOUNT</button>
+        <button
+          v-on:click="currentForm = 1; message='';"
+          class="btn btn-primary"
+          type="button"
+        >CREATE ACCOUNT</button>
         <div :class="{'show':message != ''}" class="alert">{{message}}</div>
       </form>
       <form :class="{'show': currentForm}" v-on:submit.prevent="register" class="rowc register">
@@ -21,7 +32,11 @@
         <label for="password_r">Enter a password</label>
         <input class="input_cancel" name="password_r" v-model="pw_r" type="password" required>
         <button class="btn btn-success mt-4" type="submit">REGISTER</button>
-        <button v-on:click="currentForm = 0; message='';" class="btn btn-primary" type="button">SIGN IN</button>
+        <button
+          v-on:click="currentForm = 0; message='';"
+          class="btn btn-primary"
+          type="button"
+        >SIGN IN</button>
         <div :class="{'show':message != ''}" class="alert">{{message}}</div>
       </form>
     </div>
@@ -38,7 +53,7 @@ export default {
       pw_r: "12345",
       email: "teste@gmail.com",
 
-      message: '',
+      message: "",
 
       show: false,
       currentForm: 0
@@ -50,9 +65,9 @@ export default {
         username: this.username,
         password: this.pw
       });
-      this.message = res
-      const alerts = document.getElementsByClassName('alert')
-      for(var i of alerts) {
+      this.message = res;
+      const alerts = document.getElementsByClassName("alert");
+      for (var i of alerts) {
         i.style.backgroundColor = "red";
       }
     },
@@ -63,22 +78,22 @@ export default {
         email: this.email,
         password: this.pw
       });
-      if(res.content) {
+      if (res.content) {
         this.currentForm = 0;
         setTimeout(() => {
-          this.message = res.content
-        },300)
-        this.username = res.username
-        this.pw = ''
-        const alerts = document.getElementsByClassName('alert')
-        for(var i of alerts) {
+          this.message = res.content;
+        }, 300);
+        this.username = res.username;
+        this.pw = "";
+        const alerts = document.getElementsByClassName("alert");
+        for (var i of alerts) {
           i.style.backgroundColor = "darkblue";
         }
-        document.getElementById('username_focus').focus()
+        document.getElementById("username_focus").focus();
       } else {
-        this.message = res
-        const alerts = document.getElementsByClassName('alert')
-        for(var i of alerts) {
+        this.message = res;
+        const alerts = document.getElementsByClassName("alert");
+        for (var i of alerts) {
           i.style.backgroundColor = "red";
         }
       }
@@ -87,16 +102,15 @@ export default {
       this.show = true;
     }
   },
-  computed: {
-  },
+  computed: {},
   mounted() {
-      const inputs = document.getElementsByClassName('input_cancel')
-      for(var i of inputs) {
-        i.addEventListener('input', () => {
-          this.message = ''
-        })
-      }
+    const inputs = document.getElementsByClassName("input_cancel");
+    for (var i of inputs) {
+      i.addEventListener("input", () => {
+        this.message = "";
+      });
     }
+  }
 };
 </script> 
 
@@ -127,7 +141,6 @@ export default {
       font-weight: 700;
       color: white;
       opacity: 0;
-      background-color: red;
       margin-top: 35px;
       &.show {
         @include transition(opacity, 0.25s, ease-out, 0s);
@@ -135,36 +148,35 @@ export default {
       }
     }
 
-    &.register {
-      position: absolute;
-      left: 50%;
-      transform: translate(-50%, 0%);
-      &:not(.show) {
-        transform: translate(-50%, 0%) translateX(calc(100vw));
-      }
-    }
-
-    &.login {
-      position: absolute;
-      left: 50%;
-      transform: translate(-50%, 0%);
-      &:not(.show) {
-        transform: translate(-50%, 0%) translateX(calc(-100vw));
-      }
-    }
-
-    & label {
+    & .alert {
+      border-radius: 10px;
       font-weight: 700;
       color: white;
-      margin-top: 15px;
-      margin-bottom: 0;
-    }
-    & input {
-      text-align: center;
-      margin-bottom: 15px;
-    }
-    & button {
-      margin-top: 10px;
+      opacity: 0;
+      background-color: red;
+      margin-top: 20px;
+      &.show {
+        position: absolute;
+        left: 50%;
+        transform: translate(-50%, 0%);
+        &:not(.show) {
+          transform: translate(-50%, 0%) translateX(calc(-100vw));
+        }
+      }
+
+      & label {
+        font-weight: 700;
+        color: white;
+        margin-top: 15px;
+        margin-bottom: 0;
+      }
+      & input {
+        text-align: center;
+        margin-bottom: 15px;
+      }
+      & button {
+        margin-top: 10px;
+      }
     }
   }
 }

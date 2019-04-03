@@ -41,6 +41,7 @@ export default{
             return {content:'Succesfuly registered, you can now login', username: payload.username}
 
         } catch (error) {
+            commit('SET_STORE', { errorMessage:'Username or email already in use!' });
             console.error('Error', error)
             return 'Username or email already in use!'
         }
