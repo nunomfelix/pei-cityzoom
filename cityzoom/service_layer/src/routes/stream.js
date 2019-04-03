@@ -21,7 +21,13 @@ const router = new express.Router()
 router.get('',
     [authentication, validationMiddleware(validateGetAllStreams, 'query')],
     async (req, res) => {
-        result = await axios.get(config.get('DATA_LAYER_URL') + '/cbz/stream/list', { params: req.query })
+        var result = {}
+        try {
+            result = await axios.get(config.get('DATA_LAYER_URL') + '/czb/stream/list', { params: req.query })
+        } catch (e) {
+            streamDebug(e)
+            res.status(500).send('Internal Server Error')
+        }
         streamDebug(`Streams loaded with query ${JSON.stringify(req.query)}`)
         res.send(result.data)
     }
@@ -40,9 +46,14 @@ router.get('',
 router.get('/:stream_name',
     [authentication, validationMiddleware(validateGetStreamByID, 'params')],
     async (req, res) => {
-        result = await axios.get(config.get('DATA_LAYER_URL') + '/cbz/stream/' + req.params.stream_name)
+        try {
+            result = await axios.get(config.get('DATA_LAYER_URL') + '/czb/stream/' + req.params.stream_name)
+        } catch (e) {
+            streamDebug(e)
+            res.status(500).send('Internal Server Error')
+        }
         streamDebug(`Stream loaded with name ${JSON.stringify(req.params.stream_name)}`)
-        res.send(result)
+        res.send(result.data)
     }
 )
 
@@ -59,9 +70,15 @@ router.get('/:stream_name',
 router.get('/:stream_name/values',
     [authentication, validationMiddleware(validateGetDataFromStream, 'params')],
     async (req, res) => {
-        result = await axios.get(config.get('DATA_LAYER_URL') + '/cbz/stream/values', { params: req.params.stream_name })
+        const result = null
+        try {
+            result = await axios.get(config.get('DATA_LAYER_URL') + '/czb/stream/values', { params: req.query })
+        } catch (e) {
+            streamDebug(e)
+            res.status(500).send('Internal Server Error')
+        }
         streamDebug(`Retrieved values from stream ${JSON.stringify(req.params.stream_name)}`)
-        res.send(result)
+        res.send(result.data)
     }
 )
 

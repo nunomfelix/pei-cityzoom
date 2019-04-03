@@ -51,25 +51,25 @@ async function get_ipma_data(city){
 }
 
 async function create_ipma_stream(){
-    axios.post('192.136.93.14:8001/cbz/stream', {
+    axios.post('193.136.93.14:8001/cbz/stream', {
         'name': 'ipma_stream',
         'description': 'ipma_stream',
         'mobile': false,
         'type': 'ipma_post',
         'ttl': 120000,
         'periodicity': 1200
-    }).catch( ()=> {console.log('Failed to post to 192.136.93.14:3000')})
+    }).catch( ()=> {console.log('Failed to post to 193.136.93.14:3000')})
 }
 
 async function put_ipma_data(data, location){
-    axios.put('192.136.93.14:8001/cbz/stream', {
+    axios.put('193.136.93.14:8001/cbz/stream', {
         'stream_name': 'ipma_stream',
         'value': data,
         'location': {
             'latitude' : location['lat'],
             'longitude' : location['long']
         }
-    }).catch( ()=> {console.log('Failed to put to 192.136.93.14:8001')})
+    }).catch( ()=> {console.log('Failed to put to 193.136.93.14:8001')})
 }
  
 function main(){

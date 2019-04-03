@@ -1,25 +1,28 @@
 <template>
   <no-ssr>
-    <grid-layout
-      :layout="layout"
-      :col-num="12"
-      :row-height="30"
-      :is-draggable="true"
-      :is-resizable="false"
-      :vertical-compact="true"
-      :margin="[20, 20]"
-      :use-css-transforms="false"
-    >
-      <grid-item
-        v-for="item in layout"
-        :key="item.i"
-        :x="item.x"
-        :y="item.y"
-        :w="item.w"
-        :h="item.h"
-        :i="item.i"
-      >{{item.i}}</grid-item>
-    </grid-layout>
+    <div>
+      <SeriesGraph/>
+      <grid-layout
+        :layout="layout"
+        :col-num="12"
+        :row-height="30"
+        :is-draggable="true"
+        :is-resizable="false"
+        :vertical-compact="true"
+        :margin="[20, 20]"
+        :use-css-transforms="false"
+      >
+        <grid-item
+          v-for="item in layout"
+          :key="item.i"
+          :x="item.x"
+          :y="item.y"
+          :w="item.w"
+          :h="item.h"
+          :i="item.i"
+        >{{item.i}}</grid-item>
+      </grid-layout>
+    </div>
   </no-ssr>
 </template>
 
