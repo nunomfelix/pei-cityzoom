@@ -67,7 +67,7 @@ function main() {
         //console.log(data)
         put_darksky_temperature_data(data[0], data[1])
         put_darksky_pressure_data(data[0], data[1])
-    }, 1000 * 5); //every 2 minutes, making 720 requests a day (the max possible is 1000)
+    }, 1000 * 30); //every 2 minutes, making 720 requests a day (the max possible is 1000)
 }
 
 main()

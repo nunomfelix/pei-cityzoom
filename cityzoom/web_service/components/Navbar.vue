@@ -39,32 +39,32 @@ export default {
         {
           path: "dominios/metrica",
           img: 'dominios.svg',
-          name: "Domínios"
+          name: "Domains"
         },
         {
           path: "dispositivos",
           img: "dispositivos.svg",
-          name: "Dispositivos"
+          name: "Devices"
         },
         {
           path: "operacoes",
           img: "operacoes.svg",
-          name: "Operações"
+          name: "Operations"
         },
         {
           path: "notificacoes",
           img: "notificacoes.svg",
-          name: "Notificações"
+          name: "Alarms"
         },
         {
           path: "equipa",
           img: "equipa.svg",
-          name: "Equipa"
+          name: "Team"
         },
         {
           path: "definicoes",
           img: "settings.svg",
-          name: "Definições"
+          name: "Settings"
         }
       ],
       collapsed: true,

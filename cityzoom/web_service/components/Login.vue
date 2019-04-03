@@ -30,13 +30,13 @@
 export default {
   data() {
     return {
-      username: "superuser",
-      pw: "12345",
+      username: "",
+      pw: "",
 
-      name: "Nome Teste",
-      username_r: "superuser",
-      pw_r: "12345",
-      email: "teste@gmail.com",
+      name: "",
+      username_r: "",
+      pw_r: "",
+      email: "",
 
       message: '',
 
@@ -61,7 +61,7 @@ export default {
         name: this.name,
         username: this.username_r,
         email: this.email,
-        password: this.pw
+        password: this.pw_r
       });
       if(res.content) {
         this.currentForm = 0;

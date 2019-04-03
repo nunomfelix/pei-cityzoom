@@ -43,8 +43,8 @@
 
 <script>
 var testLayout = [
-  { x: 0, y: 0, w: 4, h: 14, i: "series_a", type: 'series', data:'normal' },
-  { x: 4, y: 0, w: 8, h: 14, i: "series_c", type: 'series', data: 'fake' },
+  { x: 0, y: 0, w: 8, h: 14, i: "series_a", type: 'series', data:'normal' },
+  { x: 8, y: 0, w: 4, h: 14, i: "series_c", type: 'series', data: 'fake' },
   { x: 0, y: 14, w: 13, h: 14, i: "series_b", type: 'series', data: 'fake' },
 ];
 
