@@ -23,7 +23,7 @@ router.get('',
     async (req, res) => {
         result = await axios.get(config.get('DATA_LAYER_URL') + '/cbz/stream/list', { params: req.query })
         streamDebug(`Streams loaded with query ${JSON.stringify(req.query)}`)
-        res.send(result)
+        res.send(result.data)
     }
 )
 

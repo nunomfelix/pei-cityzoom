@@ -1,0 +1,186 @@
+{
+	"info": {
+		"_postman_id": "b139a2d4-cd9d-4e6c-b438-351bd814e2db",
+		"name": "Cityzoom-service-layer",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "login",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"skrt\",\n\t\"password\": \"12345\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8002/user/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8002",
+					"path": [
+						"user",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "signup",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"André Oliveira\",\r\n    \"username\": \"skrt\",\r\n    \"email\": \"skrt@gmail.com\",\r\n    \"password\": \"12345\"\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8002/user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8002",
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get users",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://193.136.93.14:8002/user",
+					"protocol": "http",
+					"host": [
+						"193",
+						"136",
+						"93",
+						"14"
+					],
+					"port": "8002",
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get all streams",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNrcnQiLCJpYXQiOjE1NTQxNzM0MTEsImV4cCI6MTU1NDI1OTgxMX0.USjNcbCJnqNlSG_QZPNJQz3tvy47QLguaKKXmM2P47c",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8002/stream",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8002",
+					"path": [
+						"stream"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get stream by name",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNrcnQiLCJpYXQiOjE1NTQxNzM0MTEsImV4cCI6MTU1NDI1OTgxMX0.USjNcbCJnqNlSG_QZPNJQz3tvy47QLguaKKXmM2P47c",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8002/stream/temperatura3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8002",
+					"path": [
+						"stream",
+						"temperatura3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "read data from stream",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNrcnQiLCJpYXQiOjE1NTQxNzM0MTEsImV4cCI6MTU1NDI1OTgxMX0.USjNcbCJnqNlSG_QZPNJQz3tvy47QLguaKKXmM2P47c",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8002/stream/temperatura4/values",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8002",
+					"path": [
+						"stream",
+						"temperatura4",
+						"values"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
