@@ -35,7 +35,7 @@ export default {
 
       ndx: null,
       max: 0,
-      min: 999,
+      min: 9999999,
       xMin: 99999999999999,
       xMax: 0,
 
@@ -64,6 +64,7 @@ export default {
     window.removeEventListener("resize", this.onResize);
   },
   mounted() {
+    this.dataTmp = this.data
     this.dc = require("dc");
     setTimeout(() => {
       this.focusChart = this.dc.seriesChart("#" + this.name);
@@ -71,16 +72,15 @@ export default {
       var dimension, group;
       //this.dc.d3.csv("morley.csv", function(error, experiments) {
 
-      console.log(this.data)
-      if (this.data) {
-        for (let v in this.data) {
-          if (this.data[v].value > this.max) this.max = this.data[v].value;
-          else if (this.data[v].value < this.min) this.min = this.data[v].value;
-          if (this.data[v].key < this.xMin) this.xMin = Number(this.data[v].key);
-          else if (this.data[v].key > this.xMax) this.xMax = Number(this.data[v].key);
+      if (this.dataTmp) {
+        for (let v in this.dataTmp) {
+          if (this.dataTmp[v].value > this.max) this.max = Number(this.dataTmp[v].value);
+          if (this.dataTmp[v].value < this.min) this.min = Number(this.dataTmp[v].value);
+          if (this.dataTmp[v].key < this.xMin) this.xMin = Number(this.dataTmp[v].key);
+          if (this.dataTmp[v].key > this.xMax) this.xMax = Number(this.dataTmp[v].key);
         }
       } else {
-        this.data = []
+        this.dataTmp = []
         for (var i = 0; i < 250; i++) {
           for (var j = 0; j < 5; j++) {
             const x = Math.random() * 100;
@@ -91,18 +91,17 @@ export default {
             };
             if (x > this.max) this.max = x;
             if (x < this.min) this.min = x;
-            this.data.push(val);
+            this.dataTmp.push(val);
           }
         }
         this.xMin = -5;
         this.xMax = i + 10;
-        console.log(this.data)
       }
 
-      this.min = Number(this.min) - Number(this.max) * 0.15;
-      this.max = Number(this.max) + Number(this.max) * 0.15;
+      this.min = this.min - this.max * .20
+      this.max = this.max + this.max * .20
 
-      this.ndx = crossfilter(this.data);
+      this.ndx = crossfilter(this.dataTmp);
       dimension = this.ndx.dimension(function(d) {
         return [d.dataset, d.key];
       });
@@ -164,7 +163,6 @@ export default {
       this.focusChart.render();
       this.overviewChart.render();
       this.focusChart.focus([this.xMax - (this.xMax - this.xMin) * .66, this.xMax - (this.xMax - this.xMin) * .44]);
-      console.log(this.focusChart.filters())
       this.onResize();
     }, 1000);
   },
