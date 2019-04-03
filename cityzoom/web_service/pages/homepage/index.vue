@@ -66,9 +66,7 @@ export default {
   background-color: white;
   border-radius: 10px;
 
-  box-shadow: 3px 2px 3px 0px #4d4c4c;
-  -webkit-box-shadow: 3px 2px 3px 0px #4d4c4c;
-  -moz-box-shadow: 3px 2px 3px 0px #4d4c4c;
+  @include shadow(3px, 2px, 3px, 0px, #4d4c4c);
   @include unselectable();
 }
 

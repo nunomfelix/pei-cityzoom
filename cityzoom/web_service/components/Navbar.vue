@@ -127,9 +127,7 @@ $sidebar-right-size: 180px;
     }
   }
 
-  box-shadow: 3px 3px 10px 0px #4d4c4c;
-  -webkit-box-shadow: 3px 3px 10px 0px #4d4c4c;
-  -moz-box-shadow: 3px 3px 10px 0px #4d4c4c;
+  @include shadow(3px, 3px, 10px, 0px, #4d4c4c);
 
   & .sidebar {
     position: relative;
