@@ -1,6 +1,7 @@
 package org.github.ZePaiva.kafka;
 
 import com.google.gson.JsonObject;
+import com.mongodb.MongoBulkWriteException;
 import com.mongodb.client.MongoCollection;
 import org.apache.avro.Schema;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -15,28 +16,25 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
+public class StreamSink {
 
-public class ValuesSink {
-
-    private MongoCollection<Document> collection = MongoAux.getCollection("values");
+    private MongoCollection<Document> collection = MongoAux.getCollection("streams");
+    private Date time = new Date();
 
     public static void main(String[] args) {
-        new ValuesSink().run();
+        new StreamSink().run();
     }
 
     private void run() {
 
-        Logger logger = LoggerFactory.getLogger(ValuesSink.class.getName());
+        Logger logger = LoggerFactory.getLogger(StreamSink.class.getName());
 
         String bootstrapServers = "127.0.0.1:9092";
         String groupID = "cityzoom-data-layer";
-        String topic = "Values";
+        String topic = "Streams";
 
         CountDownLatch latch = new CountDownLatch(1);
         logger.info("Latch created");
@@ -76,10 +74,11 @@ public class ValuesSink {
                 "\"name\": \"Test\",\n" +
                 "\"fields\": [\n" +
                 "  { \"name\": \"stream\", \"type\": \"string\" },\n" +
-                "  { \"name\": \"value\", \"type\": \"string\" },\n" +
-                "  { \"name\": \"timestamp\", \"type\": \"long\" },\n" +
-                "  { \"name\": \"latitude\", \"type\": \"double\" },\n" +
-                "  { \"name\": \"longitude\", \"type\": \"double\" }\n" +
+                "  { \"name\": \"description\", \"type\": \"string\" },\n" +
+                "  { \"name\": \"mobile\", \"type\": \"boolean\" },\n" +
+                "  { \"name\": \"type\", \"type\": \"string\" },\n" +
+                "  { \"name\": \"ttl\", \"type\": \"int\" },\n" +
+                "  { \"name\": \"periodicity\", \"type\": \"int\" }\n" +
                 "  ]\n" +
                 "}");
 
@@ -110,19 +109,27 @@ public class ValuesSink {
                                 logger.error("Error parsing the following request: "+ value.toString());
                             } else {
                                 System.out.println(value.toString());
-                                Document document = new Document("stream_name", value.get("stream").getAsString())
-                                        .append("value", value.get("value").getAsString())
-                                        .append("timestamp", value.get("timestamp").getAsInt())
-                                        .append("latitude", value.get("latitude").getAsDouble())
-                                        .append("longitude", value.get("longitude").getAsDouble());
+                                Document document = new Document("stream", value.get("stream").getAsString())
+                                        .append("description", value.get("description").getAsString())
+                                        .append("mobile", value.get("mobile").getAsBoolean())
+                                        .append("type", value.get("type").getAsString())
+                                        .append("ttl", value.get("ttl").getAsInt())
+                                        .append("periodicity", value.get("periodicity").getAsInt())
+                                        .append("creation", time.getTime())
+                                        .append("lastUpdate", time.getTime());
                                 docsList.add(document);
                             }
-                        } catch (IllegalStateException e) {
+                        } catch (IllegalStateException | IOException e) {
                             logger.error("Object given not in JSON format!");
                         }
                     }
-                    if (!docsList.isEmpty())
-                        collection.insertMany(docsList);
+                    try {
+                        if (!docsList.isEmpty())
+                            collection.insertMany(docsList);
+                        logger.info("Stored streams with success!");
+                    } catch (MongoBulkWriteException e) {
+                        logger.error("Stream already exists");
+                    }
 
                     logger.info("Committing offsets...");
                     valuesConsumer.commitSync();
@@ -134,7 +141,7 @@ public class ValuesSink {
                         e.printStackTrace();
                     }
                 }
-            } catch (WakeupException | IOException e) {
+            } catch (WakeupException e) {
                 logger.info("Received shutdown signal!");
             } finally {
                 valuesConsumer.close();
@@ -147,3 +154,4 @@ public class ValuesSink {
         }
     }
 }
+
