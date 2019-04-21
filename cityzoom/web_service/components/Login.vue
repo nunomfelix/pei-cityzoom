@@ -98,10 +98,6 @@ export default {
     @include transition(transform, 0.25s, ease-out, 0s);
 
     & .alert {
-<<<<<<< HEAD
-      @include shadow(0px, 0px, 10px, 0px, #4d4c4c);
-=======
->>>>>>> develop
       border-radius: 10px;
       font-weight: 700;
       color: white;
@@ -109,11 +105,7 @@ export default {
       background-color: red;
       margin-top: 20px;
       &.show {
-<<<<<<< HEAD
-        @include transition(opacity, 0.25s, ease-out, 0s);
-=======
       @include transition(opacity, 0.25s, ease-out, 0s);
->>>>>>> develop
         opacity: 1;
       }
     }
