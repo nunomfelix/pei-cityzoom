@@ -98,8 +98,6 @@ public class DataLayerAPI {
                         "\t\"status\": \"Error\",\n" +
                         "\t\"Error\": \"Stream " + stream + " not found.\"\n" +
                         "}";
-
-
             }
             response.status(200);
             JsonObject jsonStream = (JsonObject) MongoAux.jsonParser.parse(document.toJson());
@@ -116,7 +114,39 @@ public class DataLayerAPI {
         });
 
         put("/czb/stream", (request, response) -> {
-            return "Pushing values to stream:\n"+request.body();
+            response.type("application/json");
+            JsonObject body = (JsonObject) MongoAux.jsonParser.parse(request.body());
+            String valid = validator.validatePushValues(body);
+            if (!valid.equals("")) {
+                response.status(HttpsURLConnection.HTTP_BAD_REQUEST);
+                return valid;
+            }
+            String stream = body.get("stream_name").getAsString();
+            Document docStream = streams.find(eq("stream", stream)).first();
+            if (docStream == null) {
+                response.status(HttpsURLConnection.HTTP_NOT_FOUND);
+                return "{\n" +
+                        "\t\"status\": \"Error\",\n" +
+                        "\t\"Error\": \"Stream " + stream + " not found.\"\n" +
+                        "}";
+            }
+            String value = body.get("value").getAsString();
+            double lat = body.get("latitude").getAsDouble();
+            double longitude = body.get("longitude").getAsDouble();
+            long timestamp = date.getTime();
+
+            String valuePost=
+                    "{\n" +
+                            "\t\"stream\": \""+stream+"\",\n" +
+                            "\t\"value\": \""+value+"\",\n" +
+                            "\t\"timestamp\": \""+timestamp+"\",\n" +
+                            "\t\"latitude\": \""+lat+"\",\n" +
+                            "\t\"longitude\": \""+longitude+"\"\n" +
+                            "}";
+            String topic = "Values";
+            producer.produce(topic, "key", valuePost);
+            response.status(HttpsURLConnection.HTTP_OK);
+            return "";
         });
 
         get("/czb/stream/values", (request, response) -> {
