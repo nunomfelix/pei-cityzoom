@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b57dff56-8f59-4293-99f2-0feaed5598cc" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/DataLayerAPI.java" beforeDir="false" afterPath="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/DataLayerAPI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Middleware/Validation.java" beforeDir="false" afterPath="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Middleware/Validation.java" afterDir="false" />
-    </list>
+    <list default="true" id="b57dff56-8f59-4293-99f2-0feaed5598cc" name="Default Changelist" comment="" />
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
     <ignored path="$PROJECT_DIR$/DataLayerCore-Broker/target/" />
@@ -60,12 +57,13 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/DataLayerAPI.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="480">
-                  <caret line="141" column="54" selection-start-line="141" selection-start-column="54" selection-end-line="141" selection-end-column="54" />
+                <state relative-caret-position="49">
+                  <caret line="152" column="78" selection-start-line="152" selection-start-column="78" selection-end-line="152" selection-end-column="78" />
                   <folding>
                     <element signature="imports" expanded="true" />
                     <element signature="e#1043#3837#0" />
                     <element signature="e#3876#4035#0" />
+                    <element signature="e#4066#4165#0" />
                   </folding>
                 </state>
               </provider>
@@ -127,7 +125,7 @@
             <entry file="file://$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/DataLayerAPI.java">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="349">
-                  <caret line="129" column="20" selection-start-line="129" selection-start-column="20" selection-end-line="129" selection-end-column="20" />
+                  <caret line="135" column="20" selection-start-line="135" selection-start-column="20" selection-end-line="135" selection-end-column="20" />
                   <folding>
                     <element signature="imports" expanded="true" />
                     <element signature="e#1043#3837#0" />
@@ -423,10 +421,10 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1918" y="-3" width="1924" height="1085" extended-state="0" />
+    <frame x="1924" y="3" width="1912" height="548" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" weight="0.23906083" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.23899034" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -436,7 +434,7 @@
       <window_info id="Favorites" order="7" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.36610878" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.8353222" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -563,12 +561,13 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/DataLayerAPI.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
-          <caret line="141" column="54" selection-start-line="141" selection-start-column="54" selection-end-line="141" selection-end-column="54" />
+        <state relative-caret-position="49">
+          <caret line="152" column="78" selection-start-line="152" selection-start-column="78" selection-end-line="152" selection-end-column="78" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#1043#3837#0" />
             <element signature="e#3876#4035#0" />
+            <element signature="e#4066#4165#0" />
           </folding>
         </state>
       </provider>
