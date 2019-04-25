@@ -4,16 +4,14 @@ import com.google.gson.JsonObject;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Validation {
+
     private Map<String, Object> createStreamRequiredFields = new HashMap<>();
     private Map<String, Object> createStreamAllowedFields = new HashMap<>();
     private Map<String, Object> pushValuesFields = new HashMap<>();
-    private List<String> deleteStreamRequiredFields = Arrays.asList(new String[]{"stream_name"});
 
     public Validation() {
         // required fields for create stream
