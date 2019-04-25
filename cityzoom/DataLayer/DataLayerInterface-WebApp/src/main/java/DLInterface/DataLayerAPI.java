@@ -5,27 +5,17 @@ import DLBroker.Producer;
 import DLInterface.Middleware.Validation;
 import DLInterface.Routes.Streams;
 import DLInterface.Routes.Values;
-import com.google.gson.JsonObject;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 
-import javax.net.ssl.HttpsURLConnection;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-
-import static com.mongodb.client.model.Filters.eq;
 import static spark.Spark.*;
 
 public class DataLayerAPI {
 
-    private static Producer producer = new Producer();
-    private static Validation validator = new Validation();
-    private static MongoCollection<Document> streams = MongoAux.getCollection("streams");
-    private static MongoCollection<Document> values = MongoAux.getCollection("values");
-    private static List<String> types = Arrays.asList("temperature", "oxygen");
-    private static Date date = new Date();
+    public static Producer producer = new Producer();
+    public static Validation validator = new Validation();
+    public static MongoCollection<Document> streams = MongoAux.getCollection("streams");
+    public static MongoCollection<Document> values = MongoAux.getCollection("values");
 
     public static void main(String[] args) {
 

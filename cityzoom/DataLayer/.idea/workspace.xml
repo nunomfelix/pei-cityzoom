@@ -2,14 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b57dff56-8f59-4293-99f2-0feaed5598cc" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Routes/Streams.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Routes/Values.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/DataLayerAPI.java" beforeDir="false" afterPath="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/DataLayerAPI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Middleware/Validation.java" beforeDir="false" afterPath="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Middleware/Validation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Routes.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataLayerInterface-WebApp/target/classes/DLInterface/DataLayerAPI.class" beforeDir="false" afterPath="$PROJECT_DIR$/DataLayerInterface-WebApp/target/classes/DLInterface/DataLayerAPI.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataLayerInterface-WebApp/target/classes/DLInterface/Routes.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Routes/Streams.java" beforeDir="false" afterPath="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Routes/Streams.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Routes/Values.java" beforeDir="false" afterPath="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Routes/Values.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -23,6 +18,9 @@
   </component>
   <component name="DefaultGradleProjectSettings">
     <option name="isMigrated" value="true" />
+  </component>
+  <component name="FavoritesManager">
+    <favorites_list name="DataLayer" />
   </component>
   <component name="FileEditorManager">
     <splitter split-orientation="horizontal" split-proportion="0.5">
@@ -61,8 +59,8 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/DataLayerAPI.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="136">
-                  <caret line="36" column="37" selection-start-line="36" selection-start-column="37" selection-end-line="36" selection-end-column="37" />
+                <state relative-caret-position="60">
+                  <caret line="17" column="11" selection-start-line="17" selection-start-column="11" selection-end-line="17" selection-end-column="11" />
                   <folding>
                     <element signature="imports" expanded="true" />
                   </folding>
@@ -73,13 +71,14 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Routes/Streams.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="266">
-                  <caret line="87" column="22" selection-start-line="87" selection-start-column="22" selection-end-line="87" selection-end-column="22" />
+                <state>
+                  <caret column="26" selection-start-column="26" selection-end-column="26" />
                   <folding>
                     <element signature="imports" expanded="true" />
                     <element signature="method#createStream#0;class#Streams#0" />
                     <element signature="method#deleteStream#0;class#Streams#0" />
-                    <element signature="e#4452#4453#0" expanded="true" />
+                    <element signature="method#listStreams#0;class#Streams#0" />
+                    <element signature="method#detailStream#0;class#Streams#0" />
                   </folding>
                 </state>
               </provider>
@@ -113,11 +112,11 @@
       </split-first>
       <split-second>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file pinned="false" current-in-tab="true">
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/DataLayerAPI.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="656">
-                  <caret line="41" column="25" selection-start-line="41" selection-start-column="25" selection-end-line="41" selection-end-column="25" />
+                <state relative-caret-position="208">
+                  <caret line="13" selection-start-line="13" selection-end-line="13" />
                   <folding>
                     <element signature="imports" expanded="true" />
                   </folding>
@@ -138,15 +137,14 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="false">
+          <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Routes/Values.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="760">
-                  <caret line="67" column="16" selection-start-line="67" selection-start-column="16" selection-end-line="67" selection-end-column="16" />
+                <state relative-caret-position="32">
+                  <caret line="2" column="23" selection-start-line="2" selection-start-column="23" selection-end-line="2" selection-end-column="23" />
                   <folding>
-                    <element signature="imports" expanded="true" />
-                    <element signature="e#592#593#0" expanded="true" />
-                    <element signature="e#635#636#0" expanded="true" />
+                    <element signature="method#getValues#0;class#Values#0" />
+                    <element signature="method#postValue#0;class#Values#0" />
                   </folding>
                 </state>
               </provider>
@@ -204,10 +202,10 @@
         <option value="$PROJECT_DIR$/DataLayerCore-Broker/src/main/java/DLBroker/Producer.java" />
         <option value="$PROJECT_DIR$/DataLayerCore-Broker/src/main/java/DLBroker/MongoAux.java" />
         <option value="$PROJECT_DIR$/DataLayerCore-Broker/src/main/java/DLBroker/StreamSink.java" />
-        <option value="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Routes/Values.java" />
         <option value="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Middleware/Validation.java" />
         <option value="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/DataLayerAPI.java" />
         <option value="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Routes/Streams.java" />
+        <option value="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Routes/Values.java" />
       </list>
     </option>
   </component>
@@ -413,10 +411,10 @@
       <window_info id="Capture Tool" order="4" />
       <window_info id="UI Designer" order="5" />
       <window_info id="Learn" order="6" weight="0.32924226" />
-      <window_info id="Favorites" order="7" side_tool="true" />
+      <window_info id="Favorites" order="7" side_tool="true" weight="0.32977587" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.6004184" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.39748955" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -531,18 +529,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Routes/Values.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="760">
-          <caret line="67" column="16" selection-start-line="67" selection-start-column="16" selection-end-line="67" selection-end-column="16" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#592#593#0" expanded="true" />
-            <element signature="e#635#636#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Middleware/Validation.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="96">
@@ -556,23 +542,35 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/DataLayerAPI.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="36" column="37" selection-start-line="36" selection-start-column="37" selection-end-line="36" selection-end-column="37" />
+        <state relative-caret-position="60">
+          <caret line="17" column="11" selection-start-line="17" selection-start-column="11" selection-end-line="17" selection-end-column="11" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Routes/Values.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="32">
+          <caret line="2" column="23" selection-start-line="2" selection-start-column="23" selection-end-line="2" selection-end-column="23" />
+          <folding>
+            <element signature="method#getValues#0;class#Values#0" />
+            <element signature="method#postValue#0;class#Values#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Routes/Streams.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="266">
-          <caret line="87" column="22" selection-start-line="87" selection-start-column="22" selection-end-line="87" selection-end-column="22" />
+        <state>
+          <caret column="26" selection-start-column="26" selection-end-column="26" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#createStream#0;class#Streams#0" />
             <element signature="method#deleteStream#0;class#Streams#0" />
-            <element signature="e#4452#4453#0" expanded="true" />
+            <element signature="method#listStreams#0;class#Streams#0" />
+            <element signature="method#detailStream#0;class#Streams#0" />
           </folding>
         </state>
       </provider>

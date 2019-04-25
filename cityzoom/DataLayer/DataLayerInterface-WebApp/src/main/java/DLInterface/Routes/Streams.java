@@ -1,28 +1,21 @@
 package DLInterface.Routes;
 
 import DLBroker.MongoAux;
-import DLBroker.Producer;
-import DLInterface.Middleware.Validation;
 import com.google.gson.JsonObject;
-import com.mongodb.client.MongoCollection;
+import com.mongodb.client.FindIterable;
 import org.bson.Document;
 import org.json.JSONException;
 import spark.Request;
 import spark.Response;
 
 import javax.net.ssl.HttpsURLConnection;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
-import static com.mongodb.client.model.Filters.eq;
+import static DLInterface.DataLayerAPI.*;
+import static com.mongodb.client.model.Filters.*;
 
 public class Streams {
 
-    private static Producer producer = new Producer();
-    private static Validation validator = new Validation();
-    private static MongoCollection<Document> streams = MongoAux.getCollection("streams");
     private static List<String> types = Arrays.asList("temperature", "oxygen");
     private static Date date = new Date();
 
@@ -100,9 +93,56 @@ public class Streams {
         return "";
     }
 
-    // Status - TODO
+    // Status - Passing
     public static String listStreams(Request request, Response response) {
-        return "Listing streams";
+        response.type("application/json");
+        long start = request.queryParams("interval_start") != null ?
+                Long.parseLong(request.queryParams("interval_start")) : 0;
+        long end = request.queryParams("interval_end") != null?
+                Long.parseLong(request.queryParams("interval_end")) : date.getTime();
+        long compass = date.getTime();
+
+        if (end < start || end > compass || start < 0) {
+            response.status(HttpsURLConnection.HTTP_NOT_ACCEPTABLE);
+            return "{\n" +
+                    "\t\"Error\": \"Interval not acceptable\"\n" +
+                    "}";
+        }
+
+        List<String> userStreams = new ArrayList<>();
+        long size = streams.countDocuments(and(gte("creation", start), lte("creation", end)));
+        long total = streams.countDocuments();
+        FindIterable<Document> streamsIterable = streams.find(and(gte("creation", start), lte("creation", end)));
+        JsonObject jsonStream;
+        for (Document document : streamsIterable) {
+            jsonStream = (JsonObject) MongoAux.jsonParser.parse(document.toJson());
+            String stream =
+                    "{\n" +
+                            "\t\"stream\": \""+jsonStream.get("stream").getAsString()+"\",\n" +
+                            "\t\"description\": \""+jsonStream.get("description").getAsString()+"\",\n" +
+                            "\t\"mobile\": \""+jsonStream.get("mobile").getAsBoolean()+"\",\n" +
+                            "\t\"type\": \""+jsonStream.get("type").getAsString()+"\",\n" +
+                            "\t\"ttl\": \""+jsonStream.get("ttl").getAsInt()+"\",\n" +
+                            "\t\"periodicity\": \""+jsonStream.get("periodicity").getAsInt()+"\",\n" +
+                            "\t\"creation\": \""+jsonStream.get("creation").getAsJsonObject().get("$numberLong").getAsLong()+"\",\n" +
+                            "\t\"lastUpdate\": \""+jsonStream.get("lastUpdate").getAsJsonObject().get("$numberLong").getAsLong()+"\"\n" +
+                            "}";
+            userStreams.add(stream);
+        }
+        response.status(HttpsURLConnection.HTTP_OK);
+        if (end != compass || start != 0) {
+            return "{\n" +
+                    "\t\"total_streams\": "+total+",\n" +
+                    "\t\"size\": "+size+",\n" +
+                    "\t\"start\": "+start+",\n" +
+                    "\t\"end\": "+end+",\n" +
+                    "\t\"user_streams\": "+userStreams.toString()+"\n" +
+                    "}";
+        }
+        return "{\n" +
+                "\t\"total_streams\": "+total+",\n" +
+                "\t\"user_streams\": "+userStreams.toString()+"\n" +
+                "}";
     }
 
     // Status - Passing
@@ -122,12 +162,12 @@ public class Streams {
         return "{\n" +
                 "\t\"stream\": \""+jsonStream.get("stream").getAsString()+"\",\n" +
                 "\t\"description\": \""+jsonStream.get("description").getAsString()+"\",\n" +
-                "\t\"mobile\": \""+jsonStream.get("mobile").getAsBoolean()+"\",\n" +
+                "\t\"mobile\": "+jsonStream.get("mobile").getAsBoolean()+",\n" +
                 "\t\"type\": \""+jsonStream.get("type").getAsString()+"\",\n" +
-                "\t\"ttl\": \""+jsonStream.get("ttl").getAsInt()+"\",\n" +
-                "\t\"periodicity\": \""+jsonStream.get("periodicity").getAsInt()+"\",\n" +
-                "\t\"creation\": \""+jsonStream.get("creation").getAsJsonObject().get("$numberLong").getAsLong()+"\",\n" +
-                "\t\"lastUpdate\": \""+jsonStream.get("lastUpdate").getAsJsonObject().get("$numberLong").getAsLong()+"\"\n" +
+                "\t\"ttl\": "+jsonStream.get("ttl").getAsInt()+",\n" +
+                "\t\"periodicity\": "+jsonStream.get("periodicity").getAsInt()+",\n" +
+                "\t\"creation\": "+jsonStream.get("creation").getAsJsonObject().get("$numberLong").getAsLong()+",\n" +
+                "\t\"lastUpdate\": "+jsonStream.get("lastUpdate").getAsJsonObject().get("$numberLong").getAsLong()+"\n" +
                 "}";
     }
 }

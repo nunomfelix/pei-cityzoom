@@ -1,34 +1,90 @@
 package DLInterface.Routes;
 
 import DLBroker.MongoAux;
-import DLBroker.Producer;
-import DLInterface.Middleware.Validation;
 import com.google.gson.JsonObject;
-import com.mongodb.client.MongoCollection;
+import com.mongodb.client.FindIterable;
 import org.bson.Document;
 import org.json.JSONException;
 import spark.Request;
 import spark.Response;
 
 import javax.net.ssl.HttpsURLConnection;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.*;
+
+import static DLInterface.DataLayerAPI.producer;
+import static DLInterface.DataLayerAPI.validator;
+import static DLInterface.DataLayerAPI.streams;
+import static DLInterface.DataLayerAPI.values;
+
 
 public class Values {
 
-    private static Producer producer = new Producer();
-    private static Validation validator = new Validation();
-    private static MongoCollection<Document> streams = MongoAux.getCollection("streams");
-    private static MongoCollection<Document> values = MongoAux.getCollection("values");
-    private static List<String> types = Arrays.asList("temperature", "oxygen");
     private static Date date = new Date();
 
-    // Status - TODO
+    // Status - Passing
     public static String getValues(Request request, Response response) {
-        return "Getting all values";
+        response.type("application/json");
+        if (request.queryParams("stream") == null) {
+            response.status(HttpsURLConnection.HTTP_NOT_ACCEPTABLE);
+            return "{\n" +
+                    "\t\"Error\": \"No stream specified\"\n" +
+                    "}";
+        } else if (streams.find(eq("stream", request.queryParams("stream"))).first() == null) {
+            response.status(HttpsURLConnection.HTTP_NOT_FOUND);
+            return "{\n" +
+                    "\t\"Error\": \"Stream "+ request.queryParams("stream")+" not found\"\n" +
+                    "}";
+        }
+        long start = request.queryParams("interval_start") != null ?
+                Long.parseLong(request.queryParams("interval_start")) : 0;
+        long end = request.queryParams("interval_end") != null?
+                Long.parseLong(request.queryParams("interval_end")) : date.getTime();
+        long compass = date.getTime();
+
+        if (end < start || end > compass || start < 0) {
+            response.status(HttpsURLConnection.HTTP_NOT_ACCEPTABLE);
+            return "{\n" +
+                    "\t\"Error\": \"Interval not acceptable\"\n" +
+                    "}";
+        }
+
+        List<String> valuesList = new ArrayList<>();
+        long size = values.countDocuments(and(eq("stream_name", request.queryParams("stream")),gte("timestamp", start), lte("timestamp", end)));
+        long total = values.countDocuments();
+        FindIterable<Document> valuesIterable = values.find(and(eq("stream_name", request.queryParams("stream")),gte("timestamp", start), lte("timestamp", end)));
+        JsonObject jsonValue;
+        for (Document document :valuesIterable) {
+            jsonValue = (JsonObject) MongoAux.jsonParser.parse(document.toJson());
+            String value =
+                    "{\n" +
+                            "\t\"timestamp\": "+jsonValue.get("timestamp").getAsJsonObject().get("$numberLong").getAsLong()+",\n" +
+                            "\t\"value\": \""+jsonValue.get("value").getAsString()+"\",\n" +
+                            "\t\"latitude\": "+jsonValue.get("latitude").getAsDouble()+",\n" +
+                            "\t\"longitude\": "+jsonValue.get("longitude").getAsDouble()+"\n" +
+                    "}";
+            valuesList.add(value);
+        }
+
+        response.status(HttpsURLConnection.HTTP_OK);
+        if (end != compass || start != 0) {
+            return "{\n" +
+                    "\t\"stream_name\": \""+request.queryParams("stream")+"\",\n" +
+                    "\t\"start\": "+start+",\n" +
+                    "\t\"end\": "+end+",\n" +
+                    "\t\"size\": "+size+",\n" +
+                    "\t\"total\": "+total+",\n" +
+                    "\t\"values\": "+valuesList.toString()+"\n" +
+                    "}";
+        }
+        return "{\n" +
+                "\t\"stream_name\": \""+request.queryParams("stream")+"\",\n" +
+                "\t\"total\": "+total+",\n" +
+                "\t\"values\": "+valuesList.toString()+"\n" +
+                "}";
     }
 
     // Status - Passing
