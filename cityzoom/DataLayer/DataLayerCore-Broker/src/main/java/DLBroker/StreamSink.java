@@ -77,7 +77,9 @@ public class StreamSink {
                 "  { \"name\": \"mobile\", \"type\": \"boolean\" },\n" +
                 "  { \"name\": \"type\", \"type\": \"string\" },\n" +
                 "  { \"name\": \"ttl\", \"type\": \"int\" },\n" +
-                "  { \"name\": \"periodicity\", \"type\": \"int\" }\n" +
+                "  { \"name\": \"periodicity\", \"type\": \"int\" },\n" +
+                "  { \"name\": \"creation\", \"type\": \"long\" }," +
+                "  { \"name\": \"lastUpdate\", \"type\": \"long\" }" +
                 "  ]\n" +
                 "}");
 
@@ -114,8 +116,8 @@ public class StreamSink {
                                         .append("type", value.get("type").getAsString())
                                         .append("ttl", value.get("ttl").getAsInt())
                                         .append("periodicity", value.get("periodicity").getAsInt())
-                                        .append("creation", time.getTime())
-                                        .append("lastUpdate", time.getTime());
+                                        .append("creation", value.get("creation").getAsLong())
+                                        .append("lastUpdate", value.get("lastUpdate").getAsLong());
                                 docsList.add(document);
                             }
                         } catch (IllegalStateException | IOException e) {

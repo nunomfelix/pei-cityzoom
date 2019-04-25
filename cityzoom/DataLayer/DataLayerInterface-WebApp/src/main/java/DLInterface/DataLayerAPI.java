@@ -22,7 +22,7 @@ public class DataLayerAPI {
     private static Validation validator = new Validation();
     private static MongoCollection<Document> streams = MongoAux.getCollection("streams");
     private static MongoCollection<Document> values = MongoAux.getCollection("values");
-    private static List<String> types = Arrays.asList(new String[]{"temperature", "oxygen"});
+    private static List<String> types = Arrays.asList("temperature", "oxygen");
     private static Date date = new Date();
 
     public static void main(String[] args) {
@@ -35,7 +35,7 @@ public class DataLayerAPI {
             response.type("application/json");
             JsonObject body = (JsonObject) MongoAux.jsonParser.parse(request.body());
             String valid = validator.validateCreate(body);
-            if (valid != "") {
+            if (!valid.equals("")) {
                 response.status(HttpsURLConnection.HTTP_BAD_REQUEST);
                 return valid;
             }
@@ -73,7 +73,9 @@ public class DataLayerAPI {
                             "\t\"type\":\""+type+"\",\n" +
                             "\t\"mobile\":\""+mobile+"\",\n" +
                             "\t\"periodicity\":\""+periodicity+"\",\n" +
-                            "\t\"ttl\":\""+ttl+"\"\n" +
+                            "\t\"ttl\":\""+ttl+"\"," +
+                            "\t\"creation\":"+date.getTime()+"," +
+                            "\t\"lastUpdate\":"+date.getTime()+"" +
                     "}";
             String topic = "Streams";
             producer.produce(topic, "chave_minima", produceRequest);
@@ -88,7 +90,29 @@ public class DataLayerAPI {
 
         get("/czb/stream/:stream", (request, response) -> {
             response.type("application/json");
-            return "Getting stream description:\n"+request.params(":stream");
+            String stream = request.params(":Stream");
+            Document document = streams.find(eq("stream",stream)).first();
+            if (document == null) {
+                response.status(HttpsURLConnection.HTTP_NOT_FOUND);
+                return "{\n" +
+                        "\t\"status\": \"Error\",\n" +
+                        "\t\"Error\": \"Stream " + stream + " not found.\"\n" +
+                        "}";
+
+
+            }
+            response.status(200);
+            JsonObject jsonStream = (JsonObject) MongoAux.jsonParser.parse(document.toJson());
+            return "{\n" +
+                    "\t\"stream\": \""+jsonStream.get("stream").getAsString()+"\",\n" +
+                    "\t\"description\": \""+jsonStream.get("description").getAsString()+"\",\n" +
+                    "\t\"mobile\": \""+jsonStream.get("mobile").getAsBoolean()+"\",\n" +
+                    "\t\"type\": \""+jsonStream.get("type").getAsString()+"\",\n" +
+                    "\t\"ttl\": \""+jsonStream.get("ttl").getAsInt()+"\",\n" +
+                    "\t\"periodicity\": \""+jsonStream.get("periodicity").getAsInt()+"\",\n" +
+                    "\t\"creation\": \""+jsonStream.get("creation").getAsJsonObject().get("$numberLong").getAsLong()+"\",\n" +
+                    "\t\"lastUpdate\": \""+jsonStream.get("lastUpdate").getAsJsonObject().get("$numberLong").getAsLong()+"\"\n" +
+                    "}";
         });
 
         put("/czb/stream", (request, response) -> {
