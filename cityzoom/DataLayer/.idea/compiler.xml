@@ -6,12 +6,20 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="DLAPI" />
+        <module name="Sinks" />
+        <module name="ValuesSinks" />
         <module name="DataLayerCoreBroker" />
-        <module name="DataLayerInterface-WebApp" />
         <module name="DataLayerInterfaceWebApp" />
-        <module name="DataLayerCore-Broker" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="API" target="8" />
+      <module name="DataLayerCore-Broker" target="8" />
+      <module name="DataLayerInterface-WebApp" target="8" />
+      <module name="StreamSinker" target="8" />
+      <module name="ValuesSinker" target="8" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
