@@ -1,0 +1,824 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AnalysisUIOptions">
+    <option name="SCOPE_TYPE" value="3" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="b57dff56-8f59-4293-99f2-0feaed5598cc" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/DLAPI/DLAPI.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DLAPI/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sinks/Sinks.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sinks/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sinks/src/main/java/Aux/MongoAux.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ValuesSinks/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ValuesSinks/src/main/java/Aux/MongoAux.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ValuesSinks/src/main/java/Sink/ValuesSinker.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataLayerCore-Broker/DataLayerCoreBroker.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataLayerCore-Broker/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataLayerCore-Broker/src/main/java/DLBroker/MongoAux.java" beforeDir="false" afterPath="$PROJECT_DIR$/DLAPI/src/main/java/API/Aux/MongoAux.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataLayerCore-Broker/src/main/java/DLBroker/Producer.java" beforeDir="false" afterPath="$PROJECT_DIR$/DLAPI/src/main/java/API/Sinks/BackendSink.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataLayerCore-Broker/src/main/java/DLBroker/StreamSink.java" beforeDir="false" afterPath="$PROJECT_DIR$/Sinks/src/main/java/Sinks/StreamSinker.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataLayerCore-Broker/src/main/java/DLBroker/ValueSink.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataLayerCore-Broker/target/classes/DLBroker/MongoAux.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataLayerCore-Broker/target/classes/DLBroker/Producer$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataLayerCore-Broker/target/classes/DLBroker/Producer.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataLayerCore-Broker/target/classes/DLBroker/StreamSink$ConsumerThread.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataLayerCore-Broker/target/classes/DLBroker/StreamSink.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataLayerCore-Broker/target/classes/DLBroker/ValueSink$ConsumerThread.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataLayerCore-Broker/target/classes/DLBroker/ValueSink.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataLayerInterface-WebApp/DataLayerInterfaceWebApp.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataLayerInterface-WebApp/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/DataLayerAPI.java" beforeDir="false" afterPath="$PROJECT_DIR$/DLAPI/src/main/java/API/DataLayerAPI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Middleware/Validation.java" beforeDir="false" afterPath="$PROJECT_DIR$/DLAPI/src/main/java/API/Middleware/Validation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Routes/Streams.java" beforeDir="false" afterPath="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Streams.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Routes/Values.java" beforeDir="false" afterPath="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Values.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataLayerInterface-WebApp/target/classes/DLInterface/DataLayerAPI.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataLayerInterface-WebApp/target/classes/DLInterface/Middleware/Validation.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+    </list>
+    <ignored path="$PROJECT_DIR$/out/" />
+    <ignored path="$PROJECT_DIR$/target/" />
+    <ignored path="$PROJECT_DIR$/DataLayerCore-Broker/target/" />
+    <ignored path="$PROJECT_DIR$/DataLayerInterface-WebApp/target/" />
+    <ignored path="$PROJECT_DIR$/DataLayerCore-Broker/ValuesSinker/target/" />
+    <ignored path="$PROJECT_DIR$/DataLayerCore-Broker/StreamSinker/target/" />
+    <ignored path="$PROJECT_DIR$/Sinks/target/" />
+    <ignored path="$PROJECT_DIR$/API/target/" />
+    <ignored path="$PROJECT_DIR$/ValuesSinks/target/" />
+    <ignored path="$PROJECT_DIR$/DLAPI/target/" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="DefaultGradleProjectSettings">
+    <option name="isMigrated" value="true" />
+  </component>
+  <component name="FavoritesManager">
+    <favorites_list name="DataLayer" />
+  </component>
+  <component name="FileEditorManager">
+    <splitter split-orientation="horizontal" split-proportion="0.5">
+      <split-first>
+        <leaf>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/ValuesSinks/pom.xml">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="1200">
+                  <caret line="75" column="65" selection-start-line="75" selection-start-column="65" selection-end-line="75" selection-end-column="65" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/Sinks/pom.xml">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="385">
+                  <caret line="56" selection-start-line="56" selection-end-line="56" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/Sinks/src/main/java/Sinks/StreamSinker.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="225">
+                  <caret line="140" column="56" selection-start-line="140" selection-start-column="56" selection-end-line="140" selection-end-column="56" />
+                  <folding>
+                    <element signature="imports" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-first>
+      <split-second>
+        <leaf>
+          <file pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/DLAPI/pom.xml">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="170">
+                  <caret line="56" selection-start-line="56" selection-end-line="56" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-second>
+    </splitter>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Enum" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <replaceStrings>
+      <replace />
+    </replaceStrings>
+    <dirStrings>
+      <dir>$PROJECT_DIR$/../../../UniAv/3_ano/PEI/pei-cityzoom/cityzoom/DataLayer</dir>
+    </dirStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/DataLayerCore-Broker/pom.xml" />
+        <option value="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Value.java" />
+        <option value="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/DataLayer.java" />
+        <option value="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/StreamPost.java" />
+        <option value="$PROJECT_DIR$/DataLayerCore-Broker/src/main/java/DLBroker/ValueSink.java" />
+        <option value="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Stream.java" />
+        <option value="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/StreamController.java" />
+        <option value="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/DataLayerSpark.java" />
+        <option value="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Routes.java" />
+        <option value="$PROJECT_DIR$/DataLayerCore-Broker/src/main/java/DLBroker/Producer.java" />
+        <option value="$PROJECT_DIR$/DataLayerCore-Broker/src/main/java/DLBroker/MongoAux.java" />
+        <option value="$PROJECT_DIR$/DataLayerCore-Broker/src/main/java/DLBroker/StreamSink.java" />
+        <option value="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Middleware/Validation.java" />
+        <option value="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/DataLayerAPI.java" />
+        <option value="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Routes/Values.java" />
+        <option value="$PROJECT_DIR$/DataLayerCore-Broker/StreamSinker/src/main/java/StreamSink.java" />
+        <option value="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Routes/Streams.java" />
+        <option value="$PROJECT_DIR$/DataLayerCore-Broker/ValuesSinker/src/main/java/MongoAux.java" />
+        <option value="$PROJECT_DIR$/DataLayerCore-Broker/ValuesSinker/src/main/java/ValuesSink.java" />
+        <option value="$PROJECT_DIR$/Dockerfile" />
+        <option value="$PROJECT_DIR$/DataLayerCore-Broker/ValuesSinker/pom.xml" />
+        <option value="$PROJECT_DIR$/DataLayerCore-Broker/ValuesSinker/Dockerfile" />
+        <option value="$PROJECT_DIR$/DataLayerInterface-WebApp/pom.xml" />
+        <option value="$PROJECT_DIR$/src/main/java/Aux/MongoAux.java" />
+        <option value="$PROJECT_DIR$/src/main/java/Sinks/StreamSinker.java" />
+        <option value="$PROJECT_DIR$/src/main/java/Sinks/ValuesSinker.java" />
+        <option value="$PROJECT_DIR$/src/main/java/Middleware/Validation.java" />
+        <option value="$PROJECT_DIR$/src/main/java/Sinks/BackendSink.java" />
+        <option value="$PROJECT_DIR$/src/main/java/Routes/Streams.java" />
+        <option value="$PROJECT_DIR$/src/main/java/Routes/Values.java" />
+        <option value="$PROJECT_DIR$/src/main/java/DataLayerAPI.java" />
+        <option value="$PROJECT_DIR$/src/main/java/API/Routes/Values.java" />
+        <option value="$PROJECT_DIR$/src/main/java/API/Routes/Streams.java" />
+        <option value="$PROJECT_DIR$/src/main/java/API/Sinks/StreamSinker.java" />
+        <option value="$PROJECT_DIR$/src/main/java/API/Sinks/ValuesSinker.java" />
+        <option value="$PROJECT_DIR$/src/main/java/API/DataLayerAPI.java" />
+        <option value="$PROJECT_DIR$/Sinks/src/main/java/Aux/MongoAux.java" />
+        <option value="$PROJECT_DIR$/Sinks/src/main/java/Sinks/ValuesSinker.java" />
+        <option value="$PROJECT_DIR$/ValuesSinks/src/main/java/Sink/ValuesSinker.java" />
+        <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/Sinks/src/main/java/Sinks/StreamSkinker.java" />
+        <option value="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Streams.java" />
+        <option value="$PROJECT_DIR$/DLAPI/pom.xml" />
+        <option value="$PROJECT_DIR$/Sinks/pom.xml" />
+        <option value="$PROJECT_DIR$/ValuesSinks/pom.xml" />
+        <option value="$PROJECT_DIR$/Sinks/src/main/java/Sinks/StreamSinker.java" />
+      </list>
+    </option>
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="importAutomatically" value="true" />
+      </MavenImportingSettings>
+    </option>
+  </component>
+  <component name="ProjectFrameBounds">
+    <option name="x" value="1924" />
+    <option name="y" value="3" />
+    <option name="width" value="1912" />
+    <option name="height" value="548" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="PackagesPane" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="DataLayer" type="b2602c69:ProjectViewProjectNode" />
+              <item name="DataLayer" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="DataLayer" type="b2602c69:ProjectViewProjectNode" />
+              <item name="DataLayer" type="462c0819:PsiDirectoryNode" />
+              <item name="DLAPI" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="DataLayer" type="b2602c69:ProjectViewProjectNode" />
+              <item name="DataLayer" type="462c0819:PsiDirectoryNode" />
+              <item name="Sinks" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="DataLayer" type="b2602c69:ProjectViewProjectNode" />
+              <item name="DataLayer" type="462c0819:PsiDirectoryNode" />
+              <item name="Sinks" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="DataLayer" type="b2602c69:ProjectViewProjectNode" />
+              <item name="DataLayer" type="462c0819:PsiDirectoryNode" />
+              <item name="Sinks" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="DataLayer" type="b2602c69:ProjectViewProjectNode" />
+              <item name="DataLayer" type="462c0819:PsiDirectoryNode" />
+              <item name="Sinks" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="DataLayer" type="b2602c69:ProjectViewProjectNode" />
+              <item name="DataLayer" type="462c0819:PsiDirectoryNode" />
+              <item name="Sinks" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="Sinks" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="DataLayer" type="b2602c69:ProjectViewProjectNode" />
+              <item name="DataLayer" type="462c0819:PsiDirectoryNode" />
+              <item name="ValuesSinks" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="DataLayer" type="b2602c69:ProjectViewProjectNode" />
+              <item name="DataLayer" type="462c0819:PsiDirectoryNode" />
+              <item name="ValuesSinks" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="DataLayer" type="b2602c69:ProjectViewProjectNode" />
+              <item name="DataLayer" type="462c0819:PsiDirectoryNode" />
+              <item name="ValuesSinks" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="DataLayer" type="b2602c69:ProjectViewProjectNode" />
+              <item name="DataLayer" type="462c0819:PsiDirectoryNode" />
+              <item name="ValuesSinks" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="Aux" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager" selected="Application.ValuesSinker">
+    <configuration name="DataLayerAPI (1)" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="DataLayerAPI" />
+      <module name="DataLayer" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="DataLayerAPI (2)" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="API.DataLayerAPI" />
+      <module name="DLAPI" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="API.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="DataLayerAPI" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="API.DataLayerAPI" />
+      <module name="DataLayer" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="API.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="StreamSinker" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Sinks.StreamSinker" />
+      <module name="Sinks" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="Sinks.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ValuesSinker" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Sink.ValuesSinker" />
+      <module name="ValuesSinks" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="Sink.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Dockerfile" type="docker-deploy" factoryName="dockerfile" temporary="true" server-name="Docker">
+      <deployment type="dockerfile">
+        <settings>
+          <option name="buildCliOptions" value="" />
+          <option name="command" value="" />
+          <option name="containerName" value="" />
+          <option name="entrypoint" value="" />
+          <option name="imageTag" value="" />
+          <option name="commandLineOptions" value="" />
+          <option name="sourceFilePath" value="Dockerfile" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.StreamSinker" />
+        <item itemvalue="Application.ValuesSinker" />
+        <item itemvalue="Application.DataLayerAPI (2)" />
+        <item itemvalue="Application.DataLayerAPI (2)" />
+        <item itemvalue="Application.DataLayerAPI (1)" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b57dff56-8f59-4293-99f2-0feaed5598cc" name="Default Changelist" comment="" />
+      <created>1555889973439</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1555889973439</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="1924" y="3" width="1912" height="548" extended-state="0" />
+    <editor active="true" />
+    <layout>
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.23899034" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Designer" order="2" />
+      <window_info id="Image Layers" order="3" />
+      <window_info id="Capture Tool" order="4" />
+      <window_info id="UI Designer" order="5" />
+      <window_info id="Learn" order="6" weight="0.32924226" />
+      <window_info id="Favorites" order="7" side_tool="true" weight="0.32977587" />
+      <window_info anchor="bottom" id="Docker" weight="0.14067279" />
+      <window_info anchor="bottom" id="Inspection Results" weight="0.7708831" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32925585" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.3506626" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="Version Control" order="7" />
+      <window_info anchor="bottom" id="Terminal" order="8" />
+      <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
+      <window_info anchor="bottom" id="Messages" order="10" weight="0.3282365" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Palette" order="3" />
+      <window_info anchor="right" id="Maven" order="4" />
+      <window_info anchor="right" id="Theme Preview" order="5" />
+      <window_info anchor="right" id="Capture Analysis" order="6" />
+      <window_info anchor="right" id="Palette&#9;" order="7" />
+    </layout>
+    <layout-to-restore>
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.23745997" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Designer" order="2" />
+      <window_info id="Image Layers" order="3" />
+      <window_info id="Capture Tool" order="4" />
+      <window_info id="UI Designer" order="5" />
+      <window_info id="Learn" order="6" weight="0.32924226" />
+      <window_info id="Favorites" order="7" side_tool="true" weight="0.32977587" />
+      <window_info anchor="bottom" id="Docker" order="0" weight="0.14067279" />
+      <window_info anchor="bottom" id="Inspection Results" order="1" weight="0.7708831" />
+      <window_info anchor="bottom" id="Message" order="2" />
+      <window_info anchor="bottom" id="Find" order="3" />
+      <window_info anchor="bottom" id="Run" order="4" weight="0.9276249" />
+      <window_info anchor="bottom" id="Debug" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="6" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="7" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="8" />
+      <window_info anchor="bottom" id="Version Control" order="9" />
+      <window_info anchor="bottom" id="Terminal" order="10" />
+      <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
+      <window_info anchor="bottom" id="Messages" order="12" weight="0.32845187" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Palette" order="3" />
+      <window_info anchor="right" id="Maven" order="4" />
+      <window_info anchor="right" id="Theme Preview" order="5" />
+      <window_info anchor="right" id="Capture Analysis" order="6" />
+      <window_info anchor="right" id="Palette&#9;" order="7" />
+    </layout-to-restore>
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="jrt:///usr/lib/jvm/java-11-openjdk!/java.base/java/lang/Runnable.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="9" column="9" selection-start-line="9" selection-start-column="9" selection-end-line="9" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Stream.java" />
+    <entry file="file://$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/StreamPost.java" />
+    <entry file="file://$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Value.java" />
+    <entry file="file://$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/DataLayer.java" />
+    <entry file="jar://$MAVEN_REPOSITORY$/com/sparkjava/spark-core/2.8.0/spark-core-2.8.0.jar!/spark/Route.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="96">
+          <caret line="9" column="11" selection-start-line="9" selection-start-column="11" selection-end-line="9" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/StreamController.java" />
+    <entry file="file://$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/DataLayerSpark.java" />
+    <entry file="file://$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/StatusCodes.java" />
+    <entry file="file://$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Routes.java" />
+    <entry file="file://$PROJECT_DIR$/docker-compose.yml">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataLayerCore-Broker/src/main/java/DLBroker/ValueSink.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="384">
+          <caret line="24" selection-start-line="24" selection-end-line="24" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataLayerCore-Broker/src/main/java/DLBroker/StreamSink.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="254">
+          <caret line="22" selection-start-line="22" selection-end-line="22" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Dockerfile">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="32">
+          <caret line="2" column="6" selection-start-line="2" selection-start-column="6" selection-end-line="2" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataLayerCore-Broker/ValuesSinker/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="675">
+          <caret line="45" selection-start-line="45" selection-end-line="45" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataLayerCore-Broker/ValuesSinker/Dockerfile">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="128">
+          <caret line="8" column="60" selection-start-line="8" selection-start-column="60" selection-end-line="8" selection-end-column="60" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataLayerCore-Broker/ValuesSinker/ValuesSinker.iml">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataLayerCore-Broker/ValuesSinker/src/main/java/MongoAux.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="480">
+          <caret line="30" column="7" selection-start-line="30" selection-start-column="7" selection-end-line="30" selection-end-column="7" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataLayerCore-Broker/StreamSinker/pom.xml">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataLayerCore-Broker/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="332">
+          <caret line="31" selection-start-line="31" selection-end-line="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Aux/MongoAux.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="336">
+          <caret line="21" column="4" selection-start-line="21" selection-start-column="4" selection-end-line="21" selection-end-column="4" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataLayerCore-Broker/StreamSinker/src/main/java/StreamSink.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="336">
+          <caret line="21" selection-start-line="21" selection-end-line="21" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Middleware/Validation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="176">
+          <caret line="11" column="14" selection-start-line="11" selection-start-column="14" selection-end-line="11" selection-end-column="14" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Middleware/Validation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="176">
+          <caret line="11" selection-start-line="11" selection-end-line="11" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#validateCreate#0;class#Validation#0" />
+            <element signature="method#validatePushValues#0;class#Validation#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataLayerCore-Broker/ValuesSinker/src/main/java/ValuesSink.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1043">
+          <caret line="75" column="34" selection-start-line="75" selection-start-column="34" selection-end-line="75" selection-end-column="34" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataLayerInterface-WebApp/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="224">
+          <caret line="14" selection-start-line="14" selection-end-line="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataLayerCore-Broker/src/main/java/DLBroker/MongoAux.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="336">
+          <caret line="21" selection-start-line="21" selection-end-line="21" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataLayerCore-Broker/src/main/java/DLBroker/Producer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="176">
+          <caret line="11" selection-start-line="11" selection-end-line="11" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Routes/Values.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="400">
+          <caret line="25" selection-start-line="25" selection-end-line="25" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/DataLayerAPI.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="96">
+          <caret line="6" selection-start-line="6" selection-end-line="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/DataLayerAPI.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="224">
+          <caret line="14" selection-start-line="14" selection-end-line="14" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Values.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="208">
+          <caret line="16" selection-start-line="16" selection-end-line="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Sinks/BackendSink.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="336">
+          <caret line="21" column="41" selection-start-line="21" selection-start-column="41" selection-end-line="21" selection-end-column="41" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Routes/Streams.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="256">
+          <caret line="16" column="13" selection-start-line="16" selection-start-column="13" selection-end-line="16" selection-end-column="13" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#createStream#0;class#Streams#0" />
+            <element signature="method#deleteStream#0;class#Streams#0" />
+            <element signature="method#listStreams#0;class#Streams#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/pom.xml">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Sinks/src/main/java/Sinks/StreamSinker.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="282">
+          <caret line="22" column="13" selection-start-line="22" selection-start-column="13" selection-end-line="22" selection-end-column="13" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Sinks/src/main/java/Aux/MongoAux.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="253">
+          <caret line="21" column="48" selection-start-line="21" selection-start-column="48" selection-end-line="21" selection-end-column="48" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Sinks/src/main/java/Sinks/ValuesSinker.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="208">
+          <caret line="31" column="32" selection-start-line="31" selection-start-column="32" selection-end-line="31" selection-end-column="32" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1079#1080#0" expanded="true" />
+            <element signature="e#1110#1111#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ValuesSinks/src/main/java/ValuesSinker.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="25" selection-start-column="25" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ValuesSinks/src/main/java/Sink/ValuesSinker.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1517">
+          <caret line="151" selection-start-line="151" selection-end-line="151" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1120#1121#0" expanded="true" />
+            <element signature="e#1168#1169#0" expanded="true" />
+            <element signature="e#7131#7132#0" expanded="true" />
+            <element signature="e#7186#7187#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/DataLayerAPI.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="192">
+          <caret line="12" column="13" selection-start-line="12" selection-start-column="13" selection-end-line="12" selection-end-column="13" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Streams.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="459">
+          <caret line="91" column="47" selection-start-line="91" selection-start-column="47" selection-end-line="91" selection-end-column="47" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#createStream#0;class#Streams#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ValuesSinks/src/main/java/Aux/MongoAux.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="9">
+          <caret line="2" column="21" selection-start-line="2" selection-start-column="21" selection-end-line="2" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="160">
+          <caret line="10" selection-start-line="10" selection-end-line="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DLAPI/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="56" selection-start-line="56" selection-end-line="56" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ValuesSinks/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1200">
+          <caret line="75" column="65" selection-start-line="75" selection-start-column="65" selection-end-line="75" selection-end-column="65" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Sinks/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="385">
+          <caret line="56" selection-start-line="56" selection-end-line="56" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Sinks/src/main/java/Sinks/StreamSinker.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="140" column="56" selection-start-line="140" selection-start-column="56" selection-end-line="140" selection-end-column="56" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>
