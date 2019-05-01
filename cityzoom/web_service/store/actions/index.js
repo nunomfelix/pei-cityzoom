@@ -5,6 +5,7 @@ function getUrl(){
 }
 
 export default{
+
     async nuxtServerInit({dispatch}, {req}){
         const cookie = req.headers.cookie
         let jwt;
@@ -15,18 +16,18 @@ export default{
         }
         if (jwt){ await dispatch('renew_data',jwt) }
     },
-    renew_data: async function ({ dispatch, state }, payload) {
+
+    renew_data: async function ({ commit, state }, payload) {
 
         try {
-            const token = payload;
             const res = await axios({
                 method: 'get',
                 url: getUrl() + '/user/me',
                 headers: {
-                    'Authorization': token
+                    'Authorization': payload
                 }
             })
-            dispatch('userdata_store', { data: res.data })
+            commit('SET_STORE', { user: { ...res.data}, jwt: payload })
         } catch (err) {
             console.error('Error', err.message)
             return err.message
@@ -51,7 +52,8 @@ export default{
 
         try {
             const res = await axios.post(getUrl() + '/user/login', payload)
-            commit('SET_STORE', { jwt: res.data.token });
+            const {jwt, ...user} = res.data
+            commit('SET_STORE', { user, jwt });
 
             if (process.client && state.socket) {
                 state.socket.emit('login', { jwt: state.jwt })
@@ -75,7 +77,8 @@ export default{
             })
             console.log(res)
             commit('SET_STORE', {
-                jwt: '',
+                user: '',
+                jwt: ''
             })
             this.$router.push('/')
         } catch (err) {

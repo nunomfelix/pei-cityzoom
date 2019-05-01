@@ -67,9 +67,9 @@ export default {
     window.removeEventListener("resize", this.onResize);
   },
   mounted() {
-    this.dc = require("dc");
     const time = this.data ? 1000 : 0;
     setTimeout(() => {
+    this.dc = require("dc");
       this.dataTmp = this.data;
       this.focusChart = this.dc.seriesChart("#" + this.name);
       this.overviewChart = this.dc.seriesChart("#" + this.name + "overview");
@@ -209,13 +209,13 @@ export default {
       this.focusChart.legend(
         this.dc
           .legend()
-          .x(w - 160)
-          .y(h / 2 - (24 * this.tmpNames.length) / 2)
+          .x(w / 2 - (this.tmpNames.length / 2 * 85))
+          .y(/*h / 2 - (24 * this.tmpNames.length) / 2*/ 5)
           .itemHeight(13)
-          .horizontal(false)
+          .horizontal(true)
           .gap(15)
-          .legendWidth(100)
-          .itemWidth(100)
+          .legendWidth(10000)
+          .itemWidth(170)
       );
       const tmp = this.focusChart.filters()[0]
         ? [this.focusChart.filters()[0][0], this.focusChart.filters()[0][1]]

@@ -37,9 +37,9 @@ export default {
     return {
       sidebarTabs: [
         {
-          path: "dominios/metrica",
+          path: "mapa",
           img: 'dominios.svg',
-          name: "Domains"
+          name: "Mapa"
         },
         {
           path: "dispositivos",
@@ -89,7 +89,7 @@ export default {
     },
     homeButton() {
       this.currentTab = "";
-      this.router.navigate(["/homepage"]);
+      this.$router.push("/homepage");
     }
   },
   mounted() {

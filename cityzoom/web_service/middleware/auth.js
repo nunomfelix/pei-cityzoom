@@ -1,30 +1,14 @@
 export default async function(context) {
-    const { state } =  context.store     
-    if(!state.priviledge==-1 || state.jwt=='') {
-        const { req } = context
-        let jwt;
-        if(req && req.headers) {
-            const cookie = req.headers.cookie
-            if(cookie) {
-                console.log(cookie)
-                jwt = cookie
-                        .split('; ')
-                        .find(c => c.startsWith('jwt='))
-                if(jwt) 
-                    jwt = jwt.split('=')[1]
-    
-            }
-        } else if(process.client && state.jwt) {
-             jwt = state.jwt; 
+    const { state } = context.store
+    const paths = ['/', '/login', '/register']
+    console.log("tmp")
+    if(paths.includes(context.route.path)) {
+        if(state.jwt) {
+            context.redirect('/homepage')
         }
-        if(jwt) {
-            const error = await context.store.dispatch('renew_data', jwt)
-            if(!error) {
-                if(context.route.path = '/')
-                    conrext.redirect('/homepage')
-                return
-            }
-        } 
+    } else if(state.jwt) {
+        await context.store.dispatch('renew_data', state.jwt)
+    } else {
         context.redirect('/')
-    } 
+    }
 }

@@ -19,7 +19,7 @@
           :w="item.w"
           :h="item.h"
           :i="item.i"
-          :minW="4"
+          :minW="2"
           :minH="14"
           :maxH="14"
           drag-allow-from=".widget_handle"
@@ -43,13 +43,10 @@
 
 <script>
 var testLayout = [
-  { x: 0, y: 0, w: 8, h: 14, i: "series_a", type: 'series', data:'normal' },
-  { x: 8, y: 0, w: 4, h: 14, i: "series_c", type: 'series', data: 'fake' },
   { x: 0, y: 14, w: 13, h: 14, i: "series_b", type: 'series', data: 'fake' },
 ];
 
 export default {
-  middleware: ["auth"],
   data() {
     return {
       layout: testLayout,

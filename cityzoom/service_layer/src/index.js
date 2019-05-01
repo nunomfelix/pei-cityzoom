@@ -5,6 +5,9 @@ const helmet = require('helmet')
 const morgan = require('morgan')
 const { error } = require('./middleware')
 const fs = require('fs')
+const axios = require('axios')
+
+const User = require('./db/models/user')
 
 uncaughtDebug = require('debug')('app:Uncaught')
 
@@ -44,6 +47,21 @@ app.use((req, res, next) => {
     res.header('Access-Control-Allow-Credentials', true);
     return next();
 });
+
+app.get('/reset', async (req, res) => {
+    await User.deleteMany({})
+    const user = await axios({
+        method: 'post',  
+        url: 'http://localhost:8002/user',
+        data: {
+            name: 'teste',
+            username: 'teste',
+            email: 'teste@gmail.com',
+            password: 'teste'
+        }
+    })
+    res.send(user.data)
+})
 
 app.use(morgan('dev'))
 app.use(helmet())

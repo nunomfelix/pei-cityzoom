@@ -33,7 +33,12 @@ module.exports = {
     { src: '~/assets/animations.scss', lang: 'scss' },
     { src: '~/assets/tables.scss', lang: 'scss' },
     { src: '~/node_modules/dc/style/dc.scss', lang: 'scss' },
+    { src: '~/node_modules/ol/ol.css', lang: 'css' },
   ],
+  
+  router: {
+    middleware: ['auth']
+  },
 
   /*
   ** Plugins to load before mounting the App

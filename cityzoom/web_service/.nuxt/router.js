@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import { interopDefault } from './utils'
 
 const _9fa5562a = () => interopDefault(import('../pages/homepage/index.vue' /* webpackChunkName: "pages/homepage/index" */))
+const _8449087c = () => interopDefault(import('../pages/mapa/index.vue' /* webpackChunkName: "pages/mapa/index" */))
 const _2b94b6c2 = () => interopDefault(import('../pages/user/login.vue' /* webpackChunkName: "pages/user/login" */))
 const _55f28670 = () => interopDefault(import('../pages/index.vue' /* webpackChunkName: "pages/index" */))
 
@@ -84,6 +85,10 @@ export function createRouter() {
       path: "/homepage",
       component: _9fa5562a,
       name: "homepage"
+    }, {
+      path: "/mapa",
+      component: _8449087c,
+      name: "mapa"
     }, {
       path: "/user/login",
       component: _2b94b6c2,
