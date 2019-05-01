@@ -34,6 +34,9 @@
             <div v-if="item.type=='stacked'">
               <StackedBar :name="item.i"/>
             </div>
+            <div v-if="item.type=='lines'">
+              <LineGraph :name="item.i"/>
+            </div>
           </div>
         </grid-item>
       </grid-layout>
@@ -43,9 +46,10 @@
 
 <script>
 var testLayout = [
-  { x: 0, y: 0, w: 8, h: 14, i: "series_a", type: 'series', data:'normal' },
-  { x: 8, y: 0, w: 4, h: 14, i: "series_c", type: 'series', data: 'fake' },
-  { x: 0, y: 14, w: 13, h: 14, i: "series_b", type: 'series', data: 'fake' },
+  { x: 0, y: 0, w: 12, h: 14, i: "line_a", type: 'lines', data:'fake' },
+  { x: 0, y: 0, w: 8, h: 14, i: "series_a", type: 'series', data:'fake' },
+  // { x: 8, y: 0, w: 4, h: 14, i: "series_c", type: 'series', data: 'fake' },
+  // { x: 0, y: 14, w: 13, h: 14, i: "series_b", type: 'series', data: 'fake' },
 ];
 
 export default {
