@@ -1,5 +1,5 @@
 <template>
-<div class="mapMargin">
+<div class="mapMargin mapHeight">
     <div class="mapHeight" id="map"></div>
 </div>
 </template>
