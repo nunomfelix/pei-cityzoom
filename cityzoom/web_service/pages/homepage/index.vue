@@ -46,14 +46,10 @@
 
 <script>
 var testLayout = [
-<<<<<<< HEAD
-  { x: 0, y: 14, w: 13, h: 14, i: "series_b", type: 'series', data: 'fake' },
-=======
   { x: 0, y: 0, w: 12, h: 14, i: "line_a", type: 'lines', data:'fake' },
   { x: 0, y: 0, w: 8, h: 14, i: "series_a", type: 'series', data:'fake' },
   // { x: 8, y: 0, w: 4, h: 14, i: "series_c", type: 'series', data: 'fake' },
   // { x: 0, y: 14, w: 13, h: 14, i: "series_b", type: 'series', data: 'fake' },
->>>>>>> 0b87217d4edc5115a15e50c23ed65fb7c79d09d7
 ];
 
 export default {
