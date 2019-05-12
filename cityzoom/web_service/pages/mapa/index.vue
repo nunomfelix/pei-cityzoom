@@ -1,5 +1,7 @@
 <template>
-    <div id="map" style="height: calc(100vh - 100px)"></div>
+<div class="mapMargin">
+    <div class="mapHeight" id="map"></div>
+</div>
 </template>
 
 <script>

@@ -104,9 +104,6 @@ export default {
 </script>
 
 <style lang="scss">
-$sidebar-size: 300px;
-$sidebar-left-size: 100px;
-$sidebar-right-size: 200px;
 @import "~/assets/mixins.scss";
 
 .sidebarWrapper {

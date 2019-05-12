@@ -2,6 +2,21 @@
 
 @import './mixins.scss';
 
+.mapHeight {
+    height: calc(100vh - #{$header-height});
+}
+
+.mapMargin {
+    margin-top: $header-height;
+    margin-left: $sidebar-left-size;
+}
+
+.mainMargin {
+    margin-top: calc(#{$header-height} + 3rem);
+    margin-left: 140px;
+    margin-right: 40px;
+}
+
 .rowc {
     @include row();
     flex-direction: column;
@@ -25,3 +40,6 @@ input {
     font-size: 1.4rem;
 }
 
+html {
+    font-size: 10px !important;
+}

@@ -1,3 +1,8 @@
+$header-height: 9rem;
+$sidebar-size: 30rem;
+$sidebar-left-size: 10rem;
+$sidebar-right-size: 20rem;
+
 @mixin row {
     display: flex;
     flex-wrap: wrap;
