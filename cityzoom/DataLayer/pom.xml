@@ -24,5 +24,7 @@
         <module>Sinks</module>
         <module>ValuesSinks</module>
         <module>DLAPI</module>
+        <module>KafkaStartUp</module>
+        <module>AlertsStreaming</module>
     </modules>
 </project>

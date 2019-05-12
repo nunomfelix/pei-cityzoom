@@ -16,9 +16,11 @@ public class Validation {
         // required fields for create stream
         this.createStreamRequiredFields.put("stream", String.class);
         this.createStreamRequiredFields.put("type", String.class);
+        this.createStreamRequiredFields.put("device_id", String.class);
 
         // allowed fields for create stream
         this.createStreamAllowedFields.put("stream", String.class);
+        this.createStreamAllowedFields.put("device_id", String.class);
         this.createStreamAllowedFields.put("type", String.class);
         this.createStreamAllowedFields.put("description", String.class);
         this.createStreamAllowedFields.put("mobile", Boolean.class);
@@ -51,9 +53,9 @@ public class Validation {
         if (!body.keySet().containsAll(createStreamRequiredFields.keySet())) {
             return "{\n" +
                     "\t\"Status\": \"Error @ request\"\n" +
-                    "\t\"Error\": \"Field(s) \"stream\" and/or \"type\" not found\"\n" +
+                    "\t\"Error\": \"Field(s) \"stream\" and/or \"type\" and/or \"device_id\" not found\"\n" +
                     "}";
-        } else if (body.keySet().size() > 6){
+        } else if (body.keySet().size() > 7){
             return "{\n" +
                     "\t\"Status\": \"Error @ request\"\n" +
                     "\t\"Error\": \"Too many fields\"\n" +

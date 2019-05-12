@@ -7,6 +7,8 @@ import API.Routes.Values;
 import API.Sinks.BackendSink;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
+import spark.Request;
+import spark.Response;
 
 import static spark.Spark.*;
 
@@ -34,6 +36,17 @@ public class DataLayerAPI {
             // values routes and paths
             get("/values",  Values::getValues);
             post("/values", Values::postValue);
+
+            // alerts routes and paths
+            path("/alert", () -> {
+                get("/:id", (Request req, Response res) -> {return 0;});
+                patch("/:id", (Request req, Response res) -> {return 0;});
+                put("/:id", (Request req, Response res) -> {return 0;});
+                delete("/:id", (Request req, Response res) -> {return 0;});
+            });
+            get("/alerts", (Request req, Response res) -> { return "o"; });
+            post("/alerts", (Request req, Response res) -> { return "o"; });
+            put("/alerts", (Request req, Response res) -> { return "o"; });
         });
     }
 }

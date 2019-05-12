@@ -113,6 +113,7 @@ public class StreamSinker {
                                 System.out.println(value.toString());
                                 Document document = new Document("stream", value.get("stream").getAsString())
                                         .append("description", value.get("description").getAsString())
+                                        .append("device_id", value.get("device_id").getAsString())
                                         .append("mobile", value.get("mobile").getAsBoolean())
                                         .append("type", value.get("type").getAsString())
                                         .append("ttl", value.get("ttl").getAsInt())

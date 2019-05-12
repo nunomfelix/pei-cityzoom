@@ -10,6 +10,7 @@
     <option name="ignoredFiles">
       <set>
         <option value="$PROJECT_DIR$/API/pom.xml" />
+        <option value="$PROJECT_DIR$/AlertStreamer/pom.xml" />
         <option value="$PROJECT_DIR$/DataLayerCore-Broker/pom.xml" />
         <option value="$PROJECT_DIR$/DataLayerInterface-WebApp/pom.xml" />
       </set>

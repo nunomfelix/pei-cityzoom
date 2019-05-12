@@ -9,11 +9,14 @@
         <module name="DLAPI" />
         <module name="Sinks" />
         <module name="ValuesSinks" />
+        <module name="KafkaStartUp" />
+        <module name="AlertsStreaming" />
         <module name="DataLayerCoreBroker" />
         <module name="DataLayerInterfaceWebApp" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="AlertStreamer" target="8" />
       <module name="API" target="8" />
       <module name="DataLayerCore-Broker" target="8" />
       <module name="DataLayerInterface-WebApp" target="8" />

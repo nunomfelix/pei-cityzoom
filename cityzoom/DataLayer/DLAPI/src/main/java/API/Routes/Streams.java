@@ -47,6 +47,7 @@ public class Streams {
 
         }
         String description = keys.contains("description") ? body.get("description").getAsString() : "";
+        String device_id = body.get("device_id").getAsString();
         boolean mobile = keys.contains("mobile") && body.get("mobile").getAsBoolean();
         int periodicity = keys.contains("periodicity") ?
                 body.get("periodicity").getAsInt() > 0 ? body.get("periodicity").getAsInt() : 1200 :
@@ -55,16 +56,18 @@ public class Streams {
                 body.get("ttl").getAsInt() > 0 ? body.get("ttl").getAsInt() : 120000 :
                 120000;
 
+
         String produceRequest =
                 "{\n" +
                         "\t\"stream\":\""+stream+"\",\n" +
                         "\t\"description\":\""+description+"\",\n" +
+                        "\t\"device_id\":\""+device_id+"\",\n" +
                         "\t\"type\":\""+type+"\",\n" +
                         "\t\"mobile\":"+mobile+",\n" +
                         "\t\"periodicity\": "+periodicity+",\n" +
                         "\t\"ttl\": "+ttl+"," +
-                        "\t\"creation\": "+date.getTime()+"," +
-                        "\t\"lastUpdate\": "+date.getTime()+"" +
+                        "\t\"creation\": "+date.getTime()+",\n" +
+                        "\t\"lastUpdate\": "+date.getTime()+"\n" +
                         "}";
         String topic = "Streams";
         producer.produce(topic, "chave_minima", produceRequest);
@@ -121,6 +124,7 @@ public class Streams {
                     "{\n" +
                             "\t\"stream\": \""+jsonStream.get("stream").getAsString()+"\",\n" +
                             "\t\"description\": \""+jsonStream.get("description").getAsString()+"\",\n" +
+                            "\t\"device_id\": \""+jsonStream.get("device_id").getAsString()+"\",\n" +
                             "\t\"mobile\": "+jsonStream.get("mobile").getAsBoolean()+",\n" +
                             "\t\"type\": \""+jsonStream.get("type").getAsString()+"\",\n" +
                             "\t\"ttl\": "+jsonStream.get("ttl").getAsInt()+",\n" +
@@ -163,6 +167,7 @@ public class Streams {
         return "{\n" +
                 "\t\"stream\": \""+jsonStream.get("stream").getAsString()+"\",\n" +
                 "\t\"description\": \""+jsonStream.get("description").getAsString()+"\",\n" +
+                "\t\"device_id\": \""+jsonStream.get("device_id").getAsString()+"\",\n" +
                 "\t\"mobile\": "+jsonStream.get("mobile").getAsBoolean()+",\n" +
                 "\t\"type\": \""+jsonStream.get("type").getAsString()+"\",\n" +
                 "\t\"ttl\": "+jsonStream.get("ttl").getAsInt()+",\n" +
