@@ -62,7 +62,8 @@ function validateCreateDevice(object) {
     const schema = Joi.object().keys({
         name: Joi.string().required(),
         owner: Joi.string().required(),
-        location: Joi.string().required().length(19),
+        vertical: Joi.string().required(),
+        location: Joi.string().required(),
         description: Joi.string().optional()
     })
     return Joi.validate(object, schema)

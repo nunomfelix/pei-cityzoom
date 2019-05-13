@@ -14,6 +14,10 @@ const deviceSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true
+    }, vertical: {
+        type: String,
+        required: true,
+        trim: true
     }, description: {
         type: String
     }
