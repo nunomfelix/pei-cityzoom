@@ -58,6 +58,16 @@ function validateGetDataFromStream(object) {
     return Joi.validate(object, schema)
 }
 
+function validateCreateDevice(object) {
+    const schema = Joi.object().keys({
+        name: Joi.string().required(),
+        owner: Joi.string().required(),
+        location: Joi.string().required().length(19),
+        description: Joi.string().optional()
+    })
+    return Joi.validate(object, schema)
+}
+
 module.exports = {
     validateId,
     validatePatch,
@@ -65,5 +75,6 @@ module.exports = {
     validateLogin,
     validateGetAllStreams,
     validateGetDataFromStream,
-    validateGetStreamByID
+    validateGetStreamByID,
+    validateCreateDevice
 }

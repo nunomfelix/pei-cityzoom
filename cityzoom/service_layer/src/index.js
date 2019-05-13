@@ -8,6 +8,7 @@ const fs = require('fs')
 const axios = require('axios')
 
 const User = require('./db/models/user')
+const Device = require('./db/models/device')
 
 uncaughtDebug = require('debug')('app:Uncaught')
 
@@ -17,6 +18,7 @@ require('./db/mongoose')
 const accountRouter = require('./routes/user')
 const alertRouter = require('./routes/alert')
 const streamRouter = require('./routes/stream')
+const deviceRouter = require('./routes/device')
 const expressDebug = require('debug')('app:express')
 
 //Uses the express framework
@@ -36,7 +38,7 @@ process.on('unhandledRejection', (ex) => {
 })
 
 app.use((req, res, next) => {
-    var allowedOrigins = ['http://127.0.0.1:3000', 'http://localhost:3000', 'http://193.136.93.14:3000', ];
+    var allowedOrigins = ['http://127.0.0.1:3000', 'http://localhost:3000', 'http://193.136.93.14:3000',];
     var origin = req.headers.origin;
     // if (allowedOrigins.indexOf(origin) > -1) {
     //     res.setHeader('Access-Control-Allow-Origin', origin);
@@ -51,7 +53,7 @@ app.use((req, res, next) => {
 app.get('/reset', async (req, res) => {
     await User.deleteMany({})
     const user = await axios({
-        method: 'post',  
+        method: 'post',
         url: 'http://localhost:8002/user',
         data: {
             name: 'teste',
@@ -71,6 +73,7 @@ app.use(express.json())
 app.use('/user', accountRouter)
 app.use('/alert', alertRouter)
 app.use('/stream', streamRouter)
+app.use('/device', deviceRouter)
 
 //Error middleware, para excessoes causadas em funcoes assincronas do express
 app.use(error)
