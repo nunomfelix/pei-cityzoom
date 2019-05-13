@@ -1,21 +1,23 @@
 <template>
-  <div v-bind:id="name+'wrapper'">
-    <div class="dc_wrapper rowc" :class="{'show': show}">
-      <div v-bind:id="name"></div>
-      <div v-bind:id="name + 'overview'"></div>
-      <button class="btn btn-danger" style="margin-right:30px" @click="reset()">reset</button>
-    </div>
-    <div v-if="!show" style="height: 666px" class="rowc">
-      <div class="lds-roller-relative mb-4">
-        <div class="lds-roller">
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
+  <div @mouseenter="enter" @mouseleave="leave" >
+    <div v-bind:id="name+'wrapper'">
+      <div class="dc_wrapper rowc" :class="{'show': show}">
+        <div v-bind:id="name"></div>
+        <div v-bind:id="name + 'overview'"></div>
+        <button class="btn btn-danger" style="margin-right:30px" @click="reset()">reset</button>
+      </div>
+      <div v-if="!show" style="height: 666px" class="rowc">
+        <div class="lds-roller-relative mb-4">
+          <div class="lds-roller">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
         </div>
       </div>
     </div>
@@ -38,6 +40,7 @@ export default {
       min: 9999999,
       xMin: 99999999999999,
       xMax: 0,
+      rendered: false,
 
       tmpNames: [
         "temperature",
@@ -64,9 +67,10 @@ export default {
     window.removeEventListener("resize", this.onResize);
   },
   mounted() {
-    this.dataTmp = this.data
-    this.dc = require("dc");
+    const time = this.data ? 1000 : 0;
     setTimeout(() => {
+    this.dc = require("dc");
+      this.dataTmp = this.data;
       this.focusChart = this.dc.seriesChart("#" + this.name);
       this.overviewChart = this.dc.seriesChart("#" + this.name + "overview");
       var dimension, group;
@@ -74,13 +78,17 @@ export default {
 
       if (this.dataTmp) {
         for (let v in this.dataTmp) {
-          if (this.dataTmp[v].value > this.max) this.max = Number(this.dataTmp[v].value);
-          if (this.dataTmp[v].value < this.min) this.min = Number(this.dataTmp[v].value);
-          if (this.dataTmp[v].key < this.xMin) this.xMin = Number(this.dataTmp[v].key);
-          if (this.dataTmp[v].key > this.xMax) this.xMax = Number(this.dataTmp[v].key);
+          if (Number(this.dataTmp[v].value) > this.max)
+            this.max = Number(this.dataTmp[v].value);
+          if (Number(this.dataTmp[v].value) < this.min)
+            this.min = Number(this.dataTmp[v].value);
+          if (Number(this.dataTmp[v].key) < this.xMin)
+            this.xMin = Number(this.dataTmp[v].key);
+          if (Number(this.dataTmp[v].key) > this.xMax)
+            this.xMax = Number(this.dataTmp[v].key);
         }
       } else {
-        this.dataTmp = []
+        this.dataTmp = [];
         for (var i = 0; i < 250; i++) {
           for (var j = 0; j < 5; j++) {
             const x = Math.random() * 100;
@@ -98,8 +106,8 @@ export default {
         this.xMax = i + 10;
       }
 
-      this.min = this.min - this.max * .20
-      this.max = this.max + this.max * .20
+      this.min = this.min - this.max * 0.2;
+      this.max = this.max + this.max * 0.2;
 
       this.ndx = crossfilter(this.dataTmp);
       dimension = this.ndx.dimension(function(d) {
@@ -135,7 +143,7 @@ export default {
         });
       //this.focusChart.yAxis().tickFormat(function (d) { return this.dc.d3.format(',d')(d + 299500); });
       this.focusChart.margins().left += 20;
-      this.focusChart.margins().right += 45;
+      this.focusChart.margins().right += 110;
 
       this.overviewChart
         .height(150)
@@ -162,15 +170,36 @@ export default {
 
       this.focusChart.render();
       this.overviewChart.render();
-      this.focusChart.focus([this.xMax - (this.xMax - this.xMin) * .66, this.xMax - (this.xMax - this.xMin) * .44]);
+      this.focusChart.focus([
+        this.xMax - (this.xMax - this.xMin) * 0.66,
+        this.xMax - (this.xMax - this.xMin) * 0.44
+      ]);
       this.onResize();
-    }, 1000);
+    }, time);
   },
   methods: {
     reset() {
       this.focusChart.focus(null);
     },
-
+    enter() {
+      if (!this.rendered) {
+        if (this.focusChart) {
+          this.focusChart.x(
+            this.dc.d3.scaleLinear().domain([this.xMin, this.xMax])
+          );
+          const tmp = this.focusChart.filters()[0]
+            ? [this.focusChart.filters()[0][0], this.focusChart.filters()[0][1]]
+            : null;
+          this.focusChart.render();
+          this.overviewChart.redraw();
+          this.focusChart.focus(tmp);
+        }
+        this.rendered = true;
+      }
+    },
+    leave() {
+      this.rendered = false;
+    },
     onResize() {
       const w = document.getElementById(this.name + "wrapper").offsetWidth;
       const h = document.getElementById(this.name + "wrapper").offsetHeight;
@@ -180,13 +209,13 @@ export default {
       this.focusChart.legend(
         this.dc
           .legend()
-          .x(w - 80)
-          .y(h / 2 - (24 * this.tmpNames.length) / 2)
+          .x(w / 2 - (this.tmpNames.length / 2 * 85))
+          .y(/*h / 2 - (24 * this.tmpNames.length) / 2*/ 5)
           .itemHeight(13)
-          .horizontal(false)
+          .horizontal(true)
           .gap(15)
-          .legendWidth(100)
-          .itemWidth(100)
+          .legendWidth(10000)
+          .itemWidth(170)
       );
       const tmp = this.focusChart.filters()[0]
         ? [this.focusChart.filters()[0][0], this.focusChart.filters()[0][1]]
