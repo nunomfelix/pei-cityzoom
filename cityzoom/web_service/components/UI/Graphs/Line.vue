@@ -1,25 +1,25 @@
 <template>
-    <div v-bind:id="name+'wrapper'">
-      <div class="dc_wrapper rowc" :class="{'show': show}">
-        <div v-bind:id="name"></div>
-        <div v-bind:id="name + 'overview'"></div>
-        <button class="btn btn-danger" style="margin-right:30px">reset</button>
-      </div>
-      <div v-if="!show" style="height: 666px" class="rowc">
-        <div class="lds-roller-relative mb-4">
-          <div class="lds-roller">
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-          </div>
-        </div>
-      </div>
-    </div>
+	<div v-bind:id="name+'wrapper'">
+		<div class="dc_wrapper rowc" :class="{'show': show}">
+			<div v-bind:id="name"></div>
+			<div v-bind:id="name + 'overview'"></div>
+			<button class="btn btn-danger" style="margin-right:30px">reset</button>
+		</div>
+		<div v-if="!show" style="height: 666px" class="rowc">
+			<div class="lds-roller-relative mb-4">
+				<div class="lds-roller">
+					<div></div>
+					<div></div>
+					<div></div>
+					<div></div>
+					<div></div>
+					<div></div>
+					<div></div>
+					<div></div>
+				</div>
+			</div>
+		</div>
+	</div>
 </template>
 
 <script>
@@ -89,7 +89,6 @@ export default {
 		return color;
 	},
 	onResize() {
-		console.log("here")
 		this.chart
 			.width(document.getElementById(this.name + 'wrapper').offsetWidth)
 			.transitionDuration(0);
@@ -99,10 +98,12 @@ export default {
 
   },
   created() {
-    window.addEventListener("resize", this.onResize);
+		if(process.client)
+    	window.addEventListener("resize", this.onResize);
   },
   destroyed() {
-    window.removeEventListener("resize", this.onResize);
+		if(process.client)
+    	window.removeEventListener("resize", this.onResize);
   },
 }
 </script>

@@ -1,7 +1,7 @@
 <template>
     <div class="mapMargin mapHeight" style="position:relative">
         <div class="mapHeight" id="map"></div>
-        <Loading :show="true" type="absolute"/> 
+        <Loading :show="!loaded" type="absolute"/> 
     </div>
 </template>
 
@@ -10,7 +10,11 @@ export default {
     data() {
         return {
             map: null,
-            loaded: false
+            loaded: false,
+            geoStyle: {
+                default: null,
+                hover: null
+            }
         }
     },
     mounted() {
@@ -19,6 +23,8 @@ export default {
         const proj = require('ol/proj')
         const source = require( 'ol/source');
         const layer = require( 'ol/layer');
+        const style = require( 'ol/style');
+        const extent = require( 'ol/extent');
         // const style = require( 'ol/style');
 
         const format = require('ol/format')
@@ -48,12 +54,20 @@ export default {
                 }),
                 new layer.Vector({
                     source: vector_source,
-                    renderMode: 'image'
+                    // renderBuffer: window.innerWidth,
+                    // updateWhileAnimating: true,
+                    renderMode: 'image',
+                    style: () => {
+                        return new style.Style({
+                        })
+                    }
                 })                
             ],
             view: new Ol.View({
                 zoom: 8,
                 center,
+                minZoom: 6,
+                maxZoom: 11
             })
 
         })
@@ -61,7 +75,15 @@ export default {
         vector_source.on('change', () => {
             if(vector_source.getState() == 'ready' && !this.loaded) {
                 this.loaded = true
-                console.log("asdfasdf")
+                var tmp_extent = extent.createEmpty()
+                vector_source.getFeatures().forEach(feature => {
+                    tmp_extent = extent.extend(tmp_extent, feature.getGeometry().getExtent())
+                })
+                this.map.getView().fit(tmp_extent, {
+                    duration: 500
+                })
+                const limits = [-8.504015, -7.586928, 41.418811, 37.230650] //Portugal
+
             }
         })
     }
