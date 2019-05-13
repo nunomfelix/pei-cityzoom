@@ -1,5 +1,5 @@
 <template>
-    <div v-if="show" :style="{'height': height ? height : '100%'}">
+    <div v-if="show" :style="{'height': type == 'absolute' ? 0 : height ? height : '100%'}">
         <div :class="{'lds-roller-relative': type == 'relative', 'lds-roller-fixed': type == 'fixed', 'lds-roller-absolute': type == 'absolute'}">
             <div class="lds-roller">
                 <div></div>
