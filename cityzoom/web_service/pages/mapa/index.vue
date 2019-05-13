@@ -45,8 +45,12 @@ export default {
                     source: new source.OSM(),
                 }),
                 new layer.Vector({
+<<<<<<< HEAD
                     source: vector_source,
                     renderMode: 'image'
+=======
+                    source: vector_source
+>>>>>>> cc3cc0d41d9bf843c6ae38081644c180033ba37f
                 })                
             ],
             view: new Ol.View({
