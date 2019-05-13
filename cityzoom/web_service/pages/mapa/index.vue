@@ -1,6 +1,7 @@
 <template>
     <div class="mapMargin mapHeight" style="position:relative">
         <div class="mapHeight" id="map"></div>
+        <div id="hover_popup" class="ol-popup"></div>
         <Loading :show="!loaded" type="absolute"/> 
     </div>
 </template>
@@ -14,6 +15,11 @@ export default {
             geoStyle: {
                 default: null,
                 hover: null
+            },
+            hoverOverlay: null,
+            hoverPopup: null,
+            testValues: {
+                
             }
         }
     },
@@ -25,6 +31,9 @@ export default {
         const layer = require( 'ol/layer');
         const style = require( 'ol/style');
         const extent = require( 'ol/extent');
+
+        const { click, pointerMove, altKeyOnly, noModifierKeys, altShiftKeysOnly, platformModifierKeyOnly } = require('ol/events/condition.js');
+
         // const style = require( 'ol/style');
 
         const format = require('ol/format')
@@ -36,14 +45,52 @@ export default {
         // const { Feature } = require( 'ol')
         // const { click, pointerMove, altKeyOnly, noModifierKeys, altShiftKeysOnly, platformModifierKeyOnly } = require( 'ol/events/condition.js');
 
+        this.geoStyle.default = new style.Style({
+            fill: new style.Fill({
+                color: 'rgba(255,255,255,.20)'
+            }),
+            stroke: new style.Stroke({
+                color:'rgb(48, 145, 198)',
+                width: 1
+            })
+        })
+
+        this.geoStyle.hover = new style.Style({
+            fill: new style.Fill({
+                color: 'rgb(48, 145, 198)'
+            }),
+            stroke: new style.Stroke({
+                color:'rgb(48, 145, 198)',
+                width: 2
+            })
+        })
+
         const centerpos = [-8.661682, 40.6331731];
         const center = proj.transform(centerpos, 'EPSG:4326', 'EPSG:3857');
         const maxExtent = [-9.5, 37, -6.2, 42.5];
         //const maxExtent = [-180, -90, 180, 90];
-        var vector_source = new source.Vector({
+        const geo_layer = new layer.Vector({
+            source: new source.Vector({
                 projection : 'EPSG:3857',
                 url: 'portugal_municipios.geojson',
                 format: new format.GeoJSON()
+            }),
+            // renderBuffer: window.innerWidth,
+            // updateWhileAnimating: true,
+            renderMode: 'image',
+            style: () => {
+                return this.geoStyle.default
+            }
+        })
+
+        this.hoverPopup = document.getElementById('hover_popup');
+        this.hoverOverlay = new Ol.Overlay({
+            element: this.hoverPopup,
+            autoPan: false,
+            positioning: 'bottom-center',
+            autoPanAnimation: {
+                duration: 250
+            }
         });
 
         this.map = new Ol.Map({
@@ -52,17 +99,9 @@ export default {
                 new layer.Tile({
                     source: new source.OSM(),
                 }),
-                new layer.Vector({
-                    source: vector_source,
-                    // renderBuffer: window.innerWidth,
-                    // updateWhileAnimating: true,
-                    renderMode: 'image',
-                    style: () => {
-                        return new style.Style({
-                        })
-                    }
-                })                
+                geo_layer             
             ],
+            overlays: [this.hoverOverlay],
             view: new Ol.View({
                 zoom: 8,
                 center,
@@ -72,18 +111,43 @@ export default {
 
         })
 
-        vector_source.on('change', () => {
-            if(vector_source.getState() == 'ready' && !this.loaded) {
+        geo_layer.getSource().on('change', () => {
+            if(geo_layer.getSource().getState() == 'ready' && !this.loaded) {
                 this.loaded = true
                 var tmp_extent = extent.createEmpty()
-                vector_source.getFeatures().forEach(feature => {
+                geo_layer.getSource().getFeatures().forEach(feature => {
                     tmp_extent = extent.extend(tmp_extent, feature.getGeometry().getExtent())
+                    this.testValues[feature.get('name_2')] = Math.random() * 1000
                 })
                 this.map.getView().fit(tmp_extent, {
                     duration: 500
                 })
                 const limits = [-8.504015, -7.586928, 41.418811, 37.230650] //Portugal
+            }
+            console.table(this.testValues)
+        })
 
+        const hover_interaction = new interaction.Select({
+            condition: (e) => {
+                return pointerMove(e);
+            },
+            layers: [geo_layer],
+            style: (feature) => {
+                return this.geoStyle.hover
+            },
+            multi: false
+        })
+
+        this.map.addInteraction(hover_interaction);
+        hover_interaction.on('select', (e) => {
+            if (e.selected.length) {    
+                const feature = e.selected[0]
+                document.body.style.cursor = "pointer"
+                this.hoverPopup.innerHTML = feature.get('name_2')
+                console.log(feature)
+                this.hoverOverlay.setPosition(extent.getCenter(feature.getGeometry().getExtent()))
+            } else {
+                
             }
         })
     }
@@ -91,100 +155,21 @@ export default {
 }
 </script>
 
-<style>
-    .lds-roller-fixed {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-    }
-    .lds-roller-relative {
-        position: relative;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100%;
-    }
-    .lds-roller {
-        width: 64px;
-        height: 64px;
-    }
-    .lds-roller div {
-        animation: lds-roller 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-        transform-origin: 32px 32px;
-    }
-    .lds-roller div:after {
-    content: " ";
-        display: block;
-        position: absolute;
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: black;
-        margin: -3px 0 0 -3px;
-    }
-    .lds-roller div:nth-child(1) {
-        animation-delay: -0.036s;
-    }
-    .lds-roller div:nth-child(1):after {
-        top: 50px;
-        left: 50px;
-    }
-    .lds-roller div:nth-child(2) {
-        animation-delay: -0.072s;
-    }
-    .lds-roller div:nth-child(2):after {
-        top: 54px;
-        left: 45px;
-    }
-    .lds-roller div:nth-child(3) {
-        animation-delay: -0.108s;
-    }
-    .lds-roller div:nth-child(3):after {
-        top: 57px;
-        left: 39px;
-    }
-    .lds-roller div:nth-child(4) {
-        animation-delay: -0.144s;
-    }
-    .lds-roller div:nth-child(4):after {
-        top: 58px;
-        left: 32px;
-    }
-    .lds-roller div:nth-child(5) {
-        animation-delay: -0.18s;
-    }
-    .lds-roller div:nth-child(5):after {
-        top: 57px;
-        left: 25px;
-    }
-    .lds-roller div:nth-child(6) {
-        animation-delay: -0.216s;
-    }
-    .lds-roller div:nth-child(6):after {
-        top: 54px;
-        left: 19px;
-    }
-    .lds-roller div:nth-child(7) {
-        animation-delay: -0.252s;
-    }
-    .lds-roller div:nth-child(7):after {
-        top: 50px;
-        left: 14px;
-    }
-    .lds-roller div:nth-child(8) {
-        animation-delay: -0.288s;
-    }
-    .lds-roller div:nth-child(8):after {
-        top: 45px;
-        left: 10px;
-    }
-    @keyframes lds-roller {
-        0% {
-            transform: rotate(0deg);
-        }
-        100% {
-            transform: rotate(360deg);
-        }
-    }
+<style lang="scss" scope>
+
+.ol-popup {
+    pointer-events: none;
+    z-index: 3332;
+    position: absolute;
+    background-color: white;
+    text-align: center;
+    -webkit-filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
+    filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
+    padding: .4rem .7rem;
+    border-radius: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+    font-size: 1rem;
+}
+
 </style>
