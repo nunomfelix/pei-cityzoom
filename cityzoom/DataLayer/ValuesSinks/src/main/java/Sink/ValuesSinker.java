@@ -91,6 +91,7 @@ public class ValuesSinker {
             kafkaProperties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
             kafkaProperties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
             kafkaProperties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, groupID);
+            kafkaProperties.setProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "1000");
             kafkaProperties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
             kafkaProperties.setProperty(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, "300000000");
             kafkaProperties.setProperty(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "100000");
