@@ -41,12 +41,12 @@ public class DataLayerAPI {
 
             // alerts routes and paths
             path("/alert", () -> {
-                get("/:id", Alerts::getAlert);
+                get("/:alert_id", Alerts::getAlert);
                 patch("/:id", Alerts::patchAlert);
                 put("/:id", Alerts::putAlert);
                 delete("/:id", Alerts::deleteAlert);
             });
-            get("/alerts", Alerts::getAlert);
+            get("/alerts/list", Alerts::listAlerts);
             post("/alerts", Alerts::postAlert);
             put("/alerts", Alerts::putAlert);
         });
