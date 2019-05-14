@@ -7,6 +7,7 @@
 </template>
 
 <script>
+var Rainbow = require('rainbowvis.js');
 export default {
     data() {
         return {
@@ -20,7 +21,8 @@ export default {
             hoverPopup: null,
             testValues: {
                 
-            }
+            },
+            rainbowHeatMap: null
         }
     },
     mounted() {
@@ -95,18 +97,18 @@ export default {
         var iconFeatures=[];
 
         var iconFeature = new Feature({
-        geometry: new geom.Point(proj.transform([-8.661682, 40.6331731], 'EPSG:4326',     
-        'EPSG:3857')),
-        name: 'Null Island',
-        population: 4000,
-        rainfall: 500
+            geometry: new geom.Point(proj.transform([-8.661682, 40.6331731], 'EPSG:4326',     
+            'EPSG:3857')),
+            name: 'Null Island',
+            population: 4000,
+            rainfall: 500
         });
 
         var iconFeature1 = new Feature({
-        geometry: new geom.Point(proj.transform([-8.661682, 40.6331731], 'EPSG:4326', 'EPSG:3857')),
-        name: 'Null Island Two',
-        population: 4001,
-        rainfall: 501
+            geometry: new geom.Point(proj.transform([-8.661682, 40.6331731], 'EPSG:4326', 'EPSG:3857')),
+            name: 'Null Island Two',
+            population: 4001,
+            rainfall: 501
         });
 
         iconFeatures.push(iconFeature);
@@ -117,14 +119,14 @@ export default {
         });
 
         var iconStyle = new style.Style({
-        image: new style.Icon(/** @type {olx.style.IconOptions} */ ({
-            anchor: [0.5, 0.5],
-            anchorXUnits: 'fraction',
-            anchorYUnits: 'fraction',
-            scale: 0.1,
-            opacity: 0.75,
-            src: 'icons/sensor.png'
-        }))
+            image: new style.Icon(/** @type {olx.style.IconOptions} */ ({
+                anchor: [0.5, 0.5],
+                anchorXUnits: 'fraction',
+                anchorYUnits: 'fraction',
+                scale: 0.1,
+                opacity: 0.75,
+                src: 'icons/sensor.png'
+            }))
         });
 
         this.map = new Ol.Map({
@@ -148,17 +150,47 @@ export default {
         geo_layer.getSource().on('change', () => {
             if(geo_layer.getSource().getState() == 'ready' && !this.loaded) {
                 this.loaded = true
+
+                this.rainbowHeatMap = new Rainbow()
+                this.rainbowHeatMap.setNumberRange(1, geo_layer.getSource().getFeatures().length);
+                this.rainbowHeatMap.setSpectrum('lightgreen', 'red'); 
+
+                var x = 0
                 var tmp_extent = extent.createEmpty()
                 geo_layer.getSource().getFeatures().forEach(feature => {
                     tmp_extent = extent.extend(tmp_extent, feature.getGeometry().getExtent())
-                    this.testValues[feature.get('name_2')] = Math.random() * 1000
+                    this.testValues[feature.get('name_2')] = {
+                        value: Math.sin(x++) * 33,
+                        color: null
+                    }
                 })
+
+                console.table(this.testValues)
+
+                geo_layer.setStyle((feature) => {
+                    return new style.Style({
+                        fill: new style.Fill({
+                            color: '#' + this.testValues[feature.get('name_2')].color
+                        }),
+                        stroke: new style.Stroke({
+                            color: 'black',
+                            width: 1.5
+                        })
+                    })
+                })
+
+                const testValuesOrdered = Object.keys(this.testValues).sort((a,b) => {
+                    return this.testValues[a].value - this.testValues[b].value
+                })
+                for(var i in testValuesOrdered) {
+                    this.testValues[testValuesOrdered[i]].color = this.rainbowHeatMap.colourAt(i);
+                }
+
                 this.map.getView().fit(tmp_extent, {
                     duration: 500
                 })
-                const limits = [-8.504015, -7.586928, 41.418811, 37.230650] //Portugal
+ 
             }
-            console.table(this.testValues)
         })
 
         const hover_interaction = new interaction.Select({
@@ -177,11 +209,12 @@ export default {
             if (e.selected.length) {    
                 const feature = e.selected[0]
                 document.body.style.cursor = "pointer"
-                this.hoverPopup.innerHTML = feature.get('name_2')
+                this.hoverPopup.innerHTML = feature.get('name_2') + ' ' + this.testValues[feature.get('name_2')].value
                 var center = extent.getCenter(feature.getGeometry().getExtent())
                 this.hoverOverlay.setPosition(center)
             } else {
                 document.body.style.cursor = "default"
+                this.hoverOverlay.setPosition(null)
             }
         })
     }
