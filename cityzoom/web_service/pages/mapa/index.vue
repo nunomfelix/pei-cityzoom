@@ -11,6 +11,14 @@
                 </span>
             </div>
         </div>
+        <div class="map-menu">
+            <div class="map-menu_button">
+
+            </div>
+            <div class="map-menu_button">
+                
+            </div>
+        </div>
         <Loading :show="!loaded" type="absolute"/> 
     </div>
 </template>
@@ -67,11 +75,11 @@ export default {
 
         this.geoStyle.hover = new style.Style({
             fill: new style.Fill({
-                color: 'rgb(48, 145, 198)'
+                color: 'rgba(255, 255, 255, .25)'
             }),
             stroke: new style.Stroke({
-                color:'rgb(48, 145, 198)',
-                width: 2
+                color:'rgb(0, 0, 0)',
+                width: 1.5
             })
         })
 
@@ -182,7 +190,7 @@ export default {
                         }),
                         stroke: new style.Stroke({
                             color: 'black',
-                            width: 1.5
+                            width: this.map.getView().getZoom() / 14 * 1.5
                         })
                     })
                 })
@@ -255,6 +263,29 @@ export default {
         color: white;
         padding: .4rem .7rem;
         border-radius: 10px;
+    }
+}
+
+.map-menu {
+    @include flex(center, center);
+    @include shadow(0px, 0px, 4px, 2px, rgba(0,0,0,0.2));
+    position: absolute;
+    right: 2rem;
+    bottom: 2rem;
+    background-color: rgba(255,255,255,.5);
+    padding: 10px;
+    & > :not(:first-child) {
+        @include shadow(0px, 0px, 4px, 2px, rgba(0,0,0,0.2));
+        margin-left: 1rem;
+    }
+    border-radius: 5px;
+
+    &_button {
+        border: 1px solid rgba(0, 0, 0, 0.171);
+        background-color: white;
+        width: 5rem;
+        height: 5rem;
+        border-radius: 5px;
     }
 }
 
