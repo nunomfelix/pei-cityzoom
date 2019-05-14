@@ -47,6 +47,8 @@ public class DataLayerAPI {
             get("/alerts", (Request req, Response res) -> { return "o"; });
             post("/alerts", (Request req, Response res) -> { return "o"; });
             put("/alerts", (Request req, Response res) -> { return "o"; });
+
+            // get
         });
     }
 }

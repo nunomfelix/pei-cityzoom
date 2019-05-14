@@ -7,6 +7,7 @@ import org.bson.Document;
 import org.json.JSONException;
 import spark.Request;
 import spark.Response;
+import org.bson.types.ObjectId;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.util.*;
@@ -30,13 +31,6 @@ public class Streams {
         }
         Set<String> keys = body.keySet();
         String stream = body.get("stream").getAsString();
-        if (streams.find(eq("stream", stream)).first() != null) {
-            response.status(HttpsURLConnection.HTTP_CONFLICT);
-            return "{\n" +
-                    "\t\"status\": \"Error @ stream name\",\n" +
-                    "\t\"Error\": \"Stream " + stream + " already exists\"\n" +
-                    "}";
-        }
         String type = body.get("type").getAsString();
         if (!types.contains(type)){
             response.status(HttpsURLConnection.HTTP_CONFLICT);
@@ -120,8 +114,10 @@ public class Streams {
         JsonObject jsonStream;
         for (Document document : streamsIterable) {
             jsonStream = (JsonObject) MongoAux.jsonParser.parse(document.toJson());
+            System.out.println(jsonStream.toString());
             String stream =
                     "{\n" +
+                            "\t\"id\": \""+jsonStream.get("_id").getAsJsonObject().get("$oid").getAsString()+"\",\n" +
                             "\t\"stream\": \""+jsonStream.get("stream").getAsString()+"\",\n" +
                             "\t\"description\": \""+jsonStream.get("description").getAsString()+"\",\n" +
                             "\t\"device_id\": \""+jsonStream.get("device_id").getAsString()+"\",\n" +
@@ -154,7 +150,7 @@ public class Streams {
     public static String detailStream(Request request, Response response) {
         response.type("application/json");
         String stream = request.params(":stream");
-        Document document = streams.find(eq("stream",stream)).first();
+        Document document = streams.find(eq("_id",new ObjectId(stream))).first();
         if (document == null) {
             response.status(HttpsURLConnection.HTTP_NOT_FOUND);
             return "{\n" +
