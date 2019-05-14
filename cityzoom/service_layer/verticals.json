@@ -1,6 +1,7 @@
 {
 	"vertical":{
 		"AirQuality": {
+			"display": "Qualidade do ar",
 			"streams":{
 				"pressure_stream": {
 					"display": "Pressão do ar",
@@ -24,6 +25,7 @@
 			}
 		},
     	"Temperatura": {
+			"display": "Temperatura",
 			"streams":{
 				"temperature_stream":{
 					"display": "Temperatura do ar",
