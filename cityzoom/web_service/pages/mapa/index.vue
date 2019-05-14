@@ -1,6 +1,14 @@
 <template>
     <div class="mapMargin mapHeight" style="position:relative">
         <div class="mapHeight" id="map"></div>
+
+        <div v-if="selected_county" class="ol-popup top">
+            <div :style="{ 'background-color': testValues[selected_county.get('name_2')].color}">
+                <span class="big"> {{selected_county.get('name_2')}} </span>
+                <span class="big"> {{testValues[selected_county.get('name_2')].value.toFixed(2)}} </span>
+            </div>
+        </div>
+
         <div id="hover_popup" class="ol-popup">
             <div v-if="hovered_feature" :style="{ 'background-color': testValues[hovered_feature.get('name_2')].color}">
                 <span class="normal">
@@ -88,7 +96,7 @@ export default {
 
         this.geoStyle.hover = new style.Style({
             fill: new style.Fill({
-                color: 'rgba(225, 225, 225, .6)'
+                color: 'rgba(225, 225, 225, .8)'
             }),
             stroke: new style.Stroke({
                 color:'rgb(0, 0, 255)',
@@ -109,12 +117,12 @@ export default {
         const geo_layer = new layer.Vector({
             source: new source.Vector({
                 projection : 'EPSG:3857',
-                url: 'portugal_municipios.geojson',
+                url: 'aveiro.geojson',
                 format: new format.GeoJSON()
             }),
-            // renderBuffer: window.innerWidth,
-            // updateWhileAnimating: true,
-            renderMode: 'image',
+            renderBuffer: window.innerWidth,
+            updateWhileAnimating: true,
+            // renderMode: 'image',
             style: (feature) => {
                 return this.geoStyle.default
             }
@@ -247,8 +255,11 @@ export default {
 
         this.map.addInteraction(hover_interaction);
         hover_interaction.on('select', (e) => {
-            if (e.selected.length) {
+            var feature = null
+            if (e.selected.length) 
                 this.hovered_feature = e.selected[0]
+
+            if(this.hovered_feature != this.selected_county) {
                 document.body.style.cursor = "pointer"
                 var center = extent.getCenter(this.hovered_feature.getGeometry().getExtent())
                 this.hoverOverlay.setPosition(center)
@@ -278,7 +289,6 @@ export default {
             }))
             this.map.getView().fit(feature.getGeometry().getExtent(), {
                 duration: 500,
-                padding: [100,100,100,100],
                 callback: () =>  {
                     this.map.setView(new this.req.Ol.View({
                         extent: feature.getGeometry().getExtent(),
@@ -290,6 +300,7 @@ export default {
                 }
             })   
             this.selected_county = feature 
+            this.hoverOverlay.setPosition(null)
             click_interaction.getFeatures().clear()
         })
 
@@ -317,7 +328,7 @@ export default {
 
 .ol-popup {
 
-    @include shadow(0px, 1px, 4px, 0px, rgba(0,0,0,0.2));
+    @include shadow(0px, 0px, 4px, 0px, rgba(0,0,0,0.2));
     pointer-events: none;
     z-index: 3332;
     position: absolute;
@@ -325,13 +336,21 @@ export default {
     filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
     font-weight: 900;
     white-space: nowrap;
-    font-size: 1.5rem;
     left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: max-content;
-    padding: 5px;
     background-color: rgba(255, 255, 255, 0.589);
+    top: 50%;
+    &:not(.top) {
+        transform: translate(-50%, -50%);
+        width: max-content;
+    }
+    &.top {
+        top: 2rem;
+        transform: translate(-50%, 0);
+        background-color: rgb(255, 255, 255);
+        min-width: 10%;
+        @include shadow(0px, 0px, 8px, 2px, rgba(0,0,0,0.2));
+    }
+    padding: 5px;
         border-radius: 12px;
 
     & > div {
