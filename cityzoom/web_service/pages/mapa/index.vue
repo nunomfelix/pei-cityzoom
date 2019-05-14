@@ -21,13 +21,13 @@
         </div>
         <div class="map-menu left" :class="{show: selected_county != null, active: selected_county == null}">
             <div class="map-menu_button" @click="deselect_county()">
-
             </div>
         </div>
 
         <div class="map-menu show">
+            {{getVerticals.length}}
             <div :title="vertical.display" v-for="vertical of getVerticals" :key="vertical" class="map-menu_button">
-                {{vertical.display}}
+                <img :src="`icons/${vertical.display}.png`" alt="">
             </div>
         </div>
         <Loading :show="!loaded" type="absolute"/> 
@@ -35,6 +35,7 @@
 </template>
 
 <script>
+var features = []
 var Rainbow = require('rainbowvis.js');
 export default {
     data() {
@@ -98,7 +99,7 @@ export default {
 
         this.geoStyle.hover = new style.Style({
             fill: new style.Fill({
-                color: 'rgba(225, 225, 225, .8)'
+                color: 'rgba(225, 225, 225, .6)'
             }),
             stroke: new style.Stroke({
                 color:'rgb(0, 0, 255)',
@@ -139,28 +140,17 @@ export default {
                 duration: 250
             }
         });
-        var iconFeatures=[];
+        
+        features.push(new Feature({
+                        geometry: new geom.Point(proj.transform([-8.661682, 40.6331731], 'EPSG:4326',     
+                        'EPSG:3857')),
+                        //id: device.id
+                        name: 'Null Island'
+                        }));
 
-        var iconFeature = new Feature({
-            geometry: new geom.Point(proj.transform([-8.661682, 40.6331731], 'EPSG:4326',     
-            'EPSG:3857')),
-            name: 'Null Island',
-            population: 4000,
-            rainfall: 500
-        });
-
-        var iconFeature1 = new Feature({
-            geometry: new geom.Point(proj.transform([-8.661682, 40.6331731], 'EPSG:4326', 'EPSG:3857')),
-            name: 'Null Island Two',
-            population: 4001,
-            rainfall: 501
-        });
-
-        iconFeatures.push(iconFeature);
-        iconFeatures.push(iconFeature1);
-
+        //console.log(features)
         var vectorSource = new source.Vector({
-            features: iconFeatures //add an array of features
+            features: features //add an array of features
         });
 
         var iconStyle = new style.Style({
@@ -168,7 +158,7 @@ export default {
                 anchor: [0.5, 0.5],
                 anchorXUnits: 'fraction',
                 anchorYUnits: 'fraction',
-                scale: 0.1,
+                scale: 0.08,
                 opacity: 0.75,
                 src: 'icons/sensor.png'
             }))
@@ -184,7 +174,11 @@ export default {
                 new layer.Tile({
                     source: new source.OSM(),
                 }),
-                geo_layer             
+                new layer.Vector({
+                    source: vectorSource,
+                    style: iconStyle
+                }),
+                geo_layer   
             ],
             overlays: [this.hoverOverlay],
             view: new this.req.Ol.View({
@@ -234,9 +228,11 @@ export default {
                     return feature == this.selected_county ? this.geoStyle.active : this.testValues[feature.get('name_2')].style
                 })
 
-                this.map.getView().fit(this.geoJsonExtent, {
-                    duration: 500
-                })
+                setTimeout(() => {
+                    this.map.getView().fit(this.geoJsonExtent, {
+                        duration: 500
+                    })
+                },0)
  
             }
         })
@@ -257,8 +253,7 @@ export default {
 
         this.map.addInteraction(hover_interaction);
         hover_interaction.on('select', (e) => {
-            var feature = null
-            if (e.selected.length) 
+            if (e.selected.length)
                 this.hovered_feature = e.selected[0]
 
             if(this.hovered_feature && this.hovered_feature != this.selected_county) {
@@ -303,9 +298,21 @@ export default {
                 }
             })   
             this.selected_county = feature 
-            this.hoverOverlay.setPosition(null)
             click_interaction.getFeatures().clear()
-        })
+        }),
+        
+        this.createFeature(vectorSource, []);
+        setInterval(()=> {
+            vectorSource.forEachFeature(feature => {
+                vectorSource.removeFeature(feature)
+                var coordinates = this.gen_random_coordinates() 
+                vectorSource.addFeature(new Feature({
+                    geometry: new geom.Point(proj.transform(coordinates, 'EPSG:4326', 'EPSG:3857')),
+                    //id: device.id
+                    name: 'Null Island'
+                }));
+            })
+        },500);
 
     },
     methods: {
@@ -320,11 +327,31 @@ export default {
                 duration: 500
             })
             this.selected_county = null
+        },
+        createFeature(source, device){
+            const { Feature } = require( 'ol');
+            const geom = require( 'ol/geom');
+            const proj = require('ol/proj');
+            for(var i=0; i<50; i++){
+                var coordinates = this.gen_random_coordinates()
+                source.addFeature(new Feature({
+                    geometry: new geom.Point(proj.transform(coordinates, 'EPSG:4326', 'EPSG:3857')),
+                    //id: device.id
+                    name: 'Null Island'
+                }));
+                //console.log(features)
+            }
+            return features
+        },
+        gen_random_coordinates(){
+            const limits = [-8.654981, -8.638642, 40.648018, 40.635610] 
+            return [(Math.random() * (limits[0] - limits[1]) + limits[1]),(Math.random() * (limits[2] - limits[3]) + limits[3])]
         }
-    }
 
+    }
 }
 </script>
+
 
 <style lang="scss" scope>
 @import '~/assets/mixins.scss';
