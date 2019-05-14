@@ -61,10 +61,12 @@ export default {
     };
   },
   created() {
-    window.addEventListener("resize", this.onResize);
+    if(process.client)
+      window.addEventListener("resize", this.onResize);
   },
   destroyed() {
-    window.removeEventListener("resize", this.onResize);
+    if(process.client)
+      window.removeEventListener("resize", this.onResize);
   },
   mounted() {
     const time = this.data ? 1000 : 0;

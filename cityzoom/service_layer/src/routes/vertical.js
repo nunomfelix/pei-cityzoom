@@ -4,10 +4,21 @@ const fs = require('fs');
 
 
 
-fs.readFile('verticals.json', (err, data) => {  
-    if (err) throw err;
-    let vertical = JSON.parse(data);
-    //console.log(JSON.stringify(vertical, null, 4));
+
+
+router.get('', (req,res) => {
+
+    fs.readFile('verticals.json', (err, data) => {  
+        if (err) throw err;
+        let vertical = JSON.parse(data);
+    
+        // console.log(JSON.stringify(vertical, null, 4));
+        res.send(vertical)
+    })
 })
 
 module.exports = router
+
+
+
+

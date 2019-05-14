@@ -22,19 +22,21 @@
         :minH="14"
         :maxH="14"
         drag-allow-from=".widget_handle"
+        @resize="onResize(item.i)"
+        @resized="onResize(item.i)"
       >
         <div class="widget">
           <div class="widget_handle">
             <img src="icons/widgets/handler.png">
           </div>
           <div v-if="item.type=='series'">
-            <SeriesGraph :data="item.data && item.data == 'fake' ? null : data" :name="item.i"/>
+            <SeriesGraph :ref="item.i" :data="item.data && item.data == 'fake' ? null : data" :name="item.i"/>
           </div>
           <div v-if="item.type=='stacked'">
-            <StackedBar :name="item.i"/>
+            <StackedBar :ref="item.i" :name="item.i"/>
           </div>
           <div v-if="item.type=='lines'">
-            <LineGraph :name="item.i"/>
+            <LineGraph :ref="item.i" :name="item.i"/>
           </div>
         </div>
       </grid-item>
@@ -71,8 +73,14 @@ export default {
       }
     }
     this.data = data
-    console.log(this.data)
   },
+  methods: {
+    onResize(i) {
+      setTimeout(() => {
+        this.$refs[i][0].onResize()
+      }, 0)
+    }
+  }
 };
 </script>
 
