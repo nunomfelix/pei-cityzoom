@@ -25,9 +25,13 @@
         </div>
 
         <div class="map-menu show">
-            {{getVerticals.length}}
-            <div :title="vertical.display" v-for="vertical of getVerticals" :key="vertical" class="map-menu_button">
-                <img :src="`icons/${vertical.display}.png`" alt="">
+            <div class="map-menu_left">
+
+            </div>
+            <div class="map-menu_right">
+                <div @click="selectVertical(i)" :class="{active: vertical.name == selected_vertical}" :title="vertical.display" v-for="(vertical, i) in getVerticals" :key="i" class="map-menu_button">
+                    <img :src="`icons/${vertical.name}.png`" alt="">
+                </div>
             </div>
         </div>
         <Loading :show="!loaded" type="absolute"/> 
@@ -41,7 +45,8 @@ export default {
     data() {
         return {
             req: {
-                Ol: null
+                Ol: null,
+                etent: null,
             },
             map: null,
             loaded: false,
@@ -50,13 +55,15 @@ export default {
                 hover: null,
                 selected: null
             },
+            geo_layer: null,
             hoverOverlay: null,
             hoverPopup: null,
-            testValues: { },
+            testValues: {},
             rainbowHeatMap: null,
-            hovered_feature: null,
-            state: null,
+
+            selected_vertical: null,
             selected_county: null,
+            hovered_feature: null,
             geoJsonExtent: null
         }
     },
@@ -71,53 +78,45 @@ export default {
         const proj = require('ol/proj')
         const source = require( 'ol/source');
         const layer = require( 'ol/layer');
-        const style = require( 'ol/style');
-        const extent = require( 'ol/extent');
-
-        const { click, pointerMove, altKeyOnly, noModifierKeys, altShiftKeysOnly, platformModifierKeyOnly } = require('ol/events/condition.js');
-
-        // const style = require( 'ol/style');
-
+        this.req.style = require( 'ol/style');
+        this.req.extent = require( 'ol/extent');
         const format = require('ol/format')
         const geom = require( 'ol/geom');
-        // const {Polygon, fromExtent} = require( 'ol/geom/Polygon');
         const interaction = require( 'ol/interaction');
-        // const extent = require( 'ol/extent');
-        // const Overlay = require( 'ol/Overlay.js');
         const { Feature } = require( 'ol')
-        // const { click, pointerMove, altKeyOnly, noModifierKeys, altShiftKeysOnly, platformModifierKeyOnly } = require( 'ol/events/condition.js');
+        const { click, pointerMove, altKeyOnly, noModifierKeys, altShiftKeysOnly, platformModifierKeyOnly } = require('ol/events/condition.js');
 
-        this.geoStyle.default = new style.Style({
-            fill: new style.Fill({
+        this.geoStyle.default = new this.req.style.Style({
+            fill: new this.req.style.Fill({
                 color: 'rgba(255,255,255,.20)'
             }),
-            stroke: new style.Stroke({
+            stroke: new this.req.style.Stroke({
                 color:'rgb(48, 145, 198)',
                 width: 1
             })
         })
 
-        this.geoStyle.hover = new style.Style({
-            fill: new style.Fill({
+        this.geoStyle.hover = new this.req.style.Style({
+            fill: new this.req.style.Fill({
                 color: 'rgba(225, 225, 225, .6)'
             }),
-            stroke: new style.Stroke({
+            stroke: new this.req.style.Stroke({
                 color:'rgb(0, 0, 255)',
                 width: 1.5
             })
         })
 
-        this.geoStyle.active = new style.Style({
-            fill: new style.Fill({
+        this.geoStyle.active = new this.req.style.Style({
+            fill: new this.req.style.Fill({
                 color: 'rgba(255, 255, 255, .25)'
             }),
-            stroke: new style.Stroke({
+            stroke: new this.req.style.Stroke({
                 color:'rgb(0, 0, 125)',
                 width: 5
             })
         })
 
-        const geo_layer = new layer.Vector({
+        this.geo_layer = new layer.Vector({
             source: new source.Vector({
                 projection : 'EPSG:3857',
                 url: 'aveiro.geojson',
@@ -153,8 +152,8 @@ export default {
             features: features //add an array of features
         });
 
-        var iconStyle = new style.Style({
-            image: new style.Icon(/** @type {olx.style.IconOptions} */ ({
+        var iconStyle = new this.req.style.Style({
+            image: new this.req.style.Icon(/** @type {olx.this.req.style.IconOptions} */ ({
                 anchor: [0.5, 0.5],
                 anchorXUnits: 'fraction',
                 anchorYUnits: 'fraction',
@@ -178,7 +177,7 @@ export default {
                     source: vectorSource,
                     style: iconStyle
                 }),
-                geo_layer   
+                this.geo_layer   
             ],
             overlays: [this.hoverOverlay],
             view: new this.req.Ol.View({
@@ -190,50 +189,11 @@ export default {
 
         })
 
-        geo_layer.getSource().on('change', () => {
-            if(geo_layer.getSource().getState() == 'ready' && !this.loaded) {
+        this.geo_layer.getSource().on('change', () => {
+            if(this.geo_layer.getSource().getState() == 'ready' && !this.loaded) {
                 this.loaded = true
-
                 this.rainbowHeatMap = new Rainbow()
-                this.rainbowHeatMap.setNumberRange(1, geo_layer.getSource().getFeatures().length);
-                this.rainbowHeatMap.setSpectrum('green', 'red'); 
-
-                this.geoJsonExtent = extent.createEmpty()
-                geo_layer.getSource().getFeatures().forEach(feature => {
-                    this.geoJsonExtent = extent.extend(this.geoJsonExtent, feature.getGeometry().getExtent())
-                    this.testValues[feature.get('name_2')] = {
-                        value: Math.random() * 35,
-                        color: null,
-                        style: null
-                    }
-                })
-
-                const testValuesOrdered = Object.keys(this.testValues).sort((a,b) => {
-                    return this.testValues[a].value - this.testValues[b].value
-                })
-                for(var i in testValuesOrdered) {
-                    this.testValues[testValuesOrdered[i]].color = '#' + this.rainbowHeatMap.colourAt(i);
-                    this.testValues[testValuesOrdered[i]].style = new style.Style({
-                        fill: new style.Fill({
-                            color: this.testValues[testValuesOrdered[i]].color
-                        }),
-                        stroke: new style.Stroke({
-                            color: 'black',
-                            width: this.map.getView().getZoom() / 20 * 2.5
-                        })
-                    })
-                }
-
-                geo_layer.setStyle((feature) => {
-                    return feature == this.selected_county ? this.geoStyle.active : this.testValues[feature.get('name_2')].style
-                })
-
-                setTimeout(() => {
-                    this.map.getView().fit(this.geoJsonExtent, {
-                        duration: 500
-                    })
-                },0)
- 
+                this.selectVertical(0)
             }
         })
 
@@ -241,7 +201,7 @@ export default {
             condition: (e) => {
                 return pointerMove(e) && !this.map.getView().getAnimating();
             },
-            layers: [geo_layer],
+            layers: [this.geo_layer],
             style: (feature) => {
                 return feature == this.selected_county ?
                     this.geoStyle.active
@@ -253,12 +213,13 @@ export default {
 
         this.map.addInteraction(hover_interaction);
         hover_interaction.on('select', (e) => {
+            this.hovered_feature = null
             if (e.selected.length)
                 this.hovered_feature = e.selected[0]
 
             if(this.hovered_feature && this.hovered_feature != this.selected_county) {
                 document.body.style.cursor = "pointer"
-                var center = extent.getCenter(this.hovered_feature.getGeometry().getExtent())
+                var center = this.req.extent.getCenter(this.hovered_feature.getGeometry().getExtent())
                 this.hoverOverlay.setPosition(center)
             } else {
                 this.hovered_feature = null
@@ -271,7 +232,7 @@ export default {
             condition: (e) => {
                 return click(e);
             },
-            layers: [geo_layer],
+            layers: [this.geo_layer],
             multi: true
         })
 
@@ -299,6 +260,7 @@ export default {
             })   
             this.selected_county = feature 
             click_interaction.getFeatures().clear()
+            this.hoverOverlay.setPosition(null)
         }),
         
         this.createFeature(vectorSource, []);
@@ -346,6 +308,47 @@ export default {
         gen_random_coordinates(){
             const limits = [-8.654981, -8.638642, 40.648018, 40.635610] 
             return [(Math.random() * (limits[0] - limits[1]) + limits[1]),(Math.random() * (limits[2] - limits[3]) + limits[3])]
+        },
+        selectVertical(i) {
+            this.selected_vertical = this.getVerticals[i].name
+            this.rainbowHeatMap.setNumberRange(1, this.geo_layer.getSource().getFeatures().length);
+            this.rainbowHeatMap.setSpectrum(this.getVerticals[i].streams[0].colors[0], this.getVerticals[i].streams[0].colors[1]); 
+
+            this.geoJsonExtent = this.req.extent.createEmpty()
+            this.geo_layer.getSource().getFeatures().forEach(feature => {
+                this.geoJsonExtent = this.req.extent.extend(this.geoJsonExtent, feature.getGeometry().getExtent())
+                this.testValues[feature.get('name_2')] = {
+                    value: Math.random() * 35,
+                    color: null,
+                    style: null
+                }
+            })
+
+            const testValuesOrdered = Object.keys(this.testValues).sort((a,b) => {
+                return this.testValues[a].value - this.testValues[b].value
+            })
+            for(var i in testValuesOrdered) {
+                this.testValues[testValuesOrdered[i]].color = '#' + this.rainbowHeatMap.colourAt(i);
+                this.testValues[testValuesOrdered[i]].style = new this.req.style.Style({
+                    fill: new this.req.style.Fill({
+                        color: this.testValues[testValuesOrdered[i]].color
+                    }),
+                    stroke: new this.req.style.Stroke({
+                        color: 'black',
+                        width: this.map.getView().getZoom() / 20 * 2.5
+                    })
+                })
+            }
+
+            this.geo_layer.setStyle((feature) => {
+                return feature == this.selected_county ? this.geoStyle.active : this.testValues[feature.get('name_2')].style
+            })
+
+            setTimeout(() => {
+                this.map.getView().fit(this.geoJsonExtent, {
+                    duration: 500
+                })
+            },0)
         }
 
     }
@@ -416,7 +419,7 @@ export default {
         right: auto;
     }
 
-    background-color: rgba(255,255,255,.5);
+    background-color: rgba(255,255,255,.75);
     padding: 10px;
     & > :not(:first-child) {
         margin-top: 1rem;
@@ -424,16 +427,19 @@ export default {
     border-radius: 5px;
 
     &_button {
-        transition: box-shadow .1s ease 0s, transform .1s ease 0s;
         @include shadow(0px, 0px, 4px, 2px, rgba(0,0,0,0.2));
+        @include flex(center, center);
+        transition: background-color .0s ease-out 0s, box-shadow .1s ease-out 0s, transform .1s ease 0s;
         border: 1px solid rgba(0, 0, 0, 0.171);
         background-color: white;
         width: 5rem;
         height: 5rem;
         border-radius: 5px;
         &:hover {
-            transform: scale(1.05);
-            cursor: pointer;
+            &:not(.active) {
+                transform: scale(1.05);
+                cursor: pointer;
+            }
             &:active {
                 @include shadow(0px, 0px, 0px, 0px, rgba(0,0,0,0));
                 transform: scale(1);
@@ -441,6 +447,10 @@ export default {
         }
         &.active {
             @include shadow(0px, 0px, 0px, 0px, rgba(0,0,0,0));
+            background-color: whitesmoke;
+        }
+        & img {
+            width: 100%;
         }
     }
 }
