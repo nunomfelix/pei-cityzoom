@@ -12,19 +12,22 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.bson.Document;
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
 public class DevSink {
     private MongoCollection<Document> collection = MongoAux.getCollection("devices");
-
-    public static void main(String[] args) {
+    private static PrintWriter writer;
+    public static void main(String[] args) throws FileNotFoundException {
+        writer = new PrintWriter("devFile");
         new DevSink().run();
     }
 
@@ -119,6 +122,7 @@ public class DevSink {
                                 System.out.println(value.toString());
                                 System.out.println(document.toJson());
                                 docsList.add(document);
+                                writer.println("ola mundo");
                             }
                         } catch (IllegalStateException | IOException e) {
                             logger.error("Object given not in JSON format!");
@@ -126,6 +130,7 @@ public class DevSink {
                     }
                     try {
                         if (!docsList.isEmpty())
+
                             collection.insertMany(docsList);
                         logger.info("Stored devices with success!");
                     } catch (MongoBulkWriteException e) {

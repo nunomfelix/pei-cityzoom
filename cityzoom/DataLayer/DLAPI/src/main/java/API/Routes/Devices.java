@@ -113,14 +113,23 @@ public class Devices {
         JsonObject jsonDev;
         for (Document document : streamsIterable) {
             jsonDev = (JsonObject) MongoAux.jsonParser.parse(document.toJson());
+
+            FindIterable<Document> streamDocs = streams.find(eq("device_id", jsonDev.get("_id").getAsJsonObject().get("$oid").getAsString()));
+            ArrayList<String> streamList = new ArrayList<>();
+            for (Document doc : streamDocs) {
+                JsonObject jsonStream = (JsonObject) MongoAux.jsonParser.parse(doc.toJson());
+                streamList.add(jsonStream.get("_id").getAsJsonObject().get("$oid").getAsString());
+            }
+
             System.out.println(jsonDev.toString());
             String device =
                     "{\n" +
                             "\t\"device_id\": \""+jsonDev.get("_id").getAsJsonObject().get("$oid").getAsString()+"\",\n" +
-                            "\t\"device_name\": \""+jsonDev.get("device_name").getAsString()+"\",\n" +
-                            "\t\"description\": \""+jsonDev.get("description").getAsString()+"\",\n" +
                             "\t\"mobile\": "+jsonDev.get("mobile").getAsBoolean()+",\n" +
                             "\t\"vertical\": \""+jsonDev.get("vertical").getAsString()+"\",\n" +
+                            "\t\"device_name\": \""+jsonDev.get("device_name").getAsString()+"\",\n" +
+                            "\t\"streams\": "+ Arrays.toString(streamList.toArray()) +",\n" +
+                            "\t\"description\": \""+jsonDev.get("description").getAsString()+"\",\n" +
                             "\t\"latitude\": "+jsonDev.get("latitude").getAsDouble()+",\n" +
                             "\t\"longitude\": "+jsonDev.get("longitude").getAsDouble()+",\n" +
                             "\t\"creation\": "+jsonDev.get("creation").getAsJsonObject().get("$numberLong").getAsLong()+"\n" +
@@ -146,23 +155,30 @@ public class Devices {
     // Status - Passing
     public static String detailDevice(Request request, Response response) {
         response.type("application/json");
-        String stream = request.params(":device_id");
-        Document document = devices.find(eq("_id",new ObjectId(stream))).first();
+        String device = request.params(":device_id");
+        Document document = devices.find(eq("_id",new ObjectId(device))).first();
         if (document == null) {
             response.status(HttpsURLConnection.HTTP_NOT_FOUND);
             return "{\n" +
                     "\t\"status\": \"Error\",\n" +
-                    "\t\"Error\": \"Device " + stream + " not found.\"\n" +
+                    "\t\"Error\": \"Device " + device + " not found.\"\n" +
                     "}";
+        }
+        FindIterable<Document> streamDocs = streams.find(eq("device_id", device));
+        ArrayList<String> streamList = new ArrayList<>();
+        for (Document doc : streamDocs) {
+            JsonObject jsonStream = (JsonObject) MongoAux.jsonParser.parse(doc.toJson());
+            streamList.add(jsonStream.get("_id").getAsJsonObject().get("$oid").getAsString());
         }
         response.status(200);
         JsonObject jsonDev = (JsonObject) MongoAux.jsonParser.parse(document.toJson());
         return "{\n" +
                 "\t\"device_id\": \""+jsonDev.get("_id").getAsJsonObject().get("$oid").getAsString()+"\",\n" +
-                "\t\"device_name\": \""+jsonDev.get("device_name").getAsString()+"\",\n" +
-                "\t\"description\": \""+jsonDev.get("description").getAsString()+"\",\n" +
                 "\t\"mobile\": "+jsonDev.get("mobile").getAsBoolean()+",\n" +
                 "\t\"vertical\": \""+jsonDev.get("vertical").getAsString()+"\",\n" +
+                "\t\"streams\": "+ Arrays.toString(streamList.toArray()) +",\n" +
+                "\t\"device_name\": \""+jsonDev.get("device_name").getAsString()+"\",\n" +
+                "\t\"description\": \""+jsonDev.get("description").getAsString()+"\",\n" +
                 "\t\"latitude\": "+jsonDev.get("latitude").getAsDouble()+",\n" +
                 "\t\"longitude\": "+jsonDev.get("longitude").getAsDouble()+",\n" +
                 "\t\"creation\": "+jsonDev.get("creation").getAsJsonObject().get("$numberLong").getAsLong()+"\n" +
