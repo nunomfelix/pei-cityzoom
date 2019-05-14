@@ -38,7 +38,8 @@ export default {
             hoverPopup: null,
             testValues: { },
             rainbowHeatMap: null,
-            hovered_feature: null
+            hovered_feature: null,
+            state: null
         }
     },
     mounted() {
@@ -275,12 +276,12 @@ export default {
     background-color: rgba(255,255,255,.5);
     padding: 10px;
     & > :not(:first-child) {
-        @include shadow(0px, 0px, 4px, 2px, rgba(0,0,0,0.2));
         margin-left: 1rem;
     }
     border-radius: 5px;
 
     &_button {
+        @include shadow(0px, 0px, 4px, 2px, rgba(0,0,0,0.2));
         border: 1px solid rgba(0, 0, 0, 0.171);
         background-color: white;
         width: 5rem;
