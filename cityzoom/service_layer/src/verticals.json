@@ -26,7 +26,7 @@
 				}
 			}
 		},
-    	"Temperatura": {
+    	"Temperature": {
 			"display": "Temperatura",
 			"streams":{
 				"temperature_stream":{

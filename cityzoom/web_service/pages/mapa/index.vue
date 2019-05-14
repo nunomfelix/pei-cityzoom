@@ -26,11 +26,8 @@
         </div>
 
         <div class="map-menu show">
-            <div class="map-menu_button">
-
-            </div>
-            <div class="map-menu_button">
-                
+            <div :title="vertical.display" v-for="vertical of getVerticals" :key="vertical" class="map-menu_button">
+                {{vertical.display}}
             </div>
         </div>
         <Loading :show="!loaded" type="absolute"/> 
@@ -60,6 +57,11 @@ export default {
             state: null,
             selected_county: null,
             geoJsonExtent: null
+        }
+    },
+    computed: {
+        getVerticals() {
+            return this.$store.state.verticals
         }
     },
     mounted() {
@@ -259,7 +261,7 @@ export default {
             if (e.selected.length) 
                 this.hovered_feature = e.selected[0]
 
-            if(this.hovered_feature != this.selected_county) {
+            if(this.hovered_feature && this.hovered_feature != this.selected_county) {
                 document.body.style.cursor = "pointer"
                 var center = extent.getCenter(this.hovered_feature.getGeometry().getExtent())
                 this.hoverOverlay.setPosition(center)
@@ -289,6 +291,7 @@ export default {
             }))
             this.map.getView().fit(feature.getGeometry().getExtent(), {
                 duration: 500,
+                padding: [120, 0, 0, 0],
                 callback: () =>  {
                     this.map.setView(new this.req.Ol.View({
                         extent: feature.getGeometry().getExtent(),
@@ -362,7 +365,8 @@ export default {
 }
 
 .map-menu {
-    @include flex(center, center);
+
+    @include flex(center, center, column);
     @include shadow(0px, 0px, 4px, 2px, rgba(0,0,0,0.2));
     @include transition(opacity, .5s, ease, 0s);
     z-index: 3600;
@@ -372,21 +376,28 @@ export default {
     }
 
     position: absolute;
-    right: 2rem;
-    bottom: 2rem;
+
+    &:not(.left) {
+        right: 2rem;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
     &.left {
+        bottom: 2rem;
         left: 2rem;
         right: auto;
     }
+
     background-color: rgba(255,255,255,.5);
     padding: 10px;
     & > :not(:first-child) {
-        margin-left: 1rem;
+        margin-top: 1rem;
     }
     border-radius: 5px;
 
     &_button {
-        transition: box-shadow .2s ease 0s, transform .2s ease 0s;
+        transition: box-shadow .1s ease 0s, transform .1s ease 0s;
         @include shadow(0px, 0px, 4px, 2px, rgba(0,0,0,0.2));
         border: 1px solid rgba(0, 0, 0, 0.171);
         background-color: white;

@@ -8,7 +8,7 @@
     <div class="sidebar">
       <div class="sidebar_row sidebar_header" :class="{'collapsed': collapsed}">
         <div class="big_logo">
-          <img @click="homeButton()" src="~/static/icons/sidebar/big_logo.png">
+          <img @click="homeButton()" src="icons/sidebar/big_logo.png">
         </div>
         <div class="sidebar_row_left">
         </div>
