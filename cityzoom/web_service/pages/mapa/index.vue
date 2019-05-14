@@ -42,7 +42,7 @@ export default {
         const interaction = require( 'ol/interaction');
         // const extent = require( 'ol/extent');
         // const Overlay = require( 'ol/Overlay.js');
-        // const { Feature } = require( 'ol')
+        const { Feature } = require( 'ol')
         // const { click, pointerMove, altKeyOnly, noModifierKeys, altShiftKeysOnly, platformModifierKeyOnly } = require( 'ol/events/condition.js');
 
         this.geoStyle.default = new style.Style({
@@ -92,6 +92,40 @@ export default {
                 duration: 250
             }
         });
+        var iconFeatures=[];
+
+        var iconFeature = new Feature({
+        geometry: new geom.Point(proj.transform([-8.661682, 40.6331731], 'EPSG:4326',     
+        'EPSG:3857')),
+        name: 'Null Island',
+        population: 4000,
+        rainfall: 500
+        });
+
+        var iconFeature1 = new Feature({
+        geometry: new geom.Point(proj.transform([-8.661682, 40.6331731], 'EPSG:4326', 'EPSG:3857')),
+        name: 'Null Island Two',
+        population: 4001,
+        rainfall: 501
+        });
+
+        iconFeatures.push(iconFeature);
+        iconFeatures.push(iconFeature1);
+
+        var vectorSource = new source.Vector({
+            features: iconFeatures //add an array of features
+        });
+
+        var iconStyle = new style.Style({
+        image: new style.Icon(/** @type {olx.style.IconOptions} */ ({
+            anchor: [0.5, 0.5],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'fraction',
+            scale: 0.1,
+            opacity: 0.75,
+            src: 'icons/sensor.png'
+        }))
+        });
 
         this.map = new Ol.Map({
             target: 'map',
@@ -106,7 +140,7 @@ export default {
                 zoom: 8,
                 center,
                 minZoom: 6,
-                maxZoom: 11
+                maxZoom: 20
             })
 
         })
@@ -144,10 +178,10 @@ export default {
                 const feature = e.selected[0]
                 document.body.style.cursor = "pointer"
                 this.hoverPopup.innerHTML = feature.get('name_2')
-                console.log(feature)
-                this.hoverOverlay.setPosition(extent.getCenter(feature.getGeometry().getExtent()))
+                var center = extent.getCenter(feature.getGeometry().getExtent())
+                this.hoverOverlay.setPosition(center)
             } else {
-                
+                document.body.style.cursor = "default"
             }
         })
     }
@@ -167,9 +201,13 @@ export default {
     filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
     padding: .4rem .7rem;
     border-radius: 10px;
-    font-weight: 700;
+    font-weight: 900;
     white-space: nowrap;
-    font-size: 1rem;
+    font-size: 1.5rem;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: max-content;
 }
 
 </style>
