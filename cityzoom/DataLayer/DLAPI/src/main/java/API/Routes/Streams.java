@@ -17,7 +17,8 @@ import static com.mongodb.client.model.Filters.*;
 
 
 public class Streams {
-    private static List<String> types = Arrays.asList("temperature", "oxygen");
+    private static List<String> types = Arrays.asList("TemperatureOut", "CO", "CH4", "NH3", "Pressure", "Humidity", "Altitude", "TemperatureIn",
+            "UvIndex", "CO2", "Sound", "WindSpeed", "WindDirection", "Lux", "Precipitation", "Coordinates", "Velocity");
     private static Date date = new Date();
 
     // Status - Passing
