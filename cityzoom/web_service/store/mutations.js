@@ -19,7 +19,6 @@ export default {
     SET_STORE: (state , transObject) => {
         state.modifier++;
         Object.keys(transObject).forEach(key => { 
-            
             if(!process.server && ['jwt'].includes(key)) {
                 Cookie.set(key, transObject[key])
                 localStorage.setItem(key,transObject[key])
@@ -27,8 +26,7 @@ export default {
             if(key in state)
                 state[key] = transObject[key] 
             else
-                console.log('Discarted', key)
-                
+                console.log('Discarted', key)     
         })
     },
     MARK_AS_READ(state,_id) {

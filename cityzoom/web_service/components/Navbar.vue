@@ -37,34 +37,34 @@ export default {
     return {
       sidebarTabs: [
         {
-          path: "dominios/metrica",
+          path: "mapa",
           img: 'dominios.svg',
-          name: "Domínios"
+          name: "Mapa"
         },
         {
           path: "dispositivos",
           img: "dispositivos.svg",
-          name: "Dispositivos"
+          name: "Devices"
         },
         {
           path: "operacoes",
           img: "operacoes.svg",
-          name: "Operações"
+          name: "Operations"
         },
         {
           path: "notificacoes",
           img: "notificacoes.svg",
-          name: "Notificações"
+          name: "Alarms"
         },
         {
           path: "equipa",
           img: "equipa.svg",
-          name: "Equipa"
+          name: "Team"
         },
         {
           path: "definicoes",
           img: "settings.svg",
-          name: "Definições"
+          name: "Settings"
         }
       ],
       collapsed: true,
@@ -89,7 +89,7 @@ export default {
     },
     homeButton() {
       this.currentTab = "";
-      this.router.navigate(["/homepage"]);
+      this.$router.push("/homepage");
     }
   },
   mounted() {
@@ -104,9 +104,6 @@ export default {
 </script>
 
 <style lang="scss">
-$sidebar-size: 300px;
-$sidebar-left-size: 100px;
-$sidebar-right-size: 200px;
 @import "~/assets/mixins.scss";
 
 .sidebarWrapper {

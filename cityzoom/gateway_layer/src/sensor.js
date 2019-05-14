@@ -59,19 +59,23 @@ var stompClient = StompJs.over(client)
 console.log("Created Client")
 
 stompClient.connect('', () => {   
-    stompClient.subscribe('/topic/last', (mes) => {
+    stompClient.subscribe('/topic/last', async (mes) => {
         if(mes.body){
             var data = JSON.parse(mes.body)
             for(i in data.sensors){
                 var sensor_name = sensors[data.sensors[i].sensor_id]
+                var location = {"lat":nodes[data.source.id].lat, "long":nodes[data.source.id].long}
+                console.log(location)
                 if(!existing_streams[data.sensors[i].sensor_id]){
                     existing_streams[data.sensors[i].sensor_id] = true
-                    create_Stream(sensor_name, data.source.id)
+                    create_Device(sensor_name, location)
+                    console.log("Created device device_" + sensor_name)
+                    var device_id = await get_Device('device_' + sensor_name)
+                    create_Stream(sensor_name, device_id)
                     console.log("Created stream stream_" + sensor_name)
                 }
-                var location = {"lat":nodes[data.source.id].lat, "long":nodes[data.source.id].long}
                 put_Stream(sensor_name, data.sensors[i]['value'],location)
-                console.log("Sent data to stream strea_" + sensor_name)
+                console.log("Sent data to stream stream_" + sensor_name)
             }
         }
         else console.log("Error receiving the message")
@@ -79,6 +83,28 @@ stompClient.connect('', () => {
 }, (err) => { 
     console.log(err)
 })
+
+async function create_Device(deviceName, location) {
+    axios.post('http://193.136.93.14:8001/czb/devices', {
+        "device_name" : "device_" + deviceName,
+        "description" : deviceName + "",
+        "vertical": deviceName + "",
+        "mobile": true,
+        "latitude": location.lat,
+        "longitude": location.long
+    }).catch( (err) => {console.log("Failed to create device with message: " + err)})
+}
+
+async function get_Device(deviceName) {
+    var data = await axios.get('http://193.136.93.14:8001/czb/devices')
+    var user_devices = JSON.parse(JSON.stringify(data.data.user_devices))
+    for(i in user_devices){
+        if(user_devices[i].device_name == deviceName){
+            return user_devices[i].device_id
+        }
+    }
+    return "0"
+}
 
 async function create_Stream(streamName, deviceID) {
     axios.post('http://193.136.93.14:8001/czb/stream', {

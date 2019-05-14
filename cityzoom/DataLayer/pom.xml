@@ -26,5 +26,6 @@
         <module>DLAPI</module>
         <module>KafkaStartUp</module>
         <module>AlertsStreaming</module>
+        <module>DevicesSinks</module>
     </modules>
 </project>

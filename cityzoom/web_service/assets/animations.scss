@@ -1,3 +1,5 @@
+@import './mixins.scss';
+
 .mainMargin {
     margin-left: 100px;
     margin-right: 100px;
@@ -9,6 +11,14 @@
     left: 50%;
     transform: translate(-50%, -50%);
 }
+
+.lds-roller-absolute {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+}
+
 .lds-roller-relative {
     position: relative;
     display: flex;

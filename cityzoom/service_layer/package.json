@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "ENV DEBUG=app:* nodemon src/index.js"
+    "dev": "DEBUG=app:* nodemon src/index.js"
   },
   "keywords": [],
   "author": "André Mourato",

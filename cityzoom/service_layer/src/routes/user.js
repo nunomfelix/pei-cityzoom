@@ -25,14 +25,12 @@ router.post('/login',
     async (req, res) => {
         const user = await User.findOne({ username: req.body.username })
         if (!user) return res.status(400).send('Invalid Credentials')
-        userDebug(req.body.password)
-        userDebug(user.password)
         const isMatch = await bcrypt.compare(req.body.password, user.password)
         if (!isMatch) return res.status(400).send('Invalid Credentials')
 
-        const token = await user.generateAuthToken()
+        const jwt = await user.generateAuthToken()
         userDebug(`User ${user.name} logged in successfully `)
-        return res.send({ token })
+        return res.send({ ...user._doc, jwt })
     }
 )
 
@@ -49,8 +47,6 @@ router.get('/logout',
     authentication,
     async (req, res) => {
         const user = await User.findById(req.user._id)
-        user.token = '' //Deletes the session token
-        await user.save()
         userDebug(`User ${user.name} logged out successfully `)
         return res.send(user)
     }
@@ -89,8 +85,16 @@ router.get('/me',
 router.post('',
     [validationMiddleware(validateCreateUser, 'body')],
     async (req, res) => {
-        const user = new User(req.body)
-        await user.save()
+        let user;
+        try {
+            user = new User(req.body)
+            await user.save()
+        } catch (e) {
+            const err = e.errors[Object.keys(e.errors)[0]]
+            if (err.kind == "unique") {
+                return res.status(400).send(err.path + " '" + err.value + "' already exists")
+            }
+        }
         userDebug(`User ${user.name} successfully created`)
         res.status(201).send(user)
     }

@@ -6,11 +6,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="DLAPI" />
+        <module name="AlertsStreaming" />
         <module name="Sinks" />
         <module name="ValuesSinks" />
+        <module name="DLAPI" />
         <module name="KafkaStartUp" />
-        <module name="AlertsStreaming" />
+        <module name="DevicesSinks" />
         <module name="DataLayerCoreBroker" />
         <module name="DataLayerInterfaceWebApp" />
       </profile>

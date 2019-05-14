@@ -5,6 +5,10 @@ const helmet = require('helmet')
 const morgan = require('morgan')
 const { error } = require('./middleware')
 const fs = require('fs')
+const axios = require('axios')
+
+const User = require('./db/models/user')
+const Device = require('./db/models/device')
 
 uncaughtDebug = require('debug')('app:Uncaught')
 
@@ -14,6 +18,8 @@ require('./db/mongoose')
 const accountRouter = require('./routes/user')
 const alertRouter = require('./routes/alert')
 const streamRouter = require('./routes/stream')
+const verticalRouter = require('./routes/vertical')
+const deviceRouter = require('./routes/device')
 const expressDebug = require('debug')('app:express')
 
 //Uses the express framework
@@ -33,7 +39,7 @@ process.on('unhandledRejection', (ex) => {
 })
 
 app.use((req, res, next) => {
-    var allowedOrigins = ['http://127.0.0.1:3000', 'http://localhost:3000', 'http://193.136.93.14:3000', ];
+    var allowedOrigins = ['http://127.0.0.1:3000', 'http://localhost:3000', 'http://193.136.93.14:3000',];
     var origin = req.headers.origin;
     // if (allowedOrigins.indexOf(origin) > -1) {
     //     res.setHeader('Access-Control-Allow-Origin', origin);
@@ -45,6 +51,21 @@ app.use((req, res, next) => {
     return next();
 });
 
+app.get('/reset', async (req, res) => {
+    await User.deleteMany({})
+    const user = await axios({
+        method: 'post',
+        url: 'http://localhost:8002/user',
+        data: {
+            name: 'teste',
+            username: 'teste',
+            email: 'teste@gmail.com',
+            password: 'teste'
+        }
+    })
+    res.send(user.data)
+})
+
 app.use(morgan('dev'))
 app.use(helmet())
 app.use(express.json())
@@ -53,6 +74,8 @@ app.use(express.json())
 app.use('/user', accountRouter)
 app.use('/alert', alertRouter)
 app.use('/stream', streamRouter)
+app.use('/vertical',verticalRouter)
+app.use('/device', deviceRouter)
 
 //Error middleware, para excessoes causadas em funcoes assincronas do express
 app.use(error)

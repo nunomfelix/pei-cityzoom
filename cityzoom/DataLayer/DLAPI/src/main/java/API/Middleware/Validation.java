@@ -10,7 +10,10 @@ import java.util.Map;
 public class Validation {
     private Map<String, Object> createStreamRequiredFields = new HashMap<>();
     private Map<String, Object> createStreamAllowedFields = new HashMap<>();
-    private Map<String, Object> pushValuesFields = new HashMap<>();
+    private Map<String, Object> pushValuesRequiredFields = new HashMap<>();
+    private Map<String, Object> pushValuesAllowedFields = new HashMap<>();
+    private Map<String, Object> createDeviceRequiredFields = new HashMap<>();
+    private Map<String, Object> createDeviceAllowedFields = new HashMap<>();
 
     public Validation() {
         // required fields for create stream
@@ -23,15 +26,32 @@ public class Validation {
         this.createStreamAllowedFields.put("device_id", String.class);
         this.createStreamAllowedFields.put("type", String.class);
         this.createStreamAllowedFields.put("description", String.class);
-        this.createStreamAllowedFields.put("mobile", Boolean.class);
         this.createStreamAllowedFields.put("ttl", Integer.class);
         this.createStreamAllowedFields.put("periodicity", Integer.class);
 
-        // fields for push values
-        this.pushValuesFields.put("stream_name", String.class);
-        this.pushValuesFields.put("value", String.class);
-        this.pushValuesFields.put("latitude", Double.class);
-        this.pushValuesFields.put("longitude", Double.class);
+        // required fields for push values
+        this.pushValuesRequiredFields.put("stream_name", String.class);
+        this.pushValuesRequiredFields.put("value", String.class);
+
+        // allowed fields for push values
+        this.pushValuesAllowedFields.put("stream_name", String.class);
+        this.pushValuesAllowedFields.put("value", String.class);
+        this.pushValuesAllowedFields.put("latitude", Double.class);
+        this.pushValuesAllowedFields.put("longitude", Double.class);
+
+        // required fields for createDevice
+        this.createDeviceRequiredFields.put("device_name", String.class);
+        this.createDeviceRequiredFields.put("mobile", Boolean.class);
+        this.createDeviceRequiredFields.put("vertical", String.class);
+
+        // required fields for createDevice
+        this.createDeviceAllowedFields.put("device_name", String.class);
+        this.createDeviceAllowedFields.put("mobile", Boolean.class);
+        this.createDeviceAllowedFields.put("vertical", String.class);
+        this.createDeviceAllowedFields.put("description", String.class);
+        this.createDeviceAllowedFields.put("latitude", Double.class);
+        this.createDeviceAllowedFields.put("longitude", Double.class);
+
     }
 
     public String validateCreate(JsonObject body) throws JSONException {
@@ -55,7 +75,7 @@ public class Validation {
                     "\t\"Status\": \"Error @ request\"\n" +
                     "\t\"Error\": \"Field(s) \"stream\" and/or \"type\" and/or \"device_id\" not found\"\n" +
                     "}";
-        } else if (body.keySet().size() > 7){
+        } else if (body.keySet().size() > 6){
             return "{\n" +
                     "\t\"Status\": \"Error @ request\"\n" +
                     "\t\"Error\": \"Too many fields\"\n" +
@@ -69,22 +89,63 @@ public class Validation {
         JSONObject trial = new JSONObject(body.toString());
         for (String key : body.keySet()) {
             Object val = trial.get(key);
-            if (!pushValuesFields.keySet().contains(key)) {
+            if (!pushValuesAllowedFields.keySet().contains(key)) {
                 return "{\n" +
                         "\t\"Status\": \"Error @ request\"\n" +
                         "\t\"Error\": \"Invalid field: \""+key+"\" \"\n" +
                         "}";
-            } else if (!val.getClass().equals(pushValuesFields.get(key))) {
+            } else if (!val.getClass().equals(pushValuesAllowedFields.get(key))) {
                 return "{\n" +
                         "\t\"Status\": \"Error @ request\"\n" +
                         "\t\"Error\": \"Invalid type in field: \""+key+"\" \"\n" +
                         "}";
             }
         }
-        if (!body.keySet().containsAll(pushValuesFields.keySet())) {
+        if (!body.keySet().containsAll(pushValuesRequiredFields.keySet())) {
             return "{\n" +
                     "\t\"Status\": \"Error @ request\"\n" +
                     "\t\"Error\": \"Required fields not found\"\n" +
+                    "}";
+        } else if (body.keySet().size() > 4){
+            return "{\n" +
+                    "\t\"Status\": \"Error @ request\"\n" +
+                    "\t\"Error\": \"Too many fields\"\n" +
+                    "}";
+        } else {
+            return "";
+        }
+    }
+
+    public String validateCreateDevice(JsonObject body) throws JSONException {
+        JSONObject trial = new JSONObject(body.toString());
+        for (String key : body.keySet()) {
+            Object val = trial.get(key);
+            if (!createDeviceAllowedFields.keySet().contains(key)) {
+                return "{\n" +
+                        "\t\"Status\": \"Error @ request\"\n" +
+                        "\t\"Error\": \"Invalid field: \""+key+"\" \"\n" +
+                        "}";
+            } else if (!val.getClass().equals(createDeviceAllowedFields.get(key))) {
+                return "{\n" +
+                        "\t\"Status\": \"Error @ request\"\n" +
+                        "\t\"Error\": \"Invalid type in field: \""+key+"\" \"\n" +
+                        "}";
+            }
+        }
+        if (!body.keySet().containsAll(createDeviceRequiredFields.keySet())) {
+            return "{\n" +
+                    "\t\"Status\": \"Error @ request\"\n" +
+                    "\t\"Error\": \"Required fields not found\"\n" +
+                    "}";
+        } else if (!body.get("mobile").getAsBoolean() && (!body.keySet().contains("latitude") || !body.keySet().contains("longitude"))) {
+            return "{\n" +
+                    "\t\"Status\": \"Error @ request\"\n" +
+                    "\t\"Error\": \"No location given for not-mobile device\"\n" +
+                    "}";
+        } else if (body.keySet().size() > 6){
+            return "{\n" +
+                    "\t\"Status\": \"Error @ request\"\n" +
+                    "\t\"Error\": \"Too many fields\"\n" +
                     "}";
         } else {
             return "";
