@@ -2,6 +2,7 @@ package API;
 
 import API.Aux.MongoAux;
 import API.Middleware.Validation;
+import API.Routes.Devices;
 import API.Routes.Streams;
 import API.Routes.Values;
 import API.Sinks.BackendSink;
@@ -17,6 +18,7 @@ public class DataLayerAPI {
     public static Validation validator = new Validation();
     public static MongoCollection<Document> streams = MongoAux.getCollection("streams");
     public static MongoCollection<Document> values = MongoAux.getCollection("values");
+    public static MongoCollection<Document> devices = MongoAux.getCollection("devices");
 
     public static void main(String[] args) {
 
@@ -48,7 +50,13 @@ public class DataLayerAPI {
             post("/alerts", (Request req, Response res) -> { return "o"; });
             put("/alerts", (Request req, Response res) -> { return "o"; });
 
-            // get
+            // devices routes and paths
+            post("/devices", Devices::createDevice);
+            get("/devices", Devices::listDevices);
+            path("/device", () -> {
+                delete(":/device_id", Devices::deleteDevice);
+                get("/:device_id", Devices::detailDevice);
+            });
         });
     }
 }

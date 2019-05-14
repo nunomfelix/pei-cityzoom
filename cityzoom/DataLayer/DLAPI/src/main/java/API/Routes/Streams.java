@@ -86,7 +86,7 @@ public class Streams {
                     "}";
         }
         streams.deleteOne(eq("stream", to_del));
-        values.deleteMany(eq("stream", to_del));
+        values.deleteMany(eq("stream_name", to_del));
         response.status(HttpsURLConnection.HTTP_NO_CONTENT);
         return "";
     }
