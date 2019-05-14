@@ -25,7 +25,7 @@
         <div class="sidebar_row_left">
           <img :src="`icons/sidebar/${tab.img}`"/>
         </div>
-        <div class="sidebar_row_right">{{tab.name}}</div>
+        <div class="sidebar_row_right"><span class="big">{{tab.name}}</span></div>
       </div>
     </div>
   </div>
@@ -136,10 +136,8 @@ export default {
       background-color: transparent;
 
       &.sidebar_header {
-        height: 140px !important;
+        height: 14rem !important;
         background: linear-gradient(to bottom, #0f589c, #147bdb) white;
-        background-position-x: -3px;
-        background-repeat-y: no-repeat;
       }
 
       & .big_logo {
@@ -160,8 +158,7 @@ export default {
         &:not(.selected) {
           @include clickable(rgba(0, 2, 121, 0.527));
         }
-        height: 60px;
-        font-size: 1.5rem;
+        height: 6rem;
         font-weight: 700;
         white-space: nowrap;
         & .sidebar_row_right {

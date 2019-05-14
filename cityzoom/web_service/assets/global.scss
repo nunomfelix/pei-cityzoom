@@ -42,9 +42,6 @@ input {
 
 html {
     @media (min-width: 0px) {
-        font-size: 7px !important;
-    }
-    @media (min-width: 600px) {
         font-size: 8px !important;
     }
     @media (min-width: 800px) {
@@ -72,10 +69,10 @@ span {
         font-size: 1.625rem;
     }
     &.big {
-        font-size: 1.9rem;
+        font-size: 2rem;
     }
     &.x-big {
-        font-size: 2.2rem;
+        font-size: 2.4rem;
     }
 }
 
