@@ -1,8 +1,0 @@
-#!/bin/bash
-kafka/kafka_2.12-2.2.0/bin/zookeeper-server-start.sh configs/zookeeper.properties &
-kafka/kafka_2.12-2.2.0/bin/kafka-server-start.sh configs/server_0.properties &
-kafka/kafka_2.12-2.2.0/bin/kafka-server-start.sh configs/server_1.properties &
-kafka/kafka_2.12-2.2.0/bin/kafka-server-start.sh configs/server_2.properties &
-kafka/kafka_2.12-2.2.0/bin/kafka-server-start.sh configs/server_3.properties &
-kafka/kafka_2.12-2.2.0/bin/kafka-server-start.sh configs/server_4.properties &
-echo "\n"

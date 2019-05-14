@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="DLAPI" />
+        <module name="Sinks" />
+        <module name="ValuesSinks" />
+        <module name="KafkaStartUp" />
+        <module name="AlertsStreaming" />
+        <module name="DataLayerCoreBroker" />
+        <module name="DataLayerInterfaceWebApp" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="AlertStreamer" target="8" />
+      <module name="API" target="8" />
+      <module name="DataLayerCore-Broker" target="8" />
+      <module name="DataLayerInterface-WebApp" target="8" />
+      <module name="StreamSinker" target="8" />
+      <module name="ValuesSinker" target="8" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="DataLayerInterfaceWebApp" options="" />
+    </option>
+  </component>
+</project>

@@ -1,47 +1,45 @@
 <template>
-  <no-ssr>
-    <div>
-      <grid-layout
-        :layout="layout"
-        :col-num="12"
-        :row-height="30"
-        :is-draggable="true"
-        :is-resizable="true"
-        :vertical-compact="true"
-        :margin="[20, 20]"
-        :use-css-transforms="false"
+  <div class="mainMargin">
+    <grid-layout
+      :layout="layout"
+      :col-num="12"
+      :row-height="30"
+      :is-draggable="true"
+      :is-resizable="true"
+      :vertical-compact="true"
+      :margin="[20, 20]"
+      :use-css-transforms="false"
+    >
+      <grid-item
+        v-for="item in layout"
+        :key="item.i"
+        :x="item.x"
+        :y="item.y"
+        :w="item.w"
+        :h="item.h"
+        :i="item.i"
+        :minW="2"
+        :minH="14"
+        :maxH="14"
+        drag-allow-from=".widget_handle"
       >
-        <grid-item
-          v-for="item in layout"
-          :key="item.i"
-          :x="item.x"
-          :y="item.y"
-          :w="item.w"
-          :h="item.h"
-          :i="item.i"
-          :minW="2"
-          :minH="14"
-          :maxH="14"
-          drag-allow-from=".widget_handle"
-        >
-          <div class="widget">
-            <div class="widget_handle">
-              <img src="icons/widgets/handler.png">
-            </div>
-            <div v-if="item.type=='series'">
-              <SeriesGraph :data="item.data && item.data == 'fake' ? null : data" :name="item.i"/>
-            </div>
-            <div v-if="item.type=='stacked'">
-              <StackedBar :name="item.i"/>
-            </div>
-            <div v-if="item.type=='lines'">
-              <LineGraph :name="item.i"/>
-            </div>
+        <div class="widget">
+          <div class="widget_handle">
+            <img src="icons/widgets/handler.png">
           </div>
-        </grid-item>
-      </grid-layout>
-    </div>
-  </no-ssr>
+          <div v-if="item.type=='series'">
+            <SeriesGraph :data="item.data && item.data == 'fake' ? null : data" :name="item.i"/>
+          </div>
+          <div v-if="item.type=='stacked'">
+            <StackedBar :name="item.i"/>
+          </div>
+          <div v-if="item.type=='lines'">
+            <LineGraph :name="item.i"/>
+          </div>
+        </div>
+      </grid-item>
+    </grid-layout>
+  </div>
 </template>
 
 <script>
