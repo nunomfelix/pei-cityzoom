@@ -1,7 +1,16 @@
 <template>
     <div class="mapMargin mapHeight" style="position:relative">
         <div class="mapHeight" id="map"></div>
-        <div id="hover_popup" class="ol-popup"></div>
+        <div id="hover_popup" class="ol-popup">
+            <div v-if="hovered_feature" :style="{ 'background-color': '#' + testValues[hovered_feature.get('name_2')].color}">
+                <span class="normal">
+                    {{hovered_feature.get('name_2')}}
+                </span>
+                <span class="normal">
+                    {{testValues[hovered_feature.get('name_2')].value.toFixed(2)}}
+                </span>
+            </div>
+        </div>
         <Loading :show="!loaded" type="absolute"/> 
     </div>
 </template>
@@ -19,10 +28,9 @@ export default {
             },
             hoverOverlay: null,
             hoverPopup: null,
-            testValues: {
-                
-            },
-            rainbowHeatMap: null
+            testValues: { },
+            rainbowHeatMap: null,
+            hovered_feature: null
         }
     },
     mounted() {
@@ -153,14 +161,14 @@ export default {
 
                 this.rainbowHeatMap = new Rainbow()
                 this.rainbowHeatMap.setNumberRange(1, geo_layer.getSource().getFeatures().length);
-                this.rainbowHeatMap.setSpectrum('lightgreen', 'red'); 
+                this.rainbowHeatMap.setSpectrum('green', 'red'); 
 
                 var x = 0
                 var tmp_extent = extent.createEmpty()
                 geo_layer.getSource().getFeatures().forEach(feature => {
                     tmp_extent = extent.extend(tmp_extent, feature.getGeometry().getExtent())
                     this.testValues[feature.get('name_2')] = {
-                        value: Math.sin(x++) * 33,
+                        value: Math.random() * 35,
                         color: null
                     }
                 })
@@ -208,11 +216,12 @@ export default {
         hover_interaction.on('select', (e) => {
             if (e.selected.length) {    
                 const feature = e.selected[0]
+                this.hovered_feature = feature
                 document.body.style.cursor = "pointer"
-                this.hoverPopup.innerHTML = feature.get('name_2') + ' ' + this.testValues[feature.get('name_2')].value
                 var center = extent.getCenter(feature.getGeometry().getExtent())
                 this.hoverOverlay.setPosition(center)
             } else {
+                this.hovered_feature = null
                 document.body.style.cursor = "default"
                 this.hoverOverlay.setPosition(null)
             }
@@ -223,17 +232,16 @@ export default {
 </script>
 
 <style lang="scss" scope>
+@import '~/assets/mixins.scss';
 
 .ol-popup {
+
+    @include shadow(0px, 1px, 4px, 0px, rgba(0,0,0,0.2));
     pointer-events: none;
     z-index: 3332;
     position: absolute;
-    background-color: white;
     text-align: center;
-    -webkit-filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
     filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
-    padding: .4rem .7rem;
-    border-radius: 10px;
     font-weight: 900;
     white-space: nowrap;
     font-size: 1.5rem;
@@ -241,6 +249,13 @@ export default {
     top: 50%;
     transform: translate(-50%, -50%);
     width: max-content;
+
+    & > div {
+        @include flex(center, center, column);
+        color: white;
+        padding: .4rem .7rem;
+        border-radius: 10px;
+    }
 }
 
 </style>
