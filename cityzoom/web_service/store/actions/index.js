@@ -27,7 +27,15 @@ export default{
                     'Authorization': payload
                 }
             })
-            commit('SET_STORE', { user: { ...res.data}, jwt: payload })
+            const verticals = await axios({
+                method: 'get',
+                url: getUrl() + '/vertical',
+                headers: {
+                    'Authorization': payload
+                }
+            })
+            console.log(verticals)
+            commit('SET_STORE', { user: { ...res.data}, jwt: payload, verticals: verticals.data })
         } catch (err) {
             console.error('Error', err.message)
             return err.message
@@ -77,7 +85,7 @@ export default{
             })
             console.log(res)
             commit('SET_STORE', {
-                user: '',
+                usera: '',
                 jwt: ''
             })
             this.$router.push('/')

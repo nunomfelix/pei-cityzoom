@@ -26,11 +26,11 @@ public class Alerts {
             response.status(HttpsURLConnection.HTTP_NOT_FOUND);
             return "{\n" +
                     "\t\"state\": " +false+ "\n" +
-                    "}"
+                    "}";
         }
         
         response.status(HttpsURLConnection.HTTP_OK);
-        jsonStream = (JsonObject) MongoAux.jsonParser.parse(alert.toJson());
+        JsonObject jsonStream = (JsonObject) MongoAux.jsonParser.parse(alert.toJson());
         return "{\n" +
             "\t\"alert_ID\": \""+ alert_id +"\",\n" +
             "\t\"alert_name\": \""+jsonStream.get("alert_name").getAsString()+"\",\n" +
@@ -56,7 +56,7 @@ public class Alerts {
         long total = alerts.countDocuments();
         long size = alerts.countDocuments(and(gte("start", start), lte("end", end)));
 
-        List<String> userAlerts = new ArrayList<>;
+        List<String> userAlerts = new ArrayList<>();
         FindIterable<Document> iterableAlerts = alerts.find(and(gte("start", start), lte("end", end)));
         JsonObject jsonStream;
         for(Document doc : iterableAlerts){
@@ -84,8 +84,8 @@ public class Alerts {
             "}";
     }
 
-    public static String listStreamAlerts (Request request, Reponse response) {
-        repose.type("application/json");
+    public static String listStreamAlerts (Request request, Response response) {
+        response.type("application/json");
 
         String stream_name = request.params(":stream_name");
         Document stream = streams.find(eq("stream_name", stream_name)).first();
@@ -93,10 +93,10 @@ public class Alerts {
             response.status(HttpsURLConnection.HTTP_BAD_REQUEST);
             return "{\n" +
                     "\t\"state\": " +false+ "\n" +
-                    "}"
+                    "}";
         }
 
-        List<String> streamAlerts = new ArrayList<>;
+        List<String> streamAlerts = new ArrayList<>();
         FindIterable<Document> iterableAlerts = alerts.find(eq("stream", stream_name));
         JsonObject jsonStream;
         for(Document doc : iterableAlerts){
@@ -123,10 +123,12 @@ public class Alerts {
 
     public static String postAlert (Request request, Response response) {
         response.type("application/json");
+        return "";
     }
 
     public static String putAlert (Request request, Response response) {
         response.type("application/json");
+        return "";
     }
 
     public static String deleteAlert (Request request, Response response) {
@@ -137,12 +139,13 @@ public class Alerts {
             return "";
         }
 
-        alerts.deleteOne(find(eq("alert_id", alert_id)));
+        alerts.deleteOne(eq("alert_id", alert_id));
         response.status(HttpsURLConnection.HTTP_NO_CONTENT);
         return "";
     }
 
     public static String patchAlert (Request request, Response response) {
         response.type("application/json");
+        return "";
     }
 }
