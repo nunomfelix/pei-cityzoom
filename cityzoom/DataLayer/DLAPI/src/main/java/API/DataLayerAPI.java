@@ -2,11 +2,15 @@ package API;
 
 import API.Aux.MongoAux;
 import API.Middleware.Validation;
+import API.Routes.Devices;
 import API.Routes.Streams;
 import API.Routes.Values;
+import API.Routes.Alerts;
 import API.Sinks.BackendSink;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spark.Request;
 import spark.Response;
 
@@ -17,6 +21,9 @@ public class DataLayerAPI {
     public static Validation validator = new Validation();
     public static MongoCollection<Document> streams = MongoAux.getCollection("streams");
     public static MongoCollection<Document> values = MongoAux.getCollection("values");
+    public static MongoCollection<Document> devices = MongoAux.getCollection("devices");
+    public static MongoCollection<Document> alerts = MongoAux.getCollection("alerts");
+    public static Logger logger = LoggerFactory.getLogger(DataLayerAPI.class);
 
     public static void main(String[] args) {
 
@@ -39,14 +46,25 @@ public class DataLayerAPI {
 
             // alerts routes and paths
             path("/alert", () -> {
-                get("/:id", (Request req, Response res) -> {return 0;});
-                patch("/:id", (Request req, Response res) -> {return 0;});
-                put("/:id", (Request req, Response res) -> {return 0;});
-                delete("/:id", (Request req, Response res) -> {return 0;});
+                get("/:alert_id", Alerts::getAlert);
+                patch("/:id", Alerts::patchAlert);
+                put("/:id", Alerts::putAlert);
+                delete("/:id", Alerts::deleteAlert);
             });
             get("/alerts", (Request req, Response res) -> { return "o"; });
             post("/alerts", (Request req, Response res) -> { return "o"; });
             put("/alerts", (Request req, Response res) -> { return "o"; });
+
+            // devices routes and paths
+            post("/devices", Devices::createDevice);
+            get("/devices", Devices::listDevices);
+            path("/device", () -> {
+                delete(":/device_id", Devices::deleteDevice);
+                get("/:device_id", Devices::detailDevice);
+            });
+            get("/alerts/list", Alerts::listAlerts);
+            post("/alerts", Alerts::postAlert);
+            put("/alerts", Alerts::putAlert);
         });
     }
 }
