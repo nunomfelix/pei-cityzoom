@@ -18,12 +18,12 @@ async function get_darksky_data(lat, long) {
     return [tmp, location]
 }
 
-async function create_darksky_temperature_stream() {
+async function create_temperature_stream() {
     axios.post('http://localhost:8001/czb/stream', {
-        'name': 'darksky_temperature_stream',
+        'stream': 'stream_TemperatureOut',
         'description': 'darksky_stream',
-        'mobile': false,
-        'type': 'darksky_post',
+        'device_id' : 'darksky',
+        'type': 'temperatureOut',
         'ttl': 120000,
         'periodicity': 1200
     }).catch(() => { console.log('Failed to post to localhost:8001') })
@@ -31,9 +31,8 @@ async function create_darksky_temperature_stream() {
 
 async function create_darksky_pressure_stream() {
     axios.post('http://localhost:8001/czb/stream', {
-        'name': 'darksky_pressure_stream',
+        'stream': 'stream_Pressure',
         'description': 'darksky_stream',
-        'mobile': false,
         'type': 'darksky_post',
         'ttl': 120000,
         'periodicity': 1200

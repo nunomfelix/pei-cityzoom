@@ -44,12 +44,12 @@ sensors = {
 }
 
 nodes = {
-    "1"  : {"lat" : "40.638423", "long" : "-8.643296"},
-    "2"  : {"lat" : "40.629010", "long" : "-8.655393"},
-    "99" : {"lat" : "40.634590", "long" : "-8.659564"},
-    "239": {"lat" : "40.634562", "long" : "-8.659555"},
-    "213": {"lat" : "40.634252", "long" : "-8.659870"},
-    "201": {"lat" : "40.633119", "long" : "-8.659400"}
+    "1"  : {"lat" : 40.638423, "long" : -8.643296},
+    "2"  : {"lat" : 40.629010, "long" : -8.655393},
+    "99" : {"lat" : 40.634590, "long" : -8.659564},
+    "239": {"lat" : 40.634562, "long" : -8.659555},
+    "213": {"lat" : 40.634252, "long" : -8.659870},
+    "201": {"lat" : 40.633119, "long" : -8.659400}
 }
 
 var url = "http://mobiwise.vm.nap.av.it.pt:15082/mobiwise-websocket"
@@ -66,10 +66,12 @@ stompClient.connect('', () => {
                 var sensor_name = sensors[data.sensors[i].sensor_id]
                 if(!existing_streams[data.sensors[i].sensor_id]){
                     existing_streams[data.sensors[i].sensor_id] = true
-                    create_Stream('stream_'+sensor_name)
+                    create_Stream(sensor_name, data.source.id)
+                    console.log("Created stream stream_" + sensor_name)
                 }
                 var location = {"lat":nodes[data.source.id].lat, "long":nodes[data.source.id].long}
-                put_Stream('stream_'+sensor_name, data.sensors[i]['value'],location)
+                put_Stream(sensor_name, data.sensors[i]['value'],location)
+                console.log("Sent data to stream strea_" + sensor_name)
             }
         }
         else console.log("Error receiving the message")
@@ -78,23 +80,23 @@ stompClient.connect('', () => {
     console.log(err)
 })
 
-async function create_Stream(streamName) {
-    axios.post('193.136.93.14:8001/czb/stream', {
-        'name': streamName,
-        'description': streamName,
-        'mobile': false,
-        'type': 'temepratureIn_post',
-        'ttl': 120000,
-        'periodicity': 1200
-    }).catch( ()=> {console.log('Failed to post to 193.136.93.14:8001')})
+async function create_Stream(streamName, deviceID) {
+    axios.post('http://193.136.93.14:8001/czb/stream', {
+            "stream" : "stream_" + streamName,
+            "description" : streamName + "",
+            "device_id" : deviceID + "",
+            "type" : streamName + "",
+            "ttl" : 120000,
+            "periodicity" : 1200
+        }).catch( (err)=> {console.log("Failed creation with message: " + err)})
 } 
 
 async function put_Stream(streamName, data, location) {
-    axios.post('193.136.93.14:8001/czb/values', {
-        'stream_name': streamName,
-        'values': data + '',
-        'latitude' : location.lat + '',
-        'longitude' : location.long + ''
-    }).catch((e) => { console.log('Failed to publish') })
+    axios.post('http://193.136.93.14:8001/czb/values', {
+        "stream_name": "stream_" + streamName,
+        "value": data + "",
+        "latitude" : location.lat,
+        "longitude" : location.long
+    }).catch((err) => { console.log('Failed to publish with message: ' + err) })
 }
 
