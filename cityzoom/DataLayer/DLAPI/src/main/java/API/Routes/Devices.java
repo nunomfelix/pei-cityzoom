@@ -21,10 +21,12 @@ public class Devices {
 
     // Status - Passing
     public static String createDevice(Request request, Response response) throws JSONException {
+        logger.info("Creating Device Request");
         response.type("application/json");
         JsonObject body = (JsonObject) MongoAux.jsonParser.parse(request.body());
         String valid = validator.validateCreateDevice(body);
         if (!valid.equals("")) {
+            logger.error("Error Creating Device");
             response.status(HttpsURLConnection.HTTP_BAD_REQUEST);
             return valid;
         }
@@ -60,6 +62,7 @@ public class Devices {
                         "}";
         String topic = "Devices";
         producer.produce(topic, "chave_minima", produceRequest);
+        logger.info("Device sent to kafka");
         return "{\n" +
                 "\t\"status\":\"Creation successful\",\n" +
                 "\t\"device_name\":\""+device_name+"\",\n" +
@@ -71,6 +74,7 @@ public class Devices {
 
     // Status - Passing
     public static String deleteDevice(Request request, Response response) {
+        logger.info("Deleting device");
         response.type("application/json");
         String to_del = request.params(":device_id");
         if (devices.find(eq("_id", new ObjectId(to_del))).first() == null) {
@@ -92,6 +96,7 @@ public class Devices {
 
     // Status - Passing
     public static String listDevices(Request request, Response response) {
+        logger.info("Listing all devices");
         response.type("application/json");
         long start = request.queryParams("interval_start") != null ?
                 Long.parseLong(request.queryParams("interval_start")) : 0;
@@ -100,6 +105,7 @@ public class Devices {
         long compass = date.getTime();
 
         if (end < start || end > compass || start < 0) {
+            logger.error("Bad time interval");
             response.status(HttpsURLConnection.HTTP_NOT_ACCEPTABLE);
             return "{\n" +
                     "\t\"Error\": \"Interval not acceptable\"\n" +
@@ -154,10 +160,12 @@ public class Devices {
 
     // Status - Passing
     public static String detailDevice(Request request, Response response) {
+        logger.info("Detailing a device");
         response.type("application/json");
         String device = request.params(":device_id");
         Document document = devices.find(eq("_id",new ObjectId(device))).first();
         if (document == null) {
+            logger.error("Device not found");
             response.status(HttpsURLConnection.HTTP_NOT_FOUND);
             return "{\n" +
                     "\t\"status\": \"Error\",\n" +

@@ -9,6 +9,8 @@ import API.Routes.Alerts;
 import API.Sinks.BackendSink;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spark.Request;
 import spark.Response;
 
@@ -21,6 +23,7 @@ public class DataLayerAPI {
     public static MongoCollection<Document> values = MongoAux.getCollection("values");
     public static MongoCollection<Document> devices = MongoAux.getCollection("devices");
     public static MongoCollection<Document> alerts = MongoAux.getCollection("alerts");
+    public static Logger logger = LoggerFactory.getLogger(DataLayerAPI.class);
 
     public static void main(String[] args) {
 

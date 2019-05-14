@@ -13,11 +13,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static API.DataLayerAPI.*;
 import static com.mongodb.client.model.Filters.*;
-import static API.DataLayerAPI.producer;
-import static API.DataLayerAPI.streams;
-import static API.DataLayerAPI.validator;
-import static API.DataLayerAPI.values;
 
 public class Values {
 
@@ -25,6 +22,7 @@ public class Values {
 
     // Status - Passing
     public static String getValues(Request request, Response response) {
+        logger.info("Getting all values from a stream");
         response.type("application/json");
         if (request.queryParams("stream") == null) {
             response.status(HttpsURLConnection.HTTP_NOT_ACCEPTABLE);
@@ -32,6 +30,7 @@ public class Values {
                     "\t\"Error\": \"No stream specified\"\n" +
                     "}";
         } else if (streams.find(eq("stream", request.queryParams("stream"))).first() == null) {
+            logger.error("Stream not found");
             response.status(HttpsURLConnection.HTTP_NOT_FOUND);
             return "{\n" +
                     "\t\"Error\": \"Stream "+ request.queryParams("stream")+" not found\"\n" +
@@ -44,6 +43,7 @@ public class Values {
         long compass = date.getTime();
 
         if (end < start || end > compass || start < 0) {
+            logger.error("Bad interval");
             response.status(HttpsURLConnection.HTTP_NOT_ACCEPTABLE);
             return "{\n" +
                     "\t\"Error\": \"Interval not acceptable\"\n" +
@@ -87,6 +87,7 @@ public class Values {
 
     // Status - Passing
     public static String postValue(Request request, Response response) throws JSONException {
+        logger.info("Posting values");
         response.type("application/json");
         JsonObject body = (JsonObject) MongoAux.jsonParser.parse(request.body());
         String valid = validator.validatePushValues(body);

@@ -5,15 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b57dff56-8f59-4293-99f2-0feaed5598cc" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Alerts.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../gateway_layer/src/sensor.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DLAPI/src/main/java/API/DataLayerAPI.java" beforeDir="false" afterPath="$PROJECT_DIR$/DLAPI/src/main/java/API/DataLayerAPI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Devices.java" beforeDir="false" afterPath="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Devices.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Streams.java" beforeDir="false" afterPath="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Streams.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../gateway_layer/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/../gateway_layer/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../gateway_layer/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../gateway_layer/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../gateway_layer/src/darksky.js" beforeDir="false" afterPath="$PROJECT_DIR$/../gateway_layer/src/darksky.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../gateway_layer/src/ipma.js" beforeDir="false" afterPath="$PROJECT_DIR$/../gateway_layer/src/ipma.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Values.java" beforeDir="false" afterPath="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Values.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -43,11 +38,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/DataLayerAPI.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="155">
-              <caret line="28" lean-forward="true" selection-start-line="28" selection-end-line="28" />
+            <state relative-caret-position="267">
+              <caret line="25" column="78" selection-start-line="25" selection-start-column="78" selection-end-line="25" selection-end-column="78" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -70,8 +65,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Streams.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="320">
-              <caret line="20" column="117" selection-start-line="20" selection-start-column="117" selection-end-line="20" selection-end-column="117" />
+            <state relative-caret-position="16">
+              <caret line="25" column="18" selection-start-line="25" selection-start-column="18" selection-end-line="25" selection-end-column="18" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -82,8 +77,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Devices.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="208">
-              <caret line="26" column="31" selection-start-line="26" selection-start-column="31" selection-end-line="26" selection-end-column="31" />
+            <state relative-caret-position="432">
+              <caret line="167" column="41" selection-start-line="167" selection-start-column="41" selection-end-line="167" selection-end-column="41" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -100,13 +95,12 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/DevicesSinks/src/main/java/Sink/DevSink.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1664">
-              <caret line="125" column="29" selection-start-line="125" selection-start-column="29" selection-end-line="125" selection-end-column="29" />
+            <state relative-caret-position="560">
+              <caret line="96" column="90" selection-start-line="96" selection-start-column="90" selection-end-line="96" selection-end-column="90" />
               <folding>
-                <element signature="imports" expanded="true" />
                 <element signature="e#7154#7155#0" expanded="true" />
                 <element signature="e#7201#7202#0" expanded="true" />
               </folding>
@@ -138,8 +132,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Values.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1264">
-              <caret line="96" column="41" selection-start-line="96" selection-start-column="41" selection-end-line="96" selection-end-column="41" />
+            <state relative-caret-position="1344">
+              <caret line="89" column="34" selection-start-line="89" selection-start-column="34" selection-end-line="89" selection-end-column="34" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -201,7 +195,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Middleware/Validation.java" />
         <option value="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/DataLayerAPI.java" />
         <option value="$PROJECT_DIR$/DataLayerInterface-WebApp/src/main/java/DLInterface/Routes/Values.java" />
         <option value="$PROJECT_DIR$/DataLayerCore-Broker/StreamSinker/src/main/java/StreamSink.java" />
@@ -246,12 +239,13 @@
         <option value="$PROJECT_DIR$/DevicesSinks/src/main/java/Aux/MongoAux.java" />
         <option value="$PROJECT_DIR$/DevicesSinks/pom.xml" />
         <option value="$PROJECT_DIR$/DLAPI/src/main/java/API/Middleware/Validation.java" />
-        <option value="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Devices.java" />
         <option value="$PROJECT_DIR$/DevicesSinks/src/main/java/Sink/DevSink.java" />
         <option value="$PROJECT_DIR$/ValuesSinks/src/main/java/Aux/GeoJS.java" />
-        <option value="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Streams.java" />
-        <option value="$PROJECT_DIR$/DLAPI/src/main/java/API/DataLayerAPI.java" />
         <option value="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Alerts.java" />
+        <option value="$PROJECT_DIR$/DLAPI/src/main/java/API/DataLayerAPI.java" />
+        <option value="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Streams.java" />
+        <option value="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Devices.java" />
+        <option value="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Values.java" />
       </list>
     </option>
   </component>
@@ -302,47 +296,37 @@
             <path>
               <item name="DataLayer" type="b2602c69:ProjectViewProjectNode" />
               <item name="DataLayer" type="462c0819:PsiDirectoryNode" />
-              <item name="DLAPI" type="462c0819:PsiDirectoryNode" />
+              <item name="DevicesSinks" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="DataLayer" type="b2602c69:ProjectViewProjectNode" />
               <item name="DataLayer" type="462c0819:PsiDirectoryNode" />
-              <item name="DLAPI" type="462c0819:PsiDirectoryNode" />
+              <item name="DevicesSinks" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="DataLayer" type="b2602c69:ProjectViewProjectNode" />
               <item name="DataLayer" type="462c0819:PsiDirectoryNode" />
-              <item name="DLAPI" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="DataLayer" type="b2602c69:ProjectViewProjectNode" />
-              <item name="DataLayer" type="462c0819:PsiDirectoryNode" />
-              <item name="DLAPI" type="462c0819:PsiDirectoryNode" />
+              <item name="DevicesSinks" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="DataLayer" type="b2602c69:ProjectViewProjectNode" />
               <item name="DataLayer" type="462c0819:PsiDirectoryNode" />
-              <item name="DLAPI" type="462c0819:PsiDirectoryNode" />
+              <item name="DevicesSinks" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
               <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="API" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="DataLayer" type="b2602c69:ProjectViewProjectNode" />
               <item name="DataLayer" type="462c0819:PsiDirectoryNode" />
-              <item name="DLAPI" type="462c0819:PsiDirectoryNode" />
+              <item name="DevicesSinks" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
               <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="API" type="462c0819:PsiDirectoryNode" />
-              <item name="Routes" type="462c0819:PsiDirectoryNode" />
+              <item name="Sink" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="DataLayer" type="b2602c69:ProjectViewProjectNode" />
@@ -418,6 +402,71 @@
     </option>
   </component>
   <component name="RunManager" selected="Application.GeoJS">
+    <configuration name="DataLayerAPI (2)" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="API.DataLayerAPI" />
+      <module name="DLAPI" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="API.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="DevSink" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Sink.DevSink" />
+      <module name="DevicesSinks" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="Sink.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GeoJS" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Aux.GeoJS" />
+      <module name="ValuesSinks" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="Aux.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="StreamSinker" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Sinks.StreamSinker" />
+      <module name="Sinks" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="Sinks.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ValuesSinker" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Sink.ValuesSinker" />
+      <module name="ValuesSinks" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="Sink.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Application.GeoJS" />
@@ -443,8 +492,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-2" y="-3" width="1924" height="1056" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.30843115" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.30843115" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -454,7 +504,7 @@
       <window_info id="Favorites" order="7" side_tool="true" weight="0.32977587" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32925585" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32686085" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32686085" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -469,7 +519,7 @@
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Palette" order="3" />
-      <window_info anchor="right" id="Maven" order="4" visible="true" weight="0.32977587" />
+      <window_info anchor="right" id="Maven" order="4" weight="0.32977587" />
       <window_info anchor="right" id="Theme Preview" order="5" />
       <window_info anchor="right" id="Capture Analysis" order="6" />
       <window_info anchor="right" id="Palette&#9;" order="7" />
@@ -672,38 +722,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Streams.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="320">
-          <caret line="20" column="117" selection-start-line="20" selection-start-column="117" selection-end-line="20" selection-end-column="117" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Devices.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="208">
-          <caret line="26" column="31" selection-start-line="26" selection-start-column="31" selection-end-line="26" selection-end-column="31" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/DevicesSinks/src/main/java/Sink/DevSink.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1664">
-          <caret line="125" column="29" selection-start-line="125" selection-start-column="29" selection-end-line="125" selection-end-column="29" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#7154#7155#0" expanded="true" />
-            <element signature="e#7201#7202#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Sinks/src/main/java/Sinks/StreamSinker.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="80">
@@ -718,16 +736,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="32">
           <caret line="2" column="28" selection-start-line="2" selection-start-column="28" selection-end-line="2" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Values.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1264">
-          <caret line="96" column="41" selection-start-line="96" selection-start-column="41" selection-end-line="96" selection-end-column="41" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -760,10 +768,51 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/DataLayerAPI.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="155">
-          <caret line="28" lean-forward="true" selection-start-line="28" selection-end-line="28" />
+        <state relative-caret-position="267">
+          <caret line="25" column="78" selection-start-line="25" selection-start-column="78" selection-end-line="25" selection-end-column="78" />
           <folding>
             <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Streams.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="16">
+          <caret line="25" column="18" selection-start-line="25" selection-start-column="18" selection-end-line="25" selection-end-column="18" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Devices.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="432">
+          <caret line="167" column="41" selection-start-line="167" selection-start-column="41" selection-end-line="167" selection-end-column="41" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Values.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1344">
+          <caret line="89" column="34" selection-start-line="89" selection-start-column="34" selection-end-line="89" selection-end-column="34" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DevicesSinks/src/main/java/Sink/DevSink.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="560">
+          <caret line="96" column="90" selection-start-line="96" selection-start-column="90" selection-end-line="96" selection-end-column="90" />
+          <folding>
+            <element signature="e#7154#7155#0" expanded="true" />
+            <element signature="e#7201#7202#0" expanded="true" />
           </folding>
         </state>
       </provider>
