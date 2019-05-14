@@ -8,12 +8,12 @@
         <outputRelativeToContentRoot value="true" />
         <module name="AlertsStreaming" />
         <module name="Sinks" />
-        <module name="ValuesSinks" />
         <module name="DLAPI" />
         <module name="KafkaStartUp" />
         <module name="DevicesSinks" />
-        <module name="DataLayerCoreBroker" />
         <module name="DataLayerInterfaceWebApp" />
+        <module name="DataLayerCoreBroker" />
+        <module name="ValuesSinks" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

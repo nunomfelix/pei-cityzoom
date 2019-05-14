@@ -17,15 +17,18 @@ import static com.mongodb.client.model.Filters.*;
 
 
 public class Streams {
-    private static List<String> types = Arrays.asList("temperature", "oxygen");
+    private static List<String> types = Arrays.asList("TemperatureOut", "CO", "CH4", "NH3", "Pressure", "Humidity", "Altitude", "TemperatureIn",
+            "UvIndex", "CO2", "Sound", "WindSpeed", "WindDirection", "Lux", "Precipitation", "Coordinates", "Velocity");
     private static Date date = new Date();
 
     // Status - Passing
     public static String createStream(Request request, Response response) throws JSONException {
+        logger.info("Creating Stream Request");
         response.type("application/json");
         JsonObject body = (JsonObject) MongoAux.jsonParser.parse(request.body());
         String valid = validator.validateCreate(body);
         if (!valid.equals("")) {
+            logger.error("Stream request failed because request");
             response.status(HttpsURLConnection.HTTP_BAD_REQUEST);
             return valid;
         }
@@ -33,6 +36,7 @@ public class Streams {
         String stream = body.get("stream").getAsString();
         String type = body.get("type").getAsString();
         if (!types.contains(type)){
+            logger.error("Stream request failed because type is wrong: " + body.get("type").getAsString());
             response.status(HttpsURLConnection.HTTP_CONFLICT);
             return "{\n" +
                     "\t\"status\": \"Error @ type\",\n" +
@@ -65,6 +69,7 @@ public class Streams {
                         "}";
         String topic = "Streams";
         producer.produce(topic, "chave_minima", produceRequest);
+        logger.info("Stream sent to kafka");
         return "{\n" +
                 "\t\"status\":\"Creation successful\",\n" +
                 "\t\"stream_name\":\""+stream+"\",\n" +
@@ -77,6 +82,7 @@ public class Streams {
     // Status - Passing
     public static String deleteStream(Request request, Response response) {
         response.type("application/json");
+        logger.info("Deleting stream");
         String to_del = request.params(":stream");
         if (streams.find(eq("stream", to_del)).first() == null) {
             response.status(HttpsURLConnection.HTTP_NOT_FOUND);
@@ -94,6 +100,7 @@ public class Streams {
     // Status - Passing
     public static String listStreams(Request request, Response response) {
         response.type("application/json");
+        logger.info("Listing All streams");
         long start = request.queryParams("interval_start") != null ?
                 Long.parseLong(request.queryParams("interval_start")) : 0;
         long end = request.queryParams("interval_end") != null?
@@ -102,6 +109,7 @@ public class Streams {
 
         if (end < start || end > compass || start < 0) {
             response.status(HttpsURLConnection.HTTP_NOT_ACCEPTABLE);
+            logger.error("Bad Interval");
             return "{\n" +
                     "\t\"Error\": \"Interval not acceptable\"\n" +
                     "}";
@@ -148,11 +156,13 @@ public class Streams {
 
     // Status - Passing
     public static String detailStream(Request request, Response response) {
+        logger.info("Detailing Stream");
         response.type("application/json");
         String stream = request.params(":stream");
         Document document = streams.find(eq("_id",new ObjectId(stream))).first();
         if (document == null) {
             response.status(HttpsURLConnection.HTTP_NOT_FOUND);
+            logger.error("Stream not found");
             return "{\n" +
                     "\t\"status\": \"Error\",\n" +
                     "\t\"Error\": \"Stream " + stream + " not found.\"\n" +
