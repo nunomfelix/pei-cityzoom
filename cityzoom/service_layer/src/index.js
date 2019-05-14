@@ -74,12 +74,9 @@ app.use(express.json())
 app.use('/user', accountRouter)
 app.use('/alert', alertRouter)
 app.use('/stream', streamRouter)
-<<<<<<< HEAD
 app.use('/device', deviceRouter)
-
-=======
 app.use('/vertical',verticalRouter)
->>>>>>> master
+
 //Error middleware, para excessoes causadas em funcoes assincronas do express
 app.use(error)
 
