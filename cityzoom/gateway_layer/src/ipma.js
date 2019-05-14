@@ -51,7 +51,7 @@ async function get_ipma_data(city){
 }
 
 async function create_ipma_stream(){
-    axios.post('193.136.93.14:8001/cbz/stream', {
+    axios.post('193.136.93.14:8001/czb/stream', {
         'name': 'ipma_stream',
         'description': 'ipma_stream',
         'mobile': false,
@@ -62,7 +62,7 @@ async function create_ipma_stream(){
 }
 
 async function put_ipma_data(data, location){
-    axios.put('193.136.93.14:8001/cbz/stream', {
+    axios.put('193.136.93.14:8001/czb/stream', {
         'stream_name': 'ipma_stream',
         'value': data,
         'location': {
