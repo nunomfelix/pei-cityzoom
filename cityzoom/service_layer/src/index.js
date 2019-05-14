@@ -5,6 +5,9 @@ const helmet = require('helmet')
 const morgan = require('morgan')
 const { error } = require('./middleware')
 const fs = require('fs')
+const axios = require('axios')
+
+const User = require('./db/models/user')
 
 uncaughtDebug = require('debug')('app:Uncaught')
 
@@ -14,6 +17,7 @@ require('./db/mongoose')
 const accountRouter = require('./routes/user')
 const alertRouter = require('./routes/alert')
 const streamRouter = require('./routes/stream')
+const verticalRouter = require('./routes/vertical')
 const expressDebug = require('debug')('app:express')
 
 //Uses the express framework
@@ -45,6 +49,21 @@ app.use((req, res, next) => {
     return next();
 });
 
+app.get('/reset', async (req, res) => {
+    await User.deleteMany({})
+    const user = await axios({
+        method: 'post',  
+        url: 'http://localhost:8002/user',
+        data: {
+            name: 'teste',
+            username: 'teste',
+            email: 'teste@gmail.com',
+            password: 'teste'
+        }
+    })
+    res.send(user.data)
+})
+
 app.use(morgan('dev'))
 app.use(helmet())
 app.use(express.json())
@@ -53,7 +72,7 @@ app.use(express.json())
 app.use('/user', accountRouter)
 app.use('/alert', alertRouter)
 app.use('/stream', streamRouter)
-
+app.use('/vertical',verticalRouter)
 //Error middleware, para excessoes causadas em funcoes assincronas do express
 app.use(error)
 

@@ -4,7 +4,7 @@ import middleware from '../.nuxt/middleware';
     <div v-if="$store.state.jwt != ''" style="background-color: darkgray">
       <Navbar/>
       <Header/>
-      <div class="mainMargin">
+      <div>
         <nuxt/>
       </div>
     </div>
@@ -20,11 +20,6 @@ export default {
 </script>
 
 <style>
-.mainMargin {
-  margin-top: 120px;
-  margin-left: 140px;
-  margin-right: 40px;
-}
 
 .horizontalMargin {
   margin-left: 140px;

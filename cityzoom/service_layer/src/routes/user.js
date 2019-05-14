@@ -25,14 +25,12 @@ router.post('/login',
     async (req, res) => {
         const user = await User.findOne({ username: req.body.username })
         if (!user) return res.status(400).send('Invalid Credentials')
-        userDebug(req.body.password)
-        userDebug(user.password)
         const isMatch = await bcrypt.compare(req.body.password, user.password)
         if (!isMatch) return res.status(400).send('Invalid Credentials')
 
-        const token = await user.generateAuthToken()
+        const jwt = await user.generateAuthToken()
         userDebug(`User ${user.name} logged in successfully `)
-        return res.send({ token })
+        return res.send({...user._doc, jwt})
     }
 )
 
@@ -49,8 +47,6 @@ router.get('/logout',
     authentication,
     async (req, res) => {
         const user = await User.findById(req.user._id)
-        user.token = '' //Deletes the session token
-        await user.save()
         userDebug(`User ${user.name} logged out successfully `)
         return res.send(user)
     }
