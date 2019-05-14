@@ -30,7 +30,7 @@ router.post('/login',
 
         const jwt = await user.generateAuthToken()
         userDebug(`User ${user.name} logged in successfully `)
-        return res.send({...user._doc, jwt})
+        return res.send({ ...user._doc, jwt })
     }
 )
 
@@ -85,8 +85,16 @@ router.get('/me',
 router.post('',
     [validationMiddleware(validateCreateUser, 'body')],
     async (req, res) => {
-        const user = new User(req.body)
-        await user.save()
+        let user;
+        try {
+            user = new User(req.body)
+            await user.save()
+        } catch (e) {
+            const err = e.errors[Object.keys(e.errors)[0]]
+            if (err.kind == "unique") {
+                return res.status(400).send(err.path + " '" + err.value + "' already exists")
+            }
+        }
         userDebug(`User ${user.name} successfully created`)
         res.status(201).send(user)
     }
