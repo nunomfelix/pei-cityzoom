@@ -32,6 +32,7 @@ import random
 '''
 
 #Resources information
+dev_id = "5cdb418d91f3f7795233e85e"
 dev_name = "drone3d"
 vertical = "Temperature"
 stream_name = "Temperature stream real"
