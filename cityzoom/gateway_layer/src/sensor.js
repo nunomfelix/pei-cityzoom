@@ -24,12 +24,12 @@ existing_streams = {
 }
 
 sensors = {
-    "1" : "TemperatureOut",
+    "1" : "temperature",
     "2" : "CO",
     "3" : "CH4",
     "4" : "NH3",
-    "5" : "Pressure",
-    "6" : "Humidity",
+    "5" : "pressure",
+    "6" : "humidity",
     "7" : "Altitude",
     "8" : "TemperatureIn",
     "9" : "UvIndex",
@@ -52,6 +52,7 @@ nodes = {
     "201": {"lat" : 40.633119, "long" : -8.659400}
 }
 
+var first = true
 var url = "http://mobiwise.vm.nap.av.it.pt:15082/mobiwise-websocket"
 var client = new SockJs(url)
 
@@ -62,21 +63,23 @@ stompClient.connect('', () => {
     stompClient.subscribe('/topic/last', async (mes) => {
         if(mes.body){
             var data = JSON.parse(mes.body)
+            var location = {"lat":nodes[data.source.id].lat, "long":nodes[data.source.id].long}
+            if(first){
+                var device_name = create_Device(data.source.id, location)
+                console.log("Created device device_" + sensor_name)
+            }
             for(i in data.sensors){
                 var sensor_name = sensors[data.sensors[i].sensor_id]
-                var location = {"lat":nodes[data.source.id].lat, "long":nodes[data.source.id].long}
-                console.log(location)
-                if(!existing_streams[data.sensors[i].sensor_id]){
-                    existing_streams[data.sensors[i].sensor_id] = true
-                    create_Device(sensor_name, location)
-                    console.log("Created device device_" + sensor_name)
-                    var device_id = await get_Device('device_' + sensor_name)
+                if(first){
+                    //existing_streams[data.sensors[i].sensor_id] = true
+                    var device_id = await get_Device(device_name)
                     create_Stream(sensor_name, device_id)
                     console.log("Created stream stream_" + sensor_name)
                 }
-                put_Stream(sensor_name, data.sensors[i]['value'],location)
+                put_Stream(sensor_name, data.sensors[i].value,location)
                 console.log("Sent data to stream stream_" + sensor_name)
             }
+            first = false
         }
         else console.log("Error receiving the message")
     })   
@@ -84,20 +87,22 @@ stompClient.connect('', () => {
     console.log(err)
 })
 
-async function create_Device(deviceName, location) {
+async function create_Device(deviceName,verticals, location) {
     axios.post('http://193.136.93.14:8001/czb/devices', {
-        "device_name" : "device_" + deviceName,
+        "device_name" : deviceName + "_device",
         "description" : deviceName + "",
-        "vertical": deviceName + "",
+        "vertical": verticals,
         "mobile": true,
         "latitude": location.lat,
-        "longitude": location.long
+        "longitude": location.long,
+        "provider": "Deployed Sensors"
     }).catch( (err) => {console.log("Failed to create device with message: " + err)})
+    return deviceName + "_device"
 }
 
 async function get_Device(deviceName) {
     var data = await axios.get('http://193.136.93.14:8001/czb/devices')
-    var user_devices = JSON.parse(JSON.stringify(data.data.user_devices))
+    var user_devices = data.data.user_devices
     for(i in user_devices){
         if(user_devices[i].device_name == deviceName){
             return user_devices[i].device_id
@@ -108,7 +113,7 @@ async function get_Device(deviceName) {
 
 async function create_Stream(streamName, deviceID) {
     axios.post('http://193.136.93.14:8001/czb/stream', {
-            "stream" : "stream_" + streamName,
+            "stream" : streamName + "_stream",
             "description" : streamName + "",
             "device_id" : deviceID + "",
             "type" : streamName + "",
@@ -119,7 +124,7 @@ async function create_Stream(streamName, deviceID) {
 
 async function put_Stream(streamName, data, location) {
     axios.post('http://193.136.93.14:8001/czb/values', {
-        "stream_name": "stream_" + streamName,
+        "stream_name": streamName + "_stream",
         "value": data + "",
         "latitude" : location.lat,
         "longitude" : location.long
