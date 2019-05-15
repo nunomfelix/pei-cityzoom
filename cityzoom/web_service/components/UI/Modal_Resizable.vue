@@ -8,12 +8,14 @@
             <slot name="header">
               Device Information
             </slot>
+
+              
           </div>
 
           <div class="modal-body">
             <slot name="body">
             <div v-if="item.type=='lines'">
-                <LineGraph :ref="item.i" :name="item.i"/>
+                <LineGraph :ref="item.i" :name="item.i" :values="values"/>
             </div>
             </slot>
           </div>
@@ -34,7 +36,8 @@
 <script>
 var item = { x: 0, y: 0, w: 12, h: 14, i: "line_a", type: 'lines', data:'fake' };
 export default {
-    //props: [devices],
+  props:{values: Object}
+  ,
   name: 'Modal_Resizable',
   data(){
       return {

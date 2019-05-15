@@ -3,7 +3,7 @@
 		<div class="dc_wrapper rowc" :class="{'show': show}">
 			<div v-bind:id="name"></div>
 			<div v-bind:id="name + 'overview'"></div>
-			<button class="btn btn-danger" style="margin-right:30px">reset</button>
+			<!--<button class="btn btn-danger" style="margin-right:30px">reset</button>-->
 		</div>
 		<div v-if="!show" style="height: 666px" class="rowc">
 			<div class="lds-roller-relative mb-4">
@@ -26,7 +26,8 @@
 import * as crossfilter from "crossfilter2";
 export default {
 	props: {
-		name: String
+		name: String,
+		values: Object
 	},
 	data(){
 		return {
@@ -44,13 +45,17 @@ export default {
 	mounted(){
 	this.dc = require('dc');
 	this.d3 = require('d3');
+	console.log(this.values)
+	
 	setTimeout(() => {
-		for (var i = 0; i <= 10; i++) {
-			const x = Math.random() * 100
+		//const times = []
+		var i = 0
+		for (i = 0; i <= 10; i++) {
 			const val = {
-			"key": i,
-			"value": x
-		}
+				"key": i,
+				"value": this.values.values[i]['value']
+			}
+			//times.push(this.values.values[i])
 		this.data.push(val)
 	  }
 
@@ -62,9 +67,9 @@ export default {
 	  this.chart
 		.height(599)
 		.x(this.d3.scaleLinear().domain([0, 10]))
-		.y(this.d3.scaleLinear().domain([0, group.top(1)[0].value * 1.1]))
+		.y(this.d3.scaleLinear().domain([0, group.top(1)[0].value * 1.3]))
 		.ordinalColors([this.getRandomColor()])
-		.yAxisLabel('kWh')
+		.yAxisLabel('temperature (ºC)')
 		.renderArea(true)
 		.brushOn(false)
 		.renderDataPoints(true)

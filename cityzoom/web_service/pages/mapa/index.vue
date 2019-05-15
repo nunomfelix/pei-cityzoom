@@ -37,7 +37,7 @@
             </div>
         </div>
         <Loading :show="!loaded" type="absolute"/> 
-        <ModalResizable v-if="showModal" @close="showModal = false"/>
+        <ModalResizable v-if="showModal" @close="showModal = false" :values="values"/>
     </div>
 </template>
 
@@ -48,6 +48,7 @@ const drone_stream = require('static/get_stream_values_response.json');
 export default {
     data() {
         return {
+            values: drone_stream,
             req: {
                 Ol: null,
                 etent: null,
@@ -64,7 +65,7 @@ export default {
             devicesStyle: {
                 templates: {
                     default: {
-                        scale: 1,
+                        scale: 0.8,
                     },
                     hover: {
                         scale: 1.2,
@@ -118,7 +119,7 @@ export default {
                 anchor: [0.5, 0.5],
                 anchorXUnits: 'fraction',
                 anchorYUnits: 'fraction',
-                scale: .75,
+                scale: 1,
                 opacity: 0.75,
                 src: 'icons/AirQuality_map.png'
             }))
@@ -128,9 +129,9 @@ export default {
                 anchor: [0.5, 0.5],
                 anchorXUnits: 'fraction',
                 anchorYUnits: 'fraction',
-                scale: .75,
+                scale: 1,
                 opacity: 0.75,
-                src: 'icons/Temperature_map.png'
+                src: 'icons/AirQuality_map.png'
             }))
         })]
 
@@ -211,7 +212,6 @@ export default {
         this.devices_layer = new layer.Vector({
             source: vectorSource,
             style: (feature) => {
-                console.log(this.devicesStyle)
                 return this.devicesStyle.styles[this.getVerticals[this.selected_vertical].name].default
             },
             renderBuffer: window.innerWidth,
@@ -317,9 +317,7 @@ export default {
                 }
             } else if(this.hovered_geo) {
                 this.clearGeoDevices(this.hovered_geo)
-                this.hovered_geo = null
-                document.body.style.cursor = "default"
-                this.hoverOverlay.setPosition(null)
+                this.clearHoverPopup()
             }
         })
 
@@ -384,26 +382,32 @@ export default {
             click_interaction.getFeatures().clear()
         })
 
-
         //this.createFeature(vectorSource, []);
         // var feat = new Feature({
         //     geometry: new this.req.geom.Point(this.req.proj.transform([drone_stream.values[0].longitude, drone_stream.values[0].latitude], 'EPSG:4326',     
         //     'EPSG:3857'))
         //     //id: device.id
         // })
-        // this.devices_layer.getSource().addFeature(feat)
+        // vectorSource.addFeature(feat)
         // var i = 1;
         // setInterval(() => {
+        //     vectorSource.removeFeature(feat);
         //     feat = new Feature({
         //         geometry: new this.req.geom.Point(this.req.proj.transform([drone_stream.values[i].longitude, drone_stream.values[i].latitude], 'EPSG:4326',     
         //         'EPSG:3857'))
         //         //id: device.id
         //     })
-        //     this.devices_layer.getSource().addFeature(feat)
+        //     vectorSource.addFeature(feat)
         //     i++
-        // },1000)
+        // },150)
+
     },
     methods: {
+        clearHoverPopup() {
+            this.hovered_geo = null
+            document.body.style.cursor = "default"
+            this.hoverOverlay.setPosition(null)
+        },
         clearGeoDevices(geo) {
             for(var feature in this.shown_features) {
                 if(this.getDevices.find(d => d.device_id == this.shown_features[feature].get('id')).municipality == geo.get('name_2')) {
