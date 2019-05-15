@@ -6,10 +6,7 @@ const morgan = require('morgan')
 const { error } = require('./middleware')
 const fs = require('fs')
 const axios = require('axios')
-
 const User = require('./db/models/user')
-const Device = require('./db/models/device')
-
 uncaughtDebug = require('debug')('app:Uncaught')
 
 require('./db/mongoose')

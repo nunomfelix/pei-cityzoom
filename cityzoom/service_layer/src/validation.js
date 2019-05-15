@@ -59,11 +59,14 @@ function validateGetDataFromStream(object) {
 }
 
 function validateCreateDevice(object) {
+   
     const schema = Joi.object().keys({
-        name: Joi.string().required(),
-        owner: Joi.string().required(),
+        device_name: Joi.string().required(),
+//        owner: Joi.string().required(),
         vertical: Joi.string().required(),
-        location: Joi.string().required(),
+        latitude: Joi.number().optional(),
+        longitude: Joi.number().optional(),
+        mobile: Joi.boolean().required(),
         description: Joi.string().optional()
     })
     return Joi.validate(object, schema)
