@@ -52,7 +52,7 @@ async function get_ipma_data(city){
 
 async function create_ipma_stream(){
     axios.post('193.136.93.14:8001/czb/stream', {
-        'name': 'ipma_stream',
+        'stream': 'ipma_stream',
         'description': 'ipma_stream',
         'mobile': false,
         'type': 'ipma_post',

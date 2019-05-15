@@ -1,10 +1,15 @@
 package API.Middleware;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Validation {
@@ -18,13 +23,11 @@ public class Validation {
     public Validation() {
         // required fields for create stream
         this.createStreamRequiredFields.put("stream", String.class);
-        this.createStreamRequiredFields.put("type", String.class);
         this.createStreamRequiredFields.put("device_id", String.class);
 
         // allowed fields for create stream
         this.createStreamAllowedFields.put("stream", String.class);
         this.createStreamAllowedFields.put("device_id", String.class);
-        this.createStreamAllowedFields.put("type", String.class);
         this.createStreamAllowedFields.put("description", String.class);
         this.createStreamAllowedFields.put("ttl", Integer.class);
         this.createStreamAllowedFields.put("periodicity", Integer.class);
@@ -32,25 +35,29 @@ public class Validation {
         // required fields for push values
         this.pushValuesRequiredFields.put("stream_name", String.class);
         this.pushValuesRequiredFields.put("value", String.class);
+        this.pushValuesRequiredFields.put("timestamp", Long.class);
 
         // allowed fields for push values
         this.pushValuesAllowedFields.put("stream_name", String.class);
         this.pushValuesAllowedFields.put("value", String.class);
+        this.pushValuesRequiredFields.put("timestamp", Long.class);
         this.pushValuesAllowedFields.put("latitude", Double.class);
         this.pushValuesAllowedFields.put("longitude", Double.class);
 
         // required fields for createDevice
         this.createDeviceRequiredFields.put("device_name", String.class);
         this.createDeviceRequiredFields.put("mobile", Boolean.class);
-        this.createDeviceRequiredFields.put("vertical", String.class);
+        this.createDeviceRequiredFields.put("vertical", JSONArray.class);
+        this.createDeviceRequiredFields.put("provider", String.class);
 
-        // required fields for createDevice
+        // allowed fields for createDevice
         this.createDeviceAllowedFields.put("device_name", String.class);
         this.createDeviceAllowedFields.put("mobile", Boolean.class);
-        this.createDeviceAllowedFields.put("vertical", String.class);
+        this.createDeviceAllowedFields.put("vertical", JSONArray.class);
         this.createDeviceAllowedFields.put("description", String.class);
         this.createDeviceAllowedFields.put("latitude", Double.class);
         this.createDeviceAllowedFields.put("longitude", Double.class);
+        this.createDeviceAllowedFields.put("provider", String.class);
 
     }
 
@@ -106,7 +113,7 @@ public class Validation {
                     "\t\"Status\": \"Error @ request\"\n" +
                     "\t\"Error\": \"Required fields not found\"\n" +
                     "}";
-        } else if (body.keySet().size() > 4){
+        } else if (body.keySet().size() > 5){
             return "{\n" +
                     "\t\"Status\": \"Error @ request\"\n" +
                     "\t\"Error\": \"Too many fields\"\n" +
@@ -122,29 +129,31 @@ public class Validation {
             Object val = trial.get(key);
             if (!createDeviceAllowedFields.keySet().contains(key)) {
                 return "{\n" +
-                        "\t\"Status\": \"Error @ request\"\n" +
-                        "\t\"Error\": \"Invalid field: \""+key+"\" \"\n" +
+                        "\t\"Status\": \"Error @ request\",\n" +
+                        "\t\"Error\": \"Invalid field: \""+key+"\"\"\n" +
                         "}";
             } else if (!val.getClass().equals(createDeviceAllowedFields.get(key))) {
+                System.out.println(val.getClass());
                 return "{\n" +
-                        "\t\"Status\": \"Error @ request\"\n" +
-                        "\t\"Error\": \"Invalid type in field: \""+key+"\" \"\n" +
+                        "\t\"Status\": \"Error @ request\",\n" +
+                        "\t\"Error\": \"Invalid type in field: "+key+"\",\n" +
+                        "\t\"Err\": \""+body.get("vertical").getAsJsonArray()+"\"\n"+
                         "}";
             }
         }
         if (!body.keySet().containsAll(createDeviceRequiredFields.keySet())) {
             return "{\n" +
-                    "\t\"Status\": \"Error @ request\"\n" +
-                    "\t\"Error\": \"Required fields not found\"\n" +
+                    "\t\"Status\": \"Error @ request\",\n" +
+                    "\t\"Error\": \"Required fields not found\"\n"+
                     "}";
         } else if (!body.get("mobile").getAsBoolean() && (!body.keySet().contains("latitude") || !body.keySet().contains("longitude"))) {
             return "{\n" +
-                    "\t\"Status\": \"Error @ request\"\n" +
+                    "\t\"Status\": \"Error @ request\",\n" +
                     "\t\"Error\": \"No location given for not-mobile device\"\n" +
                     "}";
-        } else if (body.keySet().size() > 6){
+        } else if (body.keySet().size() > 7){
             return "{\n" +
-                    "\t\"Status\": \"Error @ request\"\n" +
+                    "\t\"Status\": \"Error @ request\",\n" +
                     "\t\"Error\": \"Too many fields\"\n" +
                     "}";
         } else {
