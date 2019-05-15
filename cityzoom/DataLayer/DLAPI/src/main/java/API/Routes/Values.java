@@ -90,11 +90,13 @@ public class Values {
         logger.info("Posting values");
         response.type("application/json");
         JsonObject body = (JsonObject) MongoAux.jsonParser.parse(request.body());
+        /*
         String valid = validator.validatePushValues(body);
         if (!valid.equals("")) {
             response.status(HttpsURLConnection.HTTP_BAD_REQUEST);
             return valid;
         }
+        */
         String stream = body.get("stream_name").getAsString();
         Document docStream = streams.find(eq("stream", stream)).first();
         if (docStream == null) {
