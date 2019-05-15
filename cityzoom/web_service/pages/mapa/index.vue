@@ -50,6 +50,8 @@ export default {
             req: {
                 Ol: null,
                 etent: null,
+                geom: null,
+                proj: null,
             },
             map: null,
             loaded: false,
@@ -81,23 +83,30 @@ export default {
             hovered_feature: null,
 
             geoJsonExtent: null,
-            showModal: false
+            showModal: false,
+
+            geo_layer: null,
+            devices_layer: null,
+            selected_devices: []
         }
     },
     computed: {
         getVerticals() {
             return this.$store.state.verticals
+        },
+        getDevices() {
+            return this.$store.state.devices
         }
     },
     mounted() {
         this.req.Ol = require( 'ol');
-        const proj = require('ol/proj')
+        this.req.proj = require('ol/proj')
         const source = require( 'ol/source');
         const layer = require( 'ol/layer');
         this.req.style = require( 'ol/style');
         this.req.extent = require( 'ol/extent');
         const format = require('ol/format')
-        const geom = require( 'ol/geom');
+        this.req.geom = require( 'ol/geom');
         const interaction = require( 'ol/interaction');
         const { Feature } = require( 'ol')
         const { click, pointerMove, altKeyOnly, noModifierKeys, altShiftKeysOnly, platformModifierKeyOnly } = require( 'ol/events/condition.js');
@@ -191,30 +200,22 @@ export default {
                 duration: 250
             }
         });
-        
-        features.push(new Feature({
-            geometry: new geom.Point(proj.transform([-8.661682, 40.6331731], 'EPSG:4326',     
-            'EPSG:3857')),
-            //id: device.id
-            name: 'Null Island'
-        }));
 
         //console.log(features)
     
         var vectorSource = new source.Vector({
-            features: features, //add an array of features
             style: (feature) => {
                 return this.devicesStyle
             }
         });
         
-        var devicesLayer = new layer.Vector({
+        this.devices_layer = new layer.Vector({
                     source: vectorSource,
                     style: iconStyle[Math.floor(Math.random() * iconStyle.length)]
         }) 
 
         const centerpos = [-8.661682, 40.6331731];
-        const center = proj.transform(centerpos, 'EPSG:4326', 'EPSG:3857');
+        const center = this.req.proj.transform(centerpos, 'EPSG:4326', 'EPSG:3857');
         const maxExtent = [-9.5, 37, -6.2, 42.5];
         //const maxExtent = [-180, -90, 180, 90];
         this.map = new this.req.Ol.Map({
@@ -223,7 +224,7 @@ export default {
                 new layer.Tile({
                     source: new source.OSM(),
                 }),
-                devicesLayer,  
+                this.devices_layer,  
                 this.geo_layer,      
             ],
             overlays: [this.hoverOverlay],
@@ -254,7 +255,7 @@ export default {
                     return this.testValues[a].value - this.testValues[b].value
                 })
 
-                devicesLayer.setStyle((feature) => { return iconStyle[Math.floor(Math.random() * iconStyle.length)]})
+                this.devices_layer.setStyle((feature) => { return iconStyle[Math.floor(Math.random() * iconStyle.length)]})
 
                 this.geo_layer.setStyle((feature) => {
                     return feature == this.selected_county ? this.geoStyle.active : this.testValues[feature.get('name_2')].style
@@ -292,9 +293,23 @@ export default {
         hover_interaction.on('select', (e) => {
             if(e.selected.length && e.selected[0] != this.selected_county) {
                 this.hovered_feature = e.selected[0]
-                console.log(this.hovered_feature)
                 document.body.style.cursor = "pointer"
                 this.hoverOverlay.setPosition(this.req.extent.getCenter(this.hovered_feature.getGeometry().getExtent()))
+                console.log("asdfasdf")
+                for(var device of this.getDevices) {
+                    // if(!selected_devices.includes(device.device_id) && device.vertical.includes(this.getVerticals[this.selected_vertical].name)) {
+                    //     var location = device.mobile ? [device.locations[0][device.locations[0].length - 1].latitude, device.locations[0][device.locations[0].length - 1].longitude] :
+                    //                         [device.locations[0][0].latitude, device.locations[0][0].longitude]
+                    //     location = this.req.proj.transform([location[1],location[0]], 'EPSG:4326', 'EPSG:3857')
+                    //     if(this.hovered_feature.getGeometry().intersectsCoordinate(location)) {
+                    //         this.devices_layer.getSource().addFeature(new Feature({
+                    //             geometry: new this.req.geom.Point(location),
+                    //             id: device.device_id,
+                    //         }))
+                    //     }
+                    //     this.selected_devices.push(device.device_id);
+                    // }
+                }
             } else {
                 this.hovered_feature = null
                 document.body.style.cursor = "default"
@@ -306,7 +321,7 @@ export default {
             condition: (e) => {
                 return click(e);
             },
-            layers: [this.geo_layer, devicesLayer],
+            layers: [this.geo_layer, this.devices_layer],
             multi: true
         })
 
@@ -322,21 +337,41 @@ export default {
                     minZoom: 0,
                     maxZoom: 18
                 }))
-                this.map.getView().fit(geo_feature.getGeometry().getExtent(), {
-                    duration: 500,
-                    padding: [120, 140, 0, 0],
-                    callback: () =>  {
-                        this.map.setView(new this.req.Ol.View({
-                            extent: geo_feature.getGeometry().getExtent(),
-                            center: this.map.getView().getCenter(),
-                            zoom: this.map.getView().getZoom(),
-                            minZoom: this.map.getView().getZoom(),
-                            maxZoom: 18
-                        }))
-                    }
-                })   
+
                 this.selected_county = geo_feature 
+                this.devices_layer.getSource().clear()
+
+                for(var device of this.getDevices) {
+                    if(device.vertical.includes(this.getVerticals[this.selected_vertical].name)) {
+                        var location = device.mobile ? [device.locations[0][device.locations[0].length - 1].latitude, device.locations[0][device.locations[0].length - 1].longitude] :
+                                            [device.locations[0][0].latitude, device.locations[0][0].longitude]
+                        location = this.req.proj.transform([location[1],location[0]], 'EPSG:4326', 'EPSG:3857')
+                        if(geo_feature.getGeometry().intersectsCoordinate(location)) {
+                            this.devices_layer.getSource().addFeature(new Feature({
+                                geometry: new this.req.geom.Point(location),
+                                id: device.device_id,
+                            }))
+                        }
+                        this.selected_devices.push(device.device_id);
+                    }
+                }
                 this.hoverOverlay.setPosition(null)
+
+                setTimeout(() => {
+                    this.map.getView().fit(geo_feature.getGeometry().getExtent(), {
+                        duration: 500,
+                        padding: [120, 140, 0, 0],
+                        callback: () =>  {
+                            this.map.setView(new this.req.Ol.View({
+                                extent: geo_feature.getGeometry().getExtent(),
+                                center: this.map.getView().getCenter(),
+                                zoom: this.map.getView().getZoom(),
+                                minZoom: this.map.getView().getZoom(),
+                                maxZoom: 18
+                            }))
+                        }
+                    })   
+                },0)
             } else if(e.selected.length > 1) {
                 const device_feature = e.selected[e.selected.length - 1]
                 this.showModal = true
@@ -348,7 +383,7 @@ export default {
         //     condition: (e) => {
         //         return click(e);
         //     },
-        //     layers: [devicesLayer]
+        //     layers: [this.devices_layer]
         // })
         // this.map.addInteraction(click_device_interaction);
 
@@ -359,10 +394,9 @@ export default {
         //     this.showModal = true
         // })
 
-        this.createFeature(vectorSource, []);
-
+        //this.createFeature(vectorSource, []);
         
-        //console.log(devicesLayer.getSource().getFeatures());
+        //console.log(this.devices_layer.getSource().getFeatures());
 
         //this.createFeature(vectorSource, []);
         // setInterval(()=> {
@@ -370,7 +404,7 @@ export default {
         //         vectorSource.removeFeature(feature)
         //         var coordinates = this.gen_random_coordinates() 
         //         vectorSource.addFeature(new Feature({
-        //             geometry: new geom.Point(proj.transform(coordinates, 'EPSG:4326', 'EPSG:3857')),
+        //             geometry: new this.req.geom.Point(this.req.proj.transform(coordinates, 'EPSG:4326', 'EPSG:3857')),
         //             //id: device.id
         //             name: 'Null Island'
         //         }));
@@ -393,8 +427,6 @@ export default {
         },
         createFeature(source, device){
             const { Feature } = require( 'ol');
-            const geom = require( 'ol/geom');
-            const proj = require('ol/proj');
             var coordinates = { 'Águeda': [ 40.595098500000006, -8.401762 ],
                                 Estarreja: [ 40.760923500000004, -8.587983000000001 ],
                                 Murtosa: [ 40.7613925, -8.663722 ],
@@ -410,7 +442,7 @@ export default {
 
             for (const [key, value] of Object.entries(coordinates)) {        
                 source.addFeature(new Feature({
-                    geometry: new geom.Point(proj.transform([value[1],value[0]], 'EPSG:4326', 'EPSG:3857')),
+                    geometry: new this.req.geom.Point(this.req.proj.transform([value[1],value[0]], 'EPSG:4326', 'EPSG:3857')),
                     //id: device.id
                     name: key
                 }));
@@ -429,6 +461,7 @@ export default {
                 this.selected_vertical = i
                 this.selected_stream = 0
                 this.updateHeatMap()
+                this.devices_layer.getSource().clear()
             }
         },
         selectStream(i) {
@@ -445,7 +478,7 @@ export default {
                 this.testValues[this.testValuesOrdered[i]].color = '#' + this.rainbowHeatMap.colourAt(i);
                 this.testValues[this.testValuesOrdered[i]].style = new this.req.style.Style({
                     fill: new this.req.style.Fill({
-                        color: this.testValues[this.testValuesOrdered[i]].color + 'e0'
+                        color: this.testValues[this.testValuesOrdered[i]].color + 'D0'
                     }),
                     stroke: new this.req.style.Stroke({
                         color: 'black',

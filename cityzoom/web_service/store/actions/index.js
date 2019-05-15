@@ -24,17 +24,24 @@ export default{
                 method: 'get',
                 url: getUrl() + '/user/me',
                 headers: {
-                    'Authorization': payload
+                    Authorization: payload
                 }
             })
             const verticals = await axios({
                 method: 'get',
                 url: getUrl() + '/vertical',
                 headers: {
-                    'Authorization': payload
+                    Authorization: payload
                 }
             })
-            commit('SET_STORE', { user: { ...res.data}, jwt: payload, verticals: verticals.data })
+            const devices = await axios({
+                method: 'get',
+                url: getUrl() + '/device',
+                headers: {
+                    Authorization: payload
+                }
+            })
+            commit('SET_STORE', { user: { ...res.data}, jwt: payload, verticals: verticals.data, devices: devices.data.user_devices })
         } catch (err) {
             console.error('Error', err.message)
             return err.message
@@ -79,7 +86,7 @@ export default{
                 method: 'get',
                 url: getUrl() + '/user/logout',
                 headers: {
-                    'Authorization': state.jwt
+                    Authorization: state.jwt
                 }
             })
             console.log(res)
@@ -108,7 +115,7 @@ export default{
                 method: 'get',
                 url: getUrl() + '/stream',
                 headers: {
-                    'Authorization': state.jwt
+                    Authorization: state.jwt
                 }
             })
             commit('STREAMS_UPDATE', res)
@@ -125,7 +132,7 @@ export default{
                 method: 'get',
                 url: getUrl() + '/stream/' + payload.name+'/values',
                 headers: {
-                    'Authorization': state.jwt
+                    Authorization: state.jwt
                 }
             })
             commit('STREAMS_UPDATE_VALUES', { name: payload.name, values: res.data.values })

@@ -8,7 +8,7 @@
 					"unit": "B",
 					"fullunit": "Bars",
 					"type": "value",
-					"colors": ["darkyellow", "darkblue", "white"]
+					"colors": ["white", "lightblue", "white"]
 				},
 				"humidity_stream": {
 					"display": "Humidade do ar",
