@@ -49,7 +49,7 @@ public class Devices {
 
         }*/
         String description = keys.contains("description") ? body.get("description").getAsString() : "";
-
+        String municipal = keys.contains("municipality") ? body.get("municipality").getAsString() : "";
         String produceRequest =
                 "{\n" +
                         "\t\"device_name\":\""+device_name+"\",\n" +
@@ -57,6 +57,7 @@ public class Devices {
                         "\t\"provider\":\""+provider+"\",\n" +
                         "\t\"vertical\":"+vertical+",\n" +
                         "\t\"mobile\":"+mobile+",\n" +
+                        "\t\"municipality\":"+municipal+",\n" +
                         "\t\"latitude\": "+latitude+",\n"+
                         "\t\"longitude\": "+longitude+",\n"+
                         "\t\"creation\": "+date.getTime()+"\n" +
@@ -133,6 +134,7 @@ public class Devices {
                     "{\n" +
                             "\t\"device_id\": \""+jsonDev.get("_id").getAsJsonObject().get("$oid").getAsString()+"\",\n" +
                             "\t\"mobile\": "+jsonDev.get("mobile").getAsBoolean()+",\n" +
+                            "\t\"municipality\": "+jsonDev.get("municipality").getAsString()+",\n" +
                             "\t\"vertical\": "+jsonDev.get("vertical").getAsJsonArray()+",\n" +
                             "\t\"provider\": \""+jsonDev.get("provider").getAsString()+"\",\n" +
                             "\t\"streams\": "+ Arrays.toString(streamList.toArray()) +",\n" +
@@ -184,6 +186,7 @@ public class Devices {
         return "{\n" +
                 "\t\"device_id\": \""+jsonDev.get("_id").getAsJsonObject().get("$oid").getAsString()+"\",\n" +
                 "\t\"mobile\": "+jsonDev.get("mobile").getAsBoolean()+",\n" +
+                "\t\"municipality\": "+jsonDev.get("municipality").getAsString()+",\n" +
                 "\t\"vertical\": "+jsonDev.get("vertical").getAsJsonArray()+",\n" +
                 "\t\"provider\": \""+jsonDev.get("provider").getAsString()+"\",\n" +
                 "\t\"streams\": "+ Arrays.toString(streamList.toArray()) +",\n" +
