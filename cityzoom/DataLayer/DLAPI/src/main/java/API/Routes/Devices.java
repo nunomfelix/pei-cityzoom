@@ -2,6 +2,7 @@ package API.Routes;
 
 import API.Aux.MongoAux;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mongodb.client.FindIterable;
 import org.bson.Document;
@@ -126,10 +127,10 @@ public class Devices {
             ArrayList<String> streamList = new ArrayList<>();
             for (Document doc : streamDocs) {
                 JsonObject jsonStream = (JsonObject) MongoAux.jsonParser.parse(doc.toJson());
-                streamList.add(jsonStream.get("_id").getAsJsonObject().get("$oid").getAsString());
+                streamList.add("\""+jsonStream.get("_id").getAsJsonObject().get("$oid").getAsString()+"\"");
             }
 
-            System.out.println(jsonDev.toString());
+            System.out.println(streamList.toString());
             String device =
                     "{\n" +
                             "\t\"device_id\": \""+jsonDev.get("_id").getAsJsonObject().get("$oid").getAsString()+"\",\n" +
@@ -175,14 +176,16 @@ public class Devices {
                     "\t\"Error\": \"Device " + device + " not found.\"\n" +
                     "}";
         }
+        System.out.println(device);
         FindIterable<Document> streamDocs = streams.find(eq("device_id", device));
         ArrayList<String> streamList = new ArrayList<>();
         for (Document doc : streamDocs) {
             JsonObject jsonStream = (JsonObject) MongoAux.jsonParser.parse(doc.toJson());
-            streamList.add(jsonStream.get("_id").getAsJsonObject().get("$oid").getAsString());
+            System.out.println(jsonStream.toString());
+            streamList.add("\""+jsonStream.get("_id").getAsJsonObject().get("$oid").getAsString()+"\"");
         }
-        response.status(200);
         JsonObject jsonDev = (JsonObject) MongoAux.jsonParser.parse(document.toJson());
+        response.status(200);
         return "{\n" +
                 "\t\"device_id\": \""+jsonDev.get("_id").getAsJsonObject().get("$oid").getAsString()+"\",\n" +
                 "\t\"mobile\": "+jsonDev.get("mobile").getAsBoolean()+",\n" +
