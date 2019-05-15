@@ -25,12 +25,21 @@ import java.util.concurrent.CountDownLatch;
 
 public class DevSink {
     private MongoCollection<Document> collection = MongoAux.getCollection("devices");
-    private static PrintWriter writer;
-    private static InputStream geojsonfile;
-    public static void main(String[] args) throws FileNotFoundException {
-        writer = new PrintWriter("devFile");
-        //geojsonfile = new FileInputStream("portugal_municipios.geojson");
-        new DevSink().run();
+    private static JsonObject geoJSONfile;
+    public static void main(String[] args) throws IOException {
+        File file = new File("/home/zero/Documents/UniAv/3_ano/PEI/pei-cityzoom/cityzoom/DataLayer/DevicesSinks/src/main/java/aveiro.geojson");
+        InputStream fis = new FileInputStream(file);
+        byte[] data = new byte[(int)file.length()];
+        fis.read(data);
+        fis.close();
+        geoJSONfile = (JsonObject) MongoAux.jsonParser.parse(new String(data, "UTF-8"));
+        System.out.println(geoJSONfile.keySet());
+        System.out.println(geoJSONfile.get("features").getAsJsonArray());
+        for (JsonElement jo : geoJSONfile.get("features").getAsJsonArray()) {
+            System.out.println(jo.getAsJsonObject().keySet());
+            System.out.println(jo.getAsJsonObject().get("properties"));
+        }
+        //new DevSink().run();
     }
 
     private void run() {
@@ -135,7 +144,6 @@ public class DevSink {
                                         .append("creation", value.get("creation").getAsLong());
                                 System.out.println(value.toString());
                                 docsList.add(document);
-                                writer.println("ola mundo");
                             }
                         } catch (IllegalStateException e) {
                             logger.error("Object given not in JSON format!");

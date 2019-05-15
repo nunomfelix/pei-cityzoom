@@ -76,7 +76,6 @@ public class StreamSinker {
                 "  { \"name\": \"stream\", \"type\": \"string\" },\n" +
                 "  { \"name\": \"description\", \"type\": \"string\" },\n" +
                 "  { \"name\": \"mobile\", \"type\": \"boolean\" },\n" +
-                "  { \"name\": \"type\", \"type\": \"string\" },\n" +
                 "  { \"name\": \"ttl\", \"type\": \"int\" },\n" +
                 "  { \"name\": \"periodicity\", \"type\": \"int\" },\n" +
                 "  { \"name\": \"creation\", \"type\": \"long\" }," +
@@ -115,7 +114,6 @@ public class StreamSinker {
                                         .append("description", value.get("description").getAsString())
                                         .append("device_id", value.get("device_id").getAsString())
                                         .append("mobile", value.get("mobile").getAsBoolean())
-                                        .append("type", value.get("type").getAsString())
                                         .append("ttl", value.get("ttl").getAsInt())
                                         .append("periodicity", value.get("periodicity").getAsInt())
                                         .append("creation", value.get("creation").getAsLong())

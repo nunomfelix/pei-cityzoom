@@ -17,7 +17,6 @@ import static API.DataLayerAPI.*;
 import static com.mongodb.client.model.Filters.*;
 
 public class Devices {
-    private static List<String> types = Arrays.asList("temperature", "oxygen");
     private static Date date = new Date();
 
     // Status - Passing
