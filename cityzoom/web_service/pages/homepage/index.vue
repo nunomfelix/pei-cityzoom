@@ -36,7 +36,7 @@
             <StackedBar :ref="item.i" :name="item.i"/>
           </div>
           <div v-if="item.type=='lines'">
-            <LineGraph :ref="item.i" :name="item.i"/>
+            <LineGraph :ref="item.i" :name="item.i" :values="values"/>
           </div>
         </div>
       </grid-item>
@@ -45,6 +45,7 @@
 </template>
 
 <script>
+const drone_stream = require('static/get_stream_values_response.json');
 var testLayout = [
   { x: 0, y: 0, w: 12, h: 14, i: "line_a", type: 'lines', data:'fake' },
   { x: 0, y: 0, w: 8, h: 14, i: "series_a", type: 'series', data:'fake' },
@@ -56,7 +57,7 @@ export default {
   data() {
     return {
       layout: testLayout,
-      data: []
+      values: drone_stream
     };
   }, 
   mounted: async function() {

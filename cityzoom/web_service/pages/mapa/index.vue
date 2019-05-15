@@ -37,7 +37,7 @@
             </div>
         </div>
         <Loading :show="!loaded" type="absolute"/> 
-        <ModalResizable v-if="showModal" @close="showModal = false"/>
+        <ModalResizable v-if="showModal" @close="showModal = false" :values="values"/>
     </div>
 </template>
 
@@ -48,6 +48,7 @@ const drone_stream = require('static/get_stream_values_response.json');
 export default {
     data() {
         return {
+            values: drone_stream,
             req: {
                 Ol: null,
                 etent: null,
@@ -62,7 +63,7 @@ export default {
             devicesStyle: {
                 templates: {
                     default: {
-                        scale: 1,
+                        scale: 0.8,
                     },
                     hover: {
                         scale: 1.2,
@@ -109,7 +110,7 @@ export default {
                 anchor: [0.5, 0.5],
                 anchorXUnits: 'fraction',
                 anchorYUnits: 'fraction',
-                scale: .75,
+                scale: 1,
                 opacity: 0.75,
                 src: 'icons/AirQuality_map.png'
             }))
@@ -119,9 +120,9 @@ export default {
                 anchor: [0.5, 0.5],
                 anchorXUnits: 'fraction',
                 anchorYUnits: 'fraction',
-                scale: .75,
+                scale: 1,
                 opacity: 0.75,
-                src: 'icons/Temperature_map.png'
+                src: 'icons/AirQuality_map.png'
             }))
         })]
 
@@ -374,7 +375,7 @@ export default {
             })
             vectorSource.addFeature(feat)
             i++
-        },200)
+        },150)
     
 
 
