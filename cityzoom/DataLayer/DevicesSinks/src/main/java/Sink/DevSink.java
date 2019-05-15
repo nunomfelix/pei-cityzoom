@@ -1,7 +1,9 @@
 package Sink;
 
 import Aux.MongoAux;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.mongodb.MongoBulkWriteException;
 import com.mongodb.client.MongoCollection;
 import org.apache.avro.Schema;
@@ -16,17 +18,52 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
 public class DevSink {
     private MongoCollection<Document> collection = MongoAux.getCollection("devices");
-    private static PrintWriter writer;
-    private static InputStream geojsonfile;
-    public static void main(String[] args) throws FileNotFoundException {
-        writer = new PrintWriter("devFile");
-        //geojsonfile = new FileInputStream("portugal_municipios.geojson");
+    private static JsonObject geoJSONfile;
+    private static Map<String, Double[]> aveiroGeoJson;
+    public static void main(String[] args) throws IOException {
+        aveiroGeoJson = new HashMap<>();
+        File file = new File("/home/zero/Documents/UniAv/3_ano/PEI/pei-cityzoom/cityzoom/DataLayer/DevicesSinks/src/main/java/aveiro.geojson");
+        InputStream fis = new FileInputStream(file);
+        byte[] data = new byte[(int)file.length()];
+        fis.read(data);
+        fis.close();
+        geoJSONfile = (JsonObject) MongoAux.jsonParser.parse(new String(data, "UTF-8"));
+        System.out.println(geoJSONfile.keySet());
+        System.out.println(geoJSONfile.get("features").getAsJsonArray());
+        for (JsonElement jo : geoJSONfile.get("features").getAsJsonArray()) {
+            double latMin = 90;
+            double latMax = -90;
+            double longMin = 180;
+            double longMax = -180;
+            System.out.println(jo.getAsJsonObject().keySet());
+            System.out.println(jo.getAsJsonObject().get("properties"));
+            System.out.println(jo.getAsJsonObject().get("properties").getAsJsonObject().get("name_2"));
+            String key = jo.getAsJsonObject().get("properties").getAsJsonObject().get("name_2").getAsString();
+            System.out.println(jo.getAsJsonObject().get("geometry").getAsJsonObject().get("coordinates").getAsJsonArray());
+            double latLong[] = new double[2];
+            for (JsonElement ji: jo.getAsJsonObject().get("geometry").getAsJsonObject().get("coordinates").getAsJsonArray()){
+                for (JsonElement jk : ji.getAsJsonArray()) {
+                    for (JsonElement jm : jk.getAsJsonArray()) {
+
+                        System.out.println(jm);
+                    }
+                }
+            }
+        }
+        /*
+        for (JsonElement i: geoJSONfile.get("features").getAsJsonArray()) {
+            double latMin = 90;
+            double latMax = -90;
+            double longMin = 180;
+            double longMax = -180;
+        }*/
         new DevSink().run();
     }
 
@@ -79,7 +116,7 @@ public class DevSink {
                 "  { \"name\": \"description\", \"type\": \"string\" },\n" +
                 "  { \"name\": \"provider\", \"type\": \"string\" },\n" +
                 "  { \"name\": \"mobile\", \"type\": \"boolean\" },\n" +
-                "  { \"name\": \"vertical\", \"type\": \"string\" },\n" +
+                "  { \"name\": \"vertical\", \"type\": { \"type\": \"array\", \"items\": {\"name\": \"verts\", \"type\": \"string\"}}},\n"+
                 "  { \"name\": \"latitude\", \"type\": \"double\" },\n" +
                 "  { \"name\": \"longitude\", \"type\": \"double\" },\n" +
                 "  { \"name\": \"creation\", \"type\": \"long\" }" +
@@ -108,6 +145,7 @@ public class DevSink {
                     for (ConsumerRecord<String, String> record: records) {
                         try {
                             logger.info("Record: "+ record.value());
+                            System.out.println(record.value());
                             JsonObject value = MongoAux.jsonParser.parse(record.value()).getAsJsonObject();
                             if (!MongoAux.schemaValidator(valuesSchema, value.toString())) {
                                 logger.error("Error parsing the following request: "+ value.toString());
@@ -117,28 +155,29 @@ public class DevSink {
                                 locationObjects.put("timestamp", value.get("creation").getAsDouble());
                                 locationObjects.put("latitude", value.get("latitude").getAsDouble());
                                 locationObjects.put("longitude", value.get("longitude").getAsDouble());
+                                ArrayList<String> verticalList = new ArrayList<>();
+                                for (JsonElement d : value.get("vertical").getAsJsonArray()) {
+                                    verticalList.add(d.getAsString());
+                                }
                                 locations.add(locationObjects);
                                 Document document = new Document("device_name", value.get("device_name").getAsString())
                                         .append("description", value.get("description").getAsString())
                                         .append("mobile", value.get("mobile").getAsBoolean())
                                         .append("provider", value.get("provider").getAsString())
-                                        .append("vertical", value.get("vertical").getAsString())
+                                        .append("vertical", verticalList)
                                         .append("locations", locations)
-                                        .append("latitude", value.get("latitude").getAsInt())
-                                        .append("longitude", value.get("longitude").getAsInt())
                                         .append("creation", value.get("creation").getAsLong());
                                 System.out.println(value.toString());
-                                System.out.println(document.toJson());
                                 docsList.add(document);
-                                writer.println("ola mundo");
                             }
-                        } catch (IllegalStateException | IOException e) {
+                        } catch (IllegalStateException e) {
                             logger.error("Object given not in JSON format!");
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
                     }
                     try {
                         if (!docsList.isEmpty())
-
                             collection.insertMany(docsList);
                         logger.info("Stored devices with success!");
                     } catch (MongoBulkWriteException e) {

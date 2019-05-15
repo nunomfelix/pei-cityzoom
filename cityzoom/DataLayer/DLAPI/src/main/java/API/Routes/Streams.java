@@ -34,15 +34,6 @@ public class Streams {
         }
         Set<String> keys = body.keySet();
         String stream = body.get("stream").getAsString();
-        String type = body.get("type").getAsString();
-        if (!types.contains(type)){
-            logger.error("Stream request failed because type is wrong: " + body.get("type").getAsString());
-            response.status(HttpsURLConnection.HTTP_CONFLICT);
-            return "{\n" +
-                    "\t\"status\": \"Error @ type\",\n" +
-                    "\t\"Error\": \"Type " + type + " not available. Available types are "+types.toString()+"\"\n" +
-                    "}";
-        }
         String device_id = body.get("device_id").getAsString();
         if (devices.find(eq("_id", new ObjectId(device_id))).first() == null) {
             logger.error("Device not found");
@@ -67,7 +58,6 @@ public class Streams {
                         "\t\"stream\":\""+stream+"\",\n" +
                         "\t\"description\":\""+description+"\",\n" +
                         "\t\"device_id\":\""+device_id+"\",\n" +
-                        "\t\"type\":\""+type+"\",\n" +
                         "\t\"mobile\":"+mobile+",\n" +
                         "\t\"periodicity\": "+periodicity+",\n" +
                         "\t\"ttl\": "+ttl+"," +
@@ -137,7 +127,6 @@ public class Streams {
                             "\t\"description\": \""+jsonStream.get("description").getAsString()+"\",\n" +
                             "\t\"device_id\": \""+jsonStream.get("device_id").getAsString()+"\",\n" +
                             "\t\"mobile\": "+jsonStream.get("mobile").getAsBoolean()+",\n" +
-                            "\t\"type\": \""+jsonStream.get("type").getAsString()+"\",\n" +
                             "\t\"ttl\": "+jsonStream.get("ttl").getAsInt()+",\n" +
                             "\t\"periodicity\": "+jsonStream.get("periodicity").getAsInt()+",\n" +
                             "\t\"creation\": "+jsonStream.get("creation").getAsJsonObject().get("$numberLong").getAsLong()+",\n" +
@@ -182,7 +171,6 @@ public class Streams {
                 "\t\"description\": \""+jsonStream.get("description").getAsString()+"\",\n" +
                 "\t\"device_id\": \""+jsonStream.get("device_id").getAsString()+"\",\n" +
                 "\t\"mobile\": "+jsonStream.get("mobile").getAsBoolean()+",\n" +
-                "\t\"type\": \""+jsonStream.get("type").getAsString()+"\",\n" +
                 "\t\"ttl\": "+jsonStream.get("ttl").getAsInt()+",\n" +
                 "\t\"periodicity\": "+jsonStream.get("periodicity").getAsInt()+",\n" +
                 "\t\"creation\": "+jsonStream.get("creation").getAsJsonObject().get("$numberLong").getAsLong()+",\n" +
