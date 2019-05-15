@@ -3,7 +3,6 @@ package Sink;
 import Aux.MongoAux;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import com.mongodb.MongoBulkWriteException;
 import com.mongodb.client.MongoCollection;
 import org.apache.avro.Schema;
@@ -18,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.lang.reflect.Array;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
@@ -26,8 +24,9 @@ import java.util.concurrent.CountDownLatch;
 public class DevSink {
     private MongoCollection<Document> collection = MongoAux.getCollection("devices");
     private static JsonObject geoJSONfile;
-    private static Map<String, Double[]> aveiroGeoJson;
+    private static Map<String, List<double[]>> aveiroGeoJson;
     public static void main(String[] args) throws IOException {
+        /*
         aveiroGeoJson = new HashMap<>();
         File file = new File("/home/zero/Documents/UniAv/3_ano/PEI/pei-cityzoom/cityzoom/DataLayer/DevicesSinks/src/main/java/aveiro.geojson");
         InputStream fis = new FileInputStream(file);
@@ -38,26 +37,19 @@ public class DevSink {
         System.out.println(geoJSONfile.keySet());
         System.out.println(geoJSONfile.get("features").getAsJsonArray());
         for (JsonElement jo : geoJSONfile.get("features").getAsJsonArray()) {
-            double latMin = 90;
-            double latMax = -90;
-            double longMin = 180;
-            double longMax = -180;
-            System.out.println(jo.getAsJsonObject().keySet());
-            System.out.println(jo.getAsJsonObject().get("properties"));
-            System.out.println(jo.getAsJsonObject().get("properties").getAsJsonObject().get("name_2"));
             String key = jo.getAsJsonObject().get("properties").getAsJsonObject().get("name_2").getAsString();
-            System.out.println(jo.getAsJsonObject().get("geometry").getAsJsonObject().get("coordinates").getAsJsonArray());
-            double latLong[] = new double[2];
+            List<double[]> positions = new ArrayList<>();
             for (JsonElement ji: jo.getAsJsonObject().get("geometry").getAsJsonObject().get("coordinates").getAsJsonArray()){
                 for (JsonElement jk : ji.getAsJsonArray()) {
                     for (JsonElement jm : jk.getAsJsonArray()) {
-
-                        System.out.println(jm);
+                        double latLong[] = {jm.getAsJsonArray().get(0).getAsDouble(), jm.getAsJsonArray().get(1).getAsDouble()};
+                        positions.add(latLong);
                     }
                 }
             }
+            aveiroGeoJson.put(key, positions);
         }
-        /*
+
         for (JsonElement i: geoJSONfile.get("features").getAsJsonArray()) {
             double latMin = 90;
             double latMax = -90;
@@ -114,6 +106,7 @@ public class DevSink {
                 "\"fields\": [\n" +
                 "  { \"name\": \"device_name\", \"type\": \"string\" },\n" +
                 "  { \"name\": \"description\", \"type\": \"string\" },\n" +
+                "  { \"name\": \"municipality\", \"type\": \"string\" },\n" +
                 "  { \"name\": \"provider\", \"type\": \"string\" },\n" +
                 "  { \"name\": \"mobile\", \"type\": \"boolean\" },\n" +
                 "  { \"name\": \"vertical\", \"type\": { \"type\": \"array\", \"items\": {\"name\": \"verts\", \"type\": \"string\"}}},\n"+
@@ -150,19 +143,25 @@ public class DevSink {
                             if (!MongoAux.schemaValidator(valuesSchema, value.toString())) {
                                 logger.error("Error parsing the following request: "+ value.toString());
                             } else {
+                                // location array config
                                 ArrayList<HashMap<String, Double>> locations = new ArrayList<>();
                                 HashMap<String, Double> locationObjects = new HashMap<>();
                                 locationObjects.put("timestamp", value.get("creation").getAsDouble());
                                 locationObjects.put("latitude", value.get("latitude").getAsDouble());
                                 locationObjects.put("longitude", value.get("longitude").getAsDouble());
+                                locations.add(locationObjects);
+
+                                // verticalList array config
                                 ArrayList<String> verticalList = new ArrayList<>();
                                 for (JsonElement d : value.get("vertical").getAsJsonArray()) {
                                     verticalList.add(d.getAsString());
                                 }
-                                locations.add(locationObjects);
+
+                                // device document
                                 Document document = new Document("device_name", value.get("device_name").getAsString())
                                         .append("description", value.get("description").getAsString())
                                         .append("mobile", value.get("mobile").getAsBoolean())
+                                        .append("municipality", value.get("municipality").getAsString())
                                         .append("provider", value.get("provider").getAsString())
                                         .append("vertical", verticalList)
                                         .append("locations", locations)

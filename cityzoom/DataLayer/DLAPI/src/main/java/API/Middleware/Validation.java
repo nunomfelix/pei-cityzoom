@@ -57,6 +57,7 @@ public class Validation {
         this.createDeviceAllowedFields.put("latitude", Double.class);
         this.createDeviceAllowedFields.put("longitude", Double.class);
         this.createDeviceAllowedFields.put("provider", String.class);
+        this.createDeviceAllowedFields.put("municipality", String.class);
 
     }
 
@@ -150,7 +151,7 @@ public class Validation {
                     "\t\"Status\": \"Error @ request\",\n" +
                     "\t\"Error\": \"No location given for not-mobile device\"\n" +
                     "}";
-        } else if (body.keySet().size() > 7){
+        } else if (body.keySet().size() > 8){
             return "{\n" +
                     "\t\"Status\": \"Error @ request\",\n" +
                     "\t\"Error\": \"Too many fields\"\n" +
