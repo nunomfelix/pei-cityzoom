@@ -562,7 +562,7 @@ export default {
         }
         &.active {
             @include shadow(0px, 0px, 0px, 0px, rgba(0,0,0,0));
-            background-color: rgb(187, 187, 187);
+            background-color: rgb(201, 201, 201);
         }
         & img {
             width: 100%;
