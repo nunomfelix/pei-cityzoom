@@ -15,10 +15,7 @@ import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
@@ -26,8 +23,10 @@ import java.util.concurrent.CountDownLatch;
 public class DevSink {
     private MongoCollection<Document> collection = MongoAux.getCollection("devices");
     private static PrintWriter writer;
+    private static InputStream geojsonfile;
     public static void main(String[] args) throws FileNotFoundException {
         writer = new PrintWriter("devFile");
+        //geojsonfile = new FileInputStream("portugal_municipios.geojson");
         new DevSink().run();
     }
 
@@ -78,6 +77,7 @@ public class DevSink {
                 "\"fields\": [\n" +
                 "  { \"name\": \"device_name\", \"type\": \"string\" },\n" +
                 "  { \"name\": \"description\", \"type\": \"string\" },\n" +
+                "  { \"name\": \"provider\", \"type\": \"string\" },\n" +
                 "  { \"name\": \"mobile\", \"type\": \"boolean\" },\n" +
                 "  { \"name\": \"vertical\", \"type\": \"string\" },\n" +
                 "  { \"name\": \"latitude\", \"type\": \"double\" },\n" +
@@ -95,7 +95,6 @@ public class DevSink {
             kafkaProperties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, groupID);
             kafkaProperties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
             kafkaProperties.setProperty(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, "300000000");
-            kafkaProperties.setProperty(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "100000");
             valuesConsumer = new KafkaConsumer<String, String>(kafkaProperties);
             valuesConsumer.subscribe(Arrays.asList(topic));
         }
@@ -113,10 +112,18 @@ public class DevSink {
                             if (!MongoAux.schemaValidator(valuesSchema, value.toString())) {
                                 logger.error("Error parsing the following request: "+ value.toString());
                             } else {
+                                ArrayList<HashMap<String, Double>> locations = new ArrayList<>();
+                                HashMap<String, Double> locationObjects = new HashMap<>();
+                                locationObjects.put("timestamp", value.get("creation").getAsDouble());
+                                locationObjects.put("latitude", value.get("latitude").getAsDouble());
+                                locationObjects.put("longitude", value.get("longitude").getAsDouble());
+                                locations.add(locationObjects);
                                 Document document = new Document("device_name", value.get("device_name").getAsString())
                                         .append("description", value.get("description").getAsString())
                                         .append("mobile", value.get("mobile").getAsBoolean())
+                                        .append("provider", value.get("provider").getAsString())
                                         .append("vertical", value.get("vertical").getAsString())
+                                        .append("locations", locations)
                                         .append("latitude", value.get("latitude").getAsInt())
                                         .append("longitude", value.get("longitude").getAsInt())
                                         .append("creation", value.get("creation").getAsLong());

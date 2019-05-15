@@ -1,4 +1,3 @@
-const Device = require('../db/models/device')
 const User = require('../db/models/user')
 const express = require('express')
 const deviceDebug = require('debug')('app:Device')
@@ -11,25 +10,22 @@ const router = new express.Router()
 
 /* Contains all device endpoints */
 
-router.post('', [authentication, validationMiddleware(validateCreateDevice, 'body'), authentication], async (req, res) => {
-
-    const user = await User.findOne({ username: req.body.owner });
-    if (!user)
-        return res.status(400).send('User ' + req.body.owner + " does not exist")
-    //TODO: Verify verticals
-    //const vertical = Vertical.findOne({name: req.body.vertical})
-    //if(!vertical)
-    //  return res.status(400).send('Vertical '+req.body.vertical+' does not exist')
-    const dev = new Device(req.body)
-    await dev.save()
-    deviceDebug(`Device ${dev.name} successfully created`)
-    return res.status(201).send(dev)
+router.post('', [validationMiddleware(validateCreateDevice, 'body', 'Invalid device'), authentication], async (req,res) => {
+    console.log(req.body)
+    //console.log(config.get('DATA_LAYER_URL'))    
+    const response = await axios.post(config.get('DATA_LAYER_URL') + '/czb/devices', req.body)
+    res.send(response.data)
 })
 
-router.get('', [authentication], async (req, res) => {
-    const result = await Device.find(req.query)
-    deviceDebug(`Device loaded with query ${JSON.stringify(req.query)}`)
-    res.send(result)
+
+router.get('',[authentication],async(req,res)=>{
+    const response = await axios.get(config.get('DATA_LAYER_URL') + '/czb/devices')
+    res.send(response.data)
+})
+
+router.get('/:id',[authentication], async(req,res)=>{
+    const response = await axios.get(config.get('DATA_LAYER_URL') + '/czb/device/'+req.params.id)
+    res.send(response.data)
 })
 
 module.exports = router
