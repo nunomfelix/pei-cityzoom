@@ -1,6 +1,7 @@
 package API.Routes;
 
 import API.Aux.MongoAux;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mongodb.client.FindIterable;
 import org.bson.Document;
@@ -33,7 +34,7 @@ public class Devices {
         Set<String> keys = body.keySet();
         String device_name = body.get("device_name").getAsString();
         String provider = body.get("provider").getAsString();
-        String vertical = body.get("vertical").getAsString();
+        JsonArray vertical = body.get("vertical").getAsJsonArray();
         boolean mobile = body.get("mobile").getAsBoolean();
         double latitude = 0;
         double longitude = 0;
@@ -56,7 +57,7 @@ public class Devices {
                         "\t\"device_name\":\""+device_name+"\",\n" +
                         "\t\"description\":\""+description+"\",\n" +
                         "\t\"provider\":\""+provider+"\",\n" +
-                        "\t\"vertical\":\""+vertical+"\",\n" +
+                        "\t\"vertical\":"+vertical+",\n" +
                         "\t\"mobile\":"+mobile+",\n" +
                         "\t\"latitude\": "+latitude+",\n"+
                         "\t\"longitude\": "+longitude+",\n"+
@@ -134,7 +135,7 @@ public class Devices {
                     "{\n" +
                             "\t\"device_id\": \""+jsonDev.get("_id").getAsJsonObject().get("$oid").getAsString()+"\",\n" +
                             "\t\"mobile\": "+jsonDev.get("mobile").getAsBoolean()+",\n" +
-                            "\t\"vertical\": \""+jsonDev.get("vertical").getAsString()+"\",\n" +
+                            "\t\"vertical\": "+jsonDev.get("vertical").getAsJsonArray()+",\n" +
                             "\t\"provider\": \""+jsonDev.get("provider").getAsString()+"\",\n" +
                             "\t\"streams\": "+ Arrays.toString(streamList.toArray()) +",\n" +
                             "\t\"device_name\": \""+jsonDev.get("device_name").getAsString()+"\",\n" +
@@ -185,7 +186,7 @@ public class Devices {
         return "{\n" +
                 "\t\"device_id\": \""+jsonDev.get("_id").getAsJsonObject().get("$oid").getAsString()+"\",\n" +
                 "\t\"mobile\": "+jsonDev.get("mobile").getAsBoolean()+",\n" +
-                "\t\"vertical\": \""+jsonDev.get("vertical").getAsString()+"\",\n" +
+                "\t\"vertical\": "+jsonDev.get("vertical").getAsJsonArray()+",\n" +
                 "\t\"provider\": \""+jsonDev.get("provider").getAsString()+"\",\n" +
                 "\t\"streams\": "+ Arrays.toString(streamList.toArray()) +",\n" +
                 "\t\"device_name\": \""+jsonDev.get("device_name").getAsString()+"\",\n" +
