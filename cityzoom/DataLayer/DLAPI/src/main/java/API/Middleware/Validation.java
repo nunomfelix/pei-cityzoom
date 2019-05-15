@@ -35,12 +35,11 @@ public class Validation {
         // required fields for push values
         this.pushValuesRequiredFields.put("stream_name", String.class);
         this.pushValuesRequiredFields.put("value", String.class);
-        this.pushValuesRequiredFields.put("timestamp", Long.class);
 
         // allowed fields for push values
         this.pushValuesAllowedFields.put("stream_name", String.class);
         this.pushValuesAllowedFields.put("value", String.class);
-        this.pushValuesRequiredFields.put("timestamp", Long.class);
+        this.pushValuesAllowedFields.put("timestamp", Long.class);
         this.pushValuesAllowedFields.put("latitude", Double.class);
         this.pushValuesAllowedFields.put("longitude", Double.class);
 

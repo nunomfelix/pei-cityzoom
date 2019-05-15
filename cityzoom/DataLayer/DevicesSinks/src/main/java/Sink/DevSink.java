@@ -26,7 +26,9 @@ import java.util.concurrent.CountDownLatch;
 public class DevSink {
     private MongoCollection<Document> collection = MongoAux.getCollection("devices");
     private static JsonObject geoJSONfile;
+    private static Map<String, Double[]> aveiroGeoJson;
     public static void main(String[] args) throws IOException {
+        aveiroGeoJson = new HashMap<>();
         File file = new File("/home/zero/Documents/UniAv/3_ano/PEI/pei-cityzoom/cityzoom/DataLayer/DevicesSinks/src/main/java/aveiro.geojson");
         InputStream fis = new FileInputStream(file);
         byte[] data = new byte[(int)file.length()];
@@ -36,10 +38,33 @@ public class DevSink {
         System.out.println(geoJSONfile.keySet());
         System.out.println(geoJSONfile.get("features").getAsJsonArray());
         for (JsonElement jo : geoJSONfile.get("features").getAsJsonArray()) {
+            double latMin = 90;
+            double latMax = -90;
+            double longMin = 180;
+            double longMax = -180;
             System.out.println(jo.getAsJsonObject().keySet());
             System.out.println(jo.getAsJsonObject().get("properties"));
+            System.out.println(jo.getAsJsonObject().get("properties").getAsJsonObject().get("name_2"));
+            String key = jo.getAsJsonObject().get("properties").getAsJsonObject().get("name_2").getAsString();
+            System.out.println(jo.getAsJsonObject().get("geometry").getAsJsonObject().get("coordinates").getAsJsonArray());
+            double latLong[] = new double[2];
+            for (JsonElement ji: jo.getAsJsonObject().get("geometry").getAsJsonObject().get("coordinates").getAsJsonArray()){
+                for (JsonElement jk : ji.getAsJsonArray()) {
+                    for (JsonElement jm : jk.getAsJsonArray()) {
+
+                        System.out.println(jm);
+                    }
+                }
+            }
         }
-        //new DevSink().run();
+        /*
+        for (JsonElement i: geoJSONfile.get("features").getAsJsonArray()) {
+            double latMin = 90;
+            double latMax = -90;
+            double longMin = 180;
+            double longMax = -180;
+        }*/
+        new DevSink().run();
     }
 
     private void run() {

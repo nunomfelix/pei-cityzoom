@@ -8,9 +8,8 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DLAPI/src/main/java/API/Middleware/Validation.java" beforeDir="false" afterPath="$PROJECT_DIR$/DLAPI/src/main/java/API/Middleware/Validation.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Devices.java" beforeDir="false" afterPath="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Devices.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Streams.java" beforeDir="false" afterPath="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Streams.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DevicesSinks/src/main/java/Sink/DevSink.java" beforeDir="false" afterPath="$PROJECT_DIR$/DevicesSinks/src/main/java/Sink/DevSink.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sinks/src/main/java/Sinks/StreamSinker.java" beforeDir="false" afterPath="$PROJECT_DIR$/Sinks/src/main/java/Sinks/StreamSinker.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ValuesSinks/src/main/java/Sink/ValuesSinker.java" beforeDir="false" afterPath="$PROJECT_DIR$/ValuesSinks/src/main/java/Sink/ValuesSinker.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -43,8 +42,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ValuesSinks/src/main/java/Sink/ValuesSinker.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="651">
-              <caret line="102" selection-start-line="102" selection-end-line="102" />
+            <state relative-caret-position="2011">
+              <caret line="149" column="25" selection-start-line="149" selection-start-column="25" selection-end-line="149" selection-end-column="25" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#7867#7868#0" expanded="true" />
@@ -53,7 +52,7 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/DataLayerAPI.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="226">
@@ -81,7 +80,7 @@
         <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Streams.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="160">
-              <caret line="19" column="36" lean-forward="true" selection-start-line="19" selection-start-column="36" selection-end-line="19" selection-end-column="36" />
+              <caret line="19" column="36" selection-start-line="19" selection-start-column="36" selection-end-line="19" selection-end-column="36" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -92,8 +91,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Devices.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-224">
-              <caret line="19" selection-start-line="19" selection-end-line="19" />
+            <state relative-caret-position="1312">
+              <caret line="191" column="34" selection-start-line="191" selection-start-column="34" selection-end-line="191" selection-end-column="34" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -104,11 +103,11 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/DevicesSinks/src/main/java/Sink/DevSink.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="288">
-              <caret line="40" column="8" selection-start-line="40" selection-start-column="8" selection-end-line="40" selection-end-column="8" />
+            <state relative-caret-position="496">
+              <caret line="170" column="55" lean-forward="true" selection-start-line="170" selection-start-column="55" selection-end-line="170" selection-end-column="55" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#8853#8854#0" expanded="true" />
+                <element signature="e#10055#10056#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -117,16 +116,16 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/DevicesSinks/src/main/java/aveiro.geojson">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="80">
+            <state relative-caret-position="64">
               <caret column="1041" selection-start-column="1041" selection-end-column="1041" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Sinks/src/main/java/Sinks/StreamSinker.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="199">
+            <state relative-caret-position="1783">
               <caret line="116" selection-start-line="116" selection-end-line="116" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -150,8 +149,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Middleware/Validation.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="48">
-              <caret line="30" lean-forward="true" selection-start-line="30" selection-end-line="30" />
+            <state relative-caret-position="244">
+              <caret line="42" column="8" selection-start-line="42" selection-start-column="8" selection-end-line="42" selection-end-column="8" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -245,13 +244,13 @@
         <option value="$PROJECT_DIR$/ValuesSinks/src/main/java/Aux/GeoJS.java" />
         <option value="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Alerts.java" />
         <option value="$PROJECT_DIR$/DLAPI/src/main/java/API/DataLayerAPI.java" />
-        <option value="$PROJECT_DIR$/ValuesSinks/src/main/java/Sink/ValuesSinker.java" />
         <option value="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Values.java" />
-        <option value="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Devices.java" />
-        <option value="$PROJECT_DIR$/DevicesSinks/src/main/java/Sink/DevSink.java" />
         <option value="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Streams.java" />
-        <option value="$PROJECT_DIR$/DLAPI/src/main/java/API/Middleware/Validation.java" />
         <option value="$PROJECT_DIR$/Sinks/src/main/java/Sinks/StreamSinker.java" />
+        <option value="$PROJECT_DIR$/DevicesSinks/src/main/java/Sink/DevSink.java" />
+        <option value="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Devices.java" />
+        <option value="$PROJECT_DIR$/DLAPI/src/main/java/API/Middleware/Validation.java" />
+        <option value="$PROJECT_DIR$/ValuesSinks/src/main/java/Sink/ValuesSinker.java" />
       </list>
     </option>
   </component>
@@ -285,15 +284,6 @@
         </path>
         <path>
           <item name="" type="16c1761:MavenProjectsStructure$RootNode" />
-          <item name="Sinks" type="9519ce18:MavenProjectsStructure$ProjectNode" />
-        </path>
-        <path>
-          <item name="" type="16c1761:MavenProjectsStructure$RootNode" />
-          <item name="Sinks" type="9519ce18:MavenProjectsStructure$ProjectNode" />
-          <item name="Lifecycle" type="58874e2:MavenProjectsStructure$LifecycleNode" />
-        </path>
-        <path>
-          <item name="" type="16c1761:MavenProjectsStructure$RootNode" />
           <item name="ValuesSinks" type="9519ce18:MavenProjectsStructure$ProjectNode" />
         </path>
         <path>
@@ -308,7 +298,7 @@
   <component name="ProjectFrameBounds">
     <option name="x" value="1924" />
     <option name="y" value="3" />
-    <option name="width" value="955" />
+    <option name="width" value="635" />
     <option name="height" value="1073" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -404,7 +394,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.DevSink">
+  <component name="RunManager" selected="Application.ValuesSinker">
     <configuration name="DataLayerAPI (2)" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="API.DataLayerAPI" />
       <module name="DLAPI" />
@@ -472,9 +462,9 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.DevSink" />
-        <item itemvalue="Application.DataLayerAPI (2)" />
         <item itemvalue="Application.ValuesSinker" />
+        <item itemvalue="Application.DataLayerAPI (2)" />
+        <item itemvalue="Application.DevSink" />
         <item itemvalue="Application.StreamSinker" />
         <item itemvalue="Application.GeoJS" />
       </list>
@@ -494,9 +484,9 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1924" y="3" width="955" height="1073" extended-state="0" />
+    <frame x="1924" y="3" width="635" height="1073" extended-state="0" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.27734807" />
+      <window_info content_ui="combo" id="Project" order="0" weight="0.42320442" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -521,7 +511,7 @@
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Palette" order="3" />
-      <window_info anchor="right" id="Maven" order="4" visible="true" weight="0.68839777" />
+      <window_info anchor="right" id="Maven" order="4" visible="true" weight="0.94871795" />
       <window_info anchor="right" id="Theme Preview" order="5" />
       <window_info anchor="right" id="Capture Analysis" order="6" />
       <window_info anchor="right" id="Palette&#9;" order="7" />
@@ -563,25 +553,25 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/DLAPI/src/main/java/API/Middleware/Validation.java</url>
-          <line>134</line>
+          <line>133</line>
           <properties />
           <option name="timeStamp" value="2" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/DLAPI/src/main/java/API/Middleware/Validation.java</url>
-          <line>148</line>
+          <line>147</line>
           <properties />
           <option name="timeStamp" value="3" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/DLAPI/src/main/java/API/Middleware/Validation.java</url>
-          <line>138</line>
+          <line>137</line>
           <properties />
           <option name="timeStamp" value="4" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/DLAPI/src/main/java/API/Middleware/Validation.java</url>
-          <line>139</line>
+          <line>138</line>
           <properties />
           <option name="timeStamp" value="5" />
         </line-breakpoint>
@@ -760,16 +750,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/DataLayerAPI.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="226">
-          <caret line="25" column="78" selection-start-line="25" selection-start-column="78" selection-end-line="25" selection-end-column="78" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Values.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1872">
@@ -783,21 +763,10 @@
     <entry file="file://$PROJECT_DIR$/DevicesSinks/src/main/java/portugal_municipios.geojson">
       <provider selected="true" editor-type-id="LargeFileEditor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/ValuesSinks/src/main/java/Sink/ValuesSinker.java">
+    <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Streams.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="651">
-          <caret line="102" selection-start-line="102" selection-end-line="102" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#7867#7868#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Middleware/Validation.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="48">
-          <caret line="30" lean-forward="true" selection-start-line="30" selection-end-line="30" />
+        <state relative-caret-position="160">
+          <caret line="19" column="36" selection-start-line="19" selection-start-column="36" selection-end-line="19" selection-end-column="36" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -806,36 +775,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/DevicesSinks/src/main/java/aveiro.geojson">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="80">
+        <state relative-caret-position="64">
           <caret column="1041" selection-start-column="1041" selection-end-column="1041" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/DevicesSinks/src/main/java/Sink/DevSink.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="288">
-          <caret line="40" column="8" selection-start-line="40" selection-start-column="8" selection-end-line="40" selection-end-column="8" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#8853#8854#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Devices.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-224">
-          <caret line="19" selection-start-line="19" selection-end-line="19" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Streams.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="160">
-          <caret line="19" column="36" lean-forward="true" selection-start-line="19" selection-start-column="36" selection-end-line="19" selection-end-column="36" />
+        <state relative-caret-position="1312">
+          <caret line="191" column="34" selection-start-line="191" selection-start-column="34" selection-end-line="191" selection-end-column="34" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -844,8 +792,50 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Sinks/src/main/java/Sinks/StreamSinker.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="199">
+        <state relative-caret-position="1783">
           <caret line="116" selection-start-line="116" selection-end-line="116" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Middleware/Validation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="244">
+          <caret line="42" column="8" selection-start-line="42" selection-start-column="8" selection-end-line="42" selection-end-column="8" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ValuesSinks/src/main/java/Sink/ValuesSinker.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2011">
+          <caret line="149" column="25" selection-start-line="149" selection-start-column="25" selection-end-line="149" selection-end-column="25" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#7867#7868#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DevicesSinks/src/main/java/Sink/DevSink.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="496">
+          <caret line="170" column="55" lean-forward="true" selection-start-line="170" selection-start-column="55" selection-end-line="170" selection-end-column="55" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#10055#10056#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/DataLayerAPI.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="226">
+          <caret line="25" column="78" selection-start-line="25" selection-start-column="78" selection-end-line="25" selection-end-column="78" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

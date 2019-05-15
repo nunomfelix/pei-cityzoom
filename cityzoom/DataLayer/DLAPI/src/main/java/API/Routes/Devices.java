@@ -5,7 +5,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mongodb.client.FindIterable;
 import org.bson.Document;
-import org.bson.types.ObjectId;
 import org.json.JSONException;
 import spark.Request;
 import spark.Response;
@@ -139,7 +138,7 @@ public class Devices {
                             "\t\"streams\": "+ Arrays.toString(streamList.toArray()) +",\n" +
                             "\t\"device_name\": \""+jsonDev.get("device_name").getAsString()+"\",\n" +
                             "\t\"description\": \""+jsonDev.get("description").getAsString()+"\",\n" +
-                            "\t\"locations\": ["+jsonDev.get("locations").getAsJsonArray()+"],\n"+
+                            "\t\"locations\": "+jsonDev.get("locations").getAsJsonArray()+",\n"+
                             "\t\"creation\": "+jsonDev.get("creation").getAsJsonObject().get("$numberLong").getAsLong()+"\n" +
                             "}";
             userDevices.add(device);
@@ -190,7 +189,7 @@ public class Devices {
                 "\t\"streams\": "+ Arrays.toString(streamList.toArray()) +",\n" +
                 "\t\"device_name\": \""+jsonDev.get("device_name").getAsString()+"\",\n" +
                 "\t\"description\": \""+jsonDev.get("description").getAsString()+"\",\n" +
-                "\t\"locations\": ["+jsonDev.get("locations").getAsJsonArray()+"],\n"+
+                "\t\"locations\": "+jsonDev.get("locations").getAsJsonArray()+",\n"+
                 "\t\"creation\": "+jsonDev.get("creation").getAsJsonObject().get("$numberLong").getAsLong()+"\n" +
                 "}";
     }

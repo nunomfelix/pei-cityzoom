@@ -147,8 +147,8 @@ public class ValuesSinker {
                     logger.info("Offsets commited");
 
                     try {
-                        Thread.sleep(Duration.ofMinutes(5).toMillis());
-                        //Thread.sleep(Duration.ofMillis(100).toMillis());
+                        //Thread.sleep(Duration.ofMinutes(5).toMillis());
+                        Thread.sleep(Duration.ofMillis(100).toMillis());
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
