@@ -52,9 +52,9 @@ public class Values {
         }
 
         List<String> valuesList = new ArrayList<>();
-        long size = values.countDocuments(and(eq("stream_name", request.queryParams("stream")),gte("timestamp", start), lte("timestamp", end)));
+        long size = values.countDocuments(and(eq("_id", new ObjectId(request.queryParams("stream"))),gte("timestamp", start), lte("timestamp", end)));
         long total = values.countDocuments();
-        FindIterable<Document> valuesIterable = values.find(and(eq("stream_name", request.queryParams("stream")),gte("timestamp", start), lte("timestamp", end)));
+        FindIterable<Document> valuesIterable = values.find(and(eq("_id", new ObjectId(request.queryParams("stream"))),gte("timestamp", start), lte("timestamp", end)));
         JsonObject jsonValue;
         for (Document document :valuesIterable) {
             jsonValue = (JsonObject) MongoAux.jsonParser.parse(document.toJson());
@@ -71,7 +71,7 @@ public class Values {
         response.status(HttpsURLConnection.HTTP_OK);
         if (end != compass || start != 0) {
             return "{\n" +
-                    "\t\"stream_name\": \""+request.queryParams("stream")+"\",\n" +
+                    "\t\"stream_id\": \""+request.queryParams("stream")+"\",\n" +
                     "\t\"start\": "+start+",\n" +
                     "\t\"end\": "+end+",\n" +
                     "\t\"size\": "+size+",\n" +
@@ -80,7 +80,7 @@ public class Values {
                     "}";
         }
         return "{\n" +
-                "\t\"stream_name\": \""+request.queryParams("stream")+"\",\n" +
+                "\t\"stream_id\": \""+request.queryParams("stream")+"\",\n" +
                 "\t\"total\": "+total+",\n" +
                 "\t\"values\": "+valuesList.toString()+"\n" +
                 "}";
@@ -98,9 +98,9 @@ public class Values {
             return valid;
         }
         */
-        String stream = body.get("stream_name").getAsString();
+        String stream = body.get("stream_id").getAsString();
         String devID = body.get("device_id").getAsString();
-        Document docStream = streams.find(eq("stream", stream)).first();
+        Document docStream = streams.find(eq("_id", new ObjectId(stream))).first();
         if (docStream == null) {
             response.status(HttpsURLConnection.HTTP_NOT_FOUND);
             return "{\n" +
