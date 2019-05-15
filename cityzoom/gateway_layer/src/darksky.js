@@ -4,7 +4,7 @@ const fs = require('fs')
 async function get_darksky_data(lat, long) {
 
     var tmp = {}
-    var city_info = await axios.get('https://api.darksky.net/forecast/f5e30cf666320006447f251880cad6bc/' + lat + ',' + long + '?units=si')
+    var city_info = await axios.get('https://api.darksky.net/forecast/b91f7d76e6e8638fa72345c58bce52ec/' + lat + ',' + long + '?units=si')
     tmp['temperature'] = city_info.data.hourly.data[0].temperature
     tmp['pressure'] = city_info.data.hourly.data[0].pressure
     tmp['humidity'] = city_info.data.hourly.data[0].humidity
@@ -91,21 +91,14 @@ for(i in obj.features){
     positions[obj.features[i].properties.name_2] = [center_long, center_lat]
 }
 
-for(city in positions){
-    var first = true
-    var position = positions[city]
-    //Create device for each city
-    create_Device('darksky', ['AirQuality', 'Temperature'] , position, `${city}`)
-    setInterval(async () => {
+(async function kek() {
+    const kek = {}
+    for(city in positions){
+        var first = true
+        var position = positions[city]
         var data = await get_darksky_data(position[1],position[0])
-        for(var key in data[0]){
-            if(first){
-                var device_id = await get_Device(position)
-                console.log(device_id)
-                create_Stream(key, device_id)
-            }
-            put_Stream(key, data[0][key], position)
-        }
-        first = false
-    }, 10000) //every 2 minutes, making 720 requests a day (the max possible is 1000) 
-}
+        //Create device for each city
+        kek[city] = data[0]
+    }
+    console.log(kek)
+})()

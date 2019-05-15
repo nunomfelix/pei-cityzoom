@@ -5,14 +5,14 @@
         <div v-if="selected_county" :style="{ 'background-color': testValues[selected_county.get('name_2')].color}" class="ol-popup top">
             <div style="background-color: rgba(0,0,0, .5)">
                 <span class="big"> {{selected_county.get('name_2')}} </span>
-                <span class="big"> {{testValues[selected_county.get('name_2')].value.toFixed(2)}} </span>
+                <span class="big"> {{data[selected_county.get('name_2')][this.getVerticals[this.selected_vertical].streams[this.selected_stream].name].toFixed(2)}} </span>
             </div>
         </div>
 
         <div id="hover_popup" class="ol-popup" :style="{ 'background-color': hovered_geo ? testValues[hovered_geo.get('name_2')].color : ''}">
             <div v-if="hovered_geo" style="background-color: rgba(0,0,0, .5)">
                 <span class="normal"> {{hovered_geo.get('name_2')}} </span>
-                <span class="normal"> {{testValues[hovered_geo.get('name_2')].value.toFixed(2)}} </span>
+                <span class="normal"> {{data[hovered_geo.get('name_2')][this.getVerticals[this.selected_vertical].streams[this.selected_stream].name].toFixed(2)}} </span>
             </div>
         </div>
 
@@ -89,7 +89,69 @@ export default {
 
             geo_layer: null,
             devices_layer: null,
-            shown_features: []
+            shown_features: [],
+
+            data: { 'Águeda':
+                { temperature_stream: 18.58,
+                    pressure_stream: 1014.08,
+                    humidity_stream: 0.82,
+                    ozone_stream: 314.83 },
+                Estarreja:
+                { temperature_stream: 16.62,
+                    pressure_stream: 1014.21,
+                    humidity_stream: 0.92,
+                    ozone_stream: 314.61 },
+                Murtosa:
+                { temperature_stream: 16.17,
+                    pressure_stream: 1014.26,
+                    humidity_stream: 1,
+                    ozone_stream: 314.54 },
+                'Oliveira de Azeméis':
+                { temperature_stream: 18.4,
+                    pressure_stream: 1014.15,
+                    humidity_stream: 0.75,
+                    ozone_stream: 314.54 },
+                'Oliveira do Bairro':
+                { temperature_stream: 17.94,
+                    pressure_stream: 1014.14,
+                    humidity_stream: 0.92,
+                    ozone_stream: 315.04 },
+                Ovar:
+                { temperature_stream: 17.91,
+                    pressure_stream: 1014.25,
+                    humidity_stream: 0.84,
+                    ozone_stream: 314.46 },
+                Vagos:
+                { temperature_stream: 17.52,
+                    pressure_stream: 1014.25,
+                    humidity_stream: 0.97,
+                    ozone_stream: 314.56 },
+                'Vale de Cambra':
+                { temperature_stream: 18.06,
+                    pressure_stream: 1014.1,
+                    humidity_stream: 0.73,
+                    ozone_stream: 314.21 },
+                'Ílhavo':
+                { temperature_stream: 17.53,
+                    pressure_stream: 1014.27,
+                    humidity_stream: 0.96,
+                    ozone_stream: 314.56 },
+                'Albergaria-a-Velha':
+                { temperature_stream: 18.34,
+                    pressure_stream: 1014.15,
+                    humidity_stream: 0.81,
+                    ozone_stream: 314.78 },
+                Anadia:
+                { temperature_stream: 18.47,
+                    pressure_stream: 1014.07,
+                    humidity_stream: 0.61,
+                    ozone_stream: 315.32 },
+                Aveiro:
+                { temperature_stream: 16.75,
+                    pressure_stream: 1014.23,
+                    humidity_stream: 0.98,
+                    ozone_stream: 314.66 } 
+            }
         }
     },
     computed: {
@@ -255,10 +317,6 @@ export default {
                     }
                 })
 
-                this.testValuesOrdered = Object.keys(this.testValues).sort((a,b) => {
-                    return this.testValues[a].value - this.testValues[b].value
-                })
-
                 this.geo_layer.setStyle((feature) => {
                     return feature == this.selected_county ? this.geoStyle.active : this.testValues[feature.get('name_2')].style
                 })
@@ -284,8 +342,8 @@ export default {
             layers: [this.geo_layer],
             style: (feature) => {
                 return feature == this.selected_county 
-                ? this.geoStyle.active
-                : this.geoStyle.hover
+                    ? this.geoStyle.active
+                    : this.geoStyle.hover
             },
             multi: false
         })
@@ -482,8 +540,12 @@ export default {
         },
         updateHeatMap() {
             this.rainbowHeatMap.setNumberRange(1, this.geo_layer.getSource().getFeatures().length);
-            console.log(this.getVerticals)
             this.rainbowHeatMap.setSpectrum(this.getVerticals[this.selected_vertical].streams[this.selected_stream].colors[0] , this.getVerticals[this.selected_vertical].streams[this.selected_stream].colors[1]); 
+
+
+            this.testValuesOrdered = Object.keys(this.data).sort((a,b) => {
+                return this.data[a][this.getVerticals[this.selected_vertical].streams[this.selected_stream].name] - this.data[b][this.getVerticals[this.selected_vertical].streams[this.selected_stream].name]
+            })
 
             for(var i in this.testValuesOrdered) {
                 this.testValues[this.testValuesOrdered[i]].color = '#' + this.rainbowHeatMap.colourAt(i);
