@@ -45,8 +45,9 @@
 </template>
 
 <script>
-var features = []
 var Rainbow = require('rainbowvis.js');
+const drone_stream = require('static/get_stream_values_response.json');
+//console.log(JSON.stringify(drone_stream))  
 export default {
     data() {
         return {
@@ -78,7 +79,7 @@ export default {
             selected_county: null,
             hovered_feature: null,
             geoJsonExtent: null,
-            showModal: false
+            showModal: false,
         }
     },
     computed: {
@@ -118,34 +119,6 @@ export default {
                 src: 'icons/Temperature.png'
             }))
         })]
-
-        this.devicesStyle.default = new this.req.style.Style({
-            fill: new this.req.style.Fill({
-                color: 'rgba(255,255,255,.6)'
-            }),
-            stroke: new this.req.style.Stroke({
-                color:'rgb(48, 145, 198)',
-                width: 1      
-            })
-        })
-        this.devicesStyle.hover = new this.req.style.Style({
-            fill: new this.req.style.Fill({
-                color: 'rgba(225, 225, 225, .6)'
-            }),
-            stroke: new this.req.style.Stroke({
-                color:'rgb(0, 0, 255)',
-                width: 1.5
-            })
-        })
-        this.devicesStyle.active = new this.req.style.Style({
-            fill: new this.req.style.Fill({
-                color: 'rgba(255, 255, 255, .25)'
-            }),
-            stroke: new this.req.style.Stroke({
-                color:'rgb(0, 0, 125)',
-                width: 5
-            })
-        })
 
         this.geoStyle.default = new this.req.style.Style({
             fill: new this.req.style.Fill({
@@ -197,18 +170,10 @@ export default {
                 duration: 250
             }
         });
-        
-        features.push(new Feature({
-            geometry: new geom.Point(proj.transform([-8.661682, 40.6331731], 'EPSG:4326',     
-            'EPSG:3857')),
-            //id: device.id
-            name: 'Null Island'
-        }));
-
+    
         //console.log(features)
     
         var vectorSource = new source.Vector({
-            features: features, //add an array of features
             style: (feature) => {
                 return this.devicesStyle
             }
@@ -344,7 +309,7 @@ export default {
                 this.hoverOverlay.setPosition(null)
             } else if(e.selected.length > 1) {
                 const device_feature = e.selected[e.selected.length - 1]
-                this.showModal = true
+                this.showModal = true   
             }
             click_interaction.getFeatures().clear()
         })
@@ -364,23 +329,31 @@ export default {
         //     this.showModal = true
         // })
 
-        this.createFeature(vectorSource, []);
+        //this.createFeature(vectorSource, []);
 
         
         //console.log(devicesLayer.getSource().getFeatures());
 
         //this.createFeature(vectorSource, []);
-        // setInterval(()=> {
-        //     vectorSource.forEachFeature(feature => {
-        //         vectorSource.removeFeature(feature)
-        //         var coordinates = this.gen_random_coordinates() 
-        //         vectorSource.addFeature(new Feature({
-        //             geometry: new geom.Point(proj.transform(coordinates, 'EPSG:4326', 'EPSG:3857')),
-        //             //id: device.id
-        //             name: 'Null Island'
-        //         }));
-        //     })
-        // },500);
+        var feat = new Feature({
+            geometry: new geom.Point(proj.transform([drone_stream.values[0].longitude, drone_stream.values[0].latitude], 'EPSG:4326',     
+            'EPSG:3857'))
+            //id: device.id
+        })
+        vectorSource.addFeature(feat)
+        var i = 1;
+        setInterval(() => {
+            vectorSource.removeFeature(feat);
+            feat = new Feature({
+                geometry: new geom.Point(proj.transform([drone_stream.values[i].longitude, drone_stream.values[i].latitude], 'EPSG:4326',     
+                'EPSG:3857'))
+                //id: device.id
+            })
+            vectorSource.addFeature(feat)
+            i++
+        },200)
+    
+
 
     },
     methods: {
@@ -419,8 +392,8 @@ export default {
                         //id: device.id
                         name: key
                     }));
-                
             }
+
 
             return features
 

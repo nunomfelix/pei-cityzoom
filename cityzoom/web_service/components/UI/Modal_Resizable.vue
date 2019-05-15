@@ -6,21 +6,23 @@
 
           <div class="modal-header">
             <slot name="header">
-              default header
+              Device Information
             </slot>
           </div>
 
           <div class="modal-body">
             <slot name="body">
-              default body
+            <div v-if="item.type=='lines'">
+                <LineGraph :ref="item.i" :name="item.i"/>
+            </div>
             </slot>
           </div>
 
           <div class="modal-footer">
             <slot name="footer">
-              default footer
+              
               <button class="modal-default-button" @click="$emit('close')">
-                OK
+                Close
               </button>
             </slot>
           </div>
@@ -30,8 +32,14 @@
   </transition>
 </template>
 <script>
+var item = { x: 0, y: 0, w: 12, h: 14, i: "line_a", type: 'lines', data:'fake' };
 export default {
-  name: 'Modal_Resizable'
+    //props: [devices],
+  name: 'Modal_Resizable',
+  data(){
+      return {
+        item: item}   
+  }
 }
 </script>
 
@@ -54,7 +62,7 @@ export default {
 }
 
 .modal-container {
-  width: 300px;
+  width: 600px;
   margin: 0px auto;
   padding: 20px 30px;
   background-color: #fff;
