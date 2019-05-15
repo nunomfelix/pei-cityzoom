@@ -11,7 +11,7 @@ const router = new express.Router()
 
 /* Contains all device endpoints */
 
-router.post('', [validationMiddleware(validateCreateDevice, 'body'), authentication], async (req, res) => {
+router.post('', [authentication, validationMiddleware(validateCreateDevice, 'body'), authentication], async (req, res) => {
 
     const user = await User.findOne({ username: req.body.owner });
     if (!user)

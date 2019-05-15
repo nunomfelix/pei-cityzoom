@@ -6,7 +6,7 @@ import SeriesGraph from "@/components/UI/Graphs/Series"
 import StackedBar from "@/components/UI/Graphs/Columns"
 import Line from "@/components/UI/Graphs/Line"
 import Loading from "@/components/UI/Loading"
-import ModalResizable from "@/components/UI/Modal_Resizable.vue"
+import ModalResizable from "@/components/UI/Modal_Resizable"
 
 Vue.component("Navbar", Navbar);
 Vue.component("Header", Header);

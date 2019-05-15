@@ -1,6 +1,14 @@
 <template>
     <div class="mapMargin mapHeight" style="position:relative">
         <div class="mapHeight" id="map"></div>
+
+        <div v-if="selected_county" class="ol-popup top">
+            <div :style="{ 'background-color': testValues[selected_county.get('name_2')].color}">
+                <span class="big"> {{selected_county.get('name_2')}} </span>
+                <span class="big"> {{testValues[selected_county.get('name_2')].value.toFixed(2)}} </span>
+            </div>
+        </div>
+
         <div id="hover_popup" class="ol-popup">
             <div v-if="hovered_feature" :style="{ 'background-color': testValues[hovered_feature.get('name_2')].color}">
                 <span class="normal">
@@ -13,19 +21,26 @@
         </div>
         <div class="map-menu left" :class="{show: selected_county != null, active: selected_county == null}">
             <div class="map-menu_button" @click="deselect_county()">
-
             </div>
         </div>
 
         <div class="map-menu show">
-            <div class="map-menu_button">
+            <div v-if="selected_vertical != null && selected_stream != null" class="map-menu_left">
+                <div :class="{active: stream.name == getVerticals[selected_vertical].streams[selected_stream].name}" :title="stream.display" v-for="(stream, i) in getVerticals[selected_vertical].streams" :key="i" class="map-menu_button">
+                    <img :src="`icons/${getVerticals[selected_vertical].name}.png`" alt="">
+                </div>
+            </div>
+            <div class="map-menu_center">
 
             </div>
-            <div class="map-menu_button">
-                
+            <div v-if="selected_vertical != null" class="map-menu_right">
+                <div @click="selectVertical(i)" :class="{active: vertical.name == getVerticals[selected_vertical].name}" :title="vertical.display" v-for="(vertical, i) in getVerticals" :key="i" class="map-menu_button">
+                    <img :src="`icons/${vertical.name}.png`" alt="">
+                </div>
             </div>
         </div>
         <Loading :show="!loaded" type="absolute"/> 
+        <ModalResizable v-if="showModal" @close="showModal = false"/>
     </div>
 </template>
 
@@ -36,7 +51,8 @@ export default {
     data() {
         return {
             req: {
-                Ol: null
+                Ol: null,
+                etent: null,
             },
             map: null,
             loaded: false,
@@ -52,47 +68,48 @@ export default {
             },  
             hoverOverlay: null,
             hoverPopup: null,
-            testValues: { },
+            testValues: {},
+            testValuesOrdered: [],
             rainbowHeatMap: null,
-            hovered_feature: null,
-            state: null,
+
+            selected_vertical: null,
+            selected_stream: null,
+
             selected_county: null,
-            geoJsonExtent: null
+            hovered_feature: null,
+            geoJsonExtent: null,
+            showModal: false
+        }
+    },
+    computed: {
+        getVerticals() {
+            return this.$store.state.verticals
         }
     },
     mounted() {
-        
         this.req.Ol = require( 'ol');
         const proj = require('ol/proj')
         const source = require( 'ol/source');
         const layer = require( 'ol/layer');
-        const style = require( 'ol/style');
-        const extent = require( 'ol/extent');
-
-        const { click, pointerMove, altKeyOnly, noModifierKeys, altShiftKeysOnly, platformModifierKeyOnly } = require('ol/events/condition.js');
-
-        // const style = require( 'ol/style');
-
+        this.req.style = require( 'ol/style');
+        this.req.extent = require( 'ol/extent');
         const format = require('ol/format')
         const geom = require( 'ol/geom');
-        // const {Polygon, fromExtent} = require( 'ol/geom/Polygon');
         const interaction = require( 'ol/interaction');
-        // const extent = require( 'ol/extent');
-        // const Overlay = require( 'ol/Overlay.js');
         const { Feature } = require( 'ol')
-        // const { click, pointerMove, altKeyOnly, noModifierKeys, altShiftKeysOnly, platformModifierKeyOnly } = require( 'ol/events/condition.js');
-        var iconStyle = [new style.Style({
-            image: new style.Icon(/** @type {olx.style.IconOptions} */ ({
+        const { click, pointerMove, altKeyOnly, noModifierKeys, altShiftKeysOnly, platformModifierKeyOnly } = require( 'ol/events/condition.js');
+        var iconStyle = [new this.req.style.Style({
+            image: new this.req.style.Icon(/** @type {olx.this.req.style.IconOptions} */ ({
                 anchor: [0.5, 0.5],
                 anchorXUnits: 'fraction',
                 anchorYUnits: 'fraction',
                 scale: 1,
                 opacity: 0.75,
-                src: 'icons/Air_Quality.png'
+                src: 'icons/AirQuality.png'
             }))
         })
-        ,new style.Style({
-            image: new style.Icon(/** @type {olx.style.IconOptions} */ ({
+        ,new this.req.style.Style({
+            image: new this.req.style.Icon(/** @type {olx.this.req.style.IconOptions} */ ({
                 anchor: [0.5, 0.5],
                 anchorXUnits: 'fraction',
                 anchorYUnits: 'fraction',
@@ -102,76 +119,73 @@ export default {
             }))
         })]
 
-        this.devicesStyle.default = new style.Style({
-            fill: new style.Fill({
+        this.devicesStyle.default = new this.req.style.Style({
+            fill: new this.req.style.Fill({
                 color: 'rgba(255,255,255,.6)'
             }),
-            stroke: new style.Stroke({
+            stroke: new this.req.style.Stroke({
                 color:'rgb(48, 145, 198)',
                 width: 1      
             })
         })
-        this.devicesStyle.hover = new style.Style({
-            fill: new style.Fill({
+        this.devicesStyle.hover = new this.req.style.Style({
+            fill: new this.req.style.Fill({
                 color: 'rgba(225, 225, 225, .6)'
             }),
-            stroke: new style.Stroke({
+            stroke: new this.req.style.Stroke({
                 color:'rgb(0, 0, 255)',
                 width: 1.5
             })
         })
-        this.devicesStyle.active = new style.Style({
-            fill: new style.Fill({
+        this.devicesStyle.active = new this.req.style.Style({
+            fill: new this.req.style.Fill({
                 color: 'rgba(255, 255, 255, .25)'
             }),
-            stroke: new style.Stroke({
+            stroke: new this.req.style.Stroke({
                 color:'rgb(0, 0, 125)',
                 width: 5
             })
         })
 
-        this.geoStyle.default = new style.Style({
-            fill: new style.Fill({
+        this.geoStyle.default = new this.req.style.Style({
+            fill: new this.req.style.Fill({
                 color: 'rgba(255,255,255,.20)'
             }),
-            stroke: new style.Stroke({
+            stroke: new this.req.style.Stroke({
                 color:'rgb(48, 145, 198)',
                 width: 1
             })
         })
 
-        this.geoStyle.hover = new style.Style({
-            fill: new style.Fill({
+        this.geoStyle.hover = new this.req.style.Style({
+            fill: new this.req.style.Fill({
                 color: 'rgba(225, 225, 225, .6)'
             }),
-            stroke: new style.Stroke({
+            stroke: new this.req.style.Stroke({
                 color:'rgb(0, 0, 255)',
                 width: 1.5
             })
         })
 
-        this.geoStyle.active = new style.Style({
-            fill: new style.Fill({
+        this.geoStyle.active = new this.req.style.Style({
+            fill: new this.req.style.Fill({
                 color: 'rgba(255, 255, 255, .25)'
             }),
-            stroke: new style.Stroke({
+            stroke: new this.req.style.Stroke({
                 color:'rgb(0, 0, 125)',
                 width: 5
             })
         })
 
-        const geo_layer = new layer.Vector({
+        this.geo_layer = new layer.Vector({
             source: new source.Vector({
                 projection : 'EPSG:3857',
-                url: 'portugal_municipios.geojson',
+                url: 'aveiro.geojson',
                 format: new format.GeoJSON()
             }),
-            // renderBuffer: window.innerWidth,
-            // updateWhileAnimating: true,
-            renderMode: 'image',
-            style: (feature) => {
-                return this.geoStyle.default
-            }
+            renderBuffer: window.innerWidth,
+            updateWhileAnimating: true,
+            // renderMode: 'image'
         })
 
         this.hoverPopup = document.getElementById('hover_popup');
@@ -184,13 +198,12 @@ export default {
             }
         });
         
-
         features.push(new Feature({
-                        geometry: new geom.Point(proj.transform([-8.661682, 40.6331731], 'EPSG:4326',     
-                        'EPSG:3857')),
-                        //id: device.id
-                        name: 'Null Island'
-                        }));
+            geometry: new geom.Point(proj.transform([-8.661682, 40.6331731], 'EPSG:4326',     
+            'EPSG:3857')),
+            //id: device.id
+            name: 'Null Island'
+        }));
 
         //console.log(features)
     
@@ -216,8 +229,8 @@ export default {
                 new layer.Tile({
                     source: new source.OSM(),
                 }),
-                geo_layer,
-                devicesLayer         
+                devicesLayer,  
+                this.geo_layer,      
             ],
             overlays: [this.hoverOverlay],
             view: new this.req.Ol.View({
@@ -228,24 +241,14 @@ export default {
             })
         })
 
-        devicesLayer.getSource().on('click', (e) => {
-            console.log('entrei')
-            map.forEachFeatureAtPixel(e.pixel, function (feature, layer) {
-                console.log('feature')
-            })
-        }) 
-
-        geo_layer.getSource().on('change', () => {
-            if(geo_layer.getSource().getState() == 'ready' && !this.loaded) {
+        this.geo_layer.getSource().on('change', () => {
+            if(this.geo_layer.getSource().getState() == 'ready' && !this.loaded) {
                 this.loaded = true
-
                 this.rainbowHeatMap = new Rainbow()
-                this.rainbowHeatMap.setNumberRange(1, geo_layer.getSource().getFeatures().length);
-                this.rainbowHeatMap.setSpectrum('green', 'red'); 
 
-                this.geoJsonExtent = extent.createEmpty()
-                geo_layer.getSource().getFeatures().forEach(feature => {
-                    this.geoJsonExtent = extent.extend(this.geoJsonExtent, feature.getGeometry().getExtent())
+                this.geoJsonExtent = this.req.extent.createEmpty()
+                this.geo_layer.getSource().getFeatures().forEach(feature => {
+                    this.geoJsonExtent = this.req.extent.extend(this.geoJsonExtent, feature.getGeometry().getExtent())
                     this.testValues[feature.get('name_2')] = {
                         value: Math.random() * 35,
                         color: null,
@@ -253,34 +256,27 @@ export default {
                     }
                 })
 
-                const testValuesOrdered = Object.keys(this.testValues).sort((a,b) => {
+                this.testValuesOrdered = Object.keys(this.testValues).sort((a,b) => {
                     return this.testValues[a].value - this.testValues[b].value
                 })
-                for(var i in testValuesOrdered) {
-                    this.testValues[testValuesOrdered[i]].color = '#' + this.rainbowHeatMap.colourAt(i);
-                    this.testValues[testValuesOrdered[i]].style = new style.Style({
-                        fill: new style.Fill({
-                            color: this.testValues[testValuesOrdered[i]].color
-                        }),
-                        stroke: new style.Stroke({
-                            color: 'black',
-                            width: this.map.getView().getZoom() / 20 * 2.5
-                        })
-                    })
-                }
 
                 devicesLayer.setStyle((feature) => { return iconStyle[Math.floor(Math.random() * iconStyle.length)]})
 
-                geo_layer.setStyle((feature) => {
+                this.geo_layer.setStyle((feature) => {
                     return feature == this.selected_county ? this.geoStyle.active : this.testValues[feature.get('name_2')].style
                 })
-
-
 
                 this.map.getView().fit(this.geoJsonExtent, {
                     duration: 500
                 })
  
+                setTimeout(() => {
+                    this.map.getView().fit(this.geoJsonExtent, {
+                        duration: 500
+                    })
+                },0)
+
+                this.selectVertical(0)
             }
         })
 
@@ -288,7 +284,7 @@ export default {
             condition: (e) => {
                 return pointerMove(e) && !this.map.getView().getAnimating();
             },
-            layers: [geo_layer],
+            layers: [this.geo_layer],
             style: (feature) => {
                 return feature == this.selected_county ?
                     this.geoStyle.active
@@ -300,55 +296,80 @@ export default {
 
         this.map.addInteraction(hover_interaction);
         hover_interaction.on('select', (e) => {
-            if (e.selected.length) {
+            if(e.selected.length && e.selected[0] != this.selected_county) {
                 this.hovered_feature = e.selected[0]
                 document.body.style.cursor = "pointer"
-                var center = extent.getCenter(this.hovered_feature.getGeometry().getExtent())
-                this.hoverOverlay.setPosition(center)
+                this.hoverOverlay.setPosition(this.req.extent.getCenter(this.hovered_feature.getGeometry().getExtent()))
             } else {
                 this.hovered_feature = null
                 document.body.style.cursor = "default"
                 this.hoverOverlay.setPosition(null)
             }
-        }) 
+        })
 
         const click_interaction = new interaction.Select({
             condition: (e) => {
                 return click(e);
             },
-            layers: [geo_layer, devicesLayer],
+            layers: [this.geo_layer, devicesLayer],
             multi: true
         })
 
         this.map.addInteraction(click_interaction);
         click_interaction.on('select', (e) => {
-            const feature = e.selected[0]
-            this.map.setView(new this.req.Ol.View({
-                center: this.map.getView().getCenter(),
-                zoom: this.map.getView().getZoom(),
-                minZoom: 0,
-                maxZoom: 18
-            }))
-            this.map.getView().fit(feature.getGeometry().getExtent(), {
-                duration: 500,
-                callback: () =>  {
-                    this.map.setView(new this.req.Ol.View({
-                        extent: feature.getGeometry().getExtent(),
-                        center: this.map.getView().getCenter(),
-                        zoom: this.map.getView().getZoom(),
-                        minZoom: this.map.getView().getZoom(),
-                        maxZoom: 18
-                    }))
-                }
-            })   
-            this.selected_county = feature 
+            document.body.style.cursor = "default"
+            this.hovered_feature = null
+            const geo_feature = e.selected[0]
+            if(geo_feature != this.selected_county) {
+                this.map.setView(new this.req.Ol.View({
+                    center: this.map.getView().getCenter(),
+                    zoom: this.map.getView().getZoom(),
+                    minZoom: 0,
+                    maxZoom: 18
+                }))
+                this.map.getView().fit(geo_feature.getGeometry().getExtent(), {
+                    duration: 500,
+                    padding: [120, 140, 0, 0],
+                    callback: () =>  {
+                        this.map.setView(new this.req.Ol.View({
+                            extent: geo_feature.getGeometry().getExtent(),
+                            center: this.map.getView().getCenter(),
+                            zoom: this.map.getView().getZoom(),
+                            minZoom: this.map.getView().getZoom(),
+                            maxZoom: 18
+                        }))
+                    }
+                })   
+                this.selected_county = geo_feature 
+                this.hoverOverlay.setPosition(null)
+            } else if(e.selected.length > 1) {
+                const device_feature = e.selected[e.selected.length - 1]
+                this.showModal = true
+            }
             click_interaction.getFeatures().clear()
-        }),
-        
-        this.createFeature(vectorSource, []);
-        
-        console.log(devicesLayer.getSource().getFeatures())
+        })
 
+        // const click_device_interaction = new interaction.Select({
+        //     condition: (e) => {
+        //         return click(e);
+        //     },
+        //     layers: [devicesLayer]
+        // })
+        // this.map.addInteraction(click_device_interaction);
+
+        // click_device_interaction.on('select', (e) => {
+        //     document.body.style.cursor = "default"
+        //     const feature = e.selected[0]
+        //     console.log(feature)
+        //     this.showModal = true
+        // })
+
+        this.createFeature(vectorSource, []);
+
+        
+        //console.log(devicesLayer.getSource().getFeatures());
+
+        //this.createFeature(vectorSource, []);
         // setInterval(()=> {
         //     vectorSource.forEachFeature(feature => {
         //         vectorSource.removeFeature(feature)
@@ -360,7 +381,6 @@ export default {
         //         }));
         //     })
         // },500);
-        
 
     },
     methods: {
@@ -393,35 +413,59 @@ export default {
                                 Anadia: [ 40.453942999999995, -8.445653 ],
                                 Aveiro: [ 40.627367, -8.642215499999999 ]}
 
-                for (const [key, value] of Object.entries(coordinates)) {        
-                        source.addFeature(new Feature({
-                            geometry: new geom.Point(proj.transform([value[1],value[0]], 'EPSG:4326', 'EPSG:3857')),
-                            //id: device.id
-                            name: key
-                        }));
-                    
-                }
-
-                return features
-
-                //console.log(features)
+            for (const [key, value] of Object.entries(coordinates)) {        
+                    source.addFeature(new Feature({
+                        geometry: new geom.Point(proj.transform([value[1],value[0]], 'EPSG:4326', 'EPSG:3857')),
+                        //id: device.id
+                        name: key
+                    }));
+                
             }
-        ,
+
+            return features
+
+            //console.log(features)
+        },
         gen_random_coordinates(){
             const limits = [-8.654981, -8.638642, 40.648018, 40.635610] 
             return [(Math.random() * (limits[0] - limits[1]) + limits[1]),(Math.random() * (limits[2] - limits[3]) + limits[3])]
+        },
+        selectVertical(i) {
+            this.selected_vertical = i
+            this.selected_stream = 0
+            this.rainbowHeatMap.setNumberRange(1, this.geo_layer.getSource().getFeatures().length);
+            this.rainbowHeatMap.setSpectrum(this.getVerticals[i].streams[0].colors[0] , this.getVerticals[i].streams[0].colors[1]); 
+
+            for(var i in this.testValuesOrdered) {
+                this.testValues[this.testValuesOrdered[i]].color = '#' + this.rainbowHeatMap.colourAt(i);
+                this.testValues[this.testValuesOrdered[i]].style = new this.req.style.Style({
+                    fill: new this.req.style.Fill({
+                        color: this.testValues[this.testValuesOrdered[i]].color
+                    }),
+                    stroke: new this.req.style.Stroke({
+                        color: 'black',
+                        width: this.map.getView().getZoom() / 20 * 2.5
+                    })
+                })
+            }
+
+            this.geo_layer.setStyle((feature) => {
+                return feature == this.selected_county ? this.geoStyle.active : this.testValues[feature.get('name_2')].style
+            })
         }
 
     }
+
 }
 </script>
+
 
 <style lang="scss" scope>
 @import '~/assets/mixins.scss';
 
 .ol-popup {
 
-    @include shadow(0px, 1px, 4px, 0px, rgba(0,0,0,0.2));
+    @include shadow(0px, 0px, 4px, 0px, rgba(0,0,0,0.2));
     pointer-events: none;
     z-index: 3332;
     position: absolute;
@@ -429,13 +473,21 @@ export default {
     filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
     font-weight: 900;
     white-space: nowrap;
-    font-size: 1.5rem;
     left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: max-content;
-    padding: 5px;
     background-color: rgba(255, 255, 255, 0.589);
+    top: 50%;
+    &:not(.top) {
+        transform: translate(-50%, -50%);
+        width: max-content;
+    }
+    &.top {
+        top: 2rem;
+        transform: translate(-50%, 0);
+        background-color: rgb(255, 255, 255);
+        min-width: 10%;
+        @include shadow(0px, 0px, 8px, 2px, rgba(0,0,0,0.2));
+    }
+    padding: 5px;
         border-radius: 12px;
 
     & > div {
@@ -447,8 +499,8 @@ export default {
 }
 
 .map-menu {
-    @include flex(center, center);
-    @include shadow(0px, 0px, 4px, 2px, rgba(0,0,0,0.2));
+
+    @include flex(center, center, row);
     @include transition(opacity, .5s, ease, 0s);
     z-index: 3600;
     opacity: 0;
@@ -457,30 +509,47 @@ export default {
     }
 
     position: absolute;
-    right: 2rem;
-    bottom: 2rem;
+
+    &:not(.left) {
+        right: 2rem;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
     &.left {
+        bottom: 2rem;
         left: 2rem;
         right: auto;
     }
-    background-color: rgba(255,255,255,.5);
-    padding: 10px;
-    & > :not(:first-child) {
-        margin-left: 1rem;
+
+    &_left,&_right {
+        @include shadow(0px, 0px, 4px, 2px, rgba(0,0,0,0.2));
+        background-color: rgba(255,255,255,.75);
+        padding: .75rem;
+        border-radius: 5px;
     }
-    border-radius: 5px;
+    &_center {
+        background-color: rgba(255,255,255,.75);
+        width: 4px;
+    }
 
     &_button {
-        transition: box-shadow .2s ease 0s, transform .2s ease 0s;
         @include shadow(0px, 0px, 4px, 2px, rgba(0,0,0,0.2));
+        @include flex(center, center);
+        transition: background-color .0s ease-out 0s, box-shadow .1s ease-out 0s, transform .1s ease 0s;
         border: 1px solid rgba(0, 0, 0, 0.171);
         background-color: white;
         width: 5rem;
         height: 5rem;
         border-radius: 5px;
+        &:not(:first-child) {
+            margin-top: .75rem;
+        }
         &:hover {
-            transform: scale(1.05);
-            cursor: pointer;
+            &:not(.active) {
+                transform: scale(1.05);
+                cursor: pointer;
+            }
             &:active {
                 @include shadow(0px, 0px, 0px, 0px, rgba(0,0,0,0));
                 transform: scale(1);
@@ -488,6 +557,10 @@ export default {
         }
         &.active {
             @include shadow(0px, 0px, 0px, 0px, rgba(0,0,0,0));
+            background-color: rgb(187, 187, 187);
+        }
+        & img {
+            width: 100%;
         }
     }
 }

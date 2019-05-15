@@ -4,6 +4,7 @@ async function get_darksky_data(lat, long) {
 
     var tmp = {}
     var city_info = await axios.get('https://api.darksky.net/forecast/f962475109da7278cd8ca1ba22186bee/' + lat + ',' + long + '?units=si')
+    console.log(city_info)
     tmp['Temperature'] = city_info.data.hourly.data[0].temperature
     tmp['PrecipProbability'] = city_info.data.hourly.data[0].precipProbability
     tmp['Humidity'] = city_info.data.hourly.data[0].humidity
@@ -40,22 +41,20 @@ async function create_darksky_pressure_stream() {
 }
 
 async function put_darksky_temperature_data(data, location) {
-    axios.put('http://localhost:8001/czb/stream', {
+    axios.post('http://localhost:8001/czb/values', {
         'stream_name': 'darksky_temperature_stream',
         'values': data.Temperature + '',
-        'location': [
-            location['lat'], location['long']
-        ]
+        'latitude' : location.lat + '',
+        'longitude' : location.long + ''
     }).catch((e) => { console.log('Failed to publish') })
 }
 
 async function put_darksky_pressure_data(data, location) {
-    axios.put('http://localhost:8001/czb/stream', {
+    axios.post('http://localhost:8001/czb/values', {
         'stream_name': 'darksky_pressure_stream',
         'values': data.Pressure + '',
-        'location': [
-            location['lat'], location['long']
-        ]
+        'latitude' : location.lat +'',
+        'longitude' : location.long +''
     }).catch((e) => { console.log('Failed to publish') })
 }
 

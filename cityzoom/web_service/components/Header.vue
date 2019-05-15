@@ -1,7 +1,7 @@
 <template>
   <div class="header">
     <div class="rowr header_buttons horizontalMargin">
-      <img src="icons/header/logout.png" @click="logout()">
+      <img src="icons/header/logout-512.png" @click="logout()">
     </div>
   </div>
 </template>
@@ -35,7 +35,7 @@ export default {
 
   &_buttons {
     & img {
-      width: 60px;
+      width: 40px;
       @include transition(transform, 0.1s, ease, 0s);
       &:hover {
         transform: scale(1.1);
