@@ -45,6 +45,11 @@ export default {
                 hover: null,
                 selected: null
             },
+            devicesStyle: {
+                default: null,
+                hover: null,
+                selected: null
+            },  
             hoverOverlay: null,
             hoverPopup: null,
             testValues: { },
@@ -76,6 +81,54 @@ export default {
         // const Overlay = require( 'ol/Overlay.js');
         const { Feature } = require( 'ol')
         // const { click, pointerMove, altKeyOnly, noModifierKeys, altShiftKeysOnly, platformModifierKeyOnly } = require( 'ol/events/condition.js');
+        var iconStyle = [new style.Style({
+            image: new style.Icon(/** @type {olx.style.IconOptions} */ ({
+                anchor: [0.5, 0.5],
+                anchorXUnits: 'fraction',
+                anchorYUnits: 'fraction',
+                scale: 1,
+                opacity: 0.75,
+                src: 'icons/Air_Quality.png'
+            }))
+        })
+        ,new style.Style({
+            image: new style.Icon(/** @type {olx.style.IconOptions} */ ({
+                anchor: [0.5, 0.5],
+                anchorXUnits: 'fraction',
+                anchorYUnits: 'fraction',
+                scale: 1,
+                opacity: 0.75,
+                src: 'icons/Temperature.png'
+            }))
+        })]
+
+        this.devicesStyle.default = new style.Style({
+            fill: new style.Fill({
+                color: 'rgba(255,255,255,.6)'
+            }),
+            stroke: new style.Stroke({
+                color:'rgb(48, 145, 198)',
+                width: 1      
+            })
+        })
+        this.devicesStyle.hover = new style.Style({
+            fill: new style.Fill({
+                color: 'rgba(225, 225, 225, .6)'
+            }),
+            stroke: new style.Stroke({
+                color:'rgb(0, 0, 255)',
+                width: 1.5
+            })
+        })
+        this.devicesStyle.active = new style.Style({
+            fill: new style.Fill({
+                color: 'rgba(255, 255, 255, .25)'
+            }),
+            stroke: new style.Stroke({
+                color:'rgb(0, 0, 125)',
+                width: 5
+            })
+        })
 
         this.geoStyle.default = new style.Style({
             fill: new style.Fill({
@@ -140,22 +193,18 @@ export default {
                         }));
 
         //console.log(features)
+    
         var vectorSource = new source.Vector({
-            features: features //add an array of features
+            features: features, //add an array of features
+            style: (feature) => {
+                return this.devicesStyle
+            }
         });
-
-
-
-        var iconStyle = new style.Style({
-            image: new style.Icon(/** @type {olx.style.IconOptions} */ ({
-                anchor: [0.5, 0.5],
-                anchorXUnits: 'fraction',
-                anchorYUnits: 'fraction',
-                scale: 0.08,
-                opacity: 0.75,
-                src: 'icons/sensor.png'
-            }))
-        });
+        
+        var devicesLayer = new layer.Vector({
+                    source: vectorSource,
+                    style: iconStyle[Math.floor(Math.random() * iconStyle.length)]
+        }) 
 
         const centerpos = [-8.661682, 40.6331731];
         const center = proj.transform(centerpos, 'EPSG:4326', 'EPSG:3857');
@@ -167,10 +216,8 @@ export default {
                 new layer.Tile({
                     source: new source.OSM(),
                 }),
-                new layer.Vector({
-                    source: vectorSource,
-                    style: iconStyle
-                })             
+                geo_layer,
+                devicesLayer         
             ],
             overlays: [this.hoverOverlay],
             view: new this.req.Ol.View({
@@ -179,8 +226,14 @@ export default {
                 minZoom: 6,
                 maxZoom: 14
             })
-
         })
+
+        devicesLayer.getSource().on('click', (e) => {
+            console.log('entrei')
+            map.forEachFeatureAtPixel(e.pixel, function (feature, layer) {
+                console.log('feature')
+            })
+        }) 
 
         geo_layer.getSource().on('change', () => {
             if(geo_layer.getSource().getState() == 'ready' && !this.loaded) {
@@ -216,9 +269,13 @@ export default {
                     })
                 }
 
+                devicesLayer.setStyle((feature) => { return iconStyle[Math.floor(Math.random() * iconStyle.length)]})
+
                 geo_layer.setStyle((feature) => {
                     return feature == this.selected_county ? this.geoStyle.active : this.testValues[feature.get('name_2')].style
                 })
+
+
 
                 this.map.getView().fit(this.geoJsonExtent, {
                     duration: 500
@@ -253,13 +310,13 @@ export default {
                 document.body.style.cursor = "default"
                 this.hoverOverlay.setPosition(null)
             }
-        })
+        }) 
 
         const click_interaction = new interaction.Select({
             condition: (e) => {
                 return click(e);
             },
-            layers: [geo_layer],
+            layers: [geo_layer, devicesLayer],
             multi: true
         })
 
@@ -289,17 +346,21 @@ export default {
         }),
         
         this.createFeature(vectorSource, []);
-        setInterval(()=> {
-            vectorSource.forEachFeature(feature => {
-                vectorSource.removeFeature(feature)
-                var coordinates = this.gen_random_coordinates() 
-                vectorSource.addFeature(new Feature({
-                    geometry: new geom.Point(proj.transform(coordinates, 'EPSG:4326', 'EPSG:3857')),
-                    //id: device.id
-                    name: 'Null Island'
-                }));
-            })
-        },500);
+        
+        console.log(devicesLayer.getSource().getFeatures())
+
+        // setInterval(()=> {
+        //     vectorSource.forEachFeature(feature => {
+        //         vectorSource.removeFeature(feature)
+        //         var coordinates = this.gen_random_coordinates() 
+        //         vectorSource.addFeature(new Feature({
+        //             geometry: new geom.Point(proj.transform(coordinates, 'EPSG:4326', 'EPSG:3857')),
+        //             //id: device.id
+        //             name: 'Null Island'
+        //         }));
+        //     })
+        // },500);
+        
 
     },
     methods: {
@@ -319,17 +380,33 @@ export default {
             const { Feature } = require( 'ol');
             const geom = require( 'ol/geom');
             const proj = require('ol/proj');
-            for(var i=0; i<50; i++){
-                var coordinates = this.gen_random_coordinates()
-                source.addFeature(new Feature({
-                    geometry: new geom.Point(proj.transform(coordinates, 'EPSG:4326', 'EPSG:3857')),
-                    //id: device.id
-                    name: 'Null Island'
-                }));
+            var coordinates = { 'Águeda': [ 40.595098500000006, -8.401762 ],
+                                Estarreja: [ 40.760923500000004, -8.587983000000001 ],
+                                Murtosa: [ 40.7613925, -8.663722 ],
+                                'Oliveira de Azeméis': [ 40.848087, -8.4679795 ],
+                                'Oliveira do Bairro': [ 40.514727, -8.544975 ],
+                                Ovar: [ 40.888307499999996, -8.608884 ],
+                                Vagos: [ 40.5034925, -8.6958525 ],
+                                'Vale de Cambra': [ 40.8345105, -8.335746499999999 ],
+                                'Ílhavo': [ 40.6110135, -8.692087 ],
+                                'Albergaria-a-Velha': [ 40.694458, -8.519893 ],
+                                Anadia: [ 40.453942999999995, -8.445653 ],
+                                Aveiro: [ 40.627367, -8.642215499999999 ]}
+
+                for (const [key, value] of Object.entries(coordinates)) {        
+                        source.addFeature(new Feature({
+                            geometry: new geom.Point(proj.transform([value[1],value[0]], 'EPSG:4326', 'EPSG:3857')),
+                            //id: device.id
+                            name: key
+                        }));
+                    
+                }
+
+                return features
+
                 //console.log(features)
             }
-            return features
-        },
+        ,
         gen_random_coordinates(){
             const limits = [-8.654981, -8.638642, 40.648018, 40.635610] 
             return [(Math.random() * (limits[0] - limits[1]) + limits[1]),(Math.random() * (limits[2] - limits[3]) + limits[3])]
