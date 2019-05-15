@@ -18,8 +18,9 @@ async function get_darksky_data(lat, long) {
     return [tmp, location]
 }
 
+//193.136.93.14:8001
 async function create_Device(deviceName, verticals, location) {
-    axios.post('http://193.136.93.14:8001/czb/devices', {
+    axios.post('http://localhost:8001/czb/devices', {
         "device_name" : deviceName + "_device",
         "description" : deviceName + "",
         "vertical" : verticals,
@@ -32,7 +33,7 @@ async function create_Device(deviceName, verticals, location) {
 }
 
 async function get_Device(deviceName) {
-    var data = await axios.get('http://193.136.93.14:8001/czb/devices')
+    var data = await axios.get('http://localhost:8001/czb/devices')
                 .catch((err) => {console.log("Failed to get device with error message: " + err)})
     var user_devices = data.data.user_devices
     for(i in user_devices){
@@ -44,7 +45,7 @@ async function get_Device(deviceName) {
 }
 
 async function create_Stream(streamName, deviceID) {
-    axios.post('http://193.136.93.14:8001/czb/stream', {
+    axios.post('http://localhost:8001/czb/stream', {
             "stream" : streamName + "_stream",
             "description" : streamName + "",
             "device_id" : deviceID + "",
@@ -55,7 +56,7 @@ async function create_Stream(streamName, deviceID) {
 } 
 
 async function put_Stream(streamName, data, location) {
-    axios.post('http://193.136.93.14:8001/czb/values', {
+    axios.post('http://localhost:8001/czb/values', {
         "stream_name":streamName +  "_stream",
         "value": data + "",
         "latitude" : location.lat,
