@@ -1,10 +1,15 @@
 package API.Middleware;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Validation {
@@ -44,16 +49,17 @@ public class Validation {
         // required fields for createDevice
         this.createDeviceRequiredFields.put("device_name", String.class);
         this.createDeviceRequiredFields.put("mobile", Boolean.class);
-        this.createDeviceRequiredFields.put("vertical", String.class);
+        this.createDeviceRequiredFields.put("vertical", JSONArray.class);
         this.createDeviceRequiredFields.put("provider", String.class);
 
         // allowed fields for createDevice
         this.createDeviceAllowedFields.put("device_name", String.class);
         this.createDeviceAllowedFields.put("mobile", Boolean.class);
-        this.createDeviceAllowedFields.put("vertical", String.class);
+        this.createDeviceAllowedFields.put("vertical", JSONArray.class);
         this.createDeviceAllowedFields.put("description", String.class);
         this.createDeviceAllowedFields.put("latitude", Double.class);
         this.createDeviceAllowedFields.put("longitude", Double.class);
+        this.createDeviceAllowedFields.put("provider", String.class);
 
     }
 
@@ -129,9 +135,11 @@ public class Validation {
                         "\t\"Error\": \"Invalid field: \""+key+"\"\"\n" +
                         "}";
             } else if (!val.getClass().equals(createDeviceAllowedFields.get(key))) {
+                System.out.println(val.getClass());
                 return "{\n" +
                         "\t\"Status\": \"Error @ request\",\n" +
-                        "\t\"Error\": \"Invalid type in field: "+key+"\"\n" +
+                        "\t\"Error\": \"Invalid type in field: "+key+"\",\n" +
+                        "\t\"Err\": \""+body.get("vertical").getAsJsonArray()+"\"\n"+
                         "}";
             }
         }
@@ -139,7 +147,6 @@ public class Validation {
             return "{\n" +
                     "\t\"Status\": \"Error @ request\",\n" +
                     "\t\"Error\": \"Required fields not found\"\n"+
-                    "\t\"Err\": \""+body.get("vertical").getAsJsonArray()+"\"\n"+
                     "}";
         } else if (!body.get("mobile").getAsBoolean() && (!body.keySet().contains("latitude") || !body.keySet().contains("longitude"))) {
             return "{\n" +
