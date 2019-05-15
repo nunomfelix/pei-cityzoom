@@ -42,8 +42,9 @@
 </template>
 
 <script>
-var features = []
 var Rainbow = require('rainbowvis.js');
+const drone_stream = require('static/get_stream_values_response.json');
+//console.log(JSON.stringify(drone_stream))  
 export default {
     data() {
         return {
@@ -200,8 +201,6 @@ export default {
                 duration: 250
             }
         });
-
-        //console.log(features)
     
         var vectorSource = new source.Vector({
             style: (feature) => {
@@ -374,7 +373,7 @@ export default {
                 },0)
             } else if(e.selected.length > 1) {
                 const device_feature = e.selected[e.selected.length - 1]
-                this.showModal = true
+                this.showModal = true   
             }
             click_interaction.getFeatures().clear()
         })
@@ -395,21 +394,25 @@ export default {
         // })
 
         //this.createFeature(vectorSource, []);
-        
-        //console.log(this.devices_layer.getSource().getFeatures());
+        var feat = new Feature({
+            geometry: new this.req.geom.Point(this.req.proj.transform([drone_stream.values[0].longitude, drone_stream.values[0].latitude], 'EPSG:4326',     
+            'EPSG:3857'))
+            //id: device.id
+        })
+        vectorSource.addFeature(feat)
+        var i = 1;
+        setInterval(() => {
+            vectorSource.removeFeature(feat);
+            feat = new Feature({
+                geometry: new this.req.geom.Point(this.req.proj.transform([drone_stream.values[i].longitude, drone_stream.values[i].latitude], 'EPSG:4326',     
+                'EPSG:3857'))
+                //id: device.id
+            })
+            vectorSource.addFeature(feat)
+            i++
+        },200)
+    
 
-        //this.createFeature(vectorSource, []);
-        // setInterval(()=> {
-        //     vectorSource.forEachFeature(feature => {
-        //         vectorSource.removeFeature(feature)
-        //         var coordinates = this.gen_random_coordinates() 
-        //         vectorSource.addFeature(new Feature({
-        //             geometry: new this.req.geom.Point(this.req.proj.transform(coordinates, 'EPSG:4326', 'EPSG:3857')),
-        //             //id: device.id
-        //             name: 'Null Island'
-        //         }));
-        //     })
-        // },500);
 
     },
     methods: {
@@ -447,7 +450,6 @@ export default {
                     name: key
                 }));
             }
-
             return features
 
             //console.log(features)
@@ -472,6 +474,7 @@ export default {
         },
         updateHeatMap() {
             this.rainbowHeatMap.setNumberRange(1, this.geo_layer.getSource().getFeatures().length);
+            console.log(this.getVerticals)
             this.rainbowHeatMap.setSpectrum(this.getVerticals[this.selected_vertical].streams[this.selected_stream].colors[0] , this.getVerticals[this.selected_vertical].streams[this.selected_stream].colors[1]); 
 
             for(var i in this.testValuesOrdered) {

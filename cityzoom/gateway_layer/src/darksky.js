@@ -19,7 +19,8 @@ async function get_darksky_data(lat, long) {
 }
 
 //193.136.93.14:8001
-async function create_Device(deviceName, verticals, location) {
+async function create_Device(deviceName, verticals, location, municipality) {
+    console.log(municipality)
     axios.post('http://localhost:8001/czb/devices', {
         "device_name" : deviceName + "_device",
         "description" : deviceName + "",
@@ -27,7 +28,8 @@ async function create_Device(deviceName, verticals, location) {
         "mobile" : false,
         "latitude" : location[1],
         "longitude" : location[0],
-        "provider" : "DarkSky"
+        "provider" : "DarkSky",
+        municipality: municipality + ""
     }).catch((err) => {console.log("Failed to create device with error message: " + err)})
     return deviceName + "_device"
 }
@@ -93,7 +95,7 @@ for(city in positions){
     var first = true
     var position = positions[city]
     //Create device for each city
-    create_Device('darksky', ['AirQuality', 'Temperature'] , position)
+    create_Device('darksky', ['AirQuality', 'Temperature'] , position, `${city}`)
     setInterval(async () => {
         var data = await get_darksky_data(position[1],position[0])
         for(var key in data[0]){
