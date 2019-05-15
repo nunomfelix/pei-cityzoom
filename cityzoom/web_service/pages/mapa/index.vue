@@ -2,23 +2,20 @@
     <div class="mapMargin mapHeight" style="position:relative">
         <div class="mapHeight" id="map"></div>
 
-        <div v-if="selected_county" class="ol-popup top">
-            <div :style="{ 'background-color': testValues[selected_county.get('name_2')].color}">
+        <div v-if="selected_county" :style="{ 'background-color': testValues[selected_county.get('name_2')].color}" class="ol-popup top">
+            <div style="background-color: rgba(0,0,0, .5)">
                 <span class="big"> {{selected_county.get('name_2')}} </span>
                 <span class="big"> {{testValues[selected_county.get('name_2')].value.toFixed(2)}} </span>
             </div>
         </div>
 
-        <div id="hover_popup" class="ol-popup">
-            <div v-if="hovered_feature" :style="{ 'background-color': testValues[hovered_feature.get('name_2')].color}">
-                <span class="normal">
-                    {{hovered_feature.get('name_2')}}
-                </span>
-                <span class="normal">
-                    {{testValues[hovered_feature.get('name_2')].value.toFixed(2)}}
-                </span>
+        <div id="hover_popup" class="ol-popup" :style="{ 'background-color': hovered_feature ? testValues[hovered_feature.get('name_2')].color : ''}">
+            <div v-if="hovered_feature" style="background-color: rgba(0,0,0, .5)">
+                <span class="normal"> {{hovered_feature.get('name_2')}} </span>
+                <span class="normal"> {{testValues[hovered_feature.get('name_2')].value.toFixed(2)}} </span>
             </div>
         </div>
+
         <div class="map-menu left" :class="{show: selected_county != null, active: selected_county == null}">
             <div class="map-menu_button" @click="deselect_county()">
             </div>
@@ -26,7 +23,7 @@
 
         <div class="map-menu show">
             <div v-if="selected_vertical != null && selected_stream != null" class="map-menu_left">
-                <div :class="{active: stream.name == getVerticals[selected_vertical].streams[selected_stream].name}" :title="stream.display" v-for="(stream, i) in getVerticals[selected_vertical].streams" :key="i" class="map-menu_button">
+                <div @mousedown="selectStream(i)" :class="{active: stream.name == getVerticals[selected_vertical].streams[selected_stream].name}" :title="stream.display" v-for="(stream, i) in getVerticals[selected_vertical].streams" :key="i" class="map-menu_button">
                     <img :src="`icons/${getVerticals[selected_vertical].name}.png`" alt="">
                 </div>
             </div>
@@ -34,12 +31,13 @@
 
             </div>
             <div v-if="selected_vertical != null" class="map-menu_right">
-                <div @click="selectVertical(i)" :class="{active: vertical.name == getVerticals[selected_vertical].name}" :title="vertical.display" v-for="(vertical, i) in getVerticals" :key="i" class="map-menu_button">
+                <div @mousedown="selectVertical(i)" :class="{active: vertical.name == getVerticals[selected_vertical].name}" :title="vertical.display" v-for="(vertical, i) in getVerticals" :key="i" class="map-menu_button">
                     <img :src="`icons/${vertical.name}.png`" alt="">
                 </div>
             </div>
         </div>
         <Loading :show="!loaded" type="absolute"/> 
+
     </div>
 </template>
 
@@ -106,7 +104,7 @@ export default {
 
         this.geoStyle.hover = new this.req.style.Style({
             fill: new this.req.style.Fill({
-                color: 'rgba(225, 225, 225, .6)'
+                color: 'rgba(225, 225, 225, .65)'
             }),
             stroke: new this.req.style.Stroke({
                 color:'rgb(0, 0, 255)',
@@ -116,11 +114,11 @@ export default {
 
         this.geoStyle.active = new this.req.style.Style({
             fill: new this.req.style.Fill({
-                color: 'rgba(255, 255, 255, .25)'
+                color: 'rgba(255, 255, 255, 0)'
             }),
             stroke: new this.req.style.Stroke({
                 color:'rgb(0, 0, 125)',
-                width: 5
+                width: 3.5
             })
         })
 
@@ -244,6 +242,7 @@ export default {
         hover_interaction.on('select', (e) => {
             if(e.selected.length && e.selected[0] != this.selected_county) {
                 this.hovered_feature = e.selected[0]
+                console.log(this.hovered_feature)
                 document.body.style.cursor = "pointer"
                 this.hoverOverlay.setPosition(this.req.extent.getCenter(this.hovered_feature.getGeometry().getExtent()))
             } else {
@@ -251,7 +250,6 @@ export default {
                 document.body.style.cursor = "default"
                 this.hoverOverlay.setPosition(null)
             }
-            this.hover_interaction.getFeatures().clear()
         })
 
         const click_interaction = new interaction.Select({
@@ -339,16 +337,27 @@ export default {
             return [(Math.random() * (limits[0] - limits[1]) + limits[1]),(Math.random() * (limits[2] - limits[3]) + limits[3])]
         },
         selectVertical(i) {
-            this.selected_vertical = i
-            this.selected_stream = 0
+            if(i != this.selected_vertical) {
+                this.selected_vertical = i
+                this.selected_stream = 0
+                this.updateHeatMap()
+            }
+        },
+        selectStream(i) {
+            if(i != this.selected_stream) {
+                this.selected_stream = i
+                this.updateHeatMap()
+            }
+        },
+        updateHeatMap() {
             this.rainbowHeatMap.setNumberRange(1, this.geo_layer.getSource().getFeatures().length);
-            this.rainbowHeatMap.setSpectrum(this.getVerticals[i].streams[0].colors[0] , this.getVerticals[i].streams[0].colors[1]); 
+            this.rainbowHeatMap.setSpectrum(this.getVerticals[this.selected_vertical].streams[this.selected_stream].colors[0] , this.getVerticals[this.selected_vertical].streams[this.selected_stream].colors[1]); 
 
             for(var i in this.testValuesOrdered) {
                 this.testValues[this.testValuesOrdered[i]].color = '#' + this.rainbowHeatMap.colourAt(i);
                 this.testValues[this.testValuesOrdered[i]].style = new this.req.style.Style({
                     fill: new this.req.style.Fill({
-                        color: this.testValues[this.testValuesOrdered[i]].color
+                        color: this.testValues[this.testValuesOrdered[i]].color + 'e0'
                     }),
                     stroke: new this.req.style.Stroke({
                         color: 'black',
@@ -395,7 +404,7 @@ export default {
         @include shadow(0px, 0px, 8px, 2px, rgba(0,0,0,0.2));
     }
     padding: 5px;
-        border-radius: 12px;
+    border-radius: 12px;
 
     & > div {
         @include flex(center, center, column);
@@ -430,14 +439,13 @@ export default {
     }
 
     &_left,&_right {
-        @include shadow(0px, 0px, 4px, 2px, rgba(0,0,0,0.2));
+        @include shadow(0px, 0px, 8px, 2px, rgba(0,0,0,0.2));
         background-color: rgba(255,255,255,.75);
         padding: .75rem;
         border-radius: 5px;
     }
     &_center {
-        background-color: rgba(255,255,255,.75);
-        width: 4px;
+        width: 5px;
     }
 
     &_button {
