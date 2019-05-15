@@ -92,7 +92,7 @@ public class StreamSinker {
             kafkaProperties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
             kafkaProperties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, groupID);
             kafkaProperties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-            kafkaProperties.setProperty(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, "10000");
+            kafkaProperties.setProperty(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, "300000000");
             valuesConsumer = new KafkaConsumer<String, String>(kafkaProperties);
             valuesConsumer.subscribe(Arrays.asList(topic));
         }

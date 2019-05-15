@@ -2,8 +2,12 @@ package Sink;
 
 import Aux.MongoAux;
 import com.google.gson.JsonObject;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Updates;
 import org.apache.avro.Schema;
+import org.apache.avro.data.Json;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -11,9 +15,11 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.print.Doc;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
@@ -25,6 +31,7 @@ import static com.mongodb.client.model.Updates.set;
 public class ValuesSinker {
     private MongoCollection<Document> collection = MongoAux.getCollection("values");
     private MongoCollection<Document> streams = MongoAux.getCollection("streams");
+    private MongoCollection<Document> devices = MongoAux.getCollection("devices");
     private Date date = new Date();
 
     public static void main(String[] args) {
@@ -92,7 +99,7 @@ public class ValuesSinker {
             kafkaProperties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
             kafkaProperties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, groupID);
             kafkaProperties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-            kafkaProperties.setProperty(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, "10000");
+            kafkaProperties.setProperty(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, "300000000");
             valuesConsumer = new KafkaConsumer<String, String>(kafkaProperties);
             valuesConsumer.subscribe(Arrays.asList(topic));
         }
@@ -117,7 +124,16 @@ public class ValuesSinker {
                                         .append("latitude", value.get("latitude").getAsDouble())
                                         .append("longitude", value.get("longitude").getAsDouble());
                                 docsList.add(document);
-                                streams.updateOne(eq("stream", value.get("stream").getAsString()), set("lastUpdate", date.getTime()));
+                                JsonObject stream = (JsonObject) MongoAux.jsonParser.parse(streams.findOneAndUpdate(eq("stream", value.get("stream").getAsString()), set("lastUpdate", date.getTime())).toJson());
+                                System.out.println(stream.toString());
+                                JsonObject device = (JsonObject) MongoAux.jsonParser.parse(devices.find(eq("_id", new ObjectId(stream.get("device_id").getAsString()))).first().toJson());
+                                if (device.get("mobile").getAsBoolean()) {
+                                    Document newLoc = new Document("timestamp", value.get("timestamp").getAsLong())
+                                            .append("latitude", value.get("latitude").getAsDouble())
+                                            .append("longitude", value.get("longitude").getAsDouble());
+                                    devices.updateOne(eq("_id", new ObjectId(stream.get("device_id").getAsString())), Updates.addToSet("locations", newLoc));
+
+                                }
                             }
                         } catch (IllegalStateException e) {
                             logger.error("Object given not in JSON format!");
