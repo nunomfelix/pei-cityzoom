@@ -23,13 +23,11 @@ public class Validation {
     public Validation() {
         // required fields for create stream
         this.createStreamRequiredFields.put("stream", String.class);
-        this.createStreamRequiredFields.put("type", String.class);
         this.createStreamRequiredFields.put("device_id", String.class);
 
         // allowed fields for create stream
         this.createStreamAllowedFields.put("stream", String.class);
         this.createStreamAllowedFields.put("device_id", String.class);
-        this.createStreamAllowedFields.put("type", String.class);
         this.createStreamAllowedFields.put("description", String.class);
         this.createStreamAllowedFields.put("ttl", Integer.class);
         this.createStreamAllowedFields.put("periodicity", Integer.class);
