@@ -2,23 +2,20 @@
     <div class="mapMargin mapHeight" style="position:relative">
         <div class="mapHeight" id="map"></div>
 
-        <div v-if="selected_county" class="ol-popup top">
-            <div :style="{ 'background-color': testValues[selected_county.get('name_2')].color}">
+        <div v-if="selected_county" :style="{ 'background-color': testValues[selected_county.get('name_2')].color}" class="ol-popup top">
+            <div style="background-color: rgba(0,0,0, .5)">
                 <span class="big"> {{selected_county.get('name_2')}} </span>
                 <span class="big"> {{testValues[selected_county.get('name_2')].value.toFixed(2)}} </span>
             </div>
         </div>
 
-        <div id="hover_popup" class="ol-popup">
-            <div v-if="hovered_feature" :style="{ 'background-color': testValues[hovered_feature.get('name_2')].color}">
-                <span class="normal">
-                    {{hovered_feature.get('name_2')}}
-                </span>
-                <span class="normal">
-                    {{testValues[hovered_feature.get('name_2')].value.toFixed(2)}}
-                </span>
+        <div id="hover_popup" class="ol-popup" :style="{ 'background-color': hovered_feature ? testValues[hovered_feature.get('name_2')].color : ''}">
+            <div v-if="hovered_feature" style="background-color: rgba(0,0,0, .5)">
+                <span class="normal"> {{hovered_feature.get('name_2')}} </span>
+                <span class="normal"> {{testValues[hovered_feature.get('name_2')].value.toFixed(2)}} </span>
             </div>
         </div>
+
         <div class="map-menu left" :class="{show: selected_county != null, active: selected_county == null}">
             <div class="map-menu_button" @click="deselect_county()">
             </div>
@@ -26,15 +23,15 @@
 
         <div class="map-menu show">
             <div v-if="selected_vertical != null && selected_stream != null" class="map-menu_left">
-                <div :class="{active: stream.name == getVerticals[selected_vertical].streams[selected_stream].name}" :title="stream.display" v-for="(stream, i) in getVerticals[selected_vertical].streams" :key="i" class="map-menu_button">
-                    <img :src="`icons/${getVerticals[selected_vertical].name}.png`" alt="">
+                <div @mousedown="selectStream(i)" :class="{active: stream.name == getVerticals[selected_vertical].streams[selected_stream].name}" :title="stream.display" v-for="(stream, i) in getVerticals[selected_vertical].streams" :key="i" class="map-menu_button">
+                    <img :src="`icons/streams/${getVerticals[selected_vertical].streams[i].name}.png`" alt="">
                 </div>
             </div>
             <div class="map-menu_center">
 
             </div>
             <div v-if="selected_vertical != null" class="map-menu_right">
-                <div @click="selectVertical(i)" :class="{active: vertical.name == getVerticals[selected_vertical].name}" :title="vertical.display" v-for="(vertical, i) in getVerticals" :key="i" class="map-menu_button">
+                <div @mousedown="selectVertical(i)" :class="{active: vertical.name == getVerticals[selected_vertical].name}" :title="vertical.display" v-for="(vertical, i) in getVerticals" :key="i" class="map-menu_button">
                     <img :src="`icons/${vertical.name}.png`" alt="">
                 </div>
             </div>
@@ -62,9 +59,15 @@ export default {
                 selected: null
             },
             devicesStyle: {
-                default: null,
-                hover: null,
-                selected: null
+                templates: {
+                    default: {
+                        scale: 1,
+                    },
+                    hover: {
+                        scale: 1.2,
+                    },
+                },
+                styles: {}
             },  
             hoverOverlay: null,
             hoverPopup: null,
@@ -74,9 +77,9 @@ export default {
 
             selected_vertical: null,
             selected_stream: null,
-
             selected_county: null,
             hovered_feature: null,
+
             geoJsonExtent: null,
             showModal: false
         }
@@ -98,14 +101,16 @@ export default {
         const interaction = require( 'ol/interaction');
         const { Feature } = require( 'ol')
         const { click, pointerMove, altKeyOnly, noModifierKeys, altShiftKeysOnly, platformModifierKeyOnly } = require( 'ol/events/condition.js');
+        
+        
         var iconStyle = [new this.req.style.Style({
             image: new this.req.style.Icon(/** @type {olx.this.req.style.IconOptions} */ ({
                 anchor: [0.5, 0.5],
                 anchorXUnits: 'fraction',
                 anchorYUnits: 'fraction',
-                scale: 1,
+                scale: .75,
                 opacity: 0.75,
-                src: 'icons/AirQuality.png'
+                src: 'icons/AirQuality_map.png'
             }))
         })
         ,new this.req.style.Style({
@@ -113,39 +118,28 @@ export default {
                 anchor: [0.5, 0.5],
                 anchorXUnits: 'fraction',
                 anchorYUnits: 'fraction',
-                scale: 1,
+                scale: .75,
                 opacity: 0.75,
-                src: 'icons/Temperature.png'
+                src: 'icons/Temperature_map.png'
             }))
         })]
 
-        this.devicesStyle.default = new this.req.style.Style({
-            fill: new this.req.style.Fill({
-                color: 'rgba(255,255,255,.6)'
-            }),
-            stroke: new this.req.style.Stroke({
-                color:'rgb(48, 145, 198)',
-                width: 1      
-            })
-        })
-        this.devicesStyle.hover = new this.req.style.Style({
-            fill: new this.req.style.Fill({
-                color: 'rgba(225, 225, 225, .6)'
-            }),
-            stroke: new this.req.style.Stroke({
-                color:'rgb(0, 0, 255)',
-                width: 1.5
-            })
-        })
-        this.devicesStyle.active = new this.req.style.Style({
-            fill: new this.req.style.Fill({
-                color: 'rgba(255, 255, 255, .25)'
-            }),
-            stroke: new this.req.style.Stroke({
-                color:'rgb(0, 0, 125)',
-                width: 5
-            })
-        })
+        for(var style in this.devicesStyle.templates) {
+            for(var vertical of this.getVerticals) {
+                if(!(vertical.name in this.devicesStyle.styles))
+                    this.devicesStyle.styles[vertical.name] = {}
+                this.devicesStyle.styles[vertical.name][style] = new this.req.style.Style({
+                    image: new this.req.style.Icon(/** @type {olx.this.req.style.IconOptions} */ ({
+                        anchor: [0.5, 0.5],
+                        anchorXUnits: 'fraction',
+                        anchorYUnits: 'fraction',
+                        scale: this.devicesStyle.templates[style].scale,
+                        opacity: 1,
+                        src: `icons/${vertical.name}_map.png`
+                    }))
+                })
+            }
+        }
 
         this.geoStyle.default = new this.req.style.Style({
             fill: new this.req.style.Fill({
@@ -159,7 +153,7 @@ export default {
 
         this.geoStyle.hover = new this.req.style.Style({
             fill: new this.req.style.Fill({
-                color: 'rgba(225, 225, 225, .6)'
+                color: 'rgba(225, 225, 225, .65)'
             }),
             stroke: new this.req.style.Stroke({
                 color:'rgb(0, 0, 255)',
@@ -169,11 +163,11 @@ export default {
 
         this.geoStyle.active = new this.req.style.Style({
             fill: new this.req.style.Fill({
-                color: 'rgba(255, 255, 255, .25)'
+                color: 'rgba(255, 255, 255, 0)'
             }),
             stroke: new this.req.style.Stroke({
                 color:'rgb(0, 0, 125)',
-                width: 5
+                width: 3.5
             })
         })
 
@@ -298,6 +292,7 @@ export default {
         hover_interaction.on('select', (e) => {
             if(e.selected.length && e.selected[0] != this.selected_county) {
                 this.hovered_feature = e.selected[0]
+                console.log(this.hovered_feature)
                 document.body.style.cursor = "pointer"
                 this.hoverOverlay.setPosition(this.req.extent.getCenter(this.hovered_feature.getGeometry().getExtent()))
             } else {
@@ -320,7 +315,7 @@ export default {
             document.body.style.cursor = "default"
             this.hovered_feature = null
             const geo_feature = e.selected[0]
-            if(geo_feature != this.selected_county) {
+            if(geo_feature.get('name_2') && geo_feature != this.selected_county) {
                 this.map.setView(new this.req.Ol.View({
                     center: this.map.getView().getCenter(),
                     zoom: this.map.getView().getZoom(),
@@ -414,12 +409,11 @@ export default {
                                 Aveiro: [ 40.627367, -8.642215499999999 ]}
 
             for (const [key, value] of Object.entries(coordinates)) {        
-                    source.addFeature(new Feature({
-                        geometry: new geom.Point(proj.transform([value[1],value[0]], 'EPSG:4326', 'EPSG:3857')),
-                        //id: device.id
-                        name: key
-                    }));
-                
+                source.addFeature(new Feature({
+                    geometry: new geom.Point(proj.transform([value[1],value[0]], 'EPSG:4326', 'EPSG:3857')),
+                    //id: device.id
+                    name: key
+                }));
             }
 
             return features
@@ -431,16 +425,27 @@ export default {
             return [(Math.random() * (limits[0] - limits[1]) + limits[1]),(Math.random() * (limits[2] - limits[3]) + limits[3])]
         },
         selectVertical(i) {
-            this.selected_vertical = i
-            this.selected_stream = 0
+            if(i != this.selected_vertical) {
+                this.selected_vertical = i
+                this.selected_stream = 0
+                this.updateHeatMap()
+            }
+        },
+        selectStream(i) {
+            if(i != this.selected_stream) {
+                this.selected_stream = i
+                this.updateHeatMap()
+            }
+        },
+        updateHeatMap() {
             this.rainbowHeatMap.setNumberRange(1, this.geo_layer.getSource().getFeatures().length);
-            this.rainbowHeatMap.setSpectrum(this.getVerticals[i].streams[0].colors[0] , this.getVerticals[i].streams[0].colors[1]); 
+            this.rainbowHeatMap.setSpectrum(this.getVerticals[this.selected_vertical].streams[this.selected_stream].colors[0] , this.getVerticals[this.selected_vertical].streams[this.selected_stream].colors[1]); 
 
             for(var i in this.testValuesOrdered) {
                 this.testValues[this.testValuesOrdered[i]].color = '#' + this.rainbowHeatMap.colourAt(i);
                 this.testValues[this.testValuesOrdered[i]].style = new this.req.style.Style({
                     fill: new this.req.style.Fill({
-                        color: this.testValues[this.testValuesOrdered[i]].color
+                        color: this.testValues[this.testValuesOrdered[i]].color + 'e0'
                     }),
                     stroke: new this.req.style.Stroke({
                         color: 'black',
@@ -488,7 +493,7 @@ export default {
         @include shadow(0px, 0px, 8px, 2px, rgba(0,0,0,0.2));
     }
     padding: 5px;
-        border-radius: 12px;
+    border-radius: 12px;
 
     & > div {
         @include flex(center, center, column);
@@ -523,14 +528,13 @@ export default {
     }
 
     &_left,&_right {
-        @include shadow(0px, 0px, 4px, 2px, rgba(0,0,0,0.2));
+        @include shadow(0px, 0px, 8px, 2px, rgba(0,0,0,0.2));
         background-color: rgba(255,255,255,.75);
         padding: .75rem;
         border-radius: 5px;
     }
     &_center {
-        background-color: rgba(255,255,255,.75);
-        width: 4px;
+        width: 5px;
     }
 
     &_button {
@@ -542,6 +546,7 @@ export default {
         width: 5rem;
         height: 5rem;
         border-radius: 5px;
+        padding: .25rem;
         &:not(:first-child) {
             margin-top: .75rem;
         }
@@ -557,7 +562,7 @@ export default {
         }
         &.active {
             @include shadow(0px, 0px, 0px, 0px, rgba(0,0,0,0));
-            background-color: rgb(187, 187, 187);
+            background-color: rgb(201, 201, 201);
         }
         & img {
             width: 100%;

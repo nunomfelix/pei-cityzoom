@@ -1,7 +1,9 @@
 package Sink;
 
 import Aux.MongoAux;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.mongodb.MongoBulkWriteException;
 import com.mongodb.client.MongoCollection;
 import org.apache.avro.Schema;
@@ -15,20 +17,29 @@ import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
+import java.lang.reflect.Array;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
 public class DevSink {
     private MongoCollection<Document> collection = MongoAux.getCollection("devices");
-    private static PrintWriter writer;
-    public static void main(String[] args) throws FileNotFoundException {
-        writer = new PrintWriter("devFile");
-        new DevSink().run();
+    private static JsonObject geoJSONfile;
+    public static void main(String[] args) throws IOException {
+        File file = new File("/home/zero/Documents/UniAv/3_ano/PEI/pei-cityzoom/cityzoom/DataLayer/DevicesSinks/src/main/java/aveiro.geojson");
+        InputStream fis = new FileInputStream(file);
+        byte[] data = new byte[(int)file.length()];
+        fis.read(data);
+        fis.close();
+        geoJSONfile = (JsonObject) MongoAux.jsonParser.parse(new String(data, "UTF-8"));
+        System.out.println(geoJSONfile.keySet());
+        System.out.println(geoJSONfile.get("features").getAsJsonArray());
+        for (JsonElement jo : geoJSONfile.get("features").getAsJsonArray()) {
+            System.out.println(jo.getAsJsonObject().keySet());
+            System.out.println(jo.getAsJsonObject().get("properties"));
+        }
+        //new DevSink().run();
     }
 
     private void run() {
@@ -78,8 +89,9 @@ public class DevSink {
                 "\"fields\": [\n" +
                 "  { \"name\": \"device_name\", \"type\": \"string\" },\n" +
                 "  { \"name\": \"description\", \"type\": \"string\" },\n" +
+                "  { \"name\": \"provider\", \"type\": \"string\" },\n" +
                 "  { \"name\": \"mobile\", \"type\": \"boolean\" },\n" +
-                "  { \"name\": \"vertical\", \"type\": \"string\" },\n" +
+                "  { \"name\": \"vertical\", \"type\": { \"type\": \"array\", \"items\": {\"name\": \"verts\", \"type\": \"string\"}}},\n"+
                 "  { \"name\": \"latitude\", \"type\": \"double\" },\n" +
                 "  { \"name\": \"longitude\", \"type\": \"double\" },\n" +
                 "  { \"name\": \"creation\", \"type\": \"long\" }" +
@@ -95,7 +107,6 @@ public class DevSink {
             kafkaProperties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, groupID);
             kafkaProperties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
             kafkaProperties.setProperty(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, "300000000");
-            kafkaProperties.setProperty(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "100000");
             valuesConsumer = new KafkaConsumer<String, String>(kafkaProperties);
             valuesConsumer.subscribe(Arrays.asList(topic));
         }
@@ -109,29 +120,39 @@ public class DevSink {
                     for (ConsumerRecord<String, String> record: records) {
                         try {
                             logger.info("Record: "+ record.value());
+                            System.out.println(record.value());
                             JsonObject value = MongoAux.jsonParser.parse(record.value()).getAsJsonObject();
                             if (!MongoAux.schemaValidator(valuesSchema, value.toString())) {
                                 logger.error("Error parsing the following request: "+ value.toString());
                             } else {
+                                ArrayList<HashMap<String, Double>> locations = new ArrayList<>();
+                                HashMap<String, Double> locationObjects = new HashMap<>();
+                                locationObjects.put("timestamp", value.get("creation").getAsDouble());
+                                locationObjects.put("latitude", value.get("latitude").getAsDouble());
+                                locationObjects.put("longitude", value.get("longitude").getAsDouble());
+                                ArrayList<String> verticalList = new ArrayList<>();
+                                for (JsonElement d : value.get("vertical").getAsJsonArray()) {
+                                    verticalList.add(d.getAsString());
+                                }
+                                locations.add(locationObjects);
                                 Document document = new Document("device_name", value.get("device_name").getAsString())
                                         .append("description", value.get("description").getAsString())
                                         .append("mobile", value.get("mobile").getAsBoolean())
-                                        .append("vertical", value.get("vertical").getAsString())
-                                        .append("latitude", value.get("latitude").getAsInt())
-                                        .append("longitude", value.get("longitude").getAsInt())
+                                        .append("provider", value.get("provider").getAsString())
+                                        .append("vertical", verticalList)
+                                        .append("locations", locations)
                                         .append("creation", value.get("creation").getAsLong());
                                 System.out.println(value.toString());
-                                System.out.println(document.toJson());
                                 docsList.add(document);
-                                writer.println("ola mundo");
                             }
-                        } catch (IllegalStateException | IOException e) {
+                        } catch (IllegalStateException e) {
                             logger.error("Object given not in JSON format!");
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
                     }
                     try {
                         if (!docsList.isEmpty())
-
                             collection.insertMany(docsList);
                         logger.info("Stored devices with success!");
                     } catch (MongoBulkWriteException e) {

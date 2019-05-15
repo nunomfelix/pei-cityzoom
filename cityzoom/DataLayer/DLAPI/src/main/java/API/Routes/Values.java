@@ -105,9 +105,18 @@ public class Values {
                     "}";
         }
         String value = body.get("value").getAsString();
-        double lat = body.get("latitude").getAsDouble();
-        double longitude = body.get("longitude").getAsDouble();
+        double lat = 0.0;
+        double longitude = 0.0;
         long timestamp = date.getTime();
+        if (body.keySet().contains("latitude")) {
+            lat = body.get("latitude").getAsDouble();
+        }
+        if (body.keySet().contains("longitude")) {
+            longitude = body.get("longitude").getAsDouble();
+        }
+        if (body.keySet().contains("timestamp")) {
+            timestamp = body.get("timestamp").getAsLong();
+        }
 
         String valuePost=
                 "{\n" +

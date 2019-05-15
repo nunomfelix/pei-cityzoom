@@ -76,7 +76,6 @@ public class StreamSinker {
                 "  { \"name\": \"stream\", \"type\": \"string\" },\n" +
                 "  { \"name\": \"description\", \"type\": \"string\" },\n" +
                 "  { \"name\": \"mobile\", \"type\": \"boolean\" },\n" +
-                "  { \"name\": \"type\", \"type\": \"string\" },\n" +
                 "  { \"name\": \"ttl\", \"type\": \"int\" },\n" +
                 "  { \"name\": \"periodicity\", \"type\": \"int\" },\n" +
                 "  { \"name\": \"creation\", \"type\": \"long\" }," +
@@ -93,7 +92,6 @@ public class StreamSinker {
             kafkaProperties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, groupID);
             kafkaProperties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
             kafkaProperties.setProperty(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, "300000000");
-            kafkaProperties.setProperty(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "100000");
             valuesConsumer = new KafkaConsumer<String, String>(kafkaProperties);
             valuesConsumer.subscribe(Arrays.asList(topic));
         }
@@ -116,7 +114,6 @@ public class StreamSinker {
                                         .append("description", value.get("description").getAsString())
                                         .append("device_id", value.get("device_id").getAsString())
                                         .append("mobile", value.get("mobile").getAsBoolean())
-                                        .append("type", value.get("type").getAsString())
                                         .append("ttl", value.get("ttl").getAsInt())
                                         .append("periodicity", value.get("periodicity").getAsInt())
                                         .append("creation", value.get("creation").getAsLong())

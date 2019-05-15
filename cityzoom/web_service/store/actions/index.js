@@ -34,7 +34,6 @@ export default{
                     'Authorization': payload
                 }
             })
-            console.log(verticals)
             commit('SET_STORE', { user: { ...res.data}, jwt: payload, verticals: verticals.data })
         } catch (err) {
             console.error('Error', err.message)
