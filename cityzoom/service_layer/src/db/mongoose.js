@@ -21,7 +21,7 @@ mongoose.connect(connectionURL + databaseName, {
                 display: vertical.vertical[v].display,
                 streams: vertical.vertical[v].streams,
             })
-            console.log(vert)
+            // console.log(vert)
             await vert.save()
         }
     })

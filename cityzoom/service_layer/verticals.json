@@ -7,20 +7,22 @@
 					"display": "Pressão do ar",
 					"unit": "B",
 					"fullunit": "Bars",
-					"type": "value"
+					"type": "value",
+					"colors": ["darkyellow", "darkblue", "white"]
 				},
 				"humidity_stream": {
 					"display": "Humidade do ar",
 					"unit": "%",
 					"fullunit": "percentagem",
-					"type": "value"	
+					"type": "value",
+					"colors": ["lightblue", "darkblue", "grey"]
 				},
-		
 				"ozone_stream": {
 					"display": "Ozono na atmosfera",
 					"unit": "ppm",
 					"fullunit": "partes por milhao",	
-					"type": "value"	
+					"type": "value"	,
+					"colors": ["lightblue", "purple", "black"]
 				}
 			}
 		},
@@ -31,7 +33,8 @@
 					"display": "Temperatura do ar",
 					"unit": "ºC",
 					"fullunit": "Celsius",
-					"type": "value"
+					"type": "value",
+					"colors": ["green", "red", "white"]
 				}
 			}
 		}

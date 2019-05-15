@@ -1,5 +1,6 @@
 export default () => ({
     user: {},
     jwt: '',
-    streams: []
+    streams: [],
+    verticals: {},
 })
