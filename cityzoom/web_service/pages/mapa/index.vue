@@ -59,9 +59,15 @@ export default {
                 selected: null
             },
             devicesStyle: {
-                default: null,
-                hover: null,
-                selected: null
+                templates: {
+                    default: {
+                        scale: 1,
+                    },
+                    hover: {
+                        scale: 1.2,
+                    },
+                },
+                styles: {}
             },  
             hoverOverlay: null,
             hoverPopup: null,
@@ -71,9 +77,9 @@ export default {
 
             selected_vertical: null,
             selected_stream: null,
-
             selected_county: null,
             hovered_feature: null,
+
             geoJsonExtent: null,
             showModal: false
         }
@@ -95,14 +101,16 @@ export default {
         const interaction = require( 'ol/interaction');
         const { Feature } = require( 'ol')
         const { click, pointerMove, altKeyOnly, noModifierKeys, altShiftKeysOnly, platformModifierKeyOnly } = require( 'ol/events/condition.js');
+        
+        
         var iconStyle = [new this.req.style.Style({
             image: new this.req.style.Icon(/** @type {olx.this.req.style.IconOptions} */ ({
                 anchor: [0.5, 0.5],
                 anchorXUnits: 'fraction',
                 anchorYUnits: 'fraction',
-                scale: 1,
+                scale: .75,
                 opacity: 0.75,
-                src: 'icons/AirQuality.png'
+                src: 'icons/AirQuality_map.png'
             }))
         })
         ,new this.req.style.Style({
@@ -110,39 +118,28 @@ export default {
                 anchor: [0.5, 0.5],
                 anchorXUnits: 'fraction',
                 anchorYUnits: 'fraction',
-                scale: 1,
+                scale: .75,
                 opacity: 0.75,
-                src: 'icons/Temperature.png'
+                src: 'icons/Temperature_map.png'
             }))
         })]
 
-        this.devicesStyle.default = new this.req.style.Style({
-            fill: new this.req.style.Fill({
-                color: 'rgba(255,255,255,.6)'
-            }),
-            stroke: new this.req.style.Stroke({
-                color:'rgb(48, 145, 198)',
-                width: 1      
-            })
-        })
-        this.devicesStyle.hover = new this.req.style.Style({
-            fill: new this.req.style.Fill({
-                color: 'rgba(225, 225, 225, .6)'
-            }),
-            stroke: new this.req.style.Stroke({
-                color:'rgb(0, 0, 255)',
-                width: 1.5
-            })
-        })
-        this.devicesStyle.active = new this.req.style.Style({
-            fill: new this.req.style.Fill({
-                color: 'rgba(255, 255, 255, .25)'
-            }),
-            stroke: new this.req.style.Stroke({
-                color:'rgb(0, 0, 125)',
-                width: 5
-            })
-        })
+        for(var style in this.devicesStyle.templates) {
+            for(var vertical of this.getVerticals) {
+                if(!(vertical.name in this.devicesStyle.styles))
+                    this.devicesStyle.styles[vertical.name] = {}
+                this.devicesStyle.styles[vertical.name][style] = new this.req.style.Style({
+                    image: new this.req.style.Icon(/** @type {olx.this.req.style.IconOptions} */ ({
+                        anchor: [0.5, 0.5],
+                        anchorXUnits: 'fraction',
+                        anchorYUnits: 'fraction',
+                        scale: this.devicesStyle.templates[style].scale,
+                        opacity: 1,
+                        src: `icons/${vertical.name}_map.png`
+                    }))
+                })
+            }
+        }
 
         this.geoStyle.default = new this.req.style.Style({
             fill: new this.req.style.Fill({
@@ -318,7 +315,7 @@ export default {
             document.body.style.cursor = "default"
             this.hovered_feature = null
             const geo_feature = e.selected[0]
-            if(geo_feature != this.selected_county) {
+            if(geo_feature.get('name_2') && geo_feature != this.selected_county) {
                 this.map.setView(new this.req.Ol.View({
                     center: this.map.getView().getCenter(),
                     zoom: this.map.getView().getZoom(),
@@ -412,12 +409,11 @@ export default {
                                 Aveiro: [ 40.627367, -8.642215499999999 ]}
 
             for (const [key, value] of Object.entries(coordinates)) {        
-                    source.addFeature(new Feature({
-                        geometry: new geom.Point(proj.transform([value[1],value[0]], 'EPSG:4326', 'EPSG:3857')),
-                        //id: device.id
-                        name: key
-                    }));
-                
+                source.addFeature(new Feature({
+                    geometry: new geom.Point(proj.transform([value[1],value[0]], 'EPSG:4326', 'EPSG:3857')),
+                    //id: device.id
+                    name: key
+                }));
             }
 
             return features
