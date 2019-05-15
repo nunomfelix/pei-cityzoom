@@ -28,7 +28,7 @@ public class Streams {
         JsonObject body = (JsonObject) MongoAux.jsonParser.parse(request.body());
         String valid = validator.validateCreate(body);
         if (!valid.equals("")) {
-            logger.error("Stream request failed because request");
+            logger.error("Stream request failed because request is bad");
             response.status(HttpsURLConnection.HTTP_BAD_REQUEST);
             return valid;
         }
@@ -42,10 +42,17 @@ public class Streams {
                     "\t\"status\": \"Error @ type\",\n" +
                     "\t\"Error\": \"Type " + type + " not available. Available types are "+types.toString()+"\"\n" +
                     "}";
-
+        }
+        String device_id = body.get("device_id").getAsString();
+        if (devices.find(eq("_id", new ObjectId(device_id))).first() == null) {
+            logger.error("Device not found");
+            response.status(HttpsURLConnection.HTTP_NOT_FOUND);
+            return "{\n" +
+                    "\t\"status\": \"Error @ device\",\n" +
+                    "\t\"Error\": \"Device " + device_id + " not found. Available types are "+types.toString()+"\"\n" +
+                    "}";
         }
         String description = keys.contains("description") ? body.get("description").getAsString() : "";
-        String device_id = body.get("device_id").getAsString();
         boolean mobile = keys.contains("mobile") && body.get("mobile").getAsBoolean();
         int periodicity = keys.contains("periodicity") ?
                 body.get("periodicity").getAsInt() > 0 ? body.get("periodicity").getAsInt() : 1200 :

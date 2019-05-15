@@ -32,6 +32,7 @@ public class Devices {
         }
         Set<String> keys = body.keySet();
         String device_name = body.get("device_name").getAsString();
+        String provider = body.get("provider").getAsString();
         String vertical = body.get("vertical").getAsString();
         boolean mobile = body.get("mobile").getAsBoolean();
         double latitude = 0;
@@ -54,10 +55,11 @@ public class Devices {
                 "{\n" +
                         "\t\"device_name\":\""+device_name+"\",\n" +
                         "\t\"description\":\""+description+"\",\n" +
+                        "\t\"provider\":\""+provider+"\",\n" +
                         "\t\"vertical\":\""+vertical+"\",\n" +
                         "\t\"mobile\":"+mobile+",\n" +
-                        "\t\"latitude\": "+latitude+",\n" +
-                        "\t\"longitude\": "+longitude+",\n" +
+                        "\t\"latitude\": "+latitude+",\n"+
+                        "\t\"longitude\": "+longitude+",\n"+
                         "\t\"creation\": "+date.getTime()+"\n" +
                         "}";
         String topic = "Devices";
@@ -77,7 +79,7 @@ public class Devices {
         logger.info("Deleting device");
         response.type("application/json");
         String to_del = request.params(":device_id");
-        if (devices.find(eq("_id", new ObjectId(to_del))).first() == null) {
+        if (devices.find(eq("device_name", to_del)).first() == null) {
             response.status(HttpsURLConnection.HTTP_NOT_FOUND);
             return "{\n" +
                     "\t\"status\": \"Error\",\n" +
@@ -133,11 +135,11 @@ public class Devices {
                             "\t\"device_id\": \""+jsonDev.get("_id").getAsJsonObject().get("$oid").getAsString()+"\",\n" +
                             "\t\"mobile\": "+jsonDev.get("mobile").getAsBoolean()+",\n" +
                             "\t\"vertical\": \""+jsonDev.get("vertical").getAsString()+"\",\n" +
-                            "\t\"device_name\": \""+jsonDev.get("device_name").getAsString()+"\",\n" +
+                            "\t\"provider\": \""+jsonDev.get("provider").getAsString()+"\",\n" +
                             "\t\"streams\": "+ Arrays.toString(streamList.toArray()) +",\n" +
+                            "\t\"device_name\": \""+jsonDev.get("device_name").getAsString()+"\",\n" +
                             "\t\"description\": \""+jsonDev.get("description").getAsString()+"\",\n" +
-                            "\t\"latitude\": "+jsonDev.get("latitude").getAsDouble()+",\n" +
-                            "\t\"longitude\": "+jsonDev.get("longitude").getAsDouble()+",\n" +
+                            "\t\"locations\": ["+jsonDev.get("locations").getAsJsonArray()+"],\n"+
                             "\t\"creation\": "+jsonDev.get("creation").getAsJsonObject().get("$numberLong").getAsLong()+"\n" +
                             "}";
             userDevices.add(device);
@@ -163,7 +165,7 @@ public class Devices {
         logger.info("Detailing a device");
         response.type("application/json");
         String device = request.params(":device_id");
-        Document document = devices.find(eq("_id",new ObjectId(device))).first();
+        Document document = devices.find(eq("device_name",device)).first();
         if (document == null) {
             logger.error("Device not found");
             response.status(HttpsURLConnection.HTTP_NOT_FOUND);
@@ -184,11 +186,11 @@ public class Devices {
                 "\t\"device_id\": \""+jsonDev.get("_id").getAsJsonObject().get("$oid").getAsString()+"\",\n" +
                 "\t\"mobile\": "+jsonDev.get("mobile").getAsBoolean()+",\n" +
                 "\t\"vertical\": \""+jsonDev.get("vertical").getAsString()+"\",\n" +
+                "\t\"provider\": \""+jsonDev.get("provider").getAsString()+"\",\n" +
                 "\t\"streams\": "+ Arrays.toString(streamList.toArray()) +",\n" +
                 "\t\"device_name\": \""+jsonDev.get("device_name").getAsString()+"\",\n" +
                 "\t\"description\": \""+jsonDev.get("description").getAsString()+"\",\n" +
-                "\t\"latitude\": "+jsonDev.get("latitude").getAsDouble()+",\n" +
-                "\t\"longitude\": "+jsonDev.get("longitude").getAsDouble()+",\n" +
+                "\t\"locations\": ["+jsonDev.get("locations").getAsJsonArray()+"],\n"+
                 "\t\"creation\": "+jsonDev.get("creation").getAsJsonObject().get("$numberLong").getAsLong()+"\n" +
                 "}";
     }
