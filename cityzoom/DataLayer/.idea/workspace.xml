@@ -5,7 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b57dff56-8f59-4293-99f2-0feaed5598cc" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Devices.java" beforeDir="false" afterPath="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Devices.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DLAPI/src/main/java/API/Middleware/Validation.java" beforeDir="false" afterPath="$PROJECT_DIR$/DLAPI/src/main/java/API/Middleware/Validation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Values.java" beforeDir="false" afterPath="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Values.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ValuesSinks/src/main/java/Sink/ValuesSinker.java" beforeDir="false" afterPath="$PROJECT_DIR$/ValuesSinks/src/main/java/Sink/ValuesSinker.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -35,14 +37,14 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ValuesSinks/src/main/java/Sink/ValuesSinker.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2155">
-              <caret line="149" column="25" selection-start-line="149" selection-start-column="25" selection-end-line="149" selection-end-column="25" />
+            <state relative-caret-position="563">
+              <caret line="152" column="23" selection-start-line="152" selection-start-column="23" selection-end-line="152" selection-end-column="23" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#7867#7868#0" expanded="true" />
+                <element signature="e#8157#8158#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -84,11 +86,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Devices.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="512">
-              <caret line="179" column="60" selection-start-line="179" selection-start-column="60" selection-end-line="179" selection-end-column="60" />
+            <state relative-caret-position="672">
+              <caret line="185" column="93" selection-start-line="185" selection-start-column="93" selection-end-line="185" selection-end-column="93" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -133,8 +135,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Values.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="320">
-              <caret line="98" column="10" selection-start-line="98" selection-start-column="10" selection-end-line="98" selection-end-column="10" />
+            <state relative-caret-position="737">
+              <caret line="135" column="50" selection-start-line="135" selection-start-column="50" selection-end-line="135" selection-end-column="50" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -145,8 +147,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Middleware/Validation.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="299">
-              <caret line="109" column="8" selection-start-line="109" selection-start-column="8" selection-end-line="109" selection-end-column="8" />
+            <state relative-caret-position="379">
+              <caret line="117" column="42" selection-start-line="117" selection-start-column="42" selection-end-line="117" selection-end-column="42" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -242,11 +244,11 @@
         <option value="$PROJECT_DIR$/DLAPI/src/main/java/API/DataLayerAPI.java" />
         <option value="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Streams.java" />
         <option value="$PROJECT_DIR$/Sinks/src/main/java/Sinks/StreamSinker.java" />
-        <option value="$PROJECT_DIR$/ValuesSinks/src/main/java/Sink/ValuesSinker.java" />
-        <option value="$PROJECT_DIR$/DLAPI/src/main/java/API/Middleware/Validation.java" />
         <option value="$PROJECT_DIR$/DevicesSinks/src/main/java/Sink/DevSink.java" />
-        <option value="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Values.java" />
         <option value="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Devices.java" />
+        <option value="$PROJECT_DIR$/DLAPI/src/main/java/API/Middleware/Validation.java" />
+        <option value="$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Values.java" />
+        <option value="$PROJECT_DIR$/ValuesSinks/src/main/java/Sink/ValuesSinker.java" />
       </list>
     </option>
   </component>
@@ -489,8 +491,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1918" y="-28" width="1924" height="1110" extended-state="0" />
-    <editor active="true" />
+    <frame x="1924" y="3" width="635" height="1073" extended-state="0" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" weight="0.42320442" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -512,18 +513,18 @@
       <window_info anchor="bottom" id="Messages" order="9" weight="0.32740587" />
       <window_info anchor="bottom" id="Docker" order="10" weight="0.14067279" />
       <window_info anchor="bottom" id="Inspection Results" order="11" weight="0.7708831" />
-      <window_info active="true" anchor="bottom" id="Run" order="12" visible="true" weight="0.29969418" />
+      <window_info active="true" anchor="bottom" id="Run" order="12" visible="true" weight="0.31144068" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.2497332" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Palette" order="3" />
-      <window_info anchor="right" id="Maven" order="4" weight="0.9482391" />
+      <window_info anchor="right" id="Maven" order="4" visible="true" weight="0.92649573" />
       <window_info anchor="right" id="Theme Preview" order="5" />
       <window_info anchor="right" id="Capture Analysis" order="6" />
       <window_info anchor="right" id="Palette&#9;" order="7" />
     </layout>
     <layout-to-restore>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.14781217" />
+      <window_info content_ui="combo" id="Project" order="0" weight="0.42320442" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -532,23 +533,23 @@
       <window_info id="Learn" order="6" weight="0.32924226" />
       <window_info id="Favorites" order="7" side_tool="true" weight="0.32977587" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32925585" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.35168195" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Version Control" order="7" weight="0.3294979" />
-      <window_info anchor="bottom" id="Terminal" order="8" weight="0.32925585" />
-      <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
-      <window_info anchor="bottom" id="Messages" order="10" weight="0.32740587" />
-      <window_info anchor="bottom" id="Docker" order="11" weight="0.14067279" />
-      <window_info anchor="bottom" id="Inspection Results" order="12" weight="0.7708831" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32845187" />
+      <window_info anchor="bottom" id="Debug" order="2" weight="0.39958158" />
+      <window_info anchor="bottom" id="Cvs" order="3" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="4" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="5" />
+      <window_info anchor="bottom" id="Version Control" order="6" weight="0.3294979" />
+      <window_info anchor="bottom" id="Terminal" order="7" weight="0.32925585" />
+      <window_info anchor="bottom" id="Event Log" order="8" side_tool="true" />
+      <window_info anchor="bottom" id="Messages" order="9" weight="0.32740587" />
+      <window_info anchor="bottom" id="Docker" order="10" weight="0.14067279" />
+      <window_info anchor="bottom" id="Inspection Results" order="11" weight="0.7708831" />
+      <window_info anchor="bottom" id="Run" order="12" visible="true" weight="0.29969418" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Palette" order="3" />
-      <window_info anchor="right" id="Maven" order="4" weight="0.32977587" />
+      <window_info anchor="right" id="Maven" order="4" weight="0.28922093" />
       <window_info anchor="right" id="Theme Preview" order="5" />
       <window_info anchor="right" id="Capture Analysis" order="6" />
       <window_info anchor="right" id="Palette&#9;" order="7" />
@@ -559,25 +560,25 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/DLAPI/src/main/java/API/Middleware/Validation.java</url>
-          <line>134</line>
+          <line>136</line>
           <properties />
           <option name="timeStamp" value="2" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/DLAPI/src/main/java/API/Middleware/Validation.java</url>
-          <line>148</line>
+          <line>150</line>
           <properties />
           <option name="timeStamp" value="3" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/DLAPI/src/main/java/API/Middleware/Validation.java</url>
-          <line>138</line>
+          <line>140</line>
           <properties />
           <option name="timeStamp" value="4" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/DLAPI/src/main/java/API/Middleware/Validation.java</url>
-          <line>139</line>
+          <line>141</line>
           <properties />
           <option name="timeStamp" value="5" />
         </line-breakpoint>
@@ -766,13 +767,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ValuesSinks/src/main/java/Sink/ValuesSinker.java">
+    <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Middleware/Validation.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2155">
-          <caret line="149" column="25" selection-start-line="149" selection-start-column="25" selection-end-line="149" selection-end-column="25" />
+        <state relative-caret-position="379">
+          <caret line="117" column="42" selection-start-line="117" selection-start-column="42" selection-end-line="117" selection-end-column="42" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#7867#7868#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -787,20 +787,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Values.java">
+    <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Devices.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="320">
-          <caret line="98" column="10" selection-start-line="98" selection-start-column="10" selection-end-line="98" selection-end-column="10" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Middleware/Validation.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="299">
-          <caret line="109" column="8" selection-start-line="109" selection-start-column="8" selection-end-line="109" selection-end-column="8" />
+        <state relative-caret-position="672">
+          <caret line="185" column="93" selection-start-line="185" selection-start-column="93" selection-end-line="185" selection-end-column="93" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -818,16 +808,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Streams.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1376">
-          <caret line="19" column="36" selection-start-line="19" selection-start-column="36" selection-end-line="19" selection-end-column="36" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/DataLayerAPI.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="498">
@@ -838,12 +818,33 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Devices.java">
+    <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Streams.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="512">
-          <caret line="179" column="60" selection-start-line="179" selection-start-column="60" selection-end-line="179" selection-end-column="60" />
+        <state relative-caret-position="-1376">
+          <caret line="19" column="36" selection-start-line="19" selection-start-column="36" selection-end-line="19" selection-end-column="36" />
           <folding>
             <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DLAPI/src/main/java/API/Routes/Values.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="737">
+          <caret line="135" column="50" selection-start-line="135" selection-start-column="50" selection-end-line="135" selection-end-column="50" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ValuesSinks/src/main/java/Sink/ValuesSinker.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="563">
+          <caret line="152" column="23" selection-start-line="152" selection-start-column="23" selection-end-line="152" selection-end-column="23" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#8157#8158#0" expanded="true" />
           </folding>
         </state>
       </provider>
