@@ -25,11 +25,16 @@
         </div>
 
         <div class="map-menu show">
-            <div class="map-menu_left">
+            <div v-if="selected_vertical != null && selected_stream != null" class="map-menu_left">
+                <div :class="{active: stream.name == getVerticals[selected_vertical].streams[selected_stream].name}" :title="stream.display" v-for="(stream, i) in getVerticals[selected_vertical].streams" :key="i" class="map-menu_button">
+                    <img :src="`icons/${getVerticals[selected_vertical].name}.png`" alt="">
+                </div>
+            </div>
+            <div class="map-menu_center">
 
             </div>
-            <div class="map-menu_right">
-                <div @click="selectVertical(i)" :class="{active: vertical.name == selected_vertical}" :title="vertical.display" v-for="(vertical, i) in getVerticals" :key="i" class="map-menu_button">
+            <div v-if="selected_vertical != null" class="map-menu_right">
+                <div @click="selectVertical(i)" :class="{active: vertical.name == getVerticals[selected_vertical].name}" :title="vertical.display" v-for="(vertical, i) in getVerticals" :key="i" class="map-menu_button">
                     <img :src="`icons/${vertical.name}.png`" alt="">
                 </div>
             </div>
@@ -59,9 +64,12 @@ export default {
             hoverOverlay: null,
             hoverPopup: null,
             testValues: {},
+            testValuesOrdered: [],
             rainbowHeatMap: null,
 
             selected_vertical: null,
+            selected_stream: null,
+
             selected_county: null,
             hovered_feature: null,
             geoJsonExtent: null
@@ -124,10 +132,7 @@ export default {
             }),
             renderBuffer: window.innerWidth,
             updateWhileAnimating: true,
-            // renderMode: 'image',
-            style: (feature) => {
-                return this.geoStyle.default
-            }
+            // renderMode: 'image'
         })
 
         this.hoverPopup = document.getElementById('hover_popup');
@@ -141,11 +146,11 @@ export default {
         });
         
         features.push(new Feature({
-                        geometry: new geom.Point(proj.transform([-8.661682, 40.6331731], 'EPSG:4326',     
-                        'EPSG:3857')),
-                        //id: device.id
-                        name: 'Null Island'
-                        }));
+            geometry: new geom.Point(proj.transform([-8.661682, 40.6331731], 'EPSG:4326',     
+            'EPSG:3857')),
+            //id: device.id
+            name: 'Null Island'
+        }));
 
         //console.log(features)
         var vectorSource = new source.Vector({
@@ -185,14 +190,38 @@ export default {
                 center,
                 minZoom: 6,
                 maxZoom: 14
-            })
-
+            }),
         })
+
+        console.log(this.map.getInteractions())
+        this.map.removeInteraction('PinchRotate')
+        this.map.removeInteraction('PinchZoom')
 
         this.geo_layer.getSource().on('change', () => {
             if(this.geo_layer.getSource().getState() == 'ready' && !this.loaded) {
                 this.loaded = true
                 this.rainbowHeatMap = new Rainbow()
+
+                this.geoJsonExtent = this.req.extent.createEmpty()
+                this.geo_layer.getSource().getFeatures().forEach(feature => {
+                    this.geoJsonExtent = this.req.extent.extend(this.geoJsonExtent, feature.getGeometry().getExtent())
+                    this.testValues[feature.get('name_2')] = {
+                        value: Math.random() * 35,
+                        color: null,
+                        style: null
+                    }
+                })
+
+                this.testValuesOrdered = Object.keys(this.testValues).sort((a,b) => {
+                    return this.testValues[a].value - this.testValues[b].value
+                })
+
+                setTimeout(() => {
+                    this.map.getView().fit(this.geoJsonExtent, {
+                        duration: 500
+                    })
+                },0)
+
                 this.selectVertical(0)
             }
         })
@@ -213,68 +242,68 @@ export default {
 
         this.map.addInteraction(hover_interaction);
         hover_interaction.on('select', (e) => {
-            this.hovered_feature = null
-            if (e.selected.length)
+            if(e.selected.length && e.selected[0] != this.selected_county) {
                 this.hovered_feature = e.selected[0]
-
-            if(this.hovered_feature && this.hovered_feature != this.selected_county) {
                 document.body.style.cursor = "pointer"
-                var center = this.req.extent.getCenter(this.hovered_feature.getGeometry().getExtent())
-                this.hoverOverlay.setPosition(center)
+                this.hoverOverlay.setPosition(this.req.extent.getCenter(this.hovered_feature.getGeometry().getExtent()))
             } else {
                 this.hovered_feature = null
                 document.body.style.cursor = "default"
                 this.hoverOverlay.setPosition(null)
             }
+            this.hover_interaction.getFeatures().clear()
         })
 
         const click_interaction = new interaction.Select({
             condition: (e) => {
                 return click(e);
             },
-            layers: [this.geo_layer],
-            multi: true
+            layers: [this.geo_layer]
         })
 
         this.map.addInteraction(click_interaction);
         click_interaction.on('select', (e) => {
+            document.body.style.cursor = "default"
             const feature = e.selected[0]
-            this.map.setView(new this.req.Ol.View({
-                center: this.map.getView().getCenter(),
-                zoom: this.map.getView().getZoom(),
-                minZoom: 0,
-                maxZoom: 18
-            }))
-            this.map.getView().fit(feature.getGeometry().getExtent(), {
-                duration: 500,
-                padding: [120, 0, 0, 0],
-                callback: () =>  {
-                    this.map.setView(new this.req.Ol.View({
-                        extent: feature.getGeometry().getExtent(),
-                        center: this.map.getView().getCenter(),
-                        zoom: this.map.getView().getZoom(),
-                        minZoom: this.map.getView().getZoom(),
-                        maxZoom: 18
-                    }))
-                }
-            })   
-            this.selected_county = feature 
+            this.hovered_feature = null
+            if(feature != this.selected_county) {
+                this.map.setView(new this.req.Ol.View({
+                    center: this.map.getView().getCenter(),
+                    zoom: this.map.getView().getZoom(),
+                    minZoom: 0,
+                    maxZoom: 18
+                }))
+                this.map.getView().fit(feature.getGeometry().getExtent(), {
+                    duration: 500,
+                    padding: [120, 140, 0, 0],
+                    callback: () =>  {
+                        this.map.setView(new this.req.Ol.View({
+                            extent: feature.getGeometry().getExtent(),
+                            center: this.map.getView().getCenter(),
+                            zoom: this.map.getView().getZoom(),
+                            minZoom: this.map.getView().getZoom(),
+                            maxZoom: 18
+                        }))
+                    }
+                })   
+                this.selected_county = feature 
+                this.hoverOverlay.setPosition(null)
+            }
             click_interaction.getFeatures().clear()
-            this.hoverOverlay.setPosition(null)
-        }),
-        
-        this.createFeature(vectorSource, []);
-        setInterval(()=> {
-            vectorSource.forEachFeature(feature => {
-                vectorSource.removeFeature(feature)
-                var coordinates = this.gen_random_coordinates() 
-                vectorSource.addFeature(new Feature({
-                    geometry: new geom.Point(proj.transform(coordinates, 'EPSG:4326', 'EPSG:3857')),
-                    //id: device.id
-                    name: 'Null Island'
-                }));
-            })
-        },500);
+        })
+
+        //this.createFeature(vectorSource, []);
+        // setInterval(()=> {
+        //     vectorSource.forEachFeature(feature => {
+        //         vectorSource.removeFeature(feature)
+        //         var coordinates = this.gen_random_coordinates() 
+        //         vectorSource.addFeature(new Feature({
+        //             geometry: new geom.Point(proj.transform(coordinates, 'EPSG:4326', 'EPSG:3857')),
+        //             //id: device.id
+        //             name: 'Null Island'
+        //         }));
+        //     })
+        // },500);
 
     },
     methods: {
@@ -310,28 +339,16 @@ export default {
             return [(Math.random() * (limits[0] - limits[1]) + limits[1]),(Math.random() * (limits[2] - limits[3]) + limits[3])]
         },
         selectVertical(i) {
-            this.selected_vertical = this.getVerticals[i].name
+            this.selected_vertical = i
+            this.selected_stream = 0
             this.rainbowHeatMap.setNumberRange(1, this.geo_layer.getSource().getFeatures().length);
-            this.rainbowHeatMap.setSpectrum(this.getVerticals[i].streams[0].colors[0], this.getVerticals[i].streams[0].colors[1]); 
+            this.rainbowHeatMap.setSpectrum(this.getVerticals[i].streams[0].colors[0] , this.getVerticals[i].streams[0].colors[1]); 
 
-            this.geoJsonExtent = this.req.extent.createEmpty()
-            this.geo_layer.getSource().getFeatures().forEach(feature => {
-                this.geoJsonExtent = this.req.extent.extend(this.geoJsonExtent, feature.getGeometry().getExtent())
-                this.testValues[feature.get('name_2')] = {
-                    value: Math.random() * 35,
-                    color: null,
-                    style: null
-                }
-            })
-
-            const testValuesOrdered = Object.keys(this.testValues).sort((a,b) => {
-                return this.testValues[a].value - this.testValues[b].value
-            })
-            for(var i in testValuesOrdered) {
-                this.testValues[testValuesOrdered[i]].color = '#' + this.rainbowHeatMap.colourAt(i);
-                this.testValues[testValuesOrdered[i]].style = new this.req.style.Style({
+            for(var i in this.testValuesOrdered) {
+                this.testValues[this.testValuesOrdered[i]].color = '#' + this.rainbowHeatMap.colourAt(i);
+                this.testValues[this.testValuesOrdered[i]].style = new this.req.style.Style({
                     fill: new this.req.style.Fill({
-                        color: this.testValues[testValuesOrdered[i]].color
+                        color: this.testValues[this.testValuesOrdered[i]].color
                     }),
                     stroke: new this.req.style.Stroke({
                         color: 'black',
@@ -343,12 +360,6 @@ export default {
             this.geo_layer.setStyle((feature) => {
                 return feature == this.selected_county ? this.geoStyle.active : this.testValues[feature.get('name_2')].style
             })
-
-            setTimeout(() => {
-                this.map.getView().fit(this.geoJsonExtent, {
-                    duration: 500
-                })
-            },0)
         }
 
     }
@@ -396,8 +407,7 @@ export default {
 
 .map-menu {
 
-    @include flex(center, center, column);
-    @include shadow(0px, 0px, 4px, 2px, rgba(0,0,0,0.2));
+    @include flex(center, center, row);
     @include transition(opacity, .5s, ease, 0s);
     z-index: 3600;
     opacity: 0;
@@ -419,12 +429,16 @@ export default {
         right: auto;
     }
 
-    background-color: rgba(255,255,255,.75);
-    padding: 10px;
-    & > :not(:first-child) {
-        margin-top: 1rem;
+    &_left,&_right {
+        @include shadow(0px, 0px, 4px, 2px, rgba(0,0,0,0.2));
+        background-color: rgba(255,255,255,.75);
+        padding: .75rem;
+        border-radius: 5px;
     }
-    border-radius: 5px;
+    &_center {
+        background-color: rgba(255,255,255,.75);
+        width: 4px;
+    }
 
     &_button {
         @include shadow(0px, 0px, 4px, 2px, rgba(0,0,0,0.2));
@@ -435,6 +449,9 @@ export default {
         width: 5rem;
         height: 5rem;
         border-radius: 5px;
+        &:not(:first-child) {
+            margin-top: .75rem;
+        }
         &:hover {
             &:not(.active) {
                 transform: scale(1.05);
@@ -447,7 +464,7 @@ export default {
         }
         &.active {
             @include shadow(0px, 0px, 0px, 0px, rgba(0,0,0,0));
-            background-color: whitesmoke;
+            background-color: rgb(187, 187, 187);
         }
         & img {
             width: 100%;
