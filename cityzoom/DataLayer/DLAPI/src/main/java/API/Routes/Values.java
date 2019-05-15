@@ -4,6 +4,7 @@ import API.Aux.MongoAux;
 import com.google.gson.JsonObject;
 import com.mongodb.client.FindIterable;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.json.JSONException;
 import spark.Request;
 import spark.Response;
@@ -98,12 +99,21 @@ public class Values {
         }
         */
         String stream = body.get("stream_name").getAsString();
+        String devID = body.get("device_id").getAsString();
         Document docStream = streams.find(eq("stream", stream)).first();
         if (docStream == null) {
             response.status(HttpsURLConnection.HTTP_NOT_FOUND);
             return "{\n" +
                     "\t\"status\": \"Error\",\n" +
                     "\t\"Error\": \"Stream " + stream + " not found.\"\n" +
+                    "}";
+        }
+        Document docDev = devices.find(eq("_id", new ObjectId(devID))).first();
+        if (docStream == null) {
+            response.status(HttpsURLConnection.HTTP_NOT_FOUND);
+            return "{\n" +
+                    "\t\"status\": \"Error\",\n" +
+                    "\t\"Error\": \"Device " + devID + " not found.\"\n" +
                     "}";
         }
         String value = body.get("value").getAsString();
@@ -123,6 +133,7 @@ public class Values {
         String valuePost=
                 "{\n" +
                         "\t\"stream\": \""+stream+"\",\n" +
+                        "\t\"device_id\": \""+devID+"\",\n" +
                         "\t\"value\": \""+value+"\",\n" +
                         "\t\"timestamp\": "+timestamp+",\n" +
                         "\t\"latitude\": "+lat+",\n" +

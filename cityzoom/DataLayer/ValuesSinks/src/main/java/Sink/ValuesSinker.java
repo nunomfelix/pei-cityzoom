@@ -25,6 +25,7 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
+import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.set;
 
@@ -84,6 +85,7 @@ public class ValuesSinker {
                 "\"name\": \"Test\",\n" +
                 "\"fields\": [\n" +
                 "  { \"name\": \"stream\", \"type\": \"string\" },\n" +
+                "  { \"name\": \"device_id\", \"type\": \"string\" },\n" +
                 "  { \"name\": \"value\", \"type\": \"string\" },\n" +
                 "  { \"name\": \"timestamp\", \"type\": \"long\" },\n" +
                 "  { \"name\": \"latitude\", \"type\": \"double\" },\n" +
@@ -120,11 +122,12 @@ public class ValuesSinker {
                                 System.out.println(value.toString());
                                 Document document = new Document("stream_name", value.get("stream").getAsString())
                                         .append("value", value.get("value").getAsString())
+                                        .append("device_id", value.get("value").getAsString())
                                         .append("timestamp", value.get("timestamp").getAsLong())
                                         .append("latitude", value.get("latitude").getAsDouble())
                                         .append("longitude", value.get("longitude").getAsDouble());
                                 docsList.add(document);
-                                JsonObject stream = (JsonObject) MongoAux.jsonParser.parse(streams.findOneAndUpdate(eq("stream", value.get("stream").getAsString()), set("lastUpdate", date.getTime())).toJson());
+                                JsonObject stream = (JsonObject) MongoAux.jsonParser.parse(streams.findOneAndUpdate(and(eq("stream", value.get("stream").getAsString()), eq("_id", new ObjectId(value.get("device_id").getAsString()))), set("lastUpdate", date.getTime())).toJson());
                                 System.out.println(stream.toString());
                                 JsonObject device = (JsonObject) MongoAux.jsonParser.parse(devices.find(eq("_id", new ObjectId(stream.get("device_id").getAsString()))).first().toJson());
                                 if (device.get("mobile").getAsBoolean()) {
@@ -147,8 +150,8 @@ public class ValuesSinker {
                     logger.info("Offsets commited");
 
                     try {
-                        //Thread.sleep(Duration.ofMinutes(5).toMillis());
-                        Thread.sleep(Duration.ofMillis(100).toMillis());
+                        Thread.sleep(Duration.ofMinutes(5).toMillis());
+                        //Thread.sleep(Duration.ofMillis(100).toMillis());
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

@@ -177,7 +177,8 @@ public class Devices {
                     "}";
         }
         System.out.println(device);
-        FindIterable<Document> streamDocs = streams.find(eq("device_id", device));
+        String devID = ((JsonObject) MongoAux.jsonParser.parse(devices.find(eq("device_name", device)).first().toJson())).get("_id").getAsJsonObject().get("$oid").getAsString();
+        FindIterable<Document> streamDocs = streams.find(eq("device_id", devID));
         ArrayList<String> streamList = new ArrayList<>();
         for (Document doc : streamDocs) {
             JsonObject jsonStream = (JsonObject) MongoAux.jsonParser.parse(doc.toJson());

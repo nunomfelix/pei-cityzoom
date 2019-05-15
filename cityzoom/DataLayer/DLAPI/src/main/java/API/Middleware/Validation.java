@@ -34,10 +34,12 @@ public class Validation {
 
         // required fields for push values
         this.pushValuesRequiredFields.put("stream_name", String.class);
+        this.pushValuesRequiredFields.put("device_id", String.class);
         this.pushValuesRequiredFields.put("value", String.class);
 
         // allowed fields for push values
         this.pushValuesAllowedFields.put("stream_name", String.class);
+        this.pushValuesAllowedFields.put("device_id", String.class);
         this.pushValuesAllowedFields.put("value", String.class);
         this.pushValuesAllowedFields.put("timestamp", Long.class);
         this.pushValuesAllowedFields.put("latitude", Double.class);
@@ -113,7 +115,7 @@ public class Validation {
                     "\t\"Status\": \"Error @ request\"\n" +
                     "\t\"Error\": \"Required fields not found\"\n" +
                     "}";
-        } else if (body.keySet().size() > 5){
+        } else if (body.keySet().size() > 6){
             return "{\n" +
                     "\t\"Status\": \"Error @ request\"\n" +
                     "\t\"Error\": \"Too many fields\"\n" +
