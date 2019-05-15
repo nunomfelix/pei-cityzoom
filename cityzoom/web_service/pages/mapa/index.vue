@@ -9,10 +9,10 @@
             </div>
         </div>
 
-        <div id="hover_popup" class="ol-popup" :style="{ 'background-color': hovered_feature ? testValues[hovered_feature.get('name_2')].color : ''}">
-            <div v-if="hovered_feature" style="background-color: rgba(0,0,0, .5)">
-                <span class="normal"> {{hovered_feature.get('name_2')}} </span>
-                <span class="normal"> {{testValues[hovered_feature.get('name_2')].value.toFixed(2)}} </span>
+        <div id="hover_popup" class="ol-popup" :style="{ 'background-color': hovered_geo ? testValues[hovered_geo.get('name_2')].color : ''}">
+            <div v-if="hovered_geo" style="background-color: rgba(0,0,0, .5)">
+                <span class="normal"> {{hovered_geo.get('name_2')}} </span>
+                <span class="normal"> {{testValues[hovered_geo.get('name_2')].value.toFixed(2)}} </span>
             </div>
         </div>
 
@@ -81,14 +81,14 @@ export default {
             selected_vertical: null,
             selected_stream: null,
             selected_county: null,
-            hovered_feature: null,
+            hovered_geo: null,
 
             geoJsonExtent: null,
             showModal: false,
 
             geo_layer: null,
             devices_layer: null,
-            selected_devices: []
+            shown_features: []
         }
     },
     computed: {
@@ -196,7 +196,7 @@ export default {
         this.hoverOverlay = new this.req.Ol.Overlay({
             element: this.hoverPopup,
             autoPan: false,
-            positioning: 'bottom-center',
+            positioning: 'top-center',
             autoPanAnimation: {
                 duration: 250
             }
@@ -209,8 +209,13 @@ export default {
         });
         
         this.devices_layer = new layer.Vector({
-                    source: vectorSource,
-                    style: iconStyle[Math.floor(Math.random() * iconStyle.length)]
+            source: vectorSource,
+            style: (feature) => {
+                console.log(this.devicesStyle)
+                return this.devicesStyle.styles[this.getVerticals[this.selected_vertical].name].default
+            },
+            renderBuffer: window.innerWidth,
+            updateWhileAnimating: true,
         }) 
 
         const centerpos = [-8.661682, 40.6331731];
@@ -254,8 +259,6 @@ export default {
                     return this.testValues[a].value - this.testValues[b].value
                 })
 
-                this.devices_layer.setStyle((feature) => { return iconStyle[Math.floor(Math.random() * iconStyle.length)]})
-
                 this.geo_layer.setStyle((feature) => {
                     return feature == this.selected_county ? this.geoStyle.active : this.testValues[feature.get('name_2')].style
                 })
@@ -280,10 +283,9 @@ export default {
             },
             layers: [this.geo_layer],
             style: (feature) => {
-                return feature == this.selected_county ?
-                    this.geoStyle.active
-                :
-                    this.geoStyle.hover
+                return feature == this.selected_county 
+                ? this.geoStyle.active
+                : this.geoStyle.hover
             },
             multi: false
         })
@@ -291,26 +293,31 @@ export default {
         this.map.addInteraction(hover_interaction);
         hover_interaction.on('select', (e) => {
             if(e.selected.length && e.selected[0] != this.selected_county) {
-                this.hovered_feature = e.selected[0]
-                document.body.style.cursor = "pointer"
-                this.hoverOverlay.setPosition(this.req.extent.getCenter(this.hovered_feature.getGeometry().getExtent()))
-                console.log("asdfasdf")
-                for(var device of this.getDevices) {
-                    // if(!selected_devices.includes(device.device_id) && device.vertical.includes(this.getVerticals[this.selected_vertical].name)) {
-                    //     var location = device.mobile ? [device.locations[0][device.locations[0].length - 1].latitude, device.locations[0][device.locations[0].length - 1].longitude] :
-                    //                         [device.locations[0][0].latitude, device.locations[0][0].longitude]
-                    //     location = this.req.proj.transform([location[1],location[0]], 'EPSG:4326', 'EPSG:3857')
-                    //     if(this.hovered_feature.getGeometry().intersectsCoordinate(location)) {
-                    //         this.devices_layer.getSource().addFeature(new Feature({
-                    //             geometry: new this.req.geom.Point(location),
-                    //             id: device.device_id,
-                    //         }))
-                    //     }
-                    //     this.selected_devices.push(device.device_id);
-                    // }
+                if(this.hovered_geo) {
+                    this.clearGeoDevices(this.hovered_geo)
                 }
-            } else {
-                this.hovered_feature = null
+                this.hovered_geo = e.selected[0]
+                document.body.style.cursor = "pointer"
+                const center = this.req.extent.getCenter(this.hovered_geo.getGeometry().getExtent()),
+                      bottom = this.req.extent.getBottomRight(this.hovered_geo.getGeometry().getExtent())
+                this.hoverOverlay.setPosition([center[0], (center[1] + bottom[1]) / 2]) 
+                if(this.selected_county != null) {
+                    for(var device of this.getDevices) {
+                        if(device.municipality == this.hovered_geo.get('name_2') && this.hovered_geo.get('name_2') != this.selected_county && device.vertical.includes(this.getVerticals[this.selected_vertical].name)) {
+                            var location = device.mobile ? [device.locations[device.locations.length - 1].latitude, device.locations[device.locations.length - 1].longitude] :
+                                                [device.locations[0].latitude, device.locations[0].longitude]
+                            const feat = new Feature({
+                                geometry: new this.req.geom.Point(this.req.proj.transform([location[1],location[0]], 'EPSG:4326', 'EPSG:3857')),
+                                id: device.device_id,
+                            })
+                            this.devices_layer.getSource().addFeature(feat)
+                            this.shown_features.push(feat);
+                        }
+                    }
+                }
+            } else if(this.hovered_geo) {
+                this.clearGeoDevices(this.hovered_geo)
+                this.hovered_geo = null
                 document.body.style.cursor = "default"
                 this.hoverOverlay.setPosition(null)
             }
@@ -327,7 +334,6 @@ export default {
         this.map.addInteraction(click_interaction);
         click_interaction.on('select', (e) => {
             document.body.style.cursor = "default"
-            this.hovered_feature = null
             const geo_feature = e.selected[0]
             if(geo_feature.get('name_2') && geo_feature != this.selected_county) {
                 this.map.setView(new this.req.Ol.View({
@@ -337,21 +343,21 @@ export default {
                     maxZoom: 18
                 }))
 
+                this.hovered_geo = null
                 this.selected_county = geo_feature 
+                this.shown_features = []
                 this.devices_layer.getSource().clear()
 
                 for(var device of this.getDevices) {
-                    if(device.vertical.includes(this.getVerticals[this.selected_vertical].name)) {
-                        var location = device.mobile ? [device.locations[0][device.locations[0].length - 1].latitude, device.locations[0][device.locations[0].length - 1].longitude] :
-                                            [device.locations[0][0].latitude, device.locations[0][0].longitude]
-                        location = this.req.proj.transform([location[1],location[0]], 'EPSG:4326', 'EPSG:3857')
-                        if(geo_feature.getGeometry().intersectsCoordinate(location)) {
-                            this.devices_layer.getSource().addFeature(new Feature({
-                                geometry: new this.req.geom.Point(location),
-                                id: device.device_id,
-                            }))
-                        }
-                        this.selected_devices.push(device.device_id);
+                    if(device.municipality == geo_feature.get('name_2') && device.vertical.includes(this.getVerticals[this.selected_vertical].name)) {
+                        var location = device.mobile ? [device.locations[device.locations.length - 1].latitude, device.locations[device.locations.length - 1].longitude] :
+                                            [device.locations[0].latitude, device.locations[0].longitude]
+                        const feat = new Feature({
+                            geometry: new this.req.geom.Point(this.req.proj.transform([location[1],location[0]], 'EPSG:4326', 'EPSG:3857')),
+                            id: device.device_id,
+                        })
+                        this.devices_layer.getSource().addFeature(feat)
+                        this.shown_features.push(feat);
                     }
                 }
                 this.hoverOverlay.setPosition(null)
@@ -378,44 +384,34 @@ export default {
             click_interaction.getFeatures().clear()
         })
 
-        // const click_device_interaction = new interaction.Select({
-        //     condition: (e) => {
-        //         return click(e);
-        //     },
-        //     layers: [this.devices_layer]
-        // })
-        // this.map.addInteraction(click_device_interaction);
-
-        // click_device_interaction.on('select', (e) => {
-        //     document.body.style.cursor = "default"
-        //     const feature = e.selected[0]
-        //     console.log(feature)
-        //     this.showModal = true
-        // })
 
         //this.createFeature(vectorSource, []);
-        var feat = new Feature({
-            geometry: new this.req.geom.Point(this.req.proj.transform([drone_stream.values[0].longitude, drone_stream.values[0].latitude], 'EPSG:4326',     
-            'EPSG:3857'))
-            //id: device.id
-        })
-        vectorSource.addFeature(feat)
-        var i = 1;
-        setInterval(() => {
-            vectorSource.removeFeature(feat);
-            feat = new Feature({
-                geometry: new this.req.geom.Point(this.req.proj.transform([drone_stream.values[i].longitude, drone_stream.values[i].latitude], 'EPSG:4326',     
-                'EPSG:3857'))
-                //id: device.id
-            })
-            vectorSource.addFeature(feat)
-            i++
-        },200)
-    
-
-
+        // var feat = new Feature({
+        //     geometry: new this.req.geom.Point(this.req.proj.transform([drone_stream.values[0].longitude, drone_stream.values[0].latitude], 'EPSG:4326',     
+        //     'EPSG:3857'))
+        //     //id: device.id
+        // })
+        // this.devices_layer.getSource().addFeature(feat)
+        // var i = 1;
+        // setInterval(() => {
+        //     feat = new Feature({
+        //         geometry: new this.req.geom.Point(this.req.proj.transform([drone_stream.values[i].longitude, drone_stream.values[i].latitude], 'EPSG:4326',     
+        //         'EPSG:3857'))
+        //         //id: device.id
+        //     })
+        //     this.devices_layer.getSource().addFeature(feat)
+        //     i++
+        // },1000)
     },
     methods: {
+        clearGeoDevices(geo) {
+            for(var feature in this.shown_features) {
+                if(this.getDevices.find(d => d.device_id == this.shown_features[feature].get('id')).municipality == geo.get('name_2')) {
+                    this.devices_layer.getSource().removeFeature(this.shown_features[feature])
+                    this.shown_features.splice(feature, 1)
+                }
+            }
+        },
         deselect_county() {
             this.map.setView(new this.req.Ol.View({
                 center: this.map.getView().getCenter(),
@@ -427,6 +423,8 @@ export default {
                 duration: 500
             })
             this.selected_county = null
+            this.devices_layer.getSource().clear()
+            this.shown_features = []
         },
         createFeature(source, device){
             const { Feature } = require( 'ol');
@@ -463,7 +461,13 @@ export default {
                 this.selected_vertical = i
                 this.selected_stream = 0
                 this.updateHeatMap()
-                this.devices_layer.getSource().clear()
+                for(var feature in this.shown_features) {
+                    if(!(this.getDevices.find(d => d.device_id == this.shown_features[feature].get('id')).vertical.includes(this.getVerticals[this.selected_vertical].name))) {
+                        this.devices_layer.getSource().removeFeature(this.shown_features[feature])
+                        this.shown_features.splice(feature, 1)
+                    }
+                }
+                this.devices_layer.getSource().dispatchEvent('change');
             }
         },
         selectStream(i) {
@@ -493,6 +497,9 @@ export default {
             this.geo_layer.setStyle((feature) => {
                 return feature == this.selected_county ? this.geoStyle.active : this.testValues[feature.get('name_2')].style
             })
+
+            this.map.updateSize()
+
         }
 
     }

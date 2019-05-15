@@ -4,7 +4,7 @@ const fs = require('fs')
 async function get_darksky_data(lat, long) {
 
     var tmp = {}
-    var city_info = await axios.get('https://api.darksky.net/forecast/f962475109da7278cd8ca1ba22186bee/' + lat + ',' + long + '?units=si')
+    var city_info = await axios.get('https://api.darksky.net/forecast/f5e30cf666320006447f251880cad6bc/' + lat + ',' + long + '?units=si')
     tmp['temperature'] = city_info.data.hourly.data[0].temperature
     tmp['pressure'] = city_info.data.hourly.data[0].pressure
     tmp['humidity'] = city_info.data.hourly.data[0].humidity
