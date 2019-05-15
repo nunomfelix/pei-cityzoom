@@ -120,9 +120,9 @@ public class ValuesSinker {
                                 logger.error("Error parsing the following request: "+ value.toString());
                             } else {
                                 System.out.println(value.toString());
-                                Document document = new Document("stream_name", value.get("stream").getAsString())
+                                Document document = new Document("stream_id", value.get("stream").getAsString())
                                         .append("value", value.get("value").getAsString())
-                                        .append("device_id", value.get("value").getAsString())
+                                        .append("device_id", value.get("device_id").getAsString())
                                         .append("timestamp", value.get("timestamp").getAsLong())
                                         .append("latitude", value.get("latitude").getAsDouble())
                                         .append("longitude", value.get("longitude").getAsDouble());
