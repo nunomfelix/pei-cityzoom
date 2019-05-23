@@ -4,7 +4,7 @@ const fs = require('fs')
 async function get_darksky_data(lat, long) {
 
     var tmp = {}
-    var city_info = await axios.get('https://api.darksky.net/forecast/f962475109da7278cd8ca1ba22186bee/' + lat + ',' + long + '?units=si')
+    var city_info = await axios.get('https://api.darksky.net/forecast/f5e30cf666320006447f251880cad6bc/' + lat + ',' + long + '?units=si')
     tmp['temperature'] = city_info.data.hourly.data[0].temperature
     tmp['pressure'] = city_info.data.hourly.data[0].pressure
     tmp['humidity'] = city_info.data.hourly.data[0].humidity
@@ -19,7 +19,8 @@ async function get_darksky_data(lat, long) {
 }
 
 //193.136.93.14:8001
-async function create_Device(deviceName, verticals, location) {
+async function create_Device(deviceName, verticals, location, municipality) {
+    console.log(municipality)
     axios.post('http://localhost:8001/czb/devices', {
         "device_name" : deviceName + "_device",
         "description" : deviceName + "",
@@ -27,17 +28,18 @@ async function create_Device(deviceName, verticals, location) {
         "mobile" : false,
         "latitude" : location[1],
         "longitude" : location[0],
-        "provider" : "DarkSky"
+        "provider" : "DarkSky",
+        "municipality": municipality + ""
     }).catch((err) => {console.log("Failed to create device with error message: " + err)})
     return deviceName + "_device"
 }
 
-async function get_Device(deviceName) {
+async function get_Device(location) {
     var data = await axios.get('http://localhost:8001/czb/devices')
                 .catch((err) => {console.log("Failed to get device with error message: " + err)})
     var user_devices = data.data.user_devices
     for(i in user_devices){
-        if(user_devices[i].device_name == deviceName){
+        if(user_devices[i].locations[0][0].latitude == location[1] & user_devices[i].locations[0][0].longitude == location[0]){
             return user_devices[i].device_id
         }
     }
@@ -45,7 +47,7 @@ async function get_Device(deviceName) {
 }
 
 async function create_Stream(streamName, deviceID) {
-    return await axios.post('http://localhost:8001/czb/stream', {
+    axios.post('http://localhost:8001/czb/stream', {
             "stream" : streamName + "_stream",
             "description" : streamName + "",
             "device_id" : deviceID + "",
@@ -56,7 +58,7 @@ async function create_Stream(streamName, deviceID) {
 
 async function put_Stream(streamName, data, location) {
     axios.post('http://localhost:8001/czb/values', {
-        "stream_name":streamName +  "_stream",
+        "stream_name":streamName + "_stream",
         "value": data + "",
         "latitude" : location[1],
         "longitude" : location[0]
@@ -89,21 +91,21 @@ for(i in obj.features){
     positions[obj.features[i].properties.name_2] = [center_long, center_lat]
 }
 
-console.log(positions)
 for(city in positions){
     var first = true
     var position = positions[city]
     //Create device for each city
-    var deviceName = create_Device('darksky', ['AirQuality', 'Temperatura'] , position)
+    create_Device('darksky', ['AirQuality', 'Temperature'] , position, city)
     setInterval(async () => {
         var data = await get_darksky_data(position[1],position[0])
         for(var key in data[0]){
             if(first){
-                var device_id = await get_Device(deviceName)
+                var device_id = await get_Device(position)
+                console.log(device_id)
                 create_Stream(key, device_id)
-                first = false
             }
-                put_Stream(key, data[0].key, position)
+            put_Stream(key, data[0][key], position)
         }
+        first = false
     }, 10000) //every 2 minutes, making 720 requests a day (the max possible is 1000) 
 }
