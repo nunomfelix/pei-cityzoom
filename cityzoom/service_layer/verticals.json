@@ -8,21 +8,28 @@
 					"unit": "B",
 					"fullunit": "Bars",
 					"type": "value",
-					"colors": ["white", "lightblue", "white"]
+					"colors": ["white", "lightblue", "white"],
+					"min": 870,
+					"max": 1084.8
 				},
 				"humidity_stream": {
 					"display": "Humidade do ar",
 					"unit": "%",
 					"fullunit": "percentagem",
 					"type": "value",
-					"colors": ["lightblue", "darkblue", "grey"]
+					"colors": ["lightblue", "darkblue", "grey"],
+					"min": 0,
+					"max": 100
 				},
 				"ozone_stream": {
 					"display": "Ozono na atmosfera",
-					"unit": "ppm",
-					"fullunit": "partes por milhao",	
+					"unit": "SU",
+					"fullunit": "Dobson",	
 					"type": "value"	,
-					"colors": ["lightblue", "purple", "black"]
+					"colors": ["lightblue", "purple", "black"],
+					"min": 73,
+					"max": 600
+
 				}
 			}
 		},
@@ -34,7 +41,9 @@
 					"unit": "ºC",
 					"fullunit": "Celsius",
 					"type": "value",
-					"colors": ["green", "red", "white"]
+					"colors": ["green", "red", "white"],
+					"min": -100,
+					"max": 100
 				}
 			}
 		}
