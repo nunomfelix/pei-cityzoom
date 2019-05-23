@@ -40,6 +40,15 @@ function validatePostValue(object) {
         latitude: joi.number().required(),
         longitude: joi.number().required()
     })
+    return joi.validate(object, schema)
+}
+
+function validateGetInInterval(object) {
+    const schema = joi.object().keys({
+        interval_start: joi.number().integer(),
+        interval_end: joi.number().integer()
+    })
+    return joi.validate(object, schema)
 }
 
 module.exports = {
