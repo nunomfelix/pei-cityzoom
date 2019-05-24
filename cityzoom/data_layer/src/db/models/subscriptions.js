@@ -2,30 +2,24 @@ const mongoose = require('mongoose')
 const uniqueValidator = require('mongoose-unique-validator')
 const config = require('config')
 
-const deviceSchema = new mongoose.Schema({
+const subscriptionsSchema = new mongoose.Schema({
     device_ID: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    stream_ID: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    subscription_ID: {
         type: String,
         required: true,
         trim: true,
         unique: true
     },
-    device_name: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    vertical: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    mobile: {
-        type: Boolean,
-        required: true,
-        default: true,
-        trim: true
-    },
-    provider: {
+    subscription_name: {
         type: String,
         required: true,
         trim: true
@@ -36,11 +30,6 @@ const deviceSchema = new mongoose.Schema({
         trim: true,
         default: Date.now
     },
-    locations: {
-        type: Array,
-        required: true,
-        default: []
-    },
     description: {
         type: String,
         required: false,
@@ -49,8 +38,8 @@ const deviceSchema = new mongoose.Schema({
     }
 })
 
-deviceSchema.plugin(uniqueValidator)
+subscriptionsSchema.plugin(uniqueValidator)
 
-const Device = mongoose.model('devices', deviceSchema)
+const Subscriptions = mongoose.model('subscriptions', subscriptionsSchema)
 
-module.exports = Device
+module.exports = Subscriptions

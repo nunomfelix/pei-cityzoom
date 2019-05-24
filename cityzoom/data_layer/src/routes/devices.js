@@ -2,8 +2,8 @@ const express = require('express')
 const validators = require('../validation')
 const { validation } = require('../middleware')
 const devices = require('../db/models/devices')
-//const streams = require('../db/models/streams')
-//const subscriptions = require('../db/models/subscriptions')
+const streams = require('../db/models/streams')
+const subscriptions = require('../db/models/subscriptions')
 const devicesDebug = require('debug')('app:Devices')
 
 const router = new express.Router()
@@ -19,6 +19,7 @@ router.post('', validation(validators.validateCreateDevice, 'body', 'Invalid dev
         mobile: req.body['mobile'],
         provider: req.body['provider'],
         created_at: Number(Date.now()),
+        description: 'description' in req.body ? req.body.description : "",
         locations: []
     }
     /*
@@ -48,20 +49,37 @@ router.post('', validation(validators.validateCreateDevice, 'body', 'Invalid dev
     )
 })
 
-// get all devices -- PASSING
+// get all devices -- testing
 router.get('', async (req, res) => {
     devicesDebug('[DEBUG] Fetching all Devices')
     var result = {}
-    const start = req.params['interval_start'] ? req.params['interval_start'] : 0
+    const start = req.query.interval_start ? req.query.interval_start : 0
     const compass = Number(Date.now())
-    const end = req.params['interval_end'] ? req.params['interval_end']: compass
-    if (end < start) {
+    const end = req.query.interval_end ? req.query.interval_end : compass
+    if (end < start || start < 0) {
         devicesDebug('[ERROR] Interval is wrong')
-        return res.status(400).send('Bad interval defined')
+        return res.status(400).send({error: 'Bad interval defined'})
     }
     user_devs =[]
     var allDevices = await devices.find({created_at: { $gte: start, $lte: end}})
-    allDevices.forEach((doc) => {
+
+    for (var i = 0; i < allDevices.length; i++) {
+        let doc = allDevices[i]
+       
+        // get all devices streams
+        var allDeviceStreams = await streams.find({device_ID: doc.device_ID})
+        devStreams = []
+        await allDeviceStreams.forEach(function (stream) {
+            devStreams.push(stream.stream_ID)
+        })
+       
+        // get all devices subscriptions
+        var allDeviceSubs = await subscriptions.find({device_ID: doc.device_ID})
+        devSubs = []
+        await allDeviceSubs.forEach( function (sub) {
+            devSubs.push(sub.subscription_ID)
+        })
+        
         user_devs.push({
             device_ID: doc.device_ID,
             device_name: doc.device_name,
@@ -70,11 +88,11 @@ router.get('', async (req, res) => {
             created_at: Number(doc.created_at),
             vertical: doc.vertical,
             description: doc.description,
-            locations: doc.locations
-            //streams: streams
-            //subscriptions: subscriptions
+            locations: doc.locations,
+            streams: devStreams,
+            subscriptions: devSubs
         })
-    })
+    }
     result['total_devices']
     await devices.countDocuments({created_at: { $gte: start, $lte: end}}, (err, count) => {
         result['total_devices'] = count 
@@ -87,10 +105,24 @@ router.get('', async (req, res) => {
     res.status(200).send(result)
 })
 
-// get device by ID -- PASSING
+// get device by ID -- testing
 router.get('/:id', async (req, res) => {
     const doc = await devices.findOne({device_ID:req.params.id})
     if (!doc) { return res.status(404).send({'Status':'Not Found'}) }
+    // get all device streams
+    var allDeviceStreams = await streams.find({device_ID: doc.device_ID})
+        devStreams = []
+        allDeviceStreams.forEach((stream) => {
+            devStreams.push(stream.stream_ID)
+        })
+
+    // get all devices subscriptions
+    var allDeviceSubs = await subscriptions.find({device_ID: doc.device_ID})
+    devSubs = []
+    await allDeviceSubs.forEach( function (sub) {
+        devSubs.push(sub.subscription_ID)
+    })
+
     res.status(200).send({
         device_ID: doc.device_ID,
         device_name: doc.device_name,
@@ -99,7 +131,9 @@ router.get('/:id', async (req, res) => {
         created_at: Number(doc.created_at),
         vertical: doc.vertical,
         description: doc.description,
-        locations: doc.locations
+        locations: doc.locations,
+        streams: devStreams,
+        subscriptions: devSubs
     })
 })
 

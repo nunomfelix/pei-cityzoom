@@ -15,7 +15,7 @@ function validateCreateDevice(object) {
 function validateCreateStream(object) {
     const schema = joi.object().keys({
         stream_ID: joi.string().required(),
-        device_ID: joi.string().device_ID(),
+        device_ID: joi.string().required(),
         stream_name: joi.string().required(),
         type: joi.string().required(),
         description: joi.string().optional()
@@ -27,7 +27,7 @@ function validateCreateSubscription(object){
     const schema = joi.object().keys({
         subscription_ID: joi.string().required(),
         stream_ID: joi.string().required(),
-        device_ID: joi.string().device_ID(),
+        device_ID: joi.string().required(),
         subscription_name: joi.string().required(),
         description: joi.string().optional()
     })
@@ -54,5 +54,6 @@ function validateGetInInterval(object) {
 module.exports = {
     validateCreateDevice,
     validateCreateStream,
-    validateCreateSubscription
+    validateCreateSubscription,
+    validatePostValue
 }
