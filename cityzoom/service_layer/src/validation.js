@@ -63,7 +63,7 @@ function validateCreateDevice(object) {
     const schema = Joi.object().keys({
         device_name: Joi.string().required(),
 //        owner: Joi.string().required(),
-        vertical: Joi.string().required(),
+        vertical: Joi.array().required(),
         latitude: Joi.number().optional(),
         longitude: Joi.number().optional(),
         mobile: Joi.boolean().required(),
