@@ -5,7 +5,7 @@
       :col-num="12"
       :row-height="30"
       :is-draggable="true"
-      :is-resizable="true"
+      :is-resizable="false"
       :vertical-compact="true"
       :margin="[20, 20]"
       :use-css-transforms="false"
@@ -58,9 +58,9 @@
 <script>
 const drone_stream = require('static/get_stream_values_response.json');
 var testLayout = [
-  //{ x: 0, y: 0, w: 4, h: 14, i: "line_a", type: 'lines', data:'fake' },
+  { x: 0, y: 0, w: 14, h: 14, i: "line_a", type: 'lines', data:'fake' },
   //{ x: 0, y: 0, w: 8, h: 14, i: "series_a", type: 'series', data:'fake' },
-  { x: 0, y: 0, w: 8, h: 6, i: "dfffd", type: 'widget_weather'}
+  { x: 0, y: 0, w: 8, h: 5, i: "dfffd", type: 'widget_weather'}
   // { x: 8, y: 0, w: 4, h: 14, i: "series_c", type: 'series', data: 'fake' },
   // { x: 0, y: 14, w: 13, h: 14, i: "series_b", type: 'series', data: 'fake' },
 ];
