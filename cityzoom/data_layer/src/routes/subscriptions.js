@@ -10,27 +10,27 @@ const subsSchema = new mongoose.Schema({
     subscription_ID:{
         type: String,
         required: true,
-        min: 1
+        minlength: 1
     },
     subscription_name: {
         type: String,
         required: true,
-        min: 1
+        minlength: 1
     },
     description: {
         type: String,
         required: false,
-        min: 1
+        minlength: 1
     },
     stream_ID: {
         type: String,
         required: true,
-        min: 1
+        minlength: 1
     },
     device_ID: {
         type: String,
         required: true,
-        min: 1
+        minlength: 1
     }
 })
 
@@ -44,7 +44,7 @@ router.post('',validation(validateCreateSubscription, 'body', 'Invalid Subscript
         stream_ID: req.body.stream_ID,
         device_ID: req.body.device_ID
     })
-    subs = await stream.save()
+    subs = await subs.save()
     res.send(subs)
 })
 
