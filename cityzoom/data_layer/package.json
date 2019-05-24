@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "react-scripts start",
-    "broker": "DEBUG=broker:* nodemon src/broker.js",
-    "index": "DEBUG=app:* nodemon src/index.js",
+    "broker": "DEBUG=broker:* nodemon --watch broker.js src/broker.js",
+    "index": "DEBUG=app:* nodemon --watch routes/ --watch index.js --watch db/ --watch middleware.js --watch validation.js src/index.js",
     "dev": "gnome-terminal --tab -e \"npm run broker\" & gnome-terminal --tab -e \"npm run index\""
   },
   "author": "andremourato@ua.pt&ZePaiva",
