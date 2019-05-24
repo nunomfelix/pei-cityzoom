@@ -29,6 +29,7 @@
           <div class="widget_handle">
             <img src="icons/widgets/handler.png">
           </div>
+          
           <div v-if="item.type=='series'">
             <SeriesGraph :ref="item.i" :data="item.data && item.data == 'fake' ? null : data" :name="item.i"/>
           </div>
@@ -37,6 +38,16 @@
           </div>
           <div v-if="item.type=='lines'">
             <LineGraph :ref="item.i" :name="item.i" :values="values"/>
+          </div>
+          <div v-if="item.type=='widget_weather'">
+            <WeatherWidget 
+                api-key="7fbda2874f6ebf17ef4d31443696cd68"
+                title="Weather"
+                :latitude="position.coords.latitude"
+                :longitude="position.coords.longitude"
+                language="pt"
+                units="uk">
+            </WeatherWidget>
           </div>
         </div>
       </grid-item>
@@ -47,8 +58,9 @@
 <script>
 const drone_stream = require('static/get_stream_values_response.json');
 var testLayout = [
-  { x: 0, y: 0, w: 12, h: 14, i: "line_a", type: 'lines', data:'fake' },
-  { x: 0, y: 0, w: 8, h: 14, i: "series_a", type: 'series', data:'fake' },
+  //{ x: 0, y: 0, w: 4, h: 14, i: "line_a", type: 'lines', data:'fake' },
+  //{ x: 0, y: 0, w: 8, h: 14, i: "series_a", type: 'series', data:'fake' },
+  { x: 0, y: 0, w: 8, h: 6, type: 'widget_weather'}
   // { x: 8, y: 0, w: 4, h: 14, i: "series_c", type: 'series', data: 'fake' },
   // { x: 0, y: 14, w: 13, h: 14, i: "series_b", type: 'series', data: 'fake' },
 ];
@@ -57,10 +69,13 @@ export default {
   data() {
     return {
       layout: testLayout,
-      values: drone_stream
+      values: drone_stream,
+      position: this.location,
     };
   }, 
   mounted: async function() {
+    let location = this.getLocation()
+    console.log(location);
     const data = []
     const res = await this.$store.dispatch('get_streams');
     for(let i in res) {
@@ -80,6 +95,16 @@ export default {
       setTimeout(() => {
         this.$refs[i][0].onResize()
       }, 0)
+    },
+    getLocation(){
+      if (navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(this.updatePosition);
+      }
+    },
+    updatePosition(position){
+      //console.log(position)
+      this.location=position;
+      //console.log(this.location)
     }
   }
 };
@@ -87,6 +112,7 @@ export default {
 
 <style lang="scss" scoped>
 @import "~/assets/mixins.scss";
+@import 'vue-weather-widget/dist/css/vue-weather-widget.css';
 
 .vue-grid-item {
   background-color: white;
