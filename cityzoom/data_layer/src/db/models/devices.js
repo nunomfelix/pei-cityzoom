@@ -31,20 +31,26 @@ const deviceSchema = new mongoose.Schema({
         trim: true
     },
     created_at: {
-        type: Date,
+        type: Number,
         required: true,
         trim: true,
         default: Date.now
     },
+    locations: {
+        type: Array,
+        required: true,
+        default: []
+    },
     description: {
         type: String,
         required: false,
-        trim: true
+        trim: true,
+        default: ""
     }
 })
 
 deviceSchema.plugin(uniqueValidator)
 
-const Device = mongoose.model('Device', deviceSchema)
+const Device = mongoose.model('Devices', deviceSchema)
 
 module.exports = Device

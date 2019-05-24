@@ -1,6 +1,8 @@
 const config = require('config')
 const fs = require('fs')
 const valDebug = require('debug')('app:Validation')
+const errorDebug = require('debug')('app:Error')
+
 
 function validation(method, object, message=null, code=400) {
     return function (req, res, next) {
@@ -14,6 +16,13 @@ function validation(method, object, message=null, code=400) {
     }
 }
 
+function error(err, req, res, next) {
+    fs.appendFileSync('logfile.log', new Date().toISOString() + " - " + err.message + ', requestpath: ' + req.originalUrl + ', request body: ' + JSON.stringify(req.body) + '\n');
+    errorDebug(err.message + ', requestpath: ' + req.originalUrl + ', request body: ' + JSON.stringify(req.body))
+    res.status(500).send()
+}
+
 module.exports = {
-    validation
+    validation,
+    error
 }

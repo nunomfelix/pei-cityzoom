@@ -19,5 +19,5 @@ const verticalSchema = new mongoose.Schema({
 )
 
 
-const Vertical = mongoose.model('Vertical',verticalSchema)
+const Vertical = mongoose.model('Verticals',verticalSchema)
 module.exports = Vertical
