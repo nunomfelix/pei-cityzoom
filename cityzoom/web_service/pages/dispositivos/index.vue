@@ -34,9 +34,10 @@
 
 .table{
     position: relative;
-    height: $header-height;
     border-radius: 10px;
-    background:white;
+    
+    width: 100%; 
+    background: white;
     margin-top: calc(#{$header-height} + 1rem);
     padding-left: 140px;
     padding-right: 30px;
