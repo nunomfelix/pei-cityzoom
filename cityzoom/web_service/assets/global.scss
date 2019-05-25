@@ -13,8 +13,8 @@
 
 .mainMargin {
     margin-top: calc(#{$header-height} + 1rem);
-    margin-left: 140px;
-    margin-right: 40px;
+    margin-left: calc(#{$sidebar-left-size} + 1rem);
+    margin-right: 1rem;
 }
 
 .rowc {

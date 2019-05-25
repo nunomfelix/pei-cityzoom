@@ -7,7 +7,8 @@ export default async function(context) {
             context.redirect('/homepage')
         }
     } else if(state.jwt) {
-        await context.store.dispatch('renew_data', state.jwt)
+        //TODO RENEW TOKEN
+        //await context.store.dispatch('renew_data', state.jwt)
     } else {
         context.redirect('/')
     }
