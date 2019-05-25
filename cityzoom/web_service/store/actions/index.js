@@ -20,6 +20,7 @@ export default{
     renew_data: async function ({ commit, state }, payload) {
 
         try {
+            console.log("here")
             const res = await axios({
                 method: 'get',
                 url: getUrl() + '/user/me',
@@ -34,6 +35,7 @@ export default{
                     Authorization: payload
                 }
             })
+            console.log(JSON.stringify(verticals.data))
             const devices = await axios({
                 method: 'get',
                 url: getUrl() + '/device',

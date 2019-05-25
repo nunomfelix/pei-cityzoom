@@ -39,15 +39,18 @@
           <div v-if="item.type=='lines'">
             <LineGraph :ref="item.i" :name="item.i" :values="values"/>
           </div>
-          <div v-if="item.type=='widget_weather' && position">
-            <WeatherWidget 
+          <div v-if="item.type=='widget_weather'">
+            <no-ssr>
+              <WeatherWidget 
+                :ref="item.i"
                 api-key="7fbda2874f6ebf17ef4d31443696cd68"
                 title="Weather"
-                :latitude="position.coords.latitude"
-                :longitude="position.coords.longitude"
+                :latitude="position ? position.coords.latitude : null"
+                :longitude="position ? position.coords.longitude: null"
                 language="pt"
                 units="uk">
-            </WeatherWidget>
+              </WeatherWidget>
+            </no-ssr>
           </div>
         </div>
       </grid-item>
@@ -74,8 +77,9 @@ export default {
     };
   }, 
   mounted: async function() {
-    this.getLocation()
-    console.log(this.position);
+    setTimeout(() => {
+      this.getLocation()
+    }, 0)
     const data = []
     const res = await this.$store.dispatch('get_streams');
     for(let i in res) {

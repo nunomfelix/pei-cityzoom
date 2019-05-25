@@ -2,10 +2,10 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import { interopDefault } from './utils'
 
-const _55d2fafa = () => interopDefault(import('../pages/homepage/index.vue' /* webpackChunkName: "pages/homepage/index" */))
-const _6a29954c = () => interopDefault(import('../pages/mapa/index.vue' /* webpackChunkName: "pages/mapa/index" */))
-const _11754392 = () => interopDefault(import('../pages/user/login.vue' /* webpackChunkName: "pages/user/login" */))
-const _25bf6430 = () => interopDefault(import('../pages/index.vue' /* webpackChunkName: "pages/index" */))
+const _9fa5562a = () => interopDefault(import('../pages/homepage/index.vue' /* webpackChunkName: "pages/homepage/index" */))
+const _8449087c = () => interopDefault(import('../pages/mapa/index.vue' /* webpackChunkName: "pages/mapa/index" */))
+const _2b94b6c2 = () => interopDefault(import('../pages/user/login.vue' /* webpackChunkName: "pages/user/login" */))
+const _55f28670 = () => interopDefault(import('../pages/index.vue' /* webpackChunkName: "pages/index" */))
 
 Vue.use(Router)
 
@@ -83,19 +83,19 @@ export function createRouter() {
 
     routes: [{
       path: "/homepage",
-      component: _55d2fafa,
+      component: _9fa5562a,
       name: "homepage"
     }, {
       path: "/mapa",
-      component: _6a29954c,
+      component: _8449087c,
       name: "mapa"
     }, {
       path: "/user/login",
-      component: _11754392,
+      component: _2b94b6c2,
       name: "user-login"
     }, {
       path: "/",
-      component: _25bf6430,
+      component: _55f28670,
       name: "index"
     }],
 

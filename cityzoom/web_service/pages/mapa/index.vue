@@ -1,18 +1,31 @@
 <template>
     <div class="mapMargin mapHeight" style="position:relative">
         <div class="mapHeight" id="map"></div>
-
         <div v-if="selected_county" :style="{ 'background-color': testValues[selected_county.get('name_2')].color}" class="ol-popup top">
             <div style="background-color: rgba(0,0,0, .5)">
                 <span class="big"> {{selected_county.get('name_2')}} </span>
-                <span class="big"> {{data[selected_county.get('name_2')][this.getVerticals[this.selected_vertical].streams[this.selected_stream].name].toFixed(2)}} </span>
+                <span class="big"> {{data[selected_county.get('name_2')][getVerticals[selected_vertical].streams[selected_stream].name].toFixed(2)}} {{getVerticals[selected_vertical].streams[selected_stream].unit}}</span>
+                <div class="color-band" style="position: relative"
+                    :style="{'background-image': 
+                        `linear-gradient(to right, ${getVerticals[selected_vertical].streams[selected_stream].colors[0]}, ${getVerticals[selected_vertical].streams[selected_stream].colors[1]})`}">
+                    <div class="color-position" :style="{left: `calc(${testValues[selected_county.get('name_2')].index}% - 1px)`, 'background-color': getVerticals[selected_vertical].streams[selected_stream].colors[2]}">
+
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div id="hover_popup" class="ol-popup" :style="{ 'background-color': hovered_geo ? testValues[hovered_geo.get('name_2')].color : ''}">
-            <div v-if="hovered_geo" style="background-color: rgba(0,0,0, .5)">
+        <div v-if="hovered_geo" id="hover_popup" class="ol-popup" :style="{ 'background-color': testValues[hovered_geo.get('name_2')].color}">
+            <div style="background-color: rgba(0,0,0, .5)">
                 <span class="normal"> {{hovered_geo.get('name_2')}} </span>
-                <span class="normal"> {{data[hovered_geo.get('name_2')][this.getVerticals[this.selected_vertical].streams[this.selected_stream].name].toFixed(2)}} </span>
+                <span class="normal"> {{data[hovered_geo.get('name_2')][getVerticals[selected_vertical].streams[selected_stream].name].toFixed(2)}} {{getVerticals[selected_vertical].streams[selected_stream].unit}}</span>
+                <div class="color-band" style="position: relative"
+                    :style="{'background-image': 
+                        `linear-gradient(to right, ${getVerticals[selected_vertical].streams[selected_stream].colors[0]}, ${getVerticals[selected_vertical].streams[selected_stream].colors[1]})`}">
+                    <div class="color-position" :style="{left: `calc(${testValues[hovered_geo.get('name_2')].index}% - 1px)`, 'background-color': getVerticals[selected_vertical].streams[selected_stream].colors[2]}">
+
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -175,28 +188,6 @@ export default {
         const { Feature } = require( 'ol')
         const { click, pointerMove, altKeyOnly, noModifierKeys, altShiftKeysOnly, platformModifierKeyOnly } = require( 'ol/events/condition.js');
         
-        
-        var iconStyle = [new this.req.style.Style({
-            image: new this.req.style.Icon(/** @type {olx.this.req.style.IconOptions} */ ({
-                anchor: [0.5, 0.5],
-                anchorXUnits: 'fraction',
-                anchorYUnits: 'fraction',
-                scale: 1,
-                opacity: 0.75,
-                src: 'icons/AirQuality_map.png'
-            }))
-        })
-        ,new this.req.style.Style({
-            image: new this.req.style.Icon(/** @type {olx.this.req.style.IconOptions} */ ({
-                anchor: [0.5, 0.5],
-                anchorXUnits: 'fraction',
-                anchorYUnits: 'fraction',
-                scale: 1,
-                opacity: 0.75,
-                src: 'icons/AirQuality_map.png'
-            }))
-        })]
-
         for(var style in this.devicesStyle.templates) {
             for(var vertical of this.getVerticals) {
                 if(!(vertical.name in this.devicesStyle.styles))
@@ -539,16 +530,18 @@ export default {
             }
         },
         updateHeatMap() {
-            this.rainbowHeatMap.setNumberRange(1, this.geo_layer.getSource().getFeatures().length);
-            this.rainbowHeatMap.setSpectrum(this.getVerticals[this.selected_vertical].streams[this.selected_stream].colors[0] , this.getVerticals[this.selected_vertical].streams[this.selected_stream].colors[1]); 
-
+            const stream = this.getVerticals[this.selected_vertical].streams[this.selected_stream]
+            this.rainbowHeatMap.setNumberRange(1, 100);
+            this.rainbowHeatMap.setSpectrum(stream.colors[0] , stream.colors[1]); 
 
             this.testValuesOrdered = Object.keys(this.data).sort((a,b) => {
                 return this.data[a][this.getVerticals[this.selected_vertical].streams[this.selected_stream].name] - this.data[b][this.getVerticals[this.selected_vertical].streams[this.selected_stream].name]
             })
 
             for(var i in this.testValuesOrdered) {
-                this.testValues[this.testValuesOrdered[i]].color = '#' + this.rainbowHeatMap.colourAt(i);
+                const tmp = (this.data[this.testValuesOrdered[i]][stream.name] - stream.min) * 100 / (stream.max - stream.min)
+                this.testValues[this.testValuesOrdered[i]].index = tmp
+                this.testValues[this.testValuesOrdered[i]].color = '#' + this.rainbowHeatMap.colourAt(Math.round(tmp));
                 this.testValues[this.testValuesOrdered[i]].style = new this.req.style.Style({
                     fill: new this.req.style.Fill({
                         color: this.testValues[this.testValuesOrdered[i]].color + 'D0'
@@ -605,9 +598,9 @@ export default {
     border-radius: 12px;
 
     & > div {
-        @include flex(center, center, column);
+        @include flex(space-evenly, center, column);
         color: white;
-        padding: .4rem .7rem;
+        padding: 1rem .7rem;
         border-radius: 10px;
     }
 }
@@ -677,6 +670,22 @@ export default {
             width: 100%;
         }
     }
+}
+
+.color-band {
+    background-color: white;
+    border-radius: 10px;
+    height: 2rem;
+    width: 100%;
+    border:1px solid white;
+}
+
+.color-position {
+    position: absolute;
+    border-radius: 10px;
+    height: 120%;
+    top: -10%;
+    width: 3px;
 }
 
 </style>

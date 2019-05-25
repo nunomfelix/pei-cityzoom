@@ -1,33 +1,42 @@
 {
 	"vertical":{
 		"AirQuality": {
-			"display": "Air Quality",
-			"streams": [{
-				    "name": "pressure_stream",
-					"display": "Air Pressure",
+			"display": "Qualidade do ar",
+			"streams": [
+				{
+					"name": "pressure_stream",
+					"display": "Pressão do ar",
 					"unit": "B",
 					"fullunit": "Bars",
 					"type": "value",
-					"colors": ["lightblue", "grey", "white"]
-				}, {
+					"colors": ["white", "lightblue", "white"],
+					"min": 870,
+					"max": 1084.8
+				},
+				{
 					"name": "humidity_stream",
-					"display": "Air Humidity",
+					"display": "Humidade do ar",
 					"unit": "%",
 					"fullunit": "percentagem",
 					"type": "value",
-					"colors": ["lightblue", "darkblue", "grey"]
-				}, {
+					"colors": ["lightblue", "darkblue", "grey"],
+					"min": 0,
+					"max": 1
+				},
+				{
 					"name": "ozone_stream",
-					"display": "Ozone",
-					"unit": "ppm",
-					"fullunit": "partes por milhao",	
+					"display": "Ozono na atmosfera",
+					"unit": "SU",
+					"fullunit": "Dobson",	
 					"type": "value"	,
-					"colors": ["lightblue", "purple", "black"]
+					"colors": ["lightblue", "purple", "black"],
+					"min": 73,
+					"max": 600
 				}
 			]
 		},
-    	"Temperature": {
-			"display": "Temperature",
+    	"Temperatura": {
+			"display": "Temperatura",
 			"streams": [
 				{
 					"name": "temperature_stream",
@@ -35,7 +44,9 @@
 					"unit": "ºC",
 					"fullunit": "Celsius",
 					"type": "value",
-					"colors": ["green", "red", "white"]
+					"colors": ["green", "red", "white"],
+					"min": 10,
+					"max": 30
 				}
 			]
 		}
