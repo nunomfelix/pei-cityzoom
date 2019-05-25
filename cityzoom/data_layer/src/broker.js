@@ -1,8 +1,9 @@
 var mosca = require('mosca');
 var colors = require('colors')
+const config = require('config')
 const clientDebug = require('debug')('broker:Client')
 const pubDebug = require('debug')('broker:Publish')
-const subDebug = require('debug')('broker:Publish')
+const subDebug = require('debug')('broker:Subscribe')
 
 var listener = {
   //using listener
@@ -13,8 +14,8 @@ var listener = {
 };
 
 var settings = {
-  port: 1883,
-  host: 'localhost',
+  port: config.get('BROKER_PORT'),
+  host: config.get('BROKER_HOST'),
   backend: listener
 };
 
@@ -32,7 +33,7 @@ server.on('clientDisconnected', function(client) {
 
 // fired when a message is published
 server.on('published', function(packet, client) {
-  subDebug('Published in topic', colors.blue(packet.topic), 'payload',colors.red(packet.payload.toString('utf8')));
+  pubDebug('Client published in topic', colors.blue(packet.topic), 'payload',colors.red(packet.payload.toString('utf8')));
 });
 
 // fired when a topic is subscribed
@@ -49,5 +50,5 @@ server.on('ready', setup);
  
 // fired when the mqtt server is ready
 function setup() {
-  console.log('Mosca server is up and running in port '+settings.port);
+  console.log('Mosca server is up and running at '+settings.host+':'+settings.port);
 }

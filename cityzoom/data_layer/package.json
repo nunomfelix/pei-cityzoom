@@ -6,13 +6,16 @@
   "scripts": {
     "start": "react-scripts start",
     "broker": "DEBUG=broker:* nodemon --watch broker.js src/broker.js",
-    "index": "DEBUG=app:* nodemon --watch routes/ --watch index.js --watch db/ --watch middleware.js --watch validation.js src/index.js",
-    "dev": "gnome-terminal --tab -e \"npm run broker\" & gnome-terminal --tab -e \"npm run index\""
+    "index": "DEBUG=app:* nodemon --watch routes/ --watch index.js --watch db/ --watch middleware.js --watch validation.js --watch producer.js src/index.js",
+    "consumer": "DEBUG=app:Consumer nodemon --watch consumer.js src/consumer.js",
+    "dev": "npm-run-all --parallel index consumer",
+    "all": "gnome-terminal --tab -e \"npm run broker\" & gnome-terminal --tab -e \"npm run index\""
   },
   "author": "andremourato@ua.pt&ZePaiva",
   "license": "MIT",
   "devDependencies": {
-    "nodemon": "^1.19.0"
+    "nodemon": "^1.19.0",
+    "npm-run-all": "^4.1.5"
   },
   "dependencies": {
     "axios": "^0.18.0",
