@@ -5,10 +5,12 @@ const devices = require('../db/models/devices')
 const streams = require('../db/models/streams')
 const subscriptions = require('../db/models/subscriptions')
 const streamsDebug = require('debug')('app:Streams')
+//Broker connection
+const producer = require('../producer')
 
 const router = new express.Router()
 
-// create a streams -- PASSING
+// create a streams
 router.post('', validation(validators.validateCreateStream, 'body', 'Invalid stream'), async (req, res) => {
     // convert request to broker-stuff
     streamsDebug('[DEBUG] Creating streams')
@@ -20,39 +22,31 @@ router.post('', validation(validators.validateCreateStream, 'body', 'Invalid str
         description: 'description' in req.body ? req.body.description : "",
         created_at: Number(Date.now())
     }
-    /*
-        * TODO
-        * Implement the broker send request
-        * While not implemented it will have a straight connection to mongoDB
-        */
-
-    // straight connection
+    
+    // Checks if the specified device exists
     await devices.countDocuments({device_ID:to_broker.device_ID}, (err, count) => {
         if (count == 0){
-            streamsDebug(`[ERROR] Device ${to_broker.device_ID} not found`)
+            streamsDebug(`Device ${to_broker.device_ID} not found`)
             return res.status(404).send({'Error':`Device ${to_broker.device_ID} not found`})
         }
     })
-    streamsDebug(`[DBUG] Device ${to_broker.device_ID} exists`)
-         
-    await streams.create(to_broker)
-        .then(() => {
-            streamsDebug('[DEBUG] Stream created with success')
-            return res.status(200).send({ 
-                status: 'Creation successful',
-                stream_ID: req.body['stream_ID'],
-                stream_name: req.body['stream_name'],
-                created_at: Number(Date.now())
-            })
-        })
-        .catch(() => {
-            streamsDebug(`[Error] Streams ${to_broker.stream_ID} already exists`)
-            return res.status(409).send({'Error':`Streams ${to_broker.stream_ID} already exists`}) 
-        }
-    )
+    
+    //Publishes the stream in the broker
+    const wasPublished = await producer.publish('cityzoom/streams',to_broker)
+    if(!wasPublished){
+        streamsDebug(`[Error] Stream ${to_broker.stream_ID} already exists`)
+        return res.status(409).send({'Error':`Streams ${to_broker.stream_ID} already exists`}) 
+    }
+    
+    return res.status(200).send({ 
+        status: 'Creation successful',
+        stream_ID: req.body['stream_ID'],
+        stream_name: req.body['stream_name'],
+        created_at: Number(Date.now())
+    })
 })
 
-// get all streams -- PASSING
+// get all streams
 router.get('', async (req, res) => {
     streamsDebug('[DEBUG] Fetching all Streams')
     var result = {}
@@ -96,7 +90,7 @@ router.get('', async (req, res) => {
     res.status(200).send(result)
 })
 
-// get stream by ID -- PASSING
+// get stream by ID
 router.get('/:id', async (req, res) => {
     const doc = await streams.findOne({stream_ID:req.params.id})
     if (!doc) { return res.status(404).send({'Status':'Not Found'}) }
@@ -118,7 +112,7 @@ router.get('/:id', async (req, res) => {
     })
 })
 
-// delete streams by ID -- PASSING
+// delete streams by ID
 router.delete('/:id', async (req, res) => {
     const deletion = await streams.deleteOne({stream_ID:req.params.id})
     if (deletion.deletedCount == 0) { return res.status(404).send({'Status':'Not Found'})}
