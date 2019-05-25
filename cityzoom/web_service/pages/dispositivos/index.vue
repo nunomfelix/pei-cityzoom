@@ -1,5 +1,5 @@
 <template>
-  <div class="table">
+  <div class="mainMargin">
     <b-table :items="items" :fields="fields" :tbody-tr-class="rowClass"></b-table>
   </div>
 </template>
@@ -38,10 +38,6 @@
     
     width: 100%; 
     background: white;
-    margin-top: calc(#{$header-height} + 1rem);
-    padding-left: 140px;
-    padding-right: 30px;
-    box-sizing:border-box;
 }
 
 </style>
