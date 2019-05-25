@@ -5,26 +5,18 @@
             <div style="background-color: rgba(0,0,0, .5)">
                 <span class="big"> {{selected_county.get('name_2')}} </span>
                 <span class="big"> {{data[selected_county.get('name_2')][getVerticals[selected_vertical].streams[selected_stream].name].toFixed(2)}} {{getVerticals[selected_vertical].streams[selected_stream].unit}}</span>
-                <div class="color-band" style="position: relative"
-                    :style="{'background-image': 
-                        `linear-gradient(to right, ${getVerticals[selected_vertical].streams[selected_stream].colors[0]}, ${getVerticals[selected_vertical].streams[selected_stream].colors[1]})`}">
-                    <div class="color-position" :style="{left: `calc(${testValues[selected_county.get('name_2')].index}% - 1px)`, 'background-color': getVerticals[selected_vertical].streams[selected_stream].colors[2]}">
-
-                    </div>
+                <div class="scale-band-wrapper">
+                    <div :class="{selected: index == testValues[selected_county.get('name_2')].index}" v-for="index in 100" :key="index" :style="{'background-color': '#' + rainbowHeatMap.colourAt(index)}"></div>
                 </div>
             </div>
         </div>
 
-        <div v-if="hovered_geo" id="hover_popup" class="ol-popup" :style="{ 'background-color': testValues[hovered_geo.get('name_2')].color}">
-            <div style="background-color: rgba(0,0,0, .5)">
+        <div id="hover_popup" class="ol-popup" :style="{ 'background-color': hovered_geo ? testValues[hovered_geo.get('name_2')].color : 'none'}">
+            <div v-if="hovered_geo" style="background-color: rgba(0,0,0, .5)">
                 <span class="normal"> {{hovered_geo.get('name_2')}} </span>
                 <span class="normal"> {{data[hovered_geo.get('name_2')][getVerticals[selected_vertical].streams[selected_stream].name].toFixed(2)}} {{getVerticals[selected_vertical].streams[selected_stream].unit}}</span>
-                <div class="color-band" style="position: relative"
-                    :style="{'background-image': 
-                        `linear-gradient(to right, ${getVerticals[selected_vertical].streams[selected_stream].colors[0]}, ${getVerticals[selected_vertical].streams[selected_stream].colors[1]})`}">
-                    <div class="color-position" :style="{left: `calc(${testValues[hovered_geo.get('name_2')].index}% - 1px)`, 'background-color': getVerticals[selected_vertical].streams[selected_stream].colors[2]}">
-
-                    </div>
+                <div class="scale-band-wrapper">
+                    <div :class="{selected: index == testValues[hovered_geo.get('name_2')].index}" v-for="index in 100" :key="index" :style="{'background-color': '#' + rainbowHeatMap.colourAt(index)}"></div>
                 </div>
             </div>
         </div>
@@ -540,7 +532,7 @@ export default {
 
             for(var i in this.testValuesOrdered) {
                 const tmp = (this.data[this.testValuesOrdered[i]][stream.name] - stream.min) * 100 / (stream.max - stream.min)
-                this.testValues[this.testValuesOrdered[i]].index = tmp
+                this.testValues[this.testValuesOrdered[i]].index = Math.round(tmp)
                 this.testValues[this.testValuesOrdered[i]].color = '#' + this.rainbowHeatMap.colourAt(Math.round(tmp));
                 this.testValues[this.testValuesOrdered[i]].style = new this.req.style.Style({
                     fill: new this.req.style.Fill({
@@ -594,13 +586,13 @@ export default {
         min-width: 10%;
         @include shadow(0px, 0px, 8px, 2px, rgba(0,0,0,0.2));
     }
-    padding: 5px;
+    padding: .75rem;
     border-radius: 12px;
 
     & > div {
         @include flex(space-evenly, center, column);
         color: white;
-        padding: 1rem .7rem;
+        padding: 1rem 2rem;
         border-radius: 10px;
     }
 }
@@ -672,12 +664,41 @@ export default {
     }
 }
 
+.scale-band-wrapper {
+    margin: .5rem 0;
+    height: 2rem;
+    @include flex(center, center);
+    border-radius: 10px;
+    width: 100%;
+    & > div {
+        width: 1%;
+        &:not(.selected) {
+            border-top: 1px solid white;
+            border-bottom: 1px solid white;
+            &:first-child {
+                border-left: 1px solid white;
+            }
+            &:last-child {
+                border-right: 1px solid white;
+            }
+        }
+        &.selected {
+            border: 3px solid darkred;
+            box-sizing: border-box;
+            width: 5%;
+            min-width: 1rem;
+            height: 2.5rem;
+        }
+        height: 100%;
+    }
+}
+
 .color-band {
     background-color: white;
     border-radius: 10px;
     height: 2rem;
-    width: 100%;
-    border:1px solid white;
+    width: 15rem;
+    border: 1px solid white;
 }
 
 .color-position {
