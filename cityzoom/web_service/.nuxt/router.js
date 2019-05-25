@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import { interopDefault } from './utils'
 
+const _4e797e97 = () => interopDefault(import('../pages/dispositivos/index.vue' /* webpackChunkName: "pages/dispositivos/index" */))
 const _55d2fafa = () => interopDefault(import('../pages/homepage/index.vue' /* webpackChunkName: "pages/homepage/index" */))
 const _6a29954c = () => interopDefault(import('../pages/mapa/index.vue' /* webpackChunkName: "pages/mapa/index" */))
 const _11754392 = () => interopDefault(import('../pages/user/login.vue' /* webpackChunkName: "pages/user/login" */))
@@ -82,6 +83,10 @@ export function createRouter() {
     scrollBehavior,
 
     routes: [{
+      path: "/dispositivos",
+      component: _4e797e97,
+      name: "dispositivos"
+    }, {
       path: "/homepage",
       component: _55d2fafa,
       name: "homepage"

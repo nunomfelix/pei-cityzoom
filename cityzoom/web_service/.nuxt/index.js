@@ -16,6 +16,7 @@ import nuxt_plugin_axios_09aa596e from 'nuxt_plugin_axios_09aa596e' // Source: .
 import nuxt_plugin_corecomponents_f372c12e from 'nuxt_plugin_corecomponents_f372c12e' // Source: ../plugins/core-components.js (mode: 'all')
 import nuxt_plugin_vuegrid_4a67b318 from 'nuxt_plugin_vuegrid_4a67b318' // Source: ../plugins/vue-grid.js (mode: 'client')
 import nuxt_plugin_corefunctions_06755198 from 'nuxt_plugin_corefunctions_06755198' // Source: ../plugins/core-functions.js (mode: 'client')
+import nuxt_plugin_nossrcomponents_3a168210 from 'nuxt_plugin_nossrcomponents_3a168210' // Source: ../plugins/no-ssr-components.js (mode: 'client')
 
 // Component: <NoSsr>
 Vue.component(NoSsr.name, NoSsr)
@@ -173,6 +174,10 @@ async function createApp(ssrContext) {
 
   if (process.client && typeof nuxt_plugin_corefunctions_06755198 === 'function') {
     await nuxt_plugin_corefunctions_06755198(app.context, inject)
+  }
+
+  if (process.client && typeof nuxt_plugin_nossrcomponents_3a168210 === 'function') {
+    await nuxt_plugin_nossrcomponents_3a168210(app.context, inject)
   }
 
   // If server-side, wait for async component to be resolved first

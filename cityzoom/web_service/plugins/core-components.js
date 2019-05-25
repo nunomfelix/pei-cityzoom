@@ -9,6 +9,7 @@ import Loading from "@/components/UI/Loading"
 import ModalResizable from "@/components/UI/Modal_Resizable"
 import VueWeatherWidget from 'vue-weather-widget';
 
+
 Vue.component("Navbar", Navbar);
 Vue.component("Header", Header);
 Vue.component("LoginForm", LoginForm);
