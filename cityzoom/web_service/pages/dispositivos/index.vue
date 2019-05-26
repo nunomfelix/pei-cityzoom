@@ -1,6 +1,14 @@
 <template>
-  <div class="mainMargin">
-    <b-table :items="items" :fields="fields" :tbody-tr-class="rowClass"></b-table>
+  <div class="mainMargin fontSize" >
+    <b-table :items="items" :fields="fields" :tbody-tr-class="rowClass">
+      <template slot="location" slot-scope="data">
+        
+        <div class="img">
+          {{ data.value }} <img @click="tableImage()" src="icons/search.png">
+
+        </div>
+      </template>
+    </b-table>
   </div>
 </template>
 
@@ -8,15 +16,12 @@
   export default {
     data() {
       return {
-        fields: ['first_name', 'last_name', 'age'],
+        fields: ['device_id', 'device_status', 'streams','location'],
         items: [
-          { age: 40, first_name: 'Dickerson', last_name: 'Macdonald', status: 'awesome' },
-          { age: 21, first_name: 'Larsen', last_name: 'Shaw' },
-          { age: 89, first_name: 'Geneva', last_name: 'Wilson' },
-                    { age: 89, first_name: 'Geneva', last_name: 'Wilson' },
-          { age: 89, first_name: 'Geneva', last_name: 'Wilson' },
-          { age: 89, first_name: 'Geneva', last_name: 'Wilson' }
-
+          { device_id: 1, device_status: 'Operational', streams: 'CO2, Temperature' , location: 'Aveiro' , _cellVariants: { device_status: 'success' }},
+          { device_id: 2, device_status: 'Operational', streams: 'CO2, Temperature', location: 'Aveiro'  ,_cellVariants: { device_status: 'success' }},
+          { device_id: 3, device_status: 'Operational', streams: 'CO2, Temperature', location: 'Aveiro'  ,_cellVariants: { device_status: 'success' }},
+          { device_id: 4, device_status: 'Operational', streams: 'CO2, Temperature', location: 'Aveiro ' ,_cellVariants: { device_status: 'success' }},
         ]
       }
     },
@@ -24,6 +29,9 @@
       rowClass(item, type) {
         if (!item) return
         if (item.status === 'awesome') return 'table-success'
+      },
+      tableImage() {
+        return ''
       }
     }
   }
@@ -40,4 +48,14 @@
     background: white;
 }
 
+img{
+  display: inline-block;
+  width:15px;
+  height:auto;
+}
+
+.fontSize{
+  font-family:'Courier New', Courier, monospace;
+  font-size:large;
+}
 </style>
