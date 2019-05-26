@@ -44,7 +44,7 @@ function validateGetAllStreams(object) {
 
 function validateGetStreamByID(object) {
     const schema = Joi.object().keys({
-        stream: Joi.string().required()
+        stream_name: Joi.string().required()
     })
     return Joi.validate(object, schema)
 }
