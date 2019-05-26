@@ -324,7 +324,7 @@ export default {
             }
         })
 
-        const res = await this.$axios.get('/b.json')
+        const res = await this.$axios.get('/a.json')
         for(var municipity in res.data) {
             for(var area of res.data[municipity]) {
                 for(var hex of area) {
