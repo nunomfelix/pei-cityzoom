@@ -47,6 +47,7 @@
 </template>
 
 <script>
+var h3 = require('h3-js');
 var Rainbow = require('rainbowvis.js');
 const drone_stream = require('static/get_stream_values_response.json');
 //console.log(JSON.stringify(drone_stream))  
@@ -167,7 +168,7 @@ export default {
             return this.$store.state.devices
         }
     },
-    mounted() {
+    async mounted() {
         this.req.Ol = require( 'ol');
         this.req.proj = require('ol/proj')
         const source = require( 'ol/source');
@@ -246,22 +247,26 @@ export default {
             autoPanAnimation: {
                 duration: 250
             }
-        });
-    
-        var vectorSource = new source.Vector({
-            style: (feature) => {
-                return this.devicesStyle
-            }
-        });
+        })
         
         this.devices_layer = new layer.Vector({
-            source: vectorSource,
+            source: new source.Vector(),
             style: (feature) => {
                 return this.devicesStyle.styles[this.getVerticals[this.selected_vertical].name].default
             },
             renderBuffer: window.innerWidth,
             updateWhileAnimating: true,
         }) 
+
+        this.hex_layer = new layer.Vector({
+            source: new source.Vector(),
+            style: (feature) => {
+                return this.geoStyle.default
+            },
+            renderBuffer: window.innerWidth,
+            updateWhileAnimating: true,
+
+        })
 
         const centerpos = [-8.661682, 40.6331731];
         const center = this.req.proj.transform(centerpos, 'EPSG:4326', 'EPSG:3857');
@@ -273,8 +278,9 @@ export default {
                 new layer.Tile({
                     source: new source.OSM(),
                 }),
-                this.devices_layer,  
-                this.geo_layer,      
+                this.devices_layer, 
+                this.geo_layer, 
+                this.hex_layer,      
             ],
             overlays: [this.hoverOverlay],
             view: new this.req.Ol.View({
@@ -318,6 +324,19 @@ export default {
             }
         })
 
+        const res = await this.$axios.get('/b.json')
+        for(var municipity in res.data) {
+            for(var area of res.data[municipity]) {
+                for(var hex of area) {
+                    const pol = hex.map(p => this.req.proj.transform(p, 'EPSG:4326', 'EPSG:3857'))
+                    const a = new Feature({
+                        geometry: new this.req.geom.Polygon([pol])
+                    })
+                    this.hex_layer.getSource().addFeature(a)
+                }
+            }
+        }
+
         const hover_interaction = new interaction.Select({
             condition: (e) => {
                 return pointerMove(e) && !this.map.getView().getAnimating();
@@ -331,7 +350,7 @@ export default {
             multi: false
         })
 
-        this.map.addInteraction(hover_interaction);
+        //this.map.addInteraction(hover_interaction);
         hover_interaction.on('select', (e) => {
             if(e.selected.length && e.selected[0] != this.selected_county) {
                 if(this.hovered_geo) {
