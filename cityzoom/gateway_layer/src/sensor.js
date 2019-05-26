@@ -63,7 +63,8 @@ stompClient.connect('', () => {
     stompClient.subscribe('/topic/last', async (mes) => {
         if(mes.body){
             var data = JSON.parse(mes.body)
-            var location = {"lat":nodes[data.source.id].lat, "long":nodes[data.source.id].long}
+            console.log(data)
+            /* var location = {"lat":nodes[data.source.id].lat, "long":nodes[data.source.id].long}
             if(first){
                 var device_name = create_Device(data.source.id, location)
                 console.log("Created device device_" + sensor_name)
@@ -75,11 +76,11 @@ stompClient.connect('', () => {
                     var device_id = await get_Device(device_name)
                     create_Stream(sensor_name, device_id)
                     console.log("Created stream stream_" + sensor_name)
-                }
+                }   
                 put_Stream(sensor_name, data.sensors[i].value,location)
                 console.log("Sent data to stream stream_" + sensor_name)
             }
-            first = false
+            first = false */
         }
         else console.log("Error receiving the message")
     })   
