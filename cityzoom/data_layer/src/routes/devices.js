@@ -5,51 +5,42 @@ const devices = require('../db/models/devices')
 const streams = require('../db/models/streams')
 const subscriptions = require('../db/models/subscriptions')
 const devicesDebug = require('debug')('app:Devices')
+//Broker producer and consumer
+const producer = require('../producer')
 
 const router = new express.Router()
 
-// create a device -- PASSING
+// create a device
 router.post('', validation(validators.validateCreateDevice, 'body', 'Invalid device'), async (req, res) => {
     // convert request to broker-stuff
-    devicesDebug('[DEBUG] Creating DEVICE')
-    to_broker = {
+    const to_broker = {
         device_ID: req.body['device_ID'],
         device_name: req.body['device_name'],
         vertical: req.body['vertical'],
         mobile: req.body['mobile'],
         provider: req.body['provider'],
-        created_at: Number(Date.now()),
+        created_at: Number(Date.now()), 
         description: 'description' in req.body ? req.body.description : "",
         locations: []
     }
-    /*
-        * TODO
-        * Implement the broker send request
-        * While not implemented it will have a straight connection to mongoDB
-        */
+    //Publishes the device in the broker
+    const wasPublished = await producer.publish('cityzoom/devices',to_broker)
+    if(!wasPublished){
+        devicesDebug(`Device ${to_broker.device_ID} already exists`)
+        return res.status(409).send({'Error':`Device ${to_broker.device_ID} already exists`}) 
+    }
 
-    // straight connection
-    await devices.create(to_broker)
-        .then(() => {
-            devicesDebug('[DEBUG] Device created with success')
-            return res.status(200).send({ 
-                status: 'Creation successful',
-                device_ID: req.body['device_ID'],
-                device_name: req.body['device_name'],
-                vertical: req.body['vertical'],
-                mobile: req.body['mobile'],
-                provider: req.body['provider'],
-                created_at: Number(Date.now())
-            })
-        })
-        .catch(() => {
-            devicesDebug(`[Error] Device ${to_broker.device_ID} already exists`)
-            return res.status(409).send({'Error':`Device ${to_broker.device_ID} already exists`}) 
-        }
-    )
+    return res.status(200).send({ 
+        status: 'Creation successful',
+        device_ID: req.body['device_ID'],
+        device_name: req.body['device_name'],
+        vertical: req.body['vertical'],
+        mobile: req.body['mobile'],
+        provider: req.body['provider'],
+        created_at: Number(Date.now())
+    })
 })
 
-// get all devices -- testing
 router.get('', async (req, res) => {
     devicesDebug('[DEBUG] Fetching all Devices')
     var result = {}
@@ -105,7 +96,7 @@ router.get('', async (req, res) => {
     res.status(200).send(result)
 })
 
-// get device by ID -- testing
+// get device by ID
 router.get('/:id', async (req, res) => {
     const doc = await devices.findOne({device_ID:req.params.id})
     if (!doc) { return res.status(404).send({'Status':'Not Found'}) }
@@ -137,7 +128,7 @@ router.get('/:id', async (req, res) => {
     })
 })
 
-// delete device by ID -- PASSING
+// delete device by ID
 router.delete('/:id', async (req, res) => {
     const deletion = await devices.deleteOne({device_ID:req.params.id})
     if (deletion.deletedCount == 0) { return res.status(404).send({'Status':'Not Found'})}

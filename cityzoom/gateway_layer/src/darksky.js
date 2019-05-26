@@ -29,7 +29,11 @@ async function create_Device(deviceName, verticals, location, municipality) {
         "latitude" : location[1],
         "longitude" : location[0],
         "provider" : "DarkSky",
+<<<<<<< HEAD
         municipality: municipality + ""
+=======
+        "municipality": municipality + ""
+>>>>>>> master
     }).catch((err) => {console.log("Failed to create device with error message: " + err)})
     return deviceName + "_device"
 }
@@ -91,6 +95,7 @@ for(i in obj.features){
     positions[obj.features[i].properties.name_2] = [center_long, center_lat]
 }
 
+<<<<<<< HEAD
 (async function kek() {
     const kek = {}
     for(city in positions){
@@ -102,3 +107,23 @@ for(i in obj.features){
     }
     console.log(kek)
 })()
+=======
+for(city in positions){
+    var first = true
+    var position = positions[city]
+    //Create device for each city
+    create_Device('darksky', ['AirQuality', 'Temperature'] , position, city)
+    setInterval(async () => {
+        var data = await get_darksky_data(position[1],position[0])
+        for(var key in data[0]){
+            if(first){
+                var device_id = await get_Device(position)
+                console.log(device_id)
+                create_Stream(key, device_id)
+            }
+            put_Stream(key, data[0][key], position)
+        }
+        first = false
+    }, 10000) //every 2 minutes, making 720 requests a day (the max possible is 1000) 
+}
+>>>>>>> master

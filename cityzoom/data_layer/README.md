@@ -12,12 +12,11 @@ $ sudo service mongodb start
 ```sh
 $ npm run i
 ```
-- In folder cityzoom/data_layer/ run:
+- In folder cityzoom/data_layer/ run the following commands in two different terminals:
 ```sh
 $ npm run dev
 ```
-- If anything goes wrong with the above command run in two different terminals:
- ```sh
+and
+```sh
 $ npm run broker
-$ npm run index
 ```
