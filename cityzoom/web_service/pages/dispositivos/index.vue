@@ -55,7 +55,7 @@ img{
 }
 
 .fontSize{
-  font-family:'Courier New', Courier, monospace;
-  font-size:large;
+  font-family:'Verdana';
+  font-size:medium;
 }
 </style>
