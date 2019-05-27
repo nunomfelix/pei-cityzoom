@@ -7,6 +7,7 @@ const rootTopic = config.get('BROKER_ROOT_TOPIC')
 //MongoDB
 const Device = require('./db/models/devices')
 const Stream = require('./db/models/streams')
+const Value = require('./db/models/values')
 
 /*
     returns:
@@ -39,6 +40,9 @@ async function publish(topic,msg)  {
         await client.publish(topic,JSON.stringify(msg),opt,(err,data)=>{
             prodDebug('Published new stream into topic',colors.blue(topic))
         })
+    }else if(topic == rootTopic+'values'){
+        await client.publish(topic,JSON.stringify(msg),opt)
+        prodDebug('Published new value into topic',colors.blue())
     }
     return true
 }

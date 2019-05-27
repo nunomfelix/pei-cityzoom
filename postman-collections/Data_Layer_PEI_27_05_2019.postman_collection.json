@@ -1,172 +1,25 @@
 {
 	"info": {
-		"_postman_id": "db4ad69a-1bef-49e2-9730-69265d2c4367",
+		"_postman_id": "7d98ac3f-2fbd-477d-b482-d229cedc6333",
 		"name": "Data_Layer_PEI",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "GetStreamValues - OK",
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "http://localhost:8001/czb/values?stream=Stream",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8001",
-					"path": [
-						"czb",
-						"values"
-					],
-					"query": [
-						{
-							"key": "stream",
-							"value": "Stream"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GetStreamList - OK",
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "http://localhost:8001/czb/streams?interval_start=10",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8001",
-					"path": [
-						"czb",
-						"streams"
-					],
-					"query": [
-						{
-							"key": "interval_start",
-							"value": "10"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GetStreamDescription - OK",
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "http://localhost:8001/czb/streams/lula",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8001",
-					"path": [
-						"czb",
-						"streams",
-						"lula"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "DeleteStream - OK",
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "http://localhost:8001/czb/streams/lula",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8001",
-					"path": [
-						"czb",
-						"streams",
-						"lula"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "CreateStream - OK",
+			"name": "CreateDevice - OK",
 			"request": {
 				"method": "POST",
 				"header": [
 					{
 						"key": "Content-Type",
-						"value": "application/json"
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"device_ID\": \"random_ID2\",\n\t\"stream_ID\": \"lul\",\n\t\"stream_name\": \"Stream\",\n\t\"type\": \"%\"\n}"
-				},
-				"url": {
-					"raw": "http://localhost:8001/czb/streams",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8001",
-					"path": [
-						"czb",
-						"streams"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GetDevices - OK",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
+					"raw": "{\n\t\"device_ID\": \"mobile_test\",\n\t\"device_name\": \"fast\",\n\t\"mobile\": true,\n\t\"vertical\": \"a\",\n\t\"provider\": \"ola\",\n\t\"description\": \"asdf\"\n}"
 				},
 				"url": {
 					"raw": "http://localhost:8001/czb/devices",
@@ -184,20 +37,13 @@
 			"response": []
 		},
 		{
-			"name": "CreateDevice - OK",
+			"name": "GetDevices - OK",
 			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"name": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
+				"method": "GET",
+				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"device_ID\": \"random_ID2\",\n\t\"device_name\": \"fast\",\n\t\"mobile\": false,\n\t\"vertical\": \"a\",\n\t\"provider\": \"ola\",\n\t\"description\": \"asdf\"\n}"
+					"raw": ""
 				},
 				"url": {
 					"raw": "http://localhost:8001/czb/devices",
@@ -265,47 +111,21 @@
 			"response": []
 		},
 		{
-			"name": "GetSubscriptions - OK",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "http://localhost:8001/czb/subscriptions",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8001",
-					"path": [
-						"czb",
-						"subscriptions"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "CreateSubscription - OK",
+			"name": "CreateStream - OK",
 			"request": {
 				"method": "POST",
 				"header": [
 					{
 						"key": "Content-Type",
-						"name": "Content-Type",
-						"value": "application/json",
-						"type": "text"
+						"value": "application/json"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"device_ID\": \"random_ID2\",\n\t\"stream_ID\": \"lul\",\n\t\"subscription_ID\": \"sub3\",\n\t\"subscription_name\": \"sebe\"\n}"
+					"raw": "{\n\t\"device_ID\": \"random_ID2\",\n\t\"stream_ID\": \"lul\",\n\t\"stream_name\": \"Stream\",\n\t\"type\": \"%\"\n}"
 				},
 				"url": {
-					"raw": "http://localhost:8001/czb/subscriptions",
+					"raw": "http://localhost:8001/czb/streams",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -313,23 +133,28 @@
 					"port": "8001",
 					"path": [
 						"czb",
-						"subscriptions"
+						"streams"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "GetSubscriptionById - OK",
+			"name": "GetStreamDescription - OK",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:8001/czb/subscriptions/sub",
+					"raw": "http://localhost:8001/czb/streams/lula",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -337,15 +162,50 @@
 					"port": "8001",
 					"path": [
 						"czb",
-						"subscriptions",
-						"sub"
+						"streams",
+						"lula"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "DeleteSubscription - OK",
+			"name": "GetStreamList - OK",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8001/czb/streams?interval_start=10",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8001",
+					"path": [
+						"czb",
+						"streams"
+					],
+					"query": [
+						{
+							"key": "interval_start",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteStream - OK",
 			"request": {
 				"method": "DELETE",
 				"header": [],
@@ -354,7 +214,7 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:8001/czb/subscriptions/sub",
+					"raw": "http://localhost:8001/czb/streams/lula",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -362,24 +222,29 @@
 					"port": "8001",
 					"path": [
 						"czb",
-						"subscriptions",
-						"sub"
+						"streams",
+						"lula"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "GetSubscriptionValues - OK",
+			"name": "GetStreamValues - OK",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:8001/czb/subscriptions/sub3/values",
+					"raw": "http://localhost:8001/czb/streams/lul2/values",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -387,8 +252,8 @@
 					"port": "8001",
 					"path": [
 						"czb",
-						"subscriptions",
-						"sub3",
+						"streams",
+						"lul2",
 						"values"
 					]
 				}
@@ -422,6 +287,47 @@
 						"czb",
 						"subscriptions",
 						"sub",
+						"values"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PostValueStream OK",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": ""
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetDeviceValues",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8001/czb/devices/random_ID2/values",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8001",
+					"path": [
+						"czb",
+						"devices",
+						"random_ID2",
 						"values"
 					]
 				}
