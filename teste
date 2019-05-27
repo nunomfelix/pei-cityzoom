@@ -1,0 +1,1 @@
+import geojson2h3 from 'geojson2h3';

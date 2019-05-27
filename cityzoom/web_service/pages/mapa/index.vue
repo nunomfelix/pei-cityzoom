@@ -1,22 +1,22 @@
 <template>
     <div class="mapMargin mapHeight" style="position:relative">
         <div class="mapHeight" id="map"></div>
-        <div v-if="selected_county" :style="{ 'background-color': testValues[selected_county.get('name_2')].color}" class="ol-popup top">
+        <div v-if="selected_county" :style="{ 'background-color': municipalityValues[selected_county.get('name_2')].color}" class="ol-popup top">
             <div style="background-color: rgba(0,0,0, .5)">
                 <span class="big"> {{selected_county.get('name_2')}} </span>
-                <span class="big"> {{data[selected_county.get('name_2')][getVerticals[selected_vertical].streams[selected_stream].name].toFixed(2)}} {{getVerticals[selected_vertical].streams[selected_stream].unit}}</span>
+                <span class="big"> {{municipalityValues[selected_county.get('name_2')].value.toFixed(2)}} {{getVerticals[selected_vertical].streams[selected_stream].unit}}</span>
                 <div class="scale-band-wrapper">
-                    <div :class="{selected: index == testValues[selected_county.get('name_2')].index}" v-for="index in 100" :key="index" :style="{'background-color': '#' + rainbowHeatMap.colourAt(index)}"></div>
+                    <div :class="{selected: index == municipalityValues[selected_county.get('name_2')].index}" v-for="index in 100" :key="index" :style="{'background-color': '#' + rainbowHeatMap.colourAt(index)}"></div>
                 </div>
             </div>
         </div>
 
-        <div id="hover_popup" class="ol-popup" :style="{ 'background-color': hovered_geo ? testValues[hovered_geo.get('name_2')].color : 'none'}">
+        <div id="hover_popup" class="ol-popup" :style="{ 'background-color': hovered_geo ? municipalityValues[hovered_geo.get('name_2')].color : 'none'}">
             <div v-if="hovered_geo" style="background-color: rgba(0,0,0, .5)">
                 <span class="normal"> {{hovered_geo.get('name_2')}} </span>
-                <span class="normal"> {{data[hovered_geo.get('name_2')][getVerticals[selected_vertical].streams[selected_stream].name].toFixed(2)}} {{getVerticals[selected_vertical].streams[selected_stream].unit}}</span>
+                <span class="normal"> {{municipalityValues[hovered_geo.get('name_2')].value.toFixed(2)}} {{getVerticals[selected_vertical].streams[selected_stream].unit}}</span>
                 <div class="scale-band-wrapper">
-                    <div :class="{selected: index == testValues[hovered_geo.get('name_2')].index}" v-for="index in 100" :key="index" :style="{'background-color': '#' + rainbowHeatMap.colourAt(index)}"></div>
+                    <div :class="{selected: index == municipalityValues[hovered_geo.get('name_2')].index}" v-for="index in 100" :key="index" :style="{'background-color': '#' + rainbowHeatMap.colourAt(index)}"></div>
                 </div>
             </div>
         </div>
@@ -50,6 +50,8 @@
 var h3 = require('h3-js');
 var Rainbow = require('rainbowvis.js');
 const drone_stream = require('static/get_stream_values_response.json');
+import intersect from '@turf/intersect'
+const helpers =  require('@turf/helpers')
 //console.log(JSON.stringify(drone_stream))  
 export default {
     data() {
@@ -81,6 +83,10 @@ export default {
             },  
             hoverOverlay: null,
             hoverPopup: null,
+
+            municipalityValues: {},
+            hexagonValues: {},
+            
             testValues: {},
             testValuesOrdered: [],
             rainbowHeatMap: null,
@@ -96,6 +102,7 @@ export default {
             geo_layer: null,
             devices_layer: null,
             shown_features: [],
+            hidden_hex: [],
 
             data: { 'Águeda':
                 { temperature_stream: 18.58,
@@ -175,7 +182,7 @@ export default {
         const layer = require( 'ol/layer');
         this.req.style = require( 'ol/style');
         this.req.extent = require( 'ol/extent');
-        const format = require('ol/format')
+        this.req.format = require('ol/format')
         this.req.geom = require( 'ol/geom');
         const interaction = require( 'ol/interaction');
         const { Feature } = require( 'ol')
@@ -231,12 +238,14 @@ export default {
         this.geo_layer = new layer.Vector({
             source: new source.Vector({
                 projection : 'EPSG:3857',
-                url: 'aveiro.geojson',
-                format: new format.GeoJSON()
+                url: 'concelho_aveiro.geojson',
+                format: new this.req.format.GeoJSON()
             }),
             renderBuffer: window.innerWidth,
             updateWhileAnimating: true,
-            // renderMode: 'image'
+            style: (feature) => {
+                return feature == this.selected_county ? this.geoStyle.active : this.geoStyle.default 
+            }
         })
 
         this.hoverPopup = document.getElementById('hover_popup');
@@ -291,23 +300,55 @@ export default {
             })
         })
 
-        this.geo_layer.getSource().on('change', () => {
-            if(this.geo_layer.getSource().getState() == 'ready' && !this.loaded) {
+        const res = await this.$axios.get('/a.json')
+        for(var munic in res.data) {
+            let count = 0
+            for(var area of res.data[munic]) {
+                for(var hex of area) {
+                    const pol = hex.map(p => this.req.proj.transform(p, 'EPSG:4326', 'EPSG:3857'))
+                    const a = new Feature({
+                        geometry: new this.req.geom.Polygon([pol]),
+                        municipality: munic,
+                        id: munic + count++
+                    })
+                    //this.hex_layer.getSource().addFeature(a)
+                }
+            }
+        }
+
+        // this.geo_layer.getSource().on('change', () => {
+        //     if(this.geo_layer.getSource().getState() == 'ready' && !this.loaded) {
                 this.loaded = true
                 this.rainbowHeatMap = new Rainbow()
 
                 this.geoJsonExtent = this.req.extent.createEmpty()
                 this.geo_layer.getSource().getFeatures().forEach(feature => {
                     this.geoJsonExtent = this.req.extent.extend(this.geoJsonExtent, feature.getGeometry().getExtent())
-                    this.testValues[feature.get('name_2')] = {
-                        value: Math.random() * 35,
+                })
+
+                this.hex_layer.getSource().getFeatures().forEach((feature) => {
+                    
+                    const tmp = Math.random() * 35 + 5;
+
+                    if(!(feature.get('municipality') in this.municipalityValues)) {
+                        this.municipalityValues[feature.get('municipality')] = {
+                            value: 0,
+                            count: 0,
+                            color: null,
+                            style: null
+                        }
+                    }
+
+                    this.municipalityValues[feature.get('municipality')].value = this.municipalityValues[feature.get('municipality')].value ? 
+                        (this.municipalityValues[feature.get('municipality')].value * this.municipalityValues[feature.get('municipality')].count + tmp) / (this.municipalityValues[feature.get('municipality')].count + 1) : tmp
+                    this.municipalityValues[feature.get('municipality')].count++
+
+                    this.hexagonValues[feature.get('id')] = {
+                        value: tmp,
                         color: null,
                         style: null
                     }
-                })
 
-                this.geo_layer.setStyle((feature) => {
-                    return feature == this.selected_county ? this.geoStyle.active : this.testValues[feature.get('name_2')].style
                 })
 
                 this.map.getView().fit(this.geoJsonExtent, {
@@ -321,21 +362,8 @@ export default {
                 },0)
 
                 this.selectVertical(0)
-            }
-        })
-
-        const res = await this.$axios.get('/a.json')
-        for(var municipity in res.data) {
-            for(var area of res.data[municipity]) {
-                for(var hex of area) {
-                    const pol = hex.map(p => this.req.proj.transform(p, 'EPSG:4326', 'EPSG:3857'))
-                    const a = new Feature({
-                        geometry: new this.req.geom.Polygon([pol])
-                    })
-                    this.hex_layer.getSource().addFeature(a)
-                }
-            }
-        }
+        //     }
+        // })
 
         const hover_interaction = new interaction.Select({
             condition: (e) => {
@@ -350,11 +378,12 @@ export default {
             multi: false
         })
 
-        //this.map.addInteraction(hover_interaction);
+        this.map.addInteraction(hover_interaction);
         hover_interaction.on('select', (e) => {
             if(e.selected.length && e.selected[0] != this.selected_county) {
                 if(this.hovered_geo) {
                     this.clearGeoDevices(this.hovered_geo)
+                    this.addHiddenHex(this.hovered_geo)
                 }
                 this.hovered_geo = e.selected[0]
                 document.body.style.cursor = "pointer"
@@ -375,8 +404,15 @@ export default {
                         }
                     }
                 }
+                for(var feat of this.hex_layer.getSource().getFeatures()) {
+                    if(feat.get('municipality') == this.hovered_geo.get('name_2')) {
+                        this.hex_layer.getSource().removeFeature(feat)
+                        this.hidden_hex.push(feat)
+                    }
+                }
             } else if(this.hovered_geo) {
                 this.clearGeoDevices(this.hovered_geo)
+                this.addHiddenHex(this.hovered_geo)
                 this.clearHoverPopup()
             }
         })
@@ -469,12 +505,22 @@ export default {
             this.hoverOverlay.setPosition(null)
         },
         clearGeoDevices(geo) {
-            for(var feature in this.shown_features) {
-                if(this.getDevices.find(d => d.device_id == this.shown_features[feature].get('id')).municipality == geo.get('name_2')) {
-                    this.devices_layer.getSource().removeFeature(this.shown_features[feature])
-                    this.shown_features.splice(feature, 1)
+            for(var feature of this.shown_features) {
+                if(this.getDevices.find(d => d.device_id == feature.get('id')).municipality == geo.get('name_2')) {
+                    this.devices_layer.getSource().removeFeature(feature)
+                    this.shown_features.splice(this.shown_features.findIndex(f => f == feature), 1)
                 }
             }
+        },
+        addHiddenHex(geo) {
+            const tmp = [...this.hidden_hex]
+            for(var feature of tmp) {
+                if(feature.get('municipality') == geo.get('name_2')) {
+                    this.hex_layer.getSource().addFeature(feature)
+                    this.hidden_hex.splice(this.hidden_hex.findIndex(f => f == feature), 1)
+                }
+            }
+            console.log(this.hidden_hex.length)
         },
         deselect_county() {
             this.map.setView(new this.req.Ol.View({
@@ -545,17 +591,13 @@ export default {
             this.rainbowHeatMap.setNumberRange(1, 100);
             this.rainbowHeatMap.setSpectrum(stream.colors[0] , stream.colors[1]); 
 
-            this.testValuesOrdered = Object.keys(this.data).sort((a,b) => {
-                return this.data[a][this.getVerticals[this.selected_vertical].streams[this.selected_stream].name] - this.data[b][this.getVerticals[this.selected_vertical].streams[this.selected_stream].name]
-            })
-
-            for(var i in this.testValuesOrdered) {
-                const tmp = (this.data[this.testValuesOrdered[i]][stream.name] - stream.min) * 100 / (stream.max - stream.min)
-                this.testValues[this.testValuesOrdered[i]].index = Math.round(tmp)
-                this.testValues[this.testValuesOrdered[i]].color = '#' + this.rainbowHeatMap.colourAt(Math.round(tmp));
-                this.testValues[this.testValuesOrdered[i]].style = new this.req.style.Style({
+            for(var i in this.municipalityValues) {
+                const tmp = (this.municipalityValues[i].value - stream.min) * 100 / (stream.max - stream.min)
+                this.municipalityValues[i].index = Math.round(tmp)
+                this.municipalityValues[i].color = '#' + this.rainbowHeatMap.colourAt(Math.round(tmp));
+                this.municipalityValues[i].style = new this.req.style.Style({
                     fill: new this.req.style.Fill({
-                        color: this.testValues[this.testValuesOrdered[i]].color + 'D0'
+                        color: this.municipalityValues[i].color + 'D0'
                     }),
                     stroke: new this.req.style.Stroke({
                         color: 'black',
@@ -564,11 +606,43 @@ export default {
                 })
             }
 
-            this.geo_layer.setStyle((feature) => {
-                return feature == this.selected_county ? this.geoStyle.active : this.testValues[feature.get('name_2')].style
-            })
+            for(var i in this.hexagonValues) {
+                const tmp = (this.hexagonValues[i].value - stream.min) * 100 / (stream.max - stream.min)
+                this.hexagonValues[i].index = Math.round(tmp)
+                this.hexagonValues[i].color = '#' + this.rainbowHeatMap.colourAt(Math.round(tmp));
+                this.hexagonValues[i].style = new this.req.style.Style({
+                    fill: new this.req.style.Fill({
+                        color: this.hexagonValues[i].color + 'D0'
+                    }),
+                    stroke: new this.req.style.Stroke({
+                        color: 'black',
+                        width: this.map.getView().getZoom() / 20 * 2.5 * .2
+                    })
+                })
 
-            this.map.updateSize()
+            }
+
+            this.hex_layer.setStyle((feature) => {
+                return this.hexagonValues[feature.get('id')].style
+            })
+            console.log(this.municipalityValues, this.hexagonValues)
+
+            // for(var i in this.testValuesOrdered) {
+            //     const tmp = (this.data[this.testValuesOrdered[i]][stream.name] - stream.min) * 100 / (stream.max - stream.min)
+            //     this.testValues[this.testValuesOrdered[i]].index = Math.round(tmp)
+            //     this.testValues[this.testValuesOrdered[i]].color = '#' + this.rainbowHeatMap.colourAt(Math.round(tmp));
+            //     this.testValues[this.testValuesOrdered[i]].style = new this.req.style.Style({
+            //         fill: new this.req.style.Fill({
+            //             color: this.testValues[this.testValuesOrdered[i]].color + 'D0'
+            //         }),
+            //         stroke: new this.req.style.Stroke({
+            //             color: 'black',
+            //             width: this.map.getView().getZoom() / 20 * 2.5
+            //         })
+            //     })
+            // }
+
+            this.map.updateSize()   
 
         }
 

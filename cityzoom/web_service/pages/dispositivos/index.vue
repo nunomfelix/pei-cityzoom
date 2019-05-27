@@ -51,7 +51,7 @@
 .table{
     position: relative;
     border-radius: 10px;
-    
+
     width: 100%; 
     background: white;
 }
