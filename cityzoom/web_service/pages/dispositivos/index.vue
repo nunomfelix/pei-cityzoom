@@ -22,6 +22,8 @@
 
 <script>
   export default {
+    props:{values: Object},
+
     data() {
       return {
         fields: ['device_id', 'device_status', 'streams','location'],
@@ -30,6 +32,7 @@
           { device_id: 2, device_status: 'Dead', streams: '', location: 'Aveiro'  ,_cellVariants: { device_status: 'danger' }},
           { device_id: 3, device_status: 'Operational', streams: '', location: 'Aveiro'  ,_cellVariants: { device_status: 'success' }},
           { device_id: 4, device_status: 'Operational', streams: '', location: 'Aveiro ' ,_cellVariants: { device_status: 'success' }},
+          { device_id: 5, device_status: 'Operational', streams: '', location: 'Aveiro ' ,_cellVariants: { device_status: 'success' }},
         ]
       }
     },
