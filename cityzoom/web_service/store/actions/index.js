@@ -35,10 +35,9 @@ export default{
                     Authorization: payload
                 }
             })
-            console.log(JSON.stringify(verticals.data))
             const devices = await axios({
                 method: 'get',
-                url: getUrl() + '/device',
+                url: getUrl() + '/devices',
                 headers: {
                     Authorization: payload
                 }

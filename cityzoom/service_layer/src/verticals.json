@@ -45,8 +45,8 @@
 					"fullunit": "Celsius",
 					"type": "value",
 					"colors": ["green", "red", "white"],
-					"min": 0,
-					"max": 30
+					"min": 5,
+					"max": 40
 				}
 			]
 		}
