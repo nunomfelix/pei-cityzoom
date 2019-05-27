@@ -21,7 +21,7 @@ async function get_darksky_data(lat, long) {
 //193.136.93.14:8001
 async function create_Device(deviceID, deviceName, verticals, municipality) {
     //console.log(municipality)
-    axios.post('http://localhost:8001/czb/devices', {
+    await axios.post('http://localhost:8001/czb/devices', {
         "device_ID": deviceID,
         "device_name" : deviceName,
         "description": "",
@@ -34,43 +34,50 @@ async function create_Device(deviceID, deviceName, verticals, municipality) {
 }
 
 async function create_Stream(streamID, streamName, deviceID, type) {
-    axios.post('http://localhost:8001/czb/streams', {
+    await axios.post('http://localhost:8001/czb/streams', {
             "stream_ID": streamID,
             "stream_name" : streamName,
             "description": "",
             "device_ID": deviceID,
             "type": type
-        }).catch( (err)=> {console.log("Failed creation with message: " + err)})
+        }).catch( (err)=> {console.log("Failed to create stream with message: " + err)})
 }
 
 async function create_Subscription(subID, subName, streamID, deviceID) {
-    axios.post('http://localhost:8001/czb/subscriptions', {
+    await axios.post('http://localhost:8001/czb/subscriptions', {
             "subscription_ID": subID,
             "subscription_name" : subName,
             "description": "",
             "stream_ID": streamID,
             "device_ID": deviceID
-        }).catch( (err)=> {console.log("Failed creation with message: " + err)})
+        }).catch( (err)=> {console.log("Failed to create subscription with message: " + err)})
 }
 
 async function post_Values(subID, value, lat, long) {
-    axios.post('http://localhost:8001/czb/subscriptions' + subID + '/values', {
+    await axios.post('http://localhost:8001/czb/subscriptions/' + subID + '/values', {
             "value": value,
             "latitude": lat,
             "longitude": long
-        }).catch( (err)=> {console.log("Failed creation with message: " + err)})
+        }).catch( (err)=> {console.log("Failed to post value with message: " + err)})
 } 
 
-function main() {
-    create_Device("qwerty12345", "qwerty12345", ["Temperature"], "Aveiro")
-    create_Stream("qwerty12345", "qwerty12345" ,"qwerty12345", "Temperature")
-    create_Subscription("qwerty12345", "qwerty12345", "qwerty12345" ,"qwerty12345")
-    post_Values("qwerty12345", 25, 41.2373, -8.401238)
+function sleep(ms) {
+return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-main()
+/* async function main() {
+    await create_Device("12345qwerty", "12345qwerty", "Temperature", "Aveiro")
+    await sleep(2000)
+    await create_Stream("12345qwerty", "12345qwerty" ,"12345qwerty", "Temperature")
+    await sleep(2000)
+    await create_Subscription("12345qwerty", "12345qwerty", "12345qwerty" ,"12345qwerty")
+    await sleep(2000)
+    await post_Values("12345qwerty", 25, 41.2373, -8.401238)
+} 
 
-/* (async function main() {
+main() */
+
+(async function main() {
     var obj = JSON.parse(fs.readFileSync('a.json', 'utf8'))
     //for every municipality in aveiro
     for(mun in obj){
@@ -94,13 +101,16 @@ main()
                 var device = "device_" + mun + "_" + polygon
                 var stream = "stream_" + mun + "_" + polygon
                 var subscription = "suscription_" + mun + "_" + polygon
-                create_Device(device, device, ["Temperature"], mun)
-                create_Stream(stream, stream ,device, "Temperature")
-                create_Subscription(subscription, subscription, stream ,device)
-                post_Values(subscription, data[0].temperature, data[1].lat, data[1].long)
+                await create_Device(device, device, "Temperature", mun)
+                await sleep(2000)
+                await create_Stream(stream, stream ,device, "Temperature")
+                await sleep(2000)
+                await create_Subscription(subscription, subscription, stream ,device)
+                await sleep(2000)
+                await post_Values(subscription, data[0].temperature, data[1].lat, data[1].long)
             }
         }
 
     }
 
-})() */
+})()
