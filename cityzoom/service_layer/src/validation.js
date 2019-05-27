@@ -67,7 +67,8 @@ function validateCreateDevice(object) {
         latitude: Joi.number().optional(),
         longitude: Joi.number().optional(),
         mobile: Joi.boolean().required(),
-        description: Joi.string().optional()
+        description: Joi.string().optional(),
+        municipality: joi.string().optional()
     })
     return Joi.validate(object, schema)
 }
