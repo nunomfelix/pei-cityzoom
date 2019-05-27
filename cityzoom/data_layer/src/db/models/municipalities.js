@@ -20,8 +20,8 @@ const munsSchema = new mongoose.Schema({
     }
 })
 
-munSchema.plugin(uniqueValidator)
+munsSchema.plugin(uniqueValidator)
 
-const Municipality = mongoose.model('municipalities', munSchema)
+const Municipality = mongoose.model('municipalities', munsSchema)
 
 module.exports = Municipality

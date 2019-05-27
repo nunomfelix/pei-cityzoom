@@ -66,6 +66,7 @@ client.on('message',async (topic,data,info)=>{
                 var muns = await Muns.findOne({'municipality': hexagon.municipality})
                 muns.average = (muns.average * muns.values_til_now + data_json.value) / (muns.values_til_now + 1)
                 muns.values_til_now = muns.values_til_now + 1 
+                await Device.updateOne({device_ID: stream.device_ID}, {'municipality': muns.municipality})
             }
         }
 
@@ -77,5 +78,4 @@ client.on('message',async (topic,data,info)=>{
         })
 
     }
-    */
 })
