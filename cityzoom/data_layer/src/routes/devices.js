@@ -54,26 +54,9 @@ router.get('', async (req, res) => {
         return res.status(400).send({error: 'Bad interval defined'})
     }
     user_devs =[]
-    var allDevices = await devices.find({created_at: { $gte: start, $lte: end}})
-
-    for (var i = 0; i < allDevices.length; i++) {
-        let doc = allDevices[i]
-        user_devs.push({
-            ...doc,
-            created_at: Number(doc.created_at)
-        })
-    }
-
-    result['total_devices']
-    await devices.countDocuments({created_at: { $gte: start, $lte: end}}, (err, count) => {
-        result['total_devices'] = count 
-    })
-    devicesDebug('[DEBUG] Fetched with success')
-    if (start != 0) { result['start'] = start }
-    if (end != compass) { result['end'] = end }
-    result['user_devices'] = user_devs
+    var allDevices = await devices.find({created_at: { $gte: start, $lte: end}})    
+    res.status(200).send(allDevices)
     
-    res.status(200).send(result)
 })
 
 // get device by ID

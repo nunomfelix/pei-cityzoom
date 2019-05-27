@@ -4,7 +4,10 @@
         <div v-if="selected_county" :style="{ 'background-color': municipalityValues[selected_county.get('id')].color}" class="ol-popup top">
             <div style="background-color: rgba(0,0,0, .5)">
                 <span class="big"> {{selected_county.get('Freguesia')}} </span>
-                <span class="big"> {{municipalityValues[selected_county.get('id')].value.toFixed(2)}} {{getVerticals[selected_vertical].streams[selected_stream].unit}}</span>
+                <span class="big"> 
+                    {{municipalityValues[selected_county.get('id')].value ? municipalityValues[selected_county.get('id')].value.toFixed(2) + getVerticals[selected_vertical].streams[selected_stream].unit
+                        : 'No Values'}}
+                </span>
                 <div class="scale-band-wrapper">
                     <div :class="{selected: index == municipalityValues[selected_county.get('id')].index}" v-for="index in 100" :key="index" :style="{'background-color': '#' + rainbowHeatMap.colourAt(index)}"></div>
                 </div>
@@ -14,10 +17,13 @@
         <div id="hover_popup" class="ol-popup" :style="{ 'background-color': hovered_geo ? municipalityValues[hovered_geo.get('id')].color : 'none'}">
             <div v-if="hovered_geo" style="background-color: rgba(0,0,0, .5)">
                 <span class="normal"> {{hovered_geo.get('Freguesia')}} </span>
-                <span class="normal"> {{municipalityValues[hovered_geo.get('id')].value.toFixed(2)}} {{getVerticals[selected_vertical].streams[selected_stream].unit}}</span>
-                <div class="scale-band-wrapper">
+                <span class="normal"> 
+                    {{municipalityValues[hovered_geo.get('id')].value ? municipalityValues[hovered_geo.get('id')].value.toFixed(2) + getVerticals[selected_vertical].streams[selected_stream].unit
+                        : 'No Values'}}
+                    </span>
+                <!-- <div class="scale-band-wrapper">
                     <div :class="{selected: index == municipalityValues[hovered_geo.get('id')].index}" v-for="index in 100" :key="index" :style="{'background-color': '#' + rainbowHeatMap.colourAt(index)}"></div>
-                </div>
+                </div> -->
             </div>
         </div>
 
@@ -442,7 +448,6 @@ export default {
                 this.devices_layer.getSource().clear()
 
                 for(var device of this.getDevices) {
-                    console.log(device.vertical.includes(this.getVerticals[this.selected_vertical].name))
                     if(device.hexagon && device.hexagon.substring(0, 6) == this.selected_county.get('id') && device.vertical.includes(this.getVerticals[this.selected_vertical].name)) {
                         var location = [device.locations[device.locations.length - 1].latitude, device.locations[device.locations.length - 1].longitude]
                         const feat = new Feature({
@@ -591,14 +596,18 @@ export default {
             this.rainbowHeatMap.setSpectrum(stream.colors[0] , stream.colors[1]); 
 
             for(var i in this.getHeatmap.muns) {
-                const value = this.getHeatmap.muns[i][stream.name].average
-                const index = (value - stream.min) * 100 / (stream.max - stream.min)
+                const value = this.getHeatmap.muns[i][stream.name].count ? this.getHeatmap.muns[i][stream.name].average : null
                 this.municipalityValues[i].value = value
-                this.municipalityValues[i].index = Math.round(index)
-                this.municipalityValues[i].color = value == 0 ? '#ffffff' : '#' + this.rainbowHeatMap.colourAt(Math.round(index));
+                if(value) {
+                    const index = (value - stream.min) * 100 / (stream.max - stream.min)
+                    this.municipalityValues[i].index = Math.round(index)
+                    this.municipalityValues[i].color = '#' + this.rainbowHeatMap.colourAt(Math.round(index)) + 'D0';
+                } else {
+                    this.municipalityValues[i].color = '#ffffff00';
+                }
                 this.municipalityValues[i].style = new this.req.style.Style({
                     fill: new this.req.style.Fill({
-                        color: this.municipalityValues[i].color + 'D0'
+                        color: this.municipalityValues[i].color
                     }),
                     stroke: new this.req.style.Stroke({
                         color: 'black',
@@ -608,14 +617,18 @@ export default {
             }
 
             for(var i in this.getHeatmap.hexagons) {
-                const value = this.getHeatmap.hexagons[i][stream.name].average
-                const index = (value - stream.min) * 100 / (stream.max - stream.min)
+                const value = this.getHeatmap.hexagons[i][stream.name].count ? this.getHeatmap.hexagons[i][stream.name].average : null
                 this.hexagonValues[i].value = value
-                this.hexagonValues[i].index = Math.round(index)
-                this.hexagonValues[i].color = value == 0 ? '#ffffff' : '#' + this.rainbowHeatMap.colourAt(Math.round(index));
+                if(value) {
+                    const index = (value - stream.min) * 100 / (stream.max - stream.min)
+                    this.hexagonValues[i].index = Math.round(index)
+                    this.hexagonValues[i].color = '#' + this.rainbowHeatMap.colourAt(Math.round(index)) + 'FF';
+                } else {
+                    this.hexagonValues[i].color = '#ffffff00';
+                }
                 this.hexagonValues[i].style = new this.req.style.Style({
                     fill: new this.req.style.Fill({
-                        color: this.hexagonValues[i].color + 'FF',
+                        color: this.hexagonValues[i].color,
                     }),
                     stroke: new this.req.style.Stroke({
                         color: 'black',

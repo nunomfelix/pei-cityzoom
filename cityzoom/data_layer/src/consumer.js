@@ -40,12 +40,13 @@ client.on('message',async (topic,data,info)=>{
             })
     }//If a new stream was added
     else if(topic == rootTopic+'streams'){
-        try {
-            const res = await Stream.create(data_json)
+        await Stream.create(data_json)
+        .then(() => {
             consumerDebug('Stream created with success')
-        } catch {
+        })
+        .catch(() => {
             consumerDebug('Error publishing stream')
-        }
+        })
     }else if(topic == rootTopic+'values'){
         const stream = await Stream.findOne({stream_ID:data_json.stream_ID})
         let dev = await Device.findOne({device_ID:stream.device_ID}) 
@@ -71,21 +72,32 @@ client.on('message',async (topic,data,info)=>{
                 }
             }
         }
+        
+        if(!hexa.streams)
+            hexa.streams = {}
 
         hexa.streams = {
             ...hexa.streams,
-            [stream.stream_name]: {
-                average: (hexa.streams[stream.stream_name].average * hexa.streams[stream.stream_name].count + data_json.value) / (hexa.streams[stream.stream_name].count + 1),
-                count: hexa.streams[stream.stream_name].count + 1
-            }
+            [stream.stream_name]: stream.stream_name in hexa.streams ? {
+                    average: (hexa.streams[stream.stream_name].average * hexa.streams[stream.stream_name].count + data_json.value) / (hexa.streams[stream.stream_name].count + 1),
+                    count: hexa.streams[stream.stream_name].count + 1
+                } :
+                {
+                    average: data_json.value,
+                    count: 1
+                }
         }
         var mun = await Muns.findOne({id: hexa.municipality})
         mun.streams = {
             ...mun.streams,
-            [stream.stream_name]: {
-                average: (mun.streams[stream.stream_name].average * mun.streams[stream.stream_name].count + data_json.value) / (mun.streams[stream.stream_name].count + 1),
-                count: mun.streams[stream.stream_name].count + 1
-            }
+            [stream.stream_name]: stream.stream_name in mun.streams ? {
+                    average: (mun.streams[stream.stream_name].average * mun.streams[stream.stream_name].count + data_json.value) / (mun.streams[stream.stream_name].count + 1),
+                    count: mun.streams[stream.stream_name].count + 1
+                } :
+                {
+                    average: data_json.value,
+                    count: 1
+                }
         }
         await Device.updateOne({device_ID: stream.device_ID}, {hexagon: hexa.id})
         await hexa.save()

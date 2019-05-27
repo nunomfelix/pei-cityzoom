@@ -51,9 +51,6 @@ const deviceSchema = new mongoose.Schema({
         type: String,
         required: false,
     },
-    streams: [{
-        required: false
-    }]
 })
 
 deviceSchema.plugin(uniqueValidator)

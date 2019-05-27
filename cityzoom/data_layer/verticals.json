@@ -44,7 +44,7 @@
 					"unit": "ºC",
 					"fullunit": "Celsius",
 					"type": "value",
-					"colors": ["green", "red", "white"],
+					"colors": ["blue", "red", "white"],
 					"min": 10,
 					"max": 30
 				}
