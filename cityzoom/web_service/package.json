@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "@nuxtjs/axios": "^5.3.6",
+    "@turf/helpers": "^6.1.4",
+    "@turf/turf": "^5.1.6",
     "ag-grid-community": "^20.2.0",
     "ag-grid-vue": "^20.2.0",
     "bootstrap": "^4.1.3",
