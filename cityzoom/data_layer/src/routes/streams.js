@@ -3,6 +3,7 @@ const validators = require('../validation')
 const { validation } = require('../middleware')
 const devices = require('../db/models/devices')
 const streams = require('../db/models/streams')
+const values = require('../db/models/values')
 const streamsDebug = require('debug')('app:Streams')
 //Broker connection
 const producer = require('../producer')
@@ -104,7 +105,7 @@ router.delete('/:id', async (req, res) => {
 })
 
 // get all values from stream
-router.get('/:id/values', async (req, res) => {
+router.get('/:stream_id/values', async (req, res) => {
     streamsDebug('[DEBUG] Fetching all stream values')
     const start = req.query.interval_start ? req.query.interval_start : 0
     const compass = Number(Date.now())
@@ -137,7 +138,7 @@ router.get('/:id/values', async (req, res) => {
     return res.status(200).send(sub_vals)
 })
 
-// post value to device
+// post value to stream
 router.post('/:id/values', validation(validators.validatePostValue, 'body', 'Invalid value'), async (req, res) => {
     streamsDebug('[DEBUG] Creating Value')
     to_broker = {
@@ -156,18 +157,10 @@ router.post('/:id/values', validation(validators.validatePostValue, 'body', 'Inv
     })
     streamsDebug(`[DEBUG] Stream ${to_broker.stream_ID} exists`)
     
-    const sub = await streams.findOne({stream_ID:to_broker.stream_ID})
-    let dev = await devices.findOne({device_ID:sub.device_ID}) 
-    if (dev.mobile || ( !dev.mobile && dev.locations.length == 0)) {
-        streamsDebug(`[DEBUG] Updating ${sub.device_ID} location`)
-        await devices.updateOne({device_ID:sub.device_ID}, {$push: {locations: {timestamp: to_broker.timestamp, latitude: to_broker.latitude, longitude: to_broker.longitude}}})
-    }
+    producer.publish('cityzoom/values',to_broker)
 
-    await values.create(to_broker)
-        .then(() => {
-            streamsDebug('[DEBUG] Value created with success')
-            return res.status(204).send()
-        })
+    streamsDebug('[DEBUG] Value created with success')
+    return res.status(204).send()
 })
 
 
