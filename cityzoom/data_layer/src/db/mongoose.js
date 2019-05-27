@@ -15,10 +15,10 @@ mongoose.connect(connectionUrl+database, {
     useNewUrlParser: true,
     useCreateIndex: true
 }, async () => {
-    // await devices.deleteMany({})
-    // await streams.deleteMany({})
-    // await values.deleteMany({})
-    // await muns.deleteMany({})
+    await devices.deleteMany({})
+    await streams.deleteMany({})
+    await values.deleteMany({})
+    await muns.deleteMany({})
     fs.readFile('verticals.json', async (err, data) => { 
         await verticals.deleteMany({}) 
         if (err) throw err;
@@ -30,45 +30,43 @@ mongoose.connect(connectionUrl+database, {
                 display: vertical.vertical[v].display,
                 streams: vertical.vertical[v].streams,
             })
-            streams_array.push(...Object.keys(vertical.vertical[v].streams))
+            streams_array.push(...vertical.vertical[v].streams.map(s => s.name))
             // console.log(vert)
             await vert.save()
         }
+        fs.readFile('hex_data.json', async (err, hexa_json) => {
+            await hexagons.deleteMany({})
+            if (err) throw err;
+            let hexas = JSON.parse(hexa_json)
+            const municipalities = new Set()
+            await hexagons.insertMany(hexas.map(h => {
+                municipalities.add(h.municipality)
+                return new hexagons({
+                    id: h.id,
+                    coordinates: h.coordinates,
+                    municipality: h.municipality,
+                    streams: streams_array.reduce((map, stream) => {
+                        map[stream] = {
+                            average: 0,
+                            count: 0,
+                        }
+                        return map
+                    }, {})
+                })
+            }))
+            await muns.insertMany([...municipalities].map(m =>
+                new muns({
+                    id: m,
+                    streams: streams_array.reduce((map, stream) => {
+                        map[stream] = {
+                            average: 0,
+                            count: 0,
+                        }
+                        return map
+                    }, {})
+                })
+            ))
+        })
     })
-    //     }
-    //     fs.readFile('hex_data.json', async (err, hexa_json) => {
-    //         await hexagons.deleteMany({})
-    //         if (err) throw err;
-    //         let hexas = JSON.parse(hexa_json)
-    //         const municipalities = new Set()
-    //         await hexagons.insertMany(hexas.map(h => {
-    //             municipalities.add(h.municipality)
-    //             return new hexagons({
-    //                 id: h.id,
-    //                 coordinates: h.coordinates,
-    //                 municipality: h.municipality,
-    //                 streams: streams_array.reduce((map, stream) => {
-    //                     map[stream] = {
-    //                         average: 0,
-    //                         count: 0,
-    //                     }
-    //                     return map
-    //                 }, {})
-    //             })
-    //         }))
-    //         await muns.insertMany([...municipalities].map(m =>
-    //             new muns({
-    //                 id: m,
-    //                 streams: streams_array.reduce((map, stream) => {
-    //                     map[stream] = {
-    //                         average: 0,
-    //                         count: 0,
-    //                     }
-    //                     return map
-    //                 }, {})
-    //             })
-    //         ))
-    //     })
-    // })
     mongooseDebug("Connected to mongo database!")
 })

@@ -58,27 +58,12 @@ router.get('', async (req, res) => {
 
     for (var i = 0; i < allDevices.length; i++) {
         let doc = allDevices[i]
-       
-        // get all devices streams
-        var allDeviceStreams = await streams.find({device_ID: doc.device_ID})
-        devStreams = []
-        await allDeviceStreams.forEach(function (stream) {
-            devStreams.push(stream.stream_ID)
-        })
-       
         user_devs.push({
-            device_ID: doc.device_ID,
-            device_name: doc.device_name,
-            mobile: doc.mobile,
-            provider: doc.provider,
-            created_at: Number(doc.created_at),
-            vertical: doc.vertical,
-            description: doc.description,
-            locations: doc.locations,
-            streams: devStreams,
-            hexagon: doc.hexagon
+            ...doc,
+            created_at: Number(doc.created_at)
         })
     }
+
     result['total_devices']
     await devices.countDocuments({created_at: { $gte: start, $lte: end}}, (err, count) => {
         result['total_devices'] = count 

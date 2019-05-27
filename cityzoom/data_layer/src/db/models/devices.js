@@ -50,7 +50,10 @@ const deviceSchema = new mongoose.Schema({
     hexagon: {
         type: String,
         required: false,
-    }
+    },
+    streams: [{
+        required: false
+    }]
 })
 
 deviceSchema.plugin(uniqueValidator)

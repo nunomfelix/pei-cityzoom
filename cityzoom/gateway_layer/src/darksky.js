@@ -104,7 +104,7 @@ test_posts() */
         })
         // k++
         // if(k == 2)
-        //     break;
+        //break;
     }
     await sleep(2000);
     const devicesMap = {}
@@ -121,17 +121,25 @@ test_posts() */
         }
         devicesMap[devices[d].device] = streams
     }
+    const fake = false
     for(var d of devices) {
-        console.log(d)
+        var data
         try {
-            var data = await get_darksky_data(d.center_lat, d.center_long)
-            //const data = JSON.parse(fs.readFileSync('kappa.json', 'utf8'))
+            if(!fake)
+                data = await get_darksky_data(d.center_lat, d.center_long)
+            else
+                data = JSON.parse(fs.readFileSync('kappa.json', 'utf8'))
             for(var stream of devicesMap[d.device]) {
                 await post_Values(stream.stream_id, data[0][stream.stream], d.center_lat, d.center_long)
                 await sleep(1000);
             }
-        } catch(err) {
-            break;
+        } catch {
+            fake = true
+            data = JSON.parse(fs.readFileSync('kappa.json', 'utf8'))
+            for(var stream of devicesMap[d.device]) {
+                await post_Values(stream.stream_id, data[0][stream.stream], d.center_lat, d.center_long)
+                await sleep(1000);
+            }
         }
         // fs.writeFileSync('kappa.json', JSON.stringify(data))
     }

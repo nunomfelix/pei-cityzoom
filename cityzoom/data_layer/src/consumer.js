@@ -40,12 +40,12 @@ client.on('message',async (topic,data,info)=>{
             })
     }//If a new stream was added
     else if(topic == rootTopic+'streams'){
-        await Stream.create(data_json)
-            .then(() => {
-                consumerDebug('Stream created with success')
-            }).catch(()=>{
-                consumerDebug('Error publishing stream')
-            })
+        try {
+            const res = await Stream.create(data_json)
+            consumerDebug('Stream created with success')
+        } catch {
+            consumerDebug('Error publishing stream')
+        }
     }else if(topic == rootTopic+'values'){
         const stream = await Stream.findOne({stream_ID:data_json.stream_ID})
         let dev = await Device.findOne({device_ID:stream.device_ID}) 
