@@ -10,7 +10,6 @@ const rootTopic = config.get('BROKER_ROOT_TOPIC')
 require('./db/mongoose') 
 const Device = require('./db/models/devices')
 const Stream = require('./db/models/streams')
-const Subscription = require('./db/models/subscriptions')
 
 client.on('connect',()=>{
     consumerDebug('Listening to MQTT broker!')
@@ -41,14 +40,6 @@ client.on('message',async (topic,data,info)=>{
                 consumerDebug('Stream created with success')
             }).catch(()=>{
                 consumerDebug('Error publishing stream')
-            })
-    }//If a new subscription was added
-    else if(topic == rootTopic+'subscriptions'){
-        await Subscription.create(data_json)
-            .then(() => {
-                consumerDebug('Subscription created with success')
-            }).catch(()=>{
-                consumerDebug('Error publishing subscription')
             })
     }
 })
