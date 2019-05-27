@@ -18,7 +18,6 @@ router.post('', validation(validators.validateCreateStream, 'body', 'Invalid str
         device_ID: req.body['device_ID'],
         stream_ID: req.body['stream_ID'],
         stream_name: req.body['stream_name'],
-        type: req.body['type'],
         description: 'description' in req.body ? req.body.description : "",
         created_at: Number(Date.now())
     }
@@ -66,7 +65,6 @@ router.get('', async (req, res) => {
             stream_ID: doc.stream_ID,
             stream_name: doc.stream_name,
             created_at: Number(doc.created_at),
-            type: doc.type,
             description: doc.description
         })
     })
@@ -92,7 +90,6 @@ router.get('/:id', async (req, res) => {
         stream_ID: doc.stream_ID,
         stream_name: doc.stream_name,
         created_at: Number(doc.created_at),
-        type: doc.type,
         description: doc.description
     })
 })

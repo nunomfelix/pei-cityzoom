@@ -5,7 +5,7 @@ function validateCreateDevice(object) {
         device_ID:  joi.string().required(),
         device_name: joi.string().required(),
         description: joi.string().optional(),
-        vertical: joi.string().optional(),
+        vertical: joi.array().required(),
         mobile: joi.boolean().required(),
         provider: joi.string().required(),
         municipality: joi.string().optional()
@@ -18,7 +18,7 @@ function validateCreateStream(object) {
         stream_ID: joi.string().required(),
         device_ID: joi.string().required(),
         stream_name: joi.string().required(),
-        type: joi.string().required(),
+        type: joi.string().optional(),
         description: joi.string().optional()
     })
     return joi.validate(object, schema)
