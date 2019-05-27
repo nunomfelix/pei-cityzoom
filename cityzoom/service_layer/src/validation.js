@@ -66,6 +66,7 @@ function validateCreateDevice(object) {
         description: Joi.string().optional(),
         vertical: Joi.string().required(),
         mobile: Joi.boolean().required(),
+        municipality: joi.string().optional(),
         provider: Joi.string().required()
     })
     return Joi.validate(object, schema)

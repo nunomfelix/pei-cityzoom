@@ -46,21 +46,21 @@ export default {
           img: "dispositivos.svg",
           name: "Devices"
         },
-        {
-          path: "operacoes",
-          img: "operacoes.svg",
-          name: "Operations"
-        },
+        // {
+        //   path: "operacoes",
+        //   img: "operacoes.svg",
+        //   name: "Operations"
+        // },
         {
           path: "notificacoes",
           img: "notificacoes.svg",
           name: "Alarms"
         },
-        {
-          path: "equipa",
-          img: "equipa.svg",
-          name: "Team"
-        },
+        // {
+        //   path: "equipa",
+        //   img: "equipa.svg",
+        //   name: "Team"
+        // },
         {
           path: "definicoes",
           img: "settings.svg",

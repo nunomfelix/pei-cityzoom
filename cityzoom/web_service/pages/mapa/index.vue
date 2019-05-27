@@ -1,18 +1,23 @@
 <template>
     <div class="mapMargin mapHeight" style="position:relative">
         <div class="mapHeight" id="map"></div>
-
         <div v-if="selected_county" :style="{ 'background-color': testValues[selected_county.get('name_2')].color}" class="ol-popup top">
             <div style="background-color: rgba(0,0,0, .5)">
                 <span class="big"> {{selected_county.get('name_2')}} </span>
-                <span class="big"> {{testValues[selected_county.get('name_2')].value.toFixed(2)}} </span>
+                <span class="big"> {{data[selected_county.get('name_2')][getVerticals[selected_vertical].streams[selected_stream].name].toFixed(2)}} {{getVerticals[selected_vertical].streams[selected_stream].unit}}</span>
+                <div class="scale-band-wrapper">
+                    <div :class="{selected: index == testValues[selected_county.get('name_2')].index}" v-for="index in 100" :key="index" :style="{'background-color': '#' + rainbowHeatMap.colourAt(index)}"></div>
+                </div>
             </div>
         </div>
 
-        <div id="hover_popup" class="ol-popup" :style="{ 'background-color': hovered_feature ? testValues[hovered_feature.get('name_2')].color : ''}">
-            <div v-if="hovered_feature" style="background-color: rgba(0,0,0, .5)">
-                <span class="normal"> {{hovered_feature.get('name_2')}} </span>
-                <span class="normal"> {{testValues[hovered_feature.get('name_2')].value.toFixed(2)}} </span>
+        <div id="hover_popup" class="ol-popup" :style="{ 'background-color': hovered_geo ? testValues[hovered_geo.get('name_2')].color : 'none'}">
+            <div v-if="hovered_geo" style="background-color: rgba(0,0,0, .5)">
+                <span class="normal"> {{hovered_geo.get('name_2')}} </span>
+                <span class="normal"> {{data[hovered_geo.get('name_2')][getVerticals[selected_vertical].streams[selected_stream].name].toFixed(2)}} {{getVerticals[selected_vertical].streams[selected_stream].unit}}</span>
+                <div class="scale-band-wrapper">
+                    <div :class="{selected: index == testValues[hovered_geo.get('name_2')].index}" v-for="index in 100" :key="index" :style="{'background-color': '#' + rainbowHeatMap.colourAt(index)}"></div>
+                </div>
             </div>
         </div>
 
@@ -37,19 +42,24 @@
             </div>
         </div>
         <Loading :show="!loaded" type="absolute"/> 
-        <ModalResizable v-if="showModal" @close="showModal = false"/>
+        <ModalResizable v-if="showModal" @close="showModal = false" :values="values"/>
     </div>
 </template>
 
 <script>
-var features = []
+var h3 = require('h3-js');
 var Rainbow = require('rainbowvis.js');
+const drone_stream = require('static/get_stream_values_response.json');
+//console.log(JSON.stringify(drone_stream))  
 export default {
     data() {
         return {
+            values: drone_stream,
             req: {
                 Ol: null,
                 etent: null,
+                geom: null,
+                proj: null,
             },
             map: null,
             loaded: false,
@@ -61,7 +71,7 @@ export default {
             devicesStyle: {
                 templates: {
                     default: {
-                        scale: 1,
+                        scale: 0.8,
                     },
                     hover: {
                         scale: 1.2,
@@ -78,52 +88,99 @@ export default {
             selected_vertical: null,
             selected_stream: null,
             selected_county: null,
-            hovered_feature: null,
+            hovered_geo: null,
 
             geoJsonExtent: null,
-            showModal: false
+            showModal: false,
+
+            geo_layer: null,
+            devices_layer: null,
+            shown_features: [],
+
+            data: { 'Águeda':
+                { temperature_stream: 18.58,
+                    pressure_stream: 1014.08,
+                    humidity_stream: 0.82,
+                    ozone_stream: 314.83 },
+                Estarreja:
+                { temperature_stream: 16.62,
+                    pressure_stream: 1014.21,
+                    humidity_stream: 0.92,
+                    ozone_stream: 314.61 },
+                Murtosa:
+                { temperature_stream: 16.17,
+                    pressure_stream: 1014.26,
+                    humidity_stream: 1,
+                    ozone_stream: 314.54 },
+                'Oliveira de Azeméis':
+                { temperature_stream: 18.4,
+                    pressure_stream: 1014.15,
+                    humidity_stream: 0.75,
+                    ozone_stream: 314.54 },
+                'Oliveira do Bairro':
+                { temperature_stream: 17.94,
+                    pressure_stream: 1014.14,
+                    humidity_stream: 0.92,
+                    ozone_stream: 315.04 },
+                Ovar:
+                { temperature_stream: 17.91,
+                    pressure_stream: 1014.25,
+                    humidity_stream: 0.84,
+                    ozone_stream: 314.46 },
+                Vagos:
+                { temperature_stream: 17.52,
+                    pressure_stream: 1014.25,
+                    humidity_stream: 0.97,
+                    ozone_stream: 314.56 },
+                'Vale de Cambra':
+                { temperature_stream: 18.06,
+                    pressure_stream: 1014.1,
+                    humidity_stream: 0.73,
+                    ozone_stream: 314.21 },
+                'Ílhavo':
+                { temperature_stream: 17.53,
+                    pressure_stream: 1014.27,
+                    humidity_stream: 0.96,
+                    ozone_stream: 314.56 },
+                'Albergaria-a-Velha':
+                { temperature_stream: 18.34,
+                    pressure_stream: 1014.15,
+                    humidity_stream: 0.81,
+                    ozone_stream: 314.78 },
+                Anadia:
+                { temperature_stream: 18.47,
+                    pressure_stream: 1014.07,
+                    humidity_stream: 0.61,
+                    ozone_stream: 315.32 },
+                Aveiro:
+                { temperature_stream: 16.75,
+                    pressure_stream: 1014.23,
+                    humidity_stream: 0.98,
+                    ozone_stream: 314.66 } 
+            }
         }
     },
     computed: {
         getVerticals() {
             return this.$store.state.verticals
+        },
+        getDevices() {
+            return this.$store.state.devices
         }
     },
-    mounted() {
+    async mounted() {
         this.req.Ol = require( 'ol');
-        const proj = require('ol/proj')
+        this.req.proj = require('ol/proj')
         const source = require( 'ol/source');
         const layer = require( 'ol/layer');
         this.req.style = require( 'ol/style');
         this.req.extent = require( 'ol/extent');
         const format = require('ol/format')
-        const geom = require( 'ol/geom');
+        this.req.geom = require( 'ol/geom');
         const interaction = require( 'ol/interaction');
         const { Feature } = require( 'ol')
         const { click, pointerMove, altKeyOnly, noModifierKeys, altShiftKeysOnly, platformModifierKeyOnly } = require( 'ol/events/condition.js');
         
-        
-        var iconStyle = [new this.req.style.Style({
-            image: new this.req.style.Icon(/** @type {olx.this.req.style.IconOptions} */ ({
-                anchor: [0.5, 0.5],
-                anchorXUnits: 'fraction',
-                anchorYUnits: 'fraction',
-                scale: .75,
-                opacity: 0.75,
-                src: 'icons/AirQuality_map.png'
-            }))
-        })
-        ,new this.req.style.Style({
-            image: new this.req.style.Icon(/** @type {olx.this.req.style.IconOptions} */ ({
-                anchor: [0.5, 0.5],
-                anchorXUnits: 'fraction',
-                anchorYUnits: 'fraction',
-                scale: .75,
-                opacity: 0.75,
-                src: 'icons/Temperature_map.png'
-            }))
-        })]
-
         for(var style in this.devicesStyle.templates) {
             for(var vertical of this.getVerticals) {
                 if(!(vertical.name in this.devicesStyle.styles))
@@ -186,35 +243,33 @@ export default {
         this.hoverOverlay = new this.req.Ol.Overlay({
             element: this.hoverPopup,
             autoPan: false,
-            positioning: 'bottom-center',
+            positioning: 'top-center',
             autoPanAnimation: {
                 duration: 250
             }
-        });
+        })
         
-        features.push(new Feature({
-            geometry: new geom.Point(proj.transform([-8.661682, 40.6331731], 'EPSG:4326',     
-            'EPSG:3857')),
-            //id: device.id
-            name: 'Null Island'
-        }));
-
-        //console.log(features)
-    
-        var vectorSource = new source.Vector({
-            features: features, //add an array of features
+        this.devices_layer = new layer.Vector({
+            source: new source.Vector(),
             style: (feature) => {
-                return this.devicesStyle
-            }
-        });
-        
-        var devicesLayer = new layer.Vector({
-                    source: vectorSource,
-                    style: iconStyle[Math.floor(Math.random() * iconStyle.length)]
+                return this.devicesStyle.styles[this.getVerticals[this.selected_vertical].name].default
+            },
+            renderBuffer: window.innerWidth,
+            updateWhileAnimating: true,
         }) 
 
+        this.hex_layer = new layer.Vector({
+            source: new source.Vector(),
+            style: (feature) => {
+                return this.geoStyle.default
+            },
+            renderBuffer: window.innerWidth,
+            updateWhileAnimating: true,
+
+        })
+
         const centerpos = [-8.661682, 40.6331731];
-        const center = proj.transform(centerpos, 'EPSG:4326', 'EPSG:3857');
+        const center = this.req.proj.transform(centerpos, 'EPSG:4326', 'EPSG:3857');
         const maxExtent = [-9.5, 37, -6.2, 42.5];
         //const maxExtent = [-180, -90, 180, 90];
         this.map = new this.req.Ol.Map({
@@ -223,8 +278,9 @@ export default {
                 new layer.Tile({
                     source: new source.OSM(),
                 }),
-                devicesLayer,  
-                this.geo_layer,      
+                this.devices_layer, 
+                this.geo_layer, 
+                this.hex_layer,      
             ],
             overlays: [this.hoverOverlay],
             view: new this.req.Ol.View({
@@ -250,12 +306,6 @@ export default {
                     }
                 })
 
-                this.testValuesOrdered = Object.keys(this.testValues).sort((a,b) => {
-                    return this.testValues[a].value - this.testValues[b].value
-                })
-
-                devicesLayer.setStyle((feature) => { return iconStyle[Math.floor(Math.random() * iconStyle.length)]})
-
                 this.geo_layer.setStyle((feature) => {
                     return feature == this.selected_county ? this.geoStyle.active : this.testValues[feature.get('name_2')].style
                 })
@@ -274,31 +324,60 @@ export default {
             }
         })
 
+        const res = await this.$axios.get('/a.json')
+        for(var municipity in res.data) {
+            for(var area of res.data[municipity]) {
+                for(var hex of area) {
+                    const pol = hex.map(p => this.req.proj.transform(p, 'EPSG:4326', 'EPSG:3857'))
+                    const a = new Feature({
+                        geometry: new this.req.geom.Polygon([pol])
+                    })
+                    this.hex_layer.getSource().addFeature(a)
+                }
+            }
+        }
+
         const hover_interaction = new interaction.Select({
             condition: (e) => {
                 return pointerMove(e) && !this.map.getView().getAnimating();
             },
             layers: [this.geo_layer],
             style: (feature) => {
-                return feature == this.selected_county ?
-                    this.geoStyle.active
-                :
-                    this.geoStyle.hover
+                return feature == this.selected_county 
+                    ? this.geoStyle.active
+                    : this.geoStyle.hover
             },
             multi: false
         })
 
-        this.map.addInteraction(hover_interaction);
+        //this.map.addInteraction(hover_interaction);
         hover_interaction.on('select', (e) => {
             if(e.selected.length && e.selected[0] != this.selected_county) {
-                this.hovered_feature = e.selected[0]
-                console.log(this.hovered_feature)
+                if(this.hovered_geo) {
+                    this.clearGeoDevices(this.hovered_geo)
+                }
+                this.hovered_geo = e.selected[0]
                 document.body.style.cursor = "pointer"
-                this.hoverOverlay.setPosition(this.req.extent.getCenter(this.hovered_feature.getGeometry().getExtent()))
-            } else {
-                this.hovered_feature = null
-                document.body.style.cursor = "default"
-                this.hoverOverlay.setPosition(null)
+                const center = this.req.extent.getCenter(this.hovered_geo.getGeometry().getExtent()),
+                      bottom = this.req.extent.getBottomRight(this.hovered_geo.getGeometry().getExtent())
+                this.hoverOverlay.setPosition([center[0], (center[1] + bottom[1]) / 2]) 
+                if(this.selected_county != null) {
+                    for(var device of this.getDevices) {
+                        if(device.municipality == this.hovered_geo.get('name_2') && this.hovered_geo.get('name_2') != this.selected_county && device.vertical.includes(this.getVerticals[this.selected_vertical].name)) {
+                            var location = device.mobile ? [device.locations[device.locations.length - 1].latitude, device.locations[device.locations.length - 1].longitude] :
+                                                [device.locations[0].latitude, device.locations[0].longitude]
+                            const feat = new Feature({
+                                geometry: new this.req.geom.Point(this.req.proj.transform([location[1],location[0]], 'EPSG:4326', 'EPSG:3857')),
+                                id: device.device_id,
+                            })
+                            this.devices_layer.getSource().addFeature(feat)
+                            this.shown_features.push(feat);
+                        }
+                    }
+                }
+            } else if(this.hovered_geo) {
+                this.clearGeoDevices(this.hovered_geo)
+                this.clearHoverPopup()
             }
         })
 
@@ -306,14 +385,13 @@ export default {
             condition: (e) => {
                 return click(e);
             },
-            layers: [this.geo_layer, devicesLayer],
+            layers: [this.geo_layer, this.devices_layer],
             multi: true
         })
 
         this.map.addInteraction(click_interaction);
         click_interaction.on('select', (e) => {
             document.body.style.cursor = "default"
-            this.hovered_feature = null
             const geo_feature = e.selected[0]
             if(geo_feature.get('name_2') && geo_feature != this.selected_county) {
                 this.map.setView(new this.req.Ol.View({
@@ -322,63 +400,82 @@ export default {
                     minZoom: 0,
                     maxZoom: 18
                 }))
-                this.map.getView().fit(geo_feature.getGeometry().getExtent(), {
-                    duration: 500,
-                    padding: [120, 140, 0, 0],
-                    callback: () =>  {
-                        this.map.setView(new this.req.Ol.View({
-                            extent: geo_feature.getGeometry().getExtent(),
-                            center: this.map.getView().getCenter(),
-                            zoom: this.map.getView().getZoom(),
-                            minZoom: this.map.getView().getZoom(),
-                            maxZoom: 18
-                        }))
-                    }
-                })   
+
+                this.hovered_geo = null
                 this.selected_county = geo_feature 
+                this.shown_features = []
+                this.devices_layer.getSource().clear()
+
+                for(var device of this.getDevices) {
+                    if(device.municipality == geo_feature.get('name_2') && device.vertical.includes(this.getVerticals[this.selected_vertical].name)) {
+                        var location = device.mobile ? [device.locations[device.locations.length - 1].latitude, device.locations[device.locations.length - 1].longitude] :
+                                            [device.locations[0].latitude, device.locations[0].longitude]
+                        const feat = new Feature({
+                            geometry: new this.req.geom.Point(this.req.proj.transform([location[1],location[0]], 'EPSG:4326', 'EPSG:3857')),
+                            id: device.device_id,
+                        })
+                        this.devices_layer.getSource().addFeature(feat)
+                        this.shown_features.push(feat);
+                    }
+                }
                 this.hoverOverlay.setPosition(null)
+
+                setTimeout(() => {
+                    this.map.getView().fit(geo_feature.getGeometry().getExtent(), {
+                        duration: 500,
+                        padding: [120, 140, 0, 0],
+                        callback: () =>  {
+                            this.map.setView(new this.req.Ol.View({
+                                extent: geo_feature.getGeometry().getExtent(),
+                                center: this.map.getView().getCenter(),
+                                zoom: this.map.getView().getZoom(),
+                                minZoom: this.map.getView().getZoom(),
+                                maxZoom: 18
+                            }))
+                        }
+                    })   
+                },0)
             } else if(e.selected.length > 1) {
                 const device_feature = e.selected[e.selected.length - 1]
-                this.showModal = true
+                this.showModal = true   
             }
             click_interaction.getFeatures().clear()
         })
 
-        // const click_device_interaction = new interaction.Select({
-        //     condition: (e) => {
-        //         return click(e);
-        //     },
-        //     layers: [devicesLayer]
-        // })
-        // this.map.addInteraction(click_device_interaction);
-
-        // click_device_interaction.on('select', (e) => {
-        //     document.body.style.cursor = "default"
-        //     const feature = e.selected[0]
-        //     console.log(feature)
-        //     this.showModal = true
-        // })
-
-        this.createFeature(vectorSource, []);
-
-        
-        //console.log(devicesLayer.getSource().getFeatures());
-
         //this.createFeature(vectorSource, []);
-        // setInterval(()=> {
-        //     vectorSource.forEachFeature(feature => {
-        //         vectorSource.removeFeature(feature)
-        //         var coordinates = this.gen_random_coordinates() 
-        //         vectorSource.addFeature(new Feature({
-        //             geometry: new geom.Point(proj.transform(coordinates, 'EPSG:4326', 'EPSG:3857')),
-        //             //id: device.id
-        //             name: 'Null Island'
-        //         }));
+        // var feat = new Feature({
+        //     geometry: new this.req.geom.Point(this.req.proj.transform([drone_stream.values[0].longitude, drone_stream.values[0].latitude], 'EPSG:4326',     
+        //     'EPSG:3857'))
+        //     //id: device.id
+        // })
+        // vectorSource.addFeature(feat)
+        // var i = 1;
+        // setInterval(() => {
+        //     vectorSource.removeFeature(feat);
+        //     feat = new Feature({
+        //         geometry: new this.req.geom.Point(this.req.proj.transform([drone_stream.values[i].longitude, drone_stream.values[i].latitude], 'EPSG:4326',     
+        //         'EPSG:3857'))
+        //         //id: device.id
         //     })
-        // },500);
+        //     vectorSource.addFeature(feat)
+        //     i++
+        // },150)
 
     },
     methods: {
+        clearHoverPopup() {
+            this.hovered_geo = null
+            document.body.style.cursor = "default"
+            this.hoverOverlay.setPosition(null)
+        },
+        clearGeoDevices(geo) {
+            for(var feature in this.shown_features) {
+                if(this.getDevices.find(d => d.device_id == this.shown_features[feature].get('id')).municipality == geo.get('name_2')) {
+                    this.devices_layer.getSource().removeFeature(this.shown_features[feature])
+                    this.shown_features.splice(feature, 1)
+                }
+            }
+        },
         deselect_county() {
             this.map.setView(new this.req.Ol.View({
                 center: this.map.getView().getCenter(),
@@ -390,11 +487,11 @@ export default {
                 duration: 500
             })
             this.selected_county = null
+            this.devices_layer.getSource().clear()
+            this.shown_features = []
         },
         createFeature(source, device){
             const { Feature } = require( 'ol');
-            const geom = require( 'ol/geom');
-            const proj = require('ol/proj');
             var coordinates = { 'Águeda': [ 40.595098500000006, -8.401762 ],
                                 Estarreja: [ 40.760923500000004, -8.587983000000001 ],
                                 Murtosa: [ 40.7613925, -8.663722 ],
@@ -410,12 +507,11 @@ export default {
 
             for (const [key, value] of Object.entries(coordinates)) {        
                 source.addFeature(new Feature({
-                    geometry: new geom.Point(proj.transform([value[1],value[0]], 'EPSG:4326', 'EPSG:3857')),
+                    geometry: new this.req.geom.Point(this.req.proj.transform([value[1],value[0]], 'EPSG:4326', 'EPSG:3857')),
                     //id: device.id
                     name: key
                 }));
             }
-
             return features
 
             //console.log(features)
@@ -429,6 +525,13 @@ export default {
                 this.selected_vertical = i
                 this.selected_stream = 0
                 this.updateHeatMap()
+                for(var feature in this.shown_features) {
+                    if(!(this.getDevices.find(d => d.device_id == this.shown_features[feature].get('id')).vertical.includes(this.getVerticals[this.selected_vertical].name))) {
+                        this.devices_layer.getSource().removeFeature(this.shown_features[feature])
+                        this.shown_features.splice(feature, 1)
+                    }
+                }
+                this.devices_layer.getSource().dispatchEvent('change');
             }
         },
         selectStream(i) {
@@ -438,14 +541,21 @@ export default {
             }
         },
         updateHeatMap() {
-            this.rainbowHeatMap.setNumberRange(1, this.geo_layer.getSource().getFeatures().length);
-            this.rainbowHeatMap.setSpectrum(this.getVerticals[this.selected_vertical].streams[this.selected_stream].colors[0] , this.getVerticals[this.selected_vertical].streams[this.selected_stream].colors[1]); 
+            const stream = this.getVerticals[this.selected_vertical].streams[this.selected_stream]
+            this.rainbowHeatMap.setNumberRange(1, 100);
+            this.rainbowHeatMap.setSpectrum(stream.colors[0] , stream.colors[1]); 
+
+            this.testValuesOrdered = Object.keys(this.data).sort((a,b) => {
+                return this.data[a][this.getVerticals[this.selected_vertical].streams[this.selected_stream].name] - this.data[b][this.getVerticals[this.selected_vertical].streams[this.selected_stream].name]
+            })
 
             for(var i in this.testValuesOrdered) {
-                this.testValues[this.testValuesOrdered[i]].color = '#' + this.rainbowHeatMap.colourAt(i);
+                const tmp = (this.data[this.testValuesOrdered[i]][stream.name] - stream.min) * 100 / (stream.max - stream.min)
+                this.testValues[this.testValuesOrdered[i]].index = Math.round(tmp)
+                this.testValues[this.testValuesOrdered[i]].color = '#' + this.rainbowHeatMap.colourAt(Math.round(tmp));
                 this.testValues[this.testValuesOrdered[i]].style = new this.req.style.Style({
                     fill: new this.req.style.Fill({
-                        color: this.testValues[this.testValuesOrdered[i]].color + 'e0'
+                        color: this.testValues[this.testValuesOrdered[i]].color + 'D0'
                     }),
                     stroke: new this.req.style.Stroke({
                         color: 'black',
@@ -457,6 +567,9 @@ export default {
             this.geo_layer.setStyle((feature) => {
                 return feature == this.selected_county ? this.geoStyle.active : this.testValues[feature.get('name_2')].style
             })
+
+            this.map.updateSize()
+
         }
 
     }
@@ -492,13 +605,13 @@ export default {
         min-width: 10%;
         @include shadow(0px, 0px, 8px, 2px, rgba(0,0,0,0.2));
     }
-    padding: 5px;
+    padding: .75rem;
     border-radius: 12px;
 
     & > div {
-        @include flex(center, center, column);
+        @include flex(space-evenly, center, column);
         color: white;
-        padding: .4rem .7rem;
+        padding: 1rem 2rem;
         border-radius: 10px;
     }
 }
@@ -568,6 +681,51 @@ export default {
             width: 100%;
         }
     }
+}
+
+.scale-band-wrapper {
+    margin: .5rem 0;
+    height: 2rem;
+    @include flex(center, center);
+    border-radius: 10px;
+    width: 100%;
+    & > div {
+        width: 1%;
+        &:not(.selected) {
+            border-top: 1px solid white;
+            border-bottom: 1px solid white;
+            &:first-child {
+                border-left: 1px solid white;
+            }
+            &:last-child {
+                border-right: 1px solid white;
+            }
+        }
+        &.selected {
+            border: 3px solid darkred;
+            box-sizing: border-box;
+            width: 5%;
+            min-width: 1rem;
+            height: 2.5rem;
+        }
+        height: 100%;
+    }
+}
+
+.color-band {
+    background-color: white;
+    border-radius: 10px;
+    height: 2rem;
+    width: 15rem;
+    border: 1px solid white;
+}
+
+.color-position {
+    position: absolute;
+    border-radius: 10px;
+    height: 120%;
+    top: -10%;
+    width: 3px;
 }
 
 </style>

@@ -20,6 +20,7 @@ router.post('', validation(validators.validateCreateDevice, 'body', 'Invalid dev
         provider: req.body['provider'],
         created_at: Number(Date.now()), 
         description: 'description' in req.body ? req.body.description : "",
+        municipality: req.body['municipality'],
         locations: []
     }
     
