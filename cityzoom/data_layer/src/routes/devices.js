@@ -3,7 +3,6 @@ const validators = require('../validation')
 const { validation } = require('../middleware')
 const devices = require('../db/models/devices')
 const streams = require('../db/models/streams')
-const subscriptions = require('../db/models/subscriptions')
 const devicesDebug = require('debug')('app:Devices')
 //Broker producer and consumer
 const producer = require('../producer')
@@ -65,13 +64,6 @@ router.get('', async (req, res) => {
             devStreams.push(stream.stream_ID)
         })
        
-        // get all devices subscriptions
-        var allDeviceSubs = await subscriptions.find({device_ID: doc.device_ID})
-        devSubs = []
-        await allDeviceSubs.forEach( function (sub) {
-            devSubs.push(sub.subscription_ID)
-        })
-        
         user_devs.push({
             device_ID: doc.device_ID,
             device_name: doc.device_name,
@@ -81,8 +73,7 @@ router.get('', async (req, res) => {
             vertical: doc.vertical,
             description: doc.description,
             locations: doc.locations,
-            streams: devStreams,
-            subscriptions: devSubs
+            streams: devStreams
         })
     }
     result['total_devices']
@@ -108,13 +99,6 @@ router.get('/:id', async (req, res) => {
             devStreams.push(stream.stream_ID)
         })
 
-    // get all devices subscriptions
-    var allDeviceSubs = await subscriptions.find({device_ID: doc.device_ID})
-    devSubs = []
-    await allDeviceSubs.forEach( function (sub) {
-        devSubs.push(sub.subscription_ID)
-    })
-
     res.status(200).send({
         device_ID: doc.device_ID,
         device_name: doc.device_name,
@@ -124,8 +108,7 @@ router.get('/:id', async (req, res) => {
         vertical: doc.vertical,
         description: doc.description,
         locations: doc.locations,
-        streams: devStreams,
-        subscriptions: devSubs
+        streams: devStreams
     })
 })
 

@@ -3,7 +3,7 @@ const uniqueValidator = require('mongoose-unique-validator')
 const config = require('config')
 
 const valuesSchema = new mongoose.Schema({
-    subscription_ID: {
+    streams_ID: {
         type: String,
         required: true,
         trim: true
