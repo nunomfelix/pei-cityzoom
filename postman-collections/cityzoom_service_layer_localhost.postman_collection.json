@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "0fdaf483-5f86-4914-bc6e-39654960c50f",
-		"name": "cityzoom_service_layer",
+		"name": "cityzoom_service_layer_localhost",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -263,17 +263,17 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n       \"name\": \"superuser\",\n       \"username\": \"superuser\",\n       \"email\": \"superuser@gmail.com\",\n       \"password\": \"12345\"\n }\n"
+					"raw": "{\n   \"name\": \"superuser\",\n   \"username\": \"superuser\",\n   \"email\": \"superuser@gmail.com\",\n   \"password\": \"12345\"\n}\n"
 				},
 				"url": {
-					"raw": "http://localhost:8002/user",
+					"raw": "http://localhost:8002/users",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "8002",
 					"path": [
-						"user"
+						"users"
 					]
 				}
 			},
@@ -444,7 +444,7 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:8002/streams/lul2/values",
+					"raw": "http://localhost:8002/streams/test_temperature_stream/values",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -452,7 +452,7 @@
 					"port": "8002",
 					"path": [
 						"streams",
-						"lul2",
+						"test_temperature_stream",
 						"values"
 					]
 				}

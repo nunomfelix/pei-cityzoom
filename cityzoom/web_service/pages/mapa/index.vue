@@ -596,7 +596,7 @@ export default {
             this.rainbowHeatMap.setSpectrum(stream.colors[0] , stream.colors[1]); 
 
             for(var i in this.getHeatmap.muns) {
-                const value = this.getHeatmap.muns[i][stream.name].count ? this.getHeatmap.muns[i][stream.name].average : null
+                const value = stream.name in this.getHeatmap.muns[i] && this.getHeatmap.muns[i][stream.name].count ? this.getHeatmap.muns[i][stream.name].average : null
                 this.municipalityValues[i].value = value
                 if(value) {
                     const index = (value - stream.min) * 100 / (stream.max - stream.min)
@@ -617,7 +617,7 @@ export default {
             }
 
             for(var i in this.getHeatmap.hexagons) {
-                const value = this.getHeatmap.hexagons[i][stream.name].count ? this.getHeatmap.hexagons[i][stream.name].average : null
+                const value = stream.name in this.getHeatmap.hexagons[i] && this.getHeatmap.hexagons[i][stream.name].count ? this.getHeatmap.hexagons[i][stream.name].average : null
                 this.hexagonValues[i].value = value
                 if(value) {
                     const index = (value - stream.min) * 100 / (stream.max - stream.min)
