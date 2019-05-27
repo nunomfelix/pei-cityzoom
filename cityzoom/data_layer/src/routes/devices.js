@@ -23,6 +23,7 @@ router.post('', validation(validators.validateCreateDevice, 'body', 'Invalid dev
         description: 'description' in req.body ? req.body.description : "",
         locations: []
     }
+    
     //Publishes the device in the broker
     const wasPublished = await producer.publish('cityzoom/devices',to_broker)
     if(!wasPublished){
@@ -30,7 +31,7 @@ router.post('', validation(validators.validateCreateDevice, 'body', 'Invalid dev
         return res.status(409).send({'Error':`Device ${to_broker.device_ID} already exists`}) 
     }
 
-    return res.status(200).send({ 
+    return res.status(201).send({ 
         status: 'Creation successful',
         device_ID: req.body['device_ID'],
         device_name: req.body['device_name'],
