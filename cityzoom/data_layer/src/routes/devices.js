@@ -1,9 +1,10 @@
 const express = require('express')
 const validators = require('../validation')
 const { validation } = require('../middleware')
+const devicesDebug = require('debug')('app:Devices')
 const devices = require('../db/models/devices')
 const streams = require('../db/models/streams')
-const devicesDebug = require('debug')('app:Devices')
+const values = require('../db/models/values')
 //Broker producer and consumer
 const producer = require('../producer')
 
@@ -118,6 +119,28 @@ router.delete('/:id', async (req, res) => {
     const deletion = await devices.deleteOne({device_ID:req.params.id})
     if (deletion.deletedCount == 0) { return res.status(404).send({'Status':'Not Found'})}
     res.status(204).send()
+})
+
+router.get('/:id/values', async (req,res) => {
+    const dev = await devices.findOne({device_ID:req.params.id})
+    if (!dev) { return res.status(404).send({'Status':'Not Found'}) }
+    // get all device streams
+    var allDeviceStreams = await streams.find({device_ID: dev.device_ID})
+    devStreams = []
+    allDeviceStreams.forEach((stream) => {
+        devStreams.push(stream.stream_ID)
+    })
+    let result = {}
+    for(let i in devStreams){
+        let s = devStreams[i]
+        var allFullValues = await values.find({stream_ID: devStreams[i]})
+        var allValues = []
+        allFullValues.forEach((v)=>{
+            allValues.push({value:v.value,created_at:v.created_at})
+        })
+        result[devStreams[i]] = allValues
+    }
+    res.status(200).send(result)
 })
 
 module.exports = router
