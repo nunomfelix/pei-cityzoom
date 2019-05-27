@@ -21,8 +21,6 @@ const valuesSchema = new mongoose.Schema({
 const Value = mongoose.model('Values',valuesSchema)
 
 router.post('',validation(validatePostValue,'body','Invalid Stream'), async (req,res)=>{
-    console.log(req.body)
-    
     
     let value = new Value({
         value  :   req.body.value,

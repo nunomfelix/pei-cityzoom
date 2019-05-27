@@ -3,21 +3,15 @@ const uniqueValidator = require('mongoose-unique-validator')
 const config = require('config')
 
 const munsSchema = new mongoose.Schema({
-    municipality: {
+    id: {
         type: String,
-        required: true,
-        default: "Aveiro"
+        required: true
     },
-    average: {
-        type: Number,
+    streams: {
+        type: Object,
         required: true,
-        default: 0
+        default: {}
     },
-    values_til_now: {
-        type: Number,
-        required: true,
-        default: 0
-    }
 })
 
 munsSchema.plugin(uniqueValidator)

@@ -4,6 +4,8 @@ const { validation } = require('../middleware')
 const devices = require('../db/models/devices')
 const streams = require('../db/models/streams')
 const values = require('../db/models/values')
+const Hexagons = require('../db/models/hexagons')
+const Muns = require('../db/models/municipalities')
 const streamsDebug = require('debug')('app:Streams')
 //Broker connection
 const producer = require('../producer')
@@ -78,6 +80,21 @@ router.get('', async (req, res) => {
     result['user_streams'] = user_streams
     
     res.status(200).send(result)
+})
+
+router.get('/heatmap', async (req, res) => {
+    streamsDebug('[DEBUG] Fetching Heatmap Values')
+    
+    const hexagons = (await Hexagons.find({}, 'id streams')).reduce((map, hex) => {
+        map[hex.id] = hex.streams
+        return map
+    }, {})
+    const muns = (await Muns.find({}, 'id streams')).reduce((map, mun) => {
+        map[mun.id] = mun.streams
+        return map
+    }, {})
+    
+    res.status(200).send({hexagons, muns})
 })
 
 // get stream by ID

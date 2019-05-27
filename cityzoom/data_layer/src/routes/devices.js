@@ -75,7 +75,8 @@ router.get('', async (req, res) => {
             vertical: doc.vertical,
             description: doc.description,
             locations: doc.locations,
-            streams: devStreams
+            streams: devStreams,
+            hexagon: doc.hexagon
         })
     }
     result['total_devices']
