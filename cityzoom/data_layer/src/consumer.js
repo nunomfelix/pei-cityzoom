@@ -10,7 +10,7 @@ const rootTopic = config.get('BROKER_ROOT_TOPIC')
 require('./db/mongoose') 
 const Device = require('./db/models/devices')
 const Stream = require('./db/models/streams')
-const Subscription = require('./db/models/subscriptions')
+const Value = require('./db/models/values')
 
 client.on('connect',()=>{
     consumerDebug('Listening to MQTT broker!')
@@ -42,13 +42,23 @@ client.on('message',async (topic,data,info)=>{
             }).catch(()=>{
                 consumerDebug('Error publishing stream')
             })
-    }//If a new subscription was added
-    else if(topic == rootTopic+'subscriptions'){
-        await Subscription.create(data_json)
-            .then(() => {
-                consumerDebug('Subscription created with success')
+    }else if(topic == rootTopic+'values'){
+        const stream = await Stream.findOne({stream_ID:data_json.stream_ID})
+        let dev = await Device.findOne({device_ID:stream.device_ID}) 
+        if (dev.mobile || ( !dev.mobile && dev.locations.length == 0)) {
+            await Device.updateOne({device_ID:stream.device_ID}, {$push: {locations: {timestamp: data_json.timestamp, latitude: data_json.latitude, longitude: data_json.longitude}}})
+            .then(()=>{
+                consumerDebug(`Updated the location of device ${stream.device_ID}`)
             }).catch(()=>{
-                consumerDebug('Error publishing subscription')
+                consumerDebug(`Error updating the location of device ${stream.device_ID}`)
             })
+        }
+        //Saves the value in the database
+        Value.create(data_json).then(()=>{
+            consumerDebug('Values published in the database')
+        }).catch(()=>{
+            consumerDebug('Error publishing value in the database')
+        })
+
     }
 })
