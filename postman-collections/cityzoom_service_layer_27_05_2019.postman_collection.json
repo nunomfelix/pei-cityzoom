@@ -1,0 +1,690 @@
+{
+	"info": {
+		"_postman_id": "0fdaf483-5f86-4914-bc6e-39654960c50f",
+		"name": "cityzoom_service_layer",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "create device OK",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "50353110-4957-4c66-b8ca-07993c6aed80",
+						"exec": [
+							"const echoPostRequest = {",
+							"  url: 'http://localhost:8002/user/login',",
+							"  method: 'POST',",
+							"  header: 'Content-Type:application/json',",
+							"  body: {",
+							"    mode: 'application/json',",
+							"    raw: JSON.stringify({",
+							"        username: 'superuser',",
+							"        password: '12345'",
+							"    })",
+							"  }",
+							"};",
+							"",
+							"pm.sendRequest(echoPostRequest, function (err, response) {",
+							"    var responseJson = response.json();",
+							"    console.log(response)",
+							"    pm.environment.set(\"token\", responseJson.jwt);",
+							"    console.log(pm.environment.get(\"token\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"device_ID\": \"mobile_test_device\",\n  \"device_name\" : \"mydevice123\",\n  \"description\": \"test device description\",\n  \"vertical\": \"temperature\",\n  \"mobile\": true,\n  \"provider\" : \"IT\",\n  \"municipality\": \"Esgueira\"\n}\n"
+				},
+				"url": {
+					"raw": "http://localhost:8002/devices",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8002",
+					"path": [
+						"devices"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get device by id OK",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "aafb948b-9789-452d-ac5a-090d64693218",
+						"exec": [
+							"const echoPostRequest = {",
+							"  url: 'http://localhost:8002/user/login',",
+							"  method: 'POST',",
+							"  header: 'Content-Type:application/json',",
+							"  body: {",
+							"    mode: 'application/json',",
+							"    raw: JSON.stringify({",
+							"        username: 'superuser',",
+							"        password: '12345'",
+							"    })",
+							"  }",
+							"};",
+							"",
+							"pm.sendRequest(echoPostRequest, function (err, response) {",
+							"    var responseJson = response.json();",
+							"    console.log(response)",
+							"    pm.environment.set(\"token\", responseJson.jwt);",
+							"    console.log(pm.environment.get(\"token\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8002/devices/mobile_test_device",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8002",
+					"path": [
+						"devices",
+						"mobile_test_device"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get devices OK",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "7f10edd5-9854-4774-aa20-7fbe79a4b7eb",
+						"exec": [
+							"const echoPostRequest = {",
+							"  url: 'http://localhost:8002/user/login',",
+							"  method: 'POST',",
+							"  header: 'Content-Type:application/json',",
+							"  body: {",
+							"    mode: 'application/json',",
+							"    raw: JSON.stringify({",
+							"        username: 'superuser',",
+							"        password: '12345'",
+							"    })",
+							"  }",
+							"};",
+							"",
+							"pm.sendRequest(echoPostRequest, function (err, response) {",
+							"    var responseJson = response.json();",
+							"    console.log(response)",
+							"    pm.environment.set(\"token\", responseJson.jwt);",
+							"    console.log(pm.environment.get(\"token\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8002/devices",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8002",
+					"path": [
+						"devices"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete device OK",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "cd62c386-911c-40e7-927c-beadefa85711",
+						"exec": [
+							"const echoPostRequest = {",
+							"  url: 'http://localhost:8002/user/login',",
+							"  method: 'POST',",
+							"  header: 'Content-Type:application/json',",
+							"  body: {",
+							"    mode: 'application/json',",
+							"    raw: JSON.stringify({",
+							"        username: 'superuser',",
+							"        password: '12345'",
+							"    })",
+							"  }",
+							"};",
+							"",
+							"pm.sendRequest(echoPostRequest, function (err, response) {",
+							"    var responseJson = response.json();",
+							"    console.log(response)",
+							"    pm.environment.set(\"token\", responseJson.jwt);",
+							"    console.log(pm.environment.get(\"token\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8002/devices/mobile_test_device",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8002",
+					"path": [
+						"devices",
+						"mobile_test_device"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "register user OK",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n       \"name\": \"superuser\",\n       \"username\": \"superuser\",\n       \"email\": \"superuser@gmail.com\",\n       \"password\": \"12345\"\n }\n"
+				},
+				"url": {
+					"raw": "http://localhost:8002/user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8002",
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get stream by ID OK",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "36910d07-c13f-4ae1-9818-6845477a2663",
+						"exec": [
+							"const echoPostRequest = {",
+							"  url: 'http://localhost:8002/user/login',",
+							"  method: 'POST',",
+							"  header: 'Content-Type:application/json',",
+							"  body: {",
+							"    mode: 'application/json',",
+							"    raw: JSON.stringify({",
+							"        username: 'superuser',",
+							"        password: '12345'",
+							"    })",
+							"  }",
+							"};",
+							"",
+							"pm.sendRequest(echoPostRequest, function (err, response) {",
+							"    var responseJson = response.json();",
+							"    console.log(response)",
+							"    pm.environment.set(\"token\", responseJson.jwt);",
+							"    console.log(pm.environment.get(\"token\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8002/streams/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8002",
+					"path": [
+						"streams",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get all streams OK",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "e87f7a5a-1f17-4c46-bbaf-e06a3c2e249e",
+						"exec": [
+							"const echoPostRequest = {",
+							"  url: 'http://localhost:8002/user/login',",
+							"  method: 'POST',",
+							"  header: 'Content-Type:application/json',",
+							"  body: {",
+							"    mode: 'application/json',",
+							"    raw: JSON.stringify({",
+							"        username: 'superuser',",
+							"        password: '12345'",
+							"    })",
+							"  }",
+							"};",
+							"",
+							"pm.sendRequest(echoPostRequest, function (err, response) {",
+							"    var responseJson = response.json();",
+							"    console.log(response)",
+							"    pm.environment.set(\"token\", responseJson.jwt);",
+							"    console.log(pm.environment.get(\"token\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8002/streams",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8002",
+					"path": [
+						"streams"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get stream values",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "35692778-246e-426a-ba93-465054757f9f",
+						"exec": [
+							"const echoPostRequest = {",
+							"  url: 'http://localhost:8002/user/login',",
+							"  method: 'POST',",
+							"  header: 'Content-Type:application/json',",
+							"  body: {",
+							"    mode: 'application/json',",
+							"    raw: JSON.stringify({",
+							"        username: 'superuser',",
+							"        password: '12345'",
+							"    })",
+							"  }",
+							"};",
+							"",
+							"pm.sendRequest(echoPostRequest, function (err, response) {",
+							"    var responseJson = response.json();",
+							"    console.log(response)",
+							"    pm.environment.set(\"token\", responseJson.jwt);",
+							"    console.log(pm.environment.get(\"token\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8002/streams/lul2/values",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8002",
+					"path": [
+						"streams",
+						"lul2",
+						"values"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login OK",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "c2013157-bf05-4337-927c-d7809c8441d8",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"username\": \"superuser\",\n  \"password\": \"12345\"\n}\n"
+				},
+				"url": {
+					"raw": "http://localhost:8002/user/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8002",
+					"path": [
+						"user",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get device values",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "3428e396-7eb5-4416-b099-c0c195a170dd",
+						"exec": [
+							"const echoPostRequest = {",
+							"  url: 'http://localhost:8002/user/login',",
+							"  method: 'POST',",
+							"  header: 'Content-Type:application/json',",
+							"  body: {",
+							"    mode: 'application/json',",
+							"    raw: JSON.stringify({",
+							"        username: 'superuser',",
+							"        password: '12345'",
+							"    })",
+							"  }",
+							"};",
+							"",
+							"pm.sendRequest(echoPostRequest, function (err, response) {",
+							"    var responseJson = response.json();",
+							"    console.log(response)",
+							"    pm.environment.set(\"token\", responseJson.jwt);",
+							"    console.log(pm.environment.get(\"token\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8002/device/drone3d/values",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8002",
+					"path": [
+						"device",
+						"drone3d",
+						"values"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get values from device",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "b5034aac-86f9-4446-955d-b72118c0cada",
+						"exec": [
+							"const echoPostRequest = {",
+							"  url: 'http://localhost:8002/user/login',",
+							"  method: 'POST',",
+							"  header: 'Content-Type:application/json',",
+							"  body: {",
+							"    mode: 'application/json',",
+							"    raw: JSON.stringify({",
+							"        username: 'superuser',",
+							"        password: '12345'",
+							"    })",
+							"  }",
+							"};",
+							"",
+							"pm.sendRequest(echoPostRequest, function (err, response) {",
+							"    var responseJson = response.json();",
+							"    console.log(response)",
+							"    pm.environment.set(\"token\", responseJson.jwt);",
+							"    console.log(pm.environment.get(\"token\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8002/device/drone3d/values",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8002",
+					"path": [
+						"device",
+						"drone3d",
+						"values"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get verticals OK",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "61254d88-199f-4521-a043-8fd986e54dbd",
+						"exec": [
+							"const echoPostRequest = {",
+							"  url: 'http://localhost:8002/user/login',",
+							"  method: 'POST',",
+							"  header: 'Content-Type:application/json',",
+							"  body: {",
+							"    mode: 'application/json',",
+							"    raw: JSON.stringify({",
+							"        username: 'eminem',",
+							"        password: '12345'",
+							"    })",
+							"  }",
+							"};",
+							"",
+							"pm.sendRequest(echoPostRequest, function (err, response) {",
+							"    var responseJson = response.json();",
+							"    pm.environment.set(\"token\", responseJson.jwt);",
+							"    console.log(pm.environment.get(\"token\"));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8002/vertical",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8002",
+					"path": [
+						"vertical"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
