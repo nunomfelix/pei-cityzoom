@@ -1,22 +1,22 @@
 <template>
     <div class="mapMargin mapHeight" style="position:relative">
         <div class="mapHeight" id="map"></div>
-        <div v-if="selected_county" :style="{ 'background-color': municipalityValues[selected_county.get('name_2')].color}" class="ol-popup top">
+        <div v-if="selected_county" :style="{ 'background-color': municipalityValues[selected_county.get('id')].color}" class="ol-popup top">
             <div style="background-color: rgba(0,0,0, .5)">
-                <span class="big"> {{selected_county.get('name_2')}} </span>
-                <span class="big"> {{municipalityValues[selected_county.get('name_2')].value.toFixed(2)}} {{getVerticals[selected_vertical].streams[selected_stream].unit}}</span>
+                <span class="big"> {{selected_county.get('Freguesia')}} </span>
+                <span class="big"> {{municipalityValues[selected_county.get('id')].value.toFixed(2)}} {{getVerticals[selected_vertical].streams[selected_stream].unit}}</span>
                 <div class="scale-band-wrapper">
-                    <div :class="{selected: index == municipalityValues[selected_county.get('name_2')].index}" v-for="index in 100" :key="index" :style="{'background-color': '#' + rainbowHeatMap.colourAt(index)}"></div>
+                    <div :class="{selected: index == municipalityValues[selected_county.get('id')].index}" v-for="index in 100" :key="index" :style="{'background-color': '#' + rainbowHeatMap.colourAt(index)}"></div>
                 </div>
             </div>
         </div>
 
-        <div id="hover_popup" class="ol-popup" :style="{ 'background-color': hovered_geo ? municipalityValues[hovered_geo.get('name_2')].color : 'none'}">
+        <div id="hover_popup" class="ol-popup" :style="{ 'background-color': hovered_geo ? municipalityValues[hovered_geo.get('id')].color : 'none'}">
             <div v-if="hovered_geo" style="background-color: rgba(0,0,0, .5)">
-                <span class="normal"> {{hovered_geo.get('name_2')}} </span>
-                <span class="normal"> {{municipalityValues[hovered_geo.get('name_2')].value.toFixed(2)}} {{getVerticals[selected_vertical].streams[selected_stream].unit}}</span>
+                <span class="normal"> {{hovered_geo.get('Freguesia')}} </span>
+                <span class="normal"> {{municipalityValues[hovered_geo.get('id')].value.toFixed(2)}} {{getVerticals[selected_vertical].streams[selected_stream].unit}}</span>
                 <div class="scale-band-wrapper">
-                    <div :class="{selected: index == municipalityValues[hovered_geo.get('name_2')].index}" v-for="index in 100" :key="index" :style="{'background-color': '#' + rainbowHeatMap.colourAt(index)}"></div>
+                    <div :class="{selected: index == municipalityValues[hovered_geo.get('id')].index}" v-for="index in 100" :key="index" :style="{'background-color': '#' + rainbowHeatMap.colourAt(index)}"></div>
                 </div>
             </div>
         </div>
@@ -268,13 +268,13 @@ export default {
         }) 
 
         this.hex_layer = new layer.Vector({
-            source: new source.Vector(),
-            style: (feature) => {
-                return this.geoStyle.default
-            },
+            source: new source.Vector({
+                projection : 'EPSG:3857',
+                url: 'concelho_aveiro_hex.geojson',
+                format: new this.req.format.GeoJSON()
+            }),
             renderBuffer: window.innerWidth,
             updateWhileAnimating: true,
-
         })
 
         const centerpos = [-8.661682, 40.6331731];
@@ -288,8 +288,8 @@ export default {
                     source: new source.OSM(),
                 }),
                 this.devices_layer, 
-                this.geo_layer, 
-                this.hex_layer,      
+                this.hex_layer,  
+                this.geo_layer,     
             ],
             overlays: [this.hoverOverlay],
             view: new this.req.Ol.View({
@@ -300,24 +300,24 @@ export default {
             })
         })
 
-        const res = await this.$axios.get('/a.json')
-        for(var munic in res.data) {
-            let count = 0
-            for(var area of res.data[munic]) {
-                for(var hex of area) {
-                    const pol = hex.map(p => this.req.proj.transform(p, 'EPSG:4326', 'EPSG:3857'))
-                    const a = new Feature({
-                        geometry: new this.req.geom.Polygon([pol]),
-                        municipality: munic,
-                        id: munic + count++
-                    })
-                    //this.hex_layer.getSource().addFeature(a)
-                }
-            }
-        }
+        // const res = await this.$axios.get('/a.json')
+        // for(var munic in res.data) {
+        //     let count = 0
+        //     for(var area of res.data[munic]) {
+        //         for(var hex of area) {
+        //             const pol = hex.map(p => this.req.proj.transform(p, 'EPSG:4326', 'EPSG:3857'))
+        //             const a = new Feature({
+        //                 geometry: new this.req.geom.Polygon([pol]),
+        //                 municipality: munic,
+        //                 id: munic + count++
+        //             })
+        //             //this.hex_layer.getSource().addFeature(a)
+        //         }
+        //     }
+        // }
 
-        // this.geo_layer.getSource().on('change', () => {
-        //     if(this.geo_layer.getSource().getState() == 'ready' && !this.loaded) {
+        this.hex_layer.getSource().on('change', () => {
+            if(this.hex_layer.getSource().getState() == 'ready' && !this.loaded) {
                 this.loaded = true
                 this.rainbowHeatMap = new Rainbow()
 
@@ -326,6 +326,7 @@ export default {
                     this.geoJsonExtent = this.req.extent.extend(this.geoJsonExtent, feature.getGeometry().getExtent())
                 })
 
+                console.log(this.hex_layer.getSource().getFeatures().length)
                 this.hex_layer.getSource().getFeatures().forEach((feature) => {
                     
                     const tmp = Math.random() * 35 + 5;
@@ -362,8 +363,8 @@ export default {
                 },0)
 
                 this.selectVertical(0)
-        //     }
-        // })
+            }
+        })
 
         const hover_interaction = new interaction.Select({
             condition: (e) => {
@@ -392,7 +393,7 @@ export default {
                 this.hoverOverlay.setPosition([center[0], (center[1] + bottom[1]) / 2]) 
                 if(this.selected_county != null) {
                     for(var device of this.getDevices) {
-                        if(device.municipality == this.hovered_geo.get('name_2') && this.hovered_geo.get('name_2') != this.selected_county && device.vertical.includes(this.getVerticals[this.selected_vertical].name)) {
+                        if(device.municipality == this.hovered_geo.get('id') && this.hovered_geo.get('id') != this.selected_county && device.vertical.includes(this.getVerticals[this.selected_vertical].name)) {
                             var location = device.mobile ? [device.locations[device.locations.length - 1].latitude, device.locations[device.locations.length - 1].longitude] :
                                                 [device.locations[0].latitude, device.locations[0].longitude]
                             const feat = new Feature({
@@ -405,7 +406,7 @@ export default {
                     }
                 }
                 for(var feat of this.hex_layer.getSource().getFeatures()) {
-                    if(feat.get('municipality') == this.hovered_geo.get('name_2')) {
+                    if(feat.get('municipality') == this.hovered_geo.get('id')) {
                         this.hex_layer.getSource().removeFeature(feat)
                         this.hidden_hex.push(feat)
                     }
@@ -429,7 +430,7 @@ export default {
         click_interaction.on('select', (e) => {
             document.body.style.cursor = "default"
             const geo_feature = e.selected[0]
-            if(geo_feature.get('name_2') && geo_feature != this.selected_county) {
+            if(geo_feature.get('id') && geo_feature != this.selected_county) {
                 this.map.setView(new this.req.Ol.View({
                     center: this.map.getView().getCenter(),
                     zoom: this.map.getView().getZoom(),
@@ -443,7 +444,7 @@ export default {
                 this.devices_layer.getSource().clear()
 
                 for(var device of this.getDevices) {
-                    if(device.municipality == geo_feature.get('name_2') && device.vertical.includes(this.getVerticals[this.selected_vertical].name)) {
+                    if(device.municipality == geo_feature.get('id') && device.vertical.includes(this.getVerticals[this.selected_vertical].name)) {
                         var location = device.mobile ? [device.locations[device.locations.length - 1].latitude, device.locations[device.locations.length - 1].longitude] :
                                             [device.locations[0].latitude, device.locations[0].longitude]
                         const feat = new Feature({
@@ -506,7 +507,7 @@ export default {
         },
         clearGeoDevices(geo) {
             for(var feature of this.shown_features) {
-                if(this.getDevices.find(d => d.device_id == feature.get('id')).municipality == geo.get('name_2')) {
+                if(this.getDevices.find(d => d.device_id == feature.get('id')).municipality == geo.get('id')) {
                     this.devices_layer.getSource().removeFeature(feature)
                     this.shown_features.splice(this.shown_features.findIndex(f => f == feature), 1)
                 }
@@ -515,7 +516,7 @@ export default {
         addHiddenHex(geo) {
             const tmp = [...this.hidden_hex]
             for(var feature of tmp) {
-                if(feature.get('municipality') == geo.get('name_2')) {
+                if(feature.get('municipality') == geo.get('id')) {
                     this.hex_layer.getSource().addFeature(feature)
                     this.hidden_hex.splice(this.hidden_hex.findIndex(f => f == feature), 1)
                 }
@@ -612,11 +613,11 @@ export default {
                 this.hexagonValues[i].color = '#' + this.rainbowHeatMap.colourAt(Math.round(tmp));
                 this.hexagonValues[i].style = new this.req.style.Style({
                     fill: new this.req.style.Fill({
-                        color: this.hexagonValues[i].color + 'D0'
+                        color: this.hexagonValues[i].color + 'FF',
                     }),
                     stroke: new this.req.style.Stroke({
                         color: 'black',
-                        width: this.map.getView().getZoom() / 20 * 2.5 * .2
+                        width: this.map.getView().getZoom() / 20 * 2.5 * .1
                     })
                 })
 
