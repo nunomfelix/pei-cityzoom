@@ -42,7 +42,9 @@ async function authentication(req, res, next) {
 function error(err, req, res, next) {
     fs.appendFileSync('logfile.log', new Date().toISOString() + " - " + err.message + ', requestpath: ' + req.originalUrl + ', request body: ' + JSON.stringify(req.body) + '\n');
     errorDebug(err.message + ', requestpath: ' + req.originalUrl + ', request body: ' + JSON.stringify(req.body))
-    res.status(500).send('Internal Server Error')
+    if(!err.response) return res.status(500).send('Internal Server Error')
+    if(err.response.request.res.statusCode != 500) return res.status(err.response.request.res.statusCode).send(err.response.data)
+    return res.status(500).send('Internal Server Error')
 }
 
 module.exports = {

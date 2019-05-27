@@ -11,8 +11,7 @@ const router = new express.Router()
 
 /* Contains all device endpoints */
 
-router.post('', [validationMiddleware(validateCreateDevice, 'body', 'Invalid device'), authentication], async (req,res) => {
-    console.log(req.body) 
+router.post('', [authentication,validationMiddleware(validateCreateDevice, 'body')], async (req,res) => {
     const response = await axios.post(config.get('DATA_LAYER_URL') + '/czb/devices', req.body)
     res.send(response.data)
 })

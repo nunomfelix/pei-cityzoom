@@ -22,7 +22,7 @@ router.get('',
     [authentication, validationMiddleware(validateGetAllStreams, 'query')],
     async (req, res) => {
         var result = {}
-        result = await axios.get(config.get('DATA_LAYER_URL') + '/czb/stream/list', { params: req.query })
+        result = await axios.get(config.get('DATA_LAYER_URL') + '/czb/streams/', { params: req.query })
         streamDebug(`Streams loaded with query ${JSON.stringify(req.query)}`)
         res.status(result.status).send(result.data)
     }
@@ -38,16 +38,16 @@ router.get('',
         [404] Stream not found
         [500] Internal server error
 */
-router.get('/:stream_name',
+router.get('/:stream_ID',
     [authentication, validationMiddleware(validateGetStreamByID, 'params')],
     async (req, res) => {
-        result = await axios.get(config.get('DATA_LAYER_URL') + '/czb/stream/' + req.params.stream_name)
-        streamDebug(`Stream loaded with name ${JSON.stringify(req.params.stream_name)}`)
+        result = await axios.get(config.get('DATA_LAYER_URL') + '/czb/streams/' + req.params.stream_ID)
+        streamDebug(`Stream loaded with name ${JSON.stringify(req.params.stream_ID)}`)
         res.status(result.status).send(result.data)
     }
 )
 
-/*  Gets data from a stream
+/*  Gets data from a streamuser/login
 
     req: no req
     returns: the values from the specified stream
