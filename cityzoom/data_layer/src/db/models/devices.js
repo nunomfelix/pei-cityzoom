@@ -14,11 +14,11 @@ const deviceSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    vertical: {
+    vertical: [{
         type: String,
         required: true,
         trim: true
-    },
+    }],
     mobile: {
         type: Boolean,
         required: true,
