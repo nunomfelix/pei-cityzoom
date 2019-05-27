@@ -60,7 +60,7 @@ router.get('/:stream_ID',
 router.get('/:stream/values',
     [authentication, validationMiddleware(validateGetDataFromStream, 'params')],
     async (req, res) => {
-        const result = await axios.get(config.get('DATA_LAYER_URL') + '/czb/stream/values', { params: req.params })
+        const result = await axios.get(config.get('DATA_LAYER_URL') + '/czb/streams/values', { params: req.params })
         streamDebug(`Retrieved values from stream ${JSON.stringify(req.params.stream)}`)
         res.send(result.data)
     }
