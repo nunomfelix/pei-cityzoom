@@ -126,7 +126,7 @@ export default{
         try {
             const res = await axios({
                 method: 'get',
-                url: getUrl() + '/stream',
+                url: getUrl() + '/streams',
                 headers: {
                     Authorization: state.jwt
                 }
@@ -143,7 +143,7 @@ export default{
         try {
             const res = await axios({
                 method: 'get',
-                url: getUrl() + '/stream/' + payload.name+'/values',
+                url: getUrl() + '/streams/' + payload.name+'/values',
                 headers: {
                     Authorization: state.jwt
                 }

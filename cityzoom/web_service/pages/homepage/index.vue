@@ -45,8 +45,8 @@
                 :ref="item.i"
                 api-key="7fbda2874f6ebf17ef4d31443696cd68"
                 title="Weather"
-                :latitude="position ? position.coords.latitude : null"
-                :longitude="position ? position.coords.longitude: null"
+                :latitude="position ? position.coords.latitude.toString() : null"
+                :longitude="position ? position.coords.longitude.toString(): null"
                 language="pt"
                 units="uk">
               </WeatherWidget>
@@ -102,7 +102,11 @@ export default {
     },
     getLocation(){
       if (navigator.geolocation){
-        navigator.geolocation.getCurrentPosition((position) => { this.position = position; });
+        navigator.geolocation.getCurrentPosition((position) => { 
+          this.position = position; 
+          this.position.coords.latitude = this.position.coords.latitude.toString()
+          this.position.coords.longitude = this.position.Coordinates.longitude.toString()
+          });
       }
     }
   }
