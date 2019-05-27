@@ -3,6 +3,7 @@ const validators = require('../validation')
 const { validation } = require('../middleware')
 const devices = require('../db/models/devices')
 const streams = require('../db/models/streams')
+const values = require('../db/models/values')
 const streamsDebug = require('debug')('app:Streams')
 //Broker connection
 const producer = require('../producer')
@@ -114,7 +115,7 @@ router.get('/:id/values', async (req, res) => {
         return res.status(400).send({error: 'Bad interval defined'})
     }
     
-    let count = await streams.countDocuments({stream_id:req.params.id})
+    let count = await streams.countDocuments({stream_ID:req.params.id})
     if (count == 0){
         streamsDebug(`[ERROR] Stream ${req.params.id} not found`)
         return res.status(404).send({'Error':`Stream ${req.params.id} not found`})

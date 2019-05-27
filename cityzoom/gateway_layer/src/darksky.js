@@ -43,7 +43,7 @@ async function create_Stream(streamID, streamName, deviceID, type) {
         }).catch( (err)=> {console.log("Failed to create stream with message: " + err)})
 }
 
-async function create_Subscription(subID, subName, streamID, deviceID) {
+/* async function create_Subscription(subID, subName, streamID, deviceID) {
     await axios.post('http://localhost:8001/czb/subscriptions', {
             "subscription_ID": subID,
             "subscription_name" : subName,
@@ -51,10 +51,10 @@ async function create_Subscription(subID, subName, streamID, deviceID) {
             "stream_ID": streamID,
             "device_ID": deviceID
         }).catch( (err)=> {console.log("Failed to create subscription with message: " + err)})
-}
+} */
 
-async function post_Values(subID, value, lat, long) {
-    await axios.post('http://localhost:8001/czb/subscriptions/' + subID + '/values', {
+async function post_Values(streamID, value, lat, long) {
+    await axios.post('http://localhost:8001/czb/streams/' + streamID + '/values', {
             "value": value,
             "latitude": lat,
             "longitude": long
@@ -65,19 +65,17 @@ function sleep(ms) {
 return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-/* async function main() {
+async function main() {
     await create_Device("12345qwerty", "12345qwerty", "Temperature", "Aveiro")
     await sleep(2000)
     await create_Stream("12345qwerty", "12345qwerty" ,"12345qwerty", "Temperature")
     await sleep(2000)
-    await create_Subscription("12345qwerty", "12345qwerty", "12345qwerty" ,"12345qwerty")
-    await sleep(2000)
     await post_Values("12345qwerty", 25, 41.2373, -8.401238)
 } 
 
-main() */
+main()
 
-(async function main() {
+/* (async function main() {
     var obj = JSON.parse(fs.readFileSync('a.json', 'utf8'))
     //for every municipality in aveiro
     for(mun in obj){
@@ -105,12 +103,10 @@ main() */
                 await sleep(2000)
                 await create_Stream(stream, stream ,device, "Temperature")
                 await sleep(2000)
-                await create_Subscription(subscription, subscription, stream ,device)
-                await sleep(2000)
                 await post_Values(subscription, data[0].temperature, data[1].lat, data[1].long)
             }
         }
 
     }
 
-})()
+})() */
