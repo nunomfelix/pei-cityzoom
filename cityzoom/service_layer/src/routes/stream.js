@@ -57,10 +57,10 @@ router.get('/:stream_ID',
         [404] Stream not found
         [500] Internal server error
 */
-router.get('/:stream/values',
+router.get('/:stream_ID/values',
     [authentication, validationMiddleware(validateGetDataFromStream, 'params')],
     async (req, res) => {
-        const result = await axios.get(config.get('DATA_LAYER_URL') + '/czb/stream/values', { params: req.params })
+        const result = await axios.get(config.get('DATA_LAYER_URL') + '/czb/streams/'+req.params.stream_ID+'/values')
         streamDebug(`Retrieved values from stream ${JSON.stringify(req.params.stream)}`)
         res.send(result.data)
     }

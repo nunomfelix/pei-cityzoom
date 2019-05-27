@@ -44,14 +44,14 @@ function validateGetAllStreams(object) {
 
 function validateGetStreamByID(object) {
     const schema = Joi.object().keys({
-        stream_name: Joi.string().required()
+        stream_ID: Joi.string().required()
     })
     return Joi.validate(object, schema)
 }
 
 function validateGetDataFromStream(object) {
     const schema = Joi.object().keys({
-        stream: Joi.string().required(),
+        stream_ID: Joi.string().required(),
         interval_start: Joi.number().integer(),
         interval_end: Joi.number().integer()
     })
@@ -66,7 +66,7 @@ function validateCreateDevice(object) {
         description: Joi.string().optional(),
         vertical: Joi.string().required(),
         mobile: Joi.boolean().required(),
-        municipality: joi.string().optional(),
+        municipality: Joi.string().optional(),
         provider: Joi.string().required()
     })
     return Joi.validate(object, schema)
