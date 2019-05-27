@@ -43,7 +43,7 @@ client.on('message',async (topic,data,info)=>{
         try {
             const res = await Stream.create(data_json)
             consumerDebug('Stream created with success')
-        } catch {
+        } catch(e) {
             consumerDebug('Error publishing stream')
         }
     }else if(topic == rootTopic+'values'){
@@ -58,8 +58,10 @@ client.on('message',async (topic,data,info)=>{
             })
         }
 
-        var hexa = !dev.mobile && dev.hexagon ? await Hexas.findOne({id: dev.hexagon}) : null
+        /*var hexa = !dev.mobile && dev.hexagon ? await Hexas.findOne({id: dev.hexagon}) : null
         
+        console.log(dev)
+
         if(!hexa) {
             const hexagons = await Hexas.find()
             var a = turf.point([data_json.longitude, data_json.latitude])
@@ -71,7 +73,7 @@ client.on('message',async (topic,data,info)=>{
                 }
             }
         }
-
+        
         hexa.streams = {
             ...hexa.streams,
             [stream.stream_name]: {
@@ -89,7 +91,7 @@ client.on('message',async (topic,data,info)=>{
         }
         await Device.updateOne({device_ID: stream.device_ID}, {hexagon: hexa.id})
         await hexa.save()
-        await mun.save()
+        await mun.save()*/
 
         //Saves the value in the database
         Values.create(data_json).then(()=>{
@@ -97,6 +99,5 @@ client.on('message',async (topic,data,info)=>{
         }).catch((err)=>{
             consumerDebug(err)
         })
-
     }
 })

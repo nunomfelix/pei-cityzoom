@@ -15,9 +15,9 @@ mongoose.connect(connectionUrl+database, {
     useNewUrlParser: true,
     useCreateIndex: true
 }, async () => {
-    await devices.deleteMany({})
-    await streams.deleteMany({})
-    await values.deleteMany({})
+    //await devices.deleteMany({})
+    //await streams.deleteMany({})
+    //await values.deleteMany({})
     await muns.deleteMany({})
     fs.readFile('verticals.json', async (err, data) => { 
         await verticals.deleteMany({}) 
