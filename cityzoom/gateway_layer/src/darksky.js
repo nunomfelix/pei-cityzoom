@@ -1,7 +1,7 @@
 const axios = require('axios')
 const fs = require('fs')
 
-async function get_darksky_data(lat, long, key = 'f962475109da7278cd8ca1ba22186bee') {
+async function get_darksky_data(lat, long, key = '7fbda2874f6ebf17ef4d31443696cd68') {
 
     var tmp = {}
     var city_info = await axios.get(`https://api.darksky.net/forecast/${key}/` + lat + ',' + long + '?units=si')
@@ -64,15 +64,17 @@ function sleep(ms) {
 return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-/* async function test(_posts) {
+/*
+async function test() {
     await create_Device("12345qwerty", "12345qwerty", "Temperature", "Aveiro")
     await sleep(2000)
     await create_Stream("12345qwerty", "12345qwerty" ,"12345qwerty", "Temperature")
     await sleep(2000)
     await post_Values("12345qwerty", 25, 41.2373, -8.401238)
-} 
+}
 
-test_posts() */
+test();
+*/
 
 (async function main() {
     const devices = []
@@ -123,10 +125,10 @@ test_posts() */
 
     for(var lol = 0; lol < 10; lol++) {
         for(var d of devices) {
-            var data = await get_darksky_data(d.center_lat, d.center_long)
+            var data = get_darksky_data(d.center_lat, d.center_long)
             //var data = JSON.parse(fs.readFileSync('kappa.json', 'utf8'))
             for(var stream of devicesMap[d.device]) {
-                await post_Values(stream.stream_id, data[0][stream.stream], d.center_lat, d.center_long)
+               await post_Values(stream.stream_id, data[0][stream.stream], d.center_lat, d.center_long)
             }
         }
         await sleep(1800000*.95)

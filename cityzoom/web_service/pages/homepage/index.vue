@@ -33,12 +33,26 @@
           <div v-if="item.type=='series'">
             <SeriesGraph :ref="item.i" :data="item.data && item.data == 'fake' ? null : data" :name="item.i"/>
           </div>
-          <div v-if="item.type=='stacked'">
+          <div v-else-if="item.type=='stacked'">
             <StackedBar :ref="item.i" :name="item.i"/>
           </div>
-          <div v-if="item.type=='lines'">
+          <div v-else-if="item.type=='lines'">
+            <!--
             <LineGraph :ref="item.i" :name="item.i" :values="values"/>
+            -->
+            
+            <div class="small">
+              <LineChart :ref="item.i" :name="item.i" :chartData="datacollectionline" :options="options"/>
+              <button @click="fillDataLine()">Randomize</button>
+            </div>
+            
           </div>
+          
+          <div v-else-if="item.type" class="small">
+              <BarChart/>
+          </div>
+    </div>
+          <!--
           <div v-if="item.type=='widget_weather'">
             <no-ssr>
               <WeatherWidget 
@@ -52,7 +66,8 @@
               </WeatherWidget>
             </no-ssr>
           </div>
-        </div>
+          -->
+        
       </grid-item>
     </grid-layout>
   </div>
@@ -60,12 +75,14 @@
 
 <script>
 const drone_stream = require('static/get_stream_values_response.json');
+console.log(drone_stream)
 var testLayout = [
   { x: 0, y: 0, w: 14, h: 14, i: "line_a", type: 'lines', data:'fake' },
   //{ x: 0, y: 0, w: 8, h: 14, i: "series_a", type: 'series', data:'fake' },
-  { x: 0, y: 0, w: 8, h: 5, i: "dfffd", type: 'widget_weather'}
+  //{ x: 0, y: 0, w: 8, h: 5, i: "dfffd", type: 'widget_weather'},
   // { x: 8, y: 0, w: 4, h: 14, i: "series_c", type: 'series', data: 'fake' },
   // { x: 0, y: 14, w: 13, h: 14, i: "series_b", type: 'series', data: 'fake' },
+  { x: 0, y: 14, w: 13, h: 14, i: "bar_a", type: 'bar', data: 'fake' }
 ];
 
 export default {
@@ -74,12 +91,36 @@ export default {
       layout: testLayout,
       values: drone_stream,
       position: null,
+      datacolletionline:null,
+      options:{
+        elements:{
+          line:{
+            tension:0,
+            spanGaps:true
+          }
+        },
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }],
+            xAxes: [{
+                type: 'time',
+            time: {
+              unit: 'month',
+              tooltipFormat: 'lll',
+            }
+            }]
+        }
+      }
     };
   }, 
   mounted: async function() {
     setTimeout(() => {
       this.getLocation()
     }, 0)
+    this.fillDataLine()
     const data = []
     const res = await this.$store.dispatch('get_streams');
     for(let i in res) {
@@ -108,7 +149,29 @@ export default {
           this.position.coords.longitude = this.position.Coordinates.longitude.toString()
           });
       }
-    }
+    },
+    fillDataLine () {
+        this.datacollectionline = {
+          datasets: [
+            {
+              label: 'Data One',
+              backgroundColor: '#1a8cff',
+              data: [14,13,15,20,18,17,15,14],
+            }
+            // ,
+            // {
+            //   label: 'Data Two',
+            //   backgroundColor: '#ff5050',
+            //   data: [15,13,15,20]
+            // }
+            ]
+
+        }
+    },
+    getRandomInt () {
+      return Math.floor(Math.random() * (50 - 5 + 1)) + 5
+      }
+
   }
 };
 </script>
@@ -124,7 +187,15 @@ export default {
   @include shadow(3px, 2px, 3px, 0px, #4d4c4c);
   @include unselectable();
 }
+  .small {
+    max-width: 500px;
+    margin:  150px auto;
+  }
+  .smalli{
+    max-width:200px;
+    position:relative;
 
+  }
 .widget {
   position: relative;
   height: 100%;

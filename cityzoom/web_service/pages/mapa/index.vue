@@ -102,6 +102,7 @@
                 </div>
             </div>
         </div>
+        
 
         <div class="map-menu left" :class="{show: selected_county != null, active: selected_county == null}">
             <div class="map-menu_button" @click="deselect_county()">
@@ -516,11 +517,16 @@ export default {
             return Math.ceil((new Date()).getTime() / 3600000) * 3600000
         },
         async updateValues() {
+            try{
             const res = await this.$axios.get(`http://localhost:8001/czb/streams/heatmap?interval_start=${Math.floor(this.getStartDate / (1000*60*24)) * (1000*60*24)}&interval_end=${Math.floor(this.getCurrentDate / (1000*60*24)) * (1000*60*24)}`, {
                 headers: {
                     Authorization: this.$store.state.jwt
                 }
             })
+            console.log(res.data)
+            }catch(e){
+                console.log('unexpected error')
+            }
             this.heatmap = res.data
             this.updateHeatMap()
         },

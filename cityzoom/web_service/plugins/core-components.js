@@ -8,7 +8,8 @@ import Line from "@/components/UI/Graphs/Line"
 import Loading from "@/components/UI/Loading"
 import ModalResizable from "@/components/UI/Modal_Resizable"
 import VueWeatherWidget from 'vue-weather-widget';
-
+import LineChart from "@/components/UI/Graphs/new/line"
+import BarChart from "@/components/UI/Graphs/new/bar"
 
 Vue.component("Navbar", Navbar);
 Vue.component("Header", Header);
@@ -19,3 +20,5 @@ Vue.component("LineGraph", Line)
 Vue.component("Loading", Loading)
 Vue.component("ModalResizable",ModalResizable)
 Vue.component("WeatherWidget",VueWeatherWidget)
+Vue.component("LineChart",LineChart)
+Vue.component("BarChart",BarChart)
