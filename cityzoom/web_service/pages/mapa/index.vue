@@ -3,7 +3,7 @@
         <div class="mapHeight" id="map"></div>
         <div v-if="getStream && selected_county" :style="{ 'background-color': municipalityValues[selected_county.get('id')].color}" class="ol-popup top">
             <div style="background-color: rgba(0,0,0, .5)">
-                <span class="xbig bold"> {{selected_county.get('Freguesia')}} </span>
+                <span class="xbig bold"> {{selected_county.get('Freguesia')}} <br> {{getStream.display}} </span>
                 <div v-if="getStream.name in heatmap.muns[selected_county.get('id')]" class="measure-show">
                     <div class="measure-button small">
                         <div class="arrow-down" :style="{'border-top': '1.6rem solid ' + getStream.colors[0]}"></div>
@@ -26,9 +26,23 @@
         </div>
 
         <div id="hover_popup" class="ol-popup" :style="{ 'background-color': hovered_geo ? municipalityValues[hovered_geo.get('id')].color : 'none'}">
-            <div v-if="hovered_geo" style="background-color: rgba(0,0,0, .5)">
-                <span class="normal"> {{hovered_geo.get('Freguesia')}} </span>
-                <span class="normal"> {{getStream.name in heatmap.muns[hovered_geo.get('id')] ? heatmap.muns[hovered_geo.get('id')][getStream.name].average.toFixed(2) + getStream.unit : 'No Values'}}</span>
+            <div v-if="getStream && hovered_geo" style="background-color: rgba(0,0,0, .5)">
+                <span class="big"> {{hovered_geo.get('Freguesia')}} </span>
+                <div v-if="getStream.name in heatmap.muns[hovered_geo.get('id')]" class="measure-show">
+                    <div class="measure-button small">
+                        <div class="arrow-down" :style="{'border-top': '1.6rem solid ' + getStream.colors[0]}"></div>
+                    </div>
+                    <span class="big">{{heatmap.muns[hovered_geo.get('id')][getStream.name].min.toFixed(2)}}{{getStream.unit}}</span>
+                    <div class="measure-button small">
+                        <div class="average" :style="{'background-color': '#' + rainbowHeatMap.colourAt(50)}"></div>
+                    </div>
+                    <span class="big">{{heatmap.muns[hovered_geo.get('id')][getStream.name].average.toFixed(2)}}{{getStream.unit}}</span>
+                    <div class="measure-button small">
+                        <div class="arrow-up" :style="{'border-bottom': '1.6rem solid ' + getStream.colors[1]}"></div>
+                    </div>
+                    <span class="big">{{heatmap.muns[hovered_geo.get('id')][getStream.name].max.toFixed(2)}}{{getStream.unit}}</span>
+                </div>
+                <div v-else class="normal">No Values</div>
                 <!-- <div class="scale-band-wrapper">
                     <div :class="{selected: index == municipalityValues[hovered_geo.get('id')].index}" v-for="index in 100" :key="index" :style="{'background-color': '#' + rainbowHeatMap.colourAt(index)}"></div>
                 </div> -->
