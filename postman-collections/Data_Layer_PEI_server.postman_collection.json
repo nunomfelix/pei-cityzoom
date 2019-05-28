@@ -22,10 +22,13 @@
 					"raw": "{\n\t\"device_ID\": \"mobile_test_device\",\n\t\"device_name\": \"fast\",\n\t\"mobile\": true,\n\t\"vertical\": \"a\",\n\t\"provider\": \"ola\",\n\t\"description\": \"asdf\"\n}"
 				},
 				"url": {
-					"raw": "http://localhost:8001/czb/devices",
+					"raw": "http://193.136.93.14:8001/czb/devices",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"193",
+						"136",
+						"93",
+						"14"
 					],
 					"port": "8001",
 					"path": [
@@ -46,10 +49,13 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:8001/czb/devices",
+					"raw": "http://193.136.93.14:8001/czb/devices",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"193",
+						"136",
+						"93",
+						"14"
 					],
 					"port": "8001",
 					"path": [
@@ -70,10 +76,13 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:8001/czb/devices/random_ID",
+					"raw": "http://193.136.93.14:8001/czb/devices/random_ID",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"193",
+						"136",
+						"93",
+						"14"
 					],
 					"port": "8001",
 					"path": [
@@ -95,10 +104,13 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:8001/czb/devices/random_ID2",
+					"raw": "http://193.136.93.14:8001/czb/devices/random_ID2",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"193",
+						"136",
+						"93",
+						"14"
 					],
 					"port": "8001",
 					"path": [
@@ -125,10 +137,13 @@
 					"raw": "{\n\t\"device_ID\": \"mobile_test_device\",\n\t\"stream_ID\": \"test_temperature_stream\",\n\t\"stream_name\": \"Stream\",\n\t\"type\": \"%\"\n}"
 				},
 				"url": {
-					"raw": "http://localhost:8001/czb/streams",
+					"raw": "http://193.136.93.14:8001/czb/streams",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"193",
+						"136",
+						"93",
+						"14"
 					],
 					"port": "8001",
 					"path": [
@@ -154,10 +169,13 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:8001/czb/streams/lula",
+					"raw": "http://193.136.93.14:8001/czb/streams/lula",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"193",
+						"136",
+						"93",
+						"14"
 					],
 					"port": "8001",
 					"path": [
@@ -184,10 +202,13 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:8001/czb/streams?interval_start=10",
+					"raw": "http://193.136.93.14:8001/czb/streams?interval_start=10",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"193",
+						"136",
+						"93",
+						"14"
 					],
 					"port": "8001",
 					"path": [
@@ -214,10 +235,13 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:8001/czb/streams/test_temperature_stream",
+					"raw": "http://193.136.93.14:8001/czb/streams/test_temperature_stream",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"193",
+						"136",
+						"93",
+						"14"
 					],
 					"port": "8001",
 					"path": [
@@ -244,10 +268,13 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:8001/czb/streams/test_temperature_stream/values",
+					"raw": "http://193.136.93.14:8001/czb/streams/test_temperature_stream/values",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"193",
+						"136",
+						"93",
+						"14"
 					],
 					"port": "8001",
 					"path": [
@@ -277,10 +304,13 @@
 					"raw": "{\n\t\"value\": 666,\n\t\"latitude\": 0.1,\n\t\"longitude\": 0.4\n}"
 				},
 				"url": {
-					"raw": "http://localhost:8001/czb/streams/test_temperature_stream/values",
+					"raw": "http://193.136.93.14:8001/czb/streams/test_temperature_stream/values",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"193",
+						"136",
+						"93",
+						"14"
 					],
 					"port": "8001",
 					"path": [
