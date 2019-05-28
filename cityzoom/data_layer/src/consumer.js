@@ -71,6 +71,8 @@ client.on('message',async (topic,data,info)=>{
                 }
             }
         }
+
+        console.log(new Date(data_json.timestamp))
     
         if(!hexa.streams || (!(stream.stream_name in hexa.streams))) {
             hexa.streams = {
