@@ -6,13 +6,14 @@ const morgan = require('morgan')
 const { error } = require('./middleware')
 const fs = require('fs')
 uncaughtDebug = require('debug')('app:Uncaught')
+const expressDebug = require('debug')('app:express')
 
 require('./db/mongoose')
 
 //Imports routes
 const deviceRouter = require('./routes/devices')
 const streamRouter = require('./routes/streams')
-const expressDebug = require('debug')('app:express')
+const alertRouter = require('./routes/alerts')
 
 //Uses the express framework
 const app = express()
@@ -36,6 +37,7 @@ app.use(express.json())
 // Routes setup
 app.use('/czb/devices', deviceRouter)
 app.use('/czb/streams', streamRouter)
+app.use('/czb/alerts', alertRouter)
 
 // error middleware
 //app.use(error)

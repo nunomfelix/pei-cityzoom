@@ -50,9 +50,21 @@ function validateCreateAlert(object) {
     })
 }
 
+function validatePostAlert(object){
+    const schema = joi.object().keys({
+        alert_name   : joi.string().required(),
+        threshold    : joi.string().required(),
+        type        : joi.string().required(),
+        stream_ID   : joi.string().required(),
+        level       : joi.string().required(),
+        notify_mail : joi.boolean().required()
+    })
+    return joi.validate(object, schema)
+}
+
 module.exports = {
     validateCreateDevice,
     validateCreateStream,
     validatePostValue,
-    validateCreateAlert
+    validatePostAlert
 }

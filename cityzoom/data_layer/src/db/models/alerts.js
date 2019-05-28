@@ -2,7 +2,26 @@ const mongoose = require('mongoose')
 const uniqueValidator = require('mongoose-unique-validator')
 const config = require('config')
 
-const deviceSchema = new mongoose.Schema({
+/*
+    {
+        “alert_ID”: <alert_ID> (int)
+        “alert_name”: <stream_name> (string),
+        “created_at”: <creation_time_mark> (string),
+        "trhesholds": [
+            {
+                stream_ID: <stream_ID> (string),
+                value: <value> (number),
+                type: <type> (string)
+            }
+        ]
+        “level”: <alert_level> (string),
+        “description”: <description> (string),
+        “state”: <alert_state> (boolean)
+    }
+
+*/
+
+const alertSchema = new mongoose.Schema({
     alert_ID: {
         type: Number,
         required: true,
@@ -20,13 +39,22 @@ const deviceSchema = new mongoose.Schema({
                 type: String,
                 required: true,
                 trim: true
+            },
+            value: {
+                type: Number,
+                required: true
+            },
+            type: {
+                type: String,
+                required: true,
+                trim: true
             }
         })
     ]
 })
 
-deviceSchema.plugin(uniqueValidator)
+alertSchema.plugin(uniqueValidator)
 
-const Device = mongoose.model('devices', deviceSchema)
+const Alert = mongoose.model('alerts', alertSchema)
 
-module.exports = Device
+module.exports = Alert
