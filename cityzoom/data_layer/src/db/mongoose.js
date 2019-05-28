@@ -18,13 +18,16 @@ mongoose.connect(connectionUrl+database, {
     useCreateIndex: true
 }, async () => {
 
-    fs.writeFile('data_teste_16h-21h.json', JSON.stringify({hexagons: await hexagons.find(), muns: await muns.find()}), () => {})
+    //fs.writeFile('data_teste_16h-21h.json', JSON.stringify({hexagons: await hexagons.find(), muns: await muns.find()}), () => {})
+    await hexagons.deleteMany({})
+    await muns.deleteMany({})
 
     Mutex.acquire().then(async (release) => {
-        // await devices.deleteMany({})
-        // await streams.deleteMany({})
-        // await values.deleteMany({})
-        // await muns.deleteMany({})
+        await devices.deleteMany({})
+        await streams.deleteMany({})
+        await values.deleteMany({})
+        await muns.deleteMany({})
+        await hexagons.deleteMany({})
         fs.readFile('verticals.json', async (err, data) => { 
             await verticals.deleteMany({}) 
             if (err) throw err;
@@ -41,7 +44,6 @@ mongoose.connect(connectionUrl+database, {
                 await vert.save()
             }
             // fs.readFile('hex_data.json', async (err, hexa_json) => {
-            //     await hexagons.deleteMany({})
             //     if (err) throw err;
             //     let hexas = JSON.parse(hexa_json)
             //     const municipalities = new Set()
@@ -63,6 +65,15 @@ mongoose.connect(connectionUrl+database, {
             // })
         })
         release()
+        fs.readFile('data_teste_16h-21h.json', async(err, res) => {
+            res = JSON.parse(res)
+            await hexagons.insertMany(res.hexagons.map(h => 
+                new hexagons(h)    
+            ))
+            await muns.insertMany(res.muns.map(h => 
+                new muns(h)    
+            ))
+        })
     })
     mongooseDebug("Connected to mongo database!")
 })
