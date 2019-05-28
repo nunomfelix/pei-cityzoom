@@ -50,6 +50,7 @@ const deviceSchema = new mongoose.Schema({
     hexagon: {
         type: String,
         required: false,
+        default: 0
     },
     streams: [{
         required: false

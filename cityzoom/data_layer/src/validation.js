@@ -33,16 +33,26 @@ function validatePostValue(object) {
     return joi.validate(object, schema)
 }
 
-function validateGetInInterval(object) {
+function validateCreateAlert(object) {
     const schema = joi.object().keys({
-        interval_start: joi.number().integer(),
-        interval_end: joi.number().integer()
+        alert_ID: joi.number().required().,
+        alert_name: joi.string().required(),
+        thresholds: joi.array().items(
+            joi.object().keys({
+                stream_ID: joi.string().required(),
+                value: joi.number().required(),
+                type: joi.string().required().valid(['MAX','MIN','MINEQ','MAXEQ'])
+            })
+        ),
+        level: joi.string().required().valid('neutral','bad','really bad'),
+        description: joi.string().optional(),
+        active: joi.boolean().required()
     })
-    return joi.validate(object, schema)
 }
 
 module.exports = {
     validateCreateDevice,
     validateCreateStream,
-    validatePostValue
+    validatePostValue,
+    validateCreateAlert
 }
