@@ -17,27 +17,26 @@ mongoose.connect(connectionUrl+database, {
     useNewUrlParser: true,
     useCreateIndex: true
 }, async () => {
-    await devices.deleteMany({})
-    await streams.deleteMany({})
-    await values.deleteMany({})
-    await muns.deleteMany({})
-    fs.readFile('verticals.json', async (err, data) => { 
-        await verticals.deleteMany({}) 
-        if (err) throw err;
-        let vertical = JSON.parse(data)
-        const streams_array = []
-        for(var v in vertical.vertical) {
-            const vert = new verticals({
-                name: v,
-                display: vertical.vertical[v].display,
-                streams: vertical.vertical[v].streams,
-            })
-            streams_array.push(...vertical.vertical[v].streams.map(s => s.name))
-            // console.log(vert)
-            await vert.save()
-        }
-        
-        Mutex.acquire().then(async (release) => {
+    Mutex.acquire().then(async (release) => {
+        await devices.deleteMany({})
+        await streams.deleteMany({})
+        await values.deleteMany({})
+        await muns.deleteMany({})
+        fs.readFile('verticals.json', async (err, data) => { 
+            await verticals.deleteMany({}) 
+            if (err) throw err;
+            let vertical = JSON.parse(data)
+            const streams_array = []
+            for(var v in vertical.vertical) {
+                const vert = new verticals({
+                    name: v,
+                    display: vertical.vertical[v].display,
+                    streams: vertical.vertical[v].streams,
+                })
+                streams_array.push(...vertical.vertical[v].streams.map(s => s.name))
+                // console.log(vert)
+                await vert.save()
+            }
             fs.readFile('hex_data.json', async (err, hexa_json) => {
                 await hexagons.deleteMany({})
                 if (err) throw err;
@@ -59,8 +58,8 @@ mongoose.connect(connectionUrl+database, {
                     })
                 ))
             })
-            release()
         })
+        release()
     })
     mongooseDebug("Connected to mongo database!")
 })

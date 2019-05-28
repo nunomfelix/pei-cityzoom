@@ -50,7 +50,6 @@ client.on('message',async (topic,data,info)=>{
         }
     }else if(topic == rootTopic+'values'){
         const stream = await Stream.findOne({stream_ID:data_json.stream_ID})
-
         mutex.acquire().then(async(release) => {
             let dev = await Device.findOne({device_ID:stream.device_ID}) 
             if (dev.mobile || ( !dev.mobile && dev.locations.length == 0)) {
@@ -76,12 +75,13 @@ client.on('message',async (topic,data,info)=>{
             }
     
             const date = new Date(data_json.timestamp)
-            const time_id = date.getFullYear().toString() + date.getMonth().toString() + date.getDay().toString() + date.getHours().toString()
+            const time_id = Math.floor(date / 1000)
         
-            if(!hexa.streams || (!(stream.stream_name in hexa.streams))) {
+            if(!hexa.streams || (!(stream.stream_name in hexa.streams)) || (!(time_id in hexa.streams[stream.stream_name]))) {
                 hexa.streams = {
                     ...(hexa.streams || {}),
                     [stream.stream_name]: {
+                        ...(hexa.streams && stream.stream_name in hexa.streams ? hexa.streams[stream.stream_name] : {}),
                         [time_id]: {
                             max: data_json.value,
                             min: data_json.value,
@@ -90,15 +90,14 @@ client.on('message',async (topic,data,info)=>{
                         }
                     }
                 }
-                console.log(hexa.streams)
             } else {
                 hexa.streams = {
                     ...hexa.streams,
                     [stream.stream_name]: {
                         ...hexa.streams[stream.stream_name],
                         [time_id]: {
-                            max: data_json.value > hexa.streams[stream.stream_name][time_id].max ? data_json : hexa.streams[stream.stream_name][time_id].max,
-                            min: data_json.value < hexa.streams[stream.stream_name][time_id].min ? data_json : hexa.streams[stream.stream_name][time_id].min,
+                            max: data_json.value > hexa.streams[stream.stream_name][time_id].max ? data_json.value : hexa.streams[stream.stream_name][time_id].max,
+                            min: data_json.value < hexa.streams[stream.stream_name][time_id].min ? data_json.value : hexa.streams[stream.stream_name][time_id].min,
                             average: (hexa.streams[stream.stream_name][time_id].average * hexa.streams[stream.stream_name][time_id].count + data_json.value) / (hexa.streams[stream.stream_name][time_id].count + 1),
                             count: hexa.streams[stream.stream_name][time_id].count + 1
                         }
@@ -108,10 +107,11 @@ client.on('message',async (topic,data,info)=>{
             
             var mun = await Muns.findOne({id: hexa.municipality})
         
-            if(!mun.streams || (!(stream.stream_name in mun.streams))) {
+            if(!mun.streams || (!(stream.stream_name in mun.streams)) || (!(time_id in mun.streams[stream.stream_name]))) {
                 mun.streams = {
                     ...(mun.streams || {}),
                     [stream.stream_name]: {
+                        ...(mun.streams && stream.stream_name in mun.streams ? mun.streams[stream.stream_name] : {}),
                         [time_id]: {
                             max: data_json.value,
                             min: data_json.value,
@@ -126,8 +126,8 @@ client.on('message',async (topic,data,info)=>{
                     [stream.stream_name]: {
                         ...mun.streams[stream.stream_name],
                         [time_id]: {
-                            max: data_json.value > mun.streams[stream.stream_name][time_id].max ? data_json : mun.streams[stream.stream_name][time_id].max,
-                            min: data_json.value < mun.streams[stream.stream_name][time_id].min ? data_json : mun.streams[stream.stream_name][time_id].min,
+                            max: data_json.value > mun.streams[stream.stream_name][time_id].max ? data_json.value : mun.streams[stream.stream_name][time_id].max,
+                            min: data_json.value < mun.streams[stream.stream_name][time_id].min ? data_json.value : mun.streams[stream.stream_name][time_id].min,
                             average: (mun.streams[stream.stream_name][time_id].average * mun.streams[stream.stream_name][time_id].count + data_json.value) / (mun.streams[stream.stream_name][time_id].count + 1),
                             count: mun.streams[stream.stream_name][time_id].count + 1
                         }

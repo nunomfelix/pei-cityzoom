@@ -1,7 +1,7 @@
 const axios = require('axios')
 const fs = require('fs')
 
-async function get_darksky_data(lat, long, key = 'b91f7d76e6e8638fa72345c58bce52ec') {
+async function get_darksky_data(lat, long, key = 'f962475109da7278cd8ca1ba22186bee') {
 
     var tmp = {}
     var city_info = await axios.get(`https://api.darksky.net/forecast/${key}/` + lat + ',' + long + '?units=si')
@@ -103,10 +103,9 @@ test_posts() */
             center_lat
         })
         k++
-        if(k == 5)
-            break
+        if(k == 69)
+            break;
     }
-    await sleep(2000);
     const devicesMap = {}
     for(var d in devices) {
         const streams = []
@@ -121,15 +120,16 @@ test_posts() */
         }
         devicesMap[devices[d].device] = streams
     }
-    const fake = false
-    for(var d of devices) {
-        //var data = await get_darksky_data(d.center_lat, d.center_long)
-        var data = JSON.parse(fs.readFileSync('kappa.json', 'utf8'))
-        for(var stream of devicesMap[d.device]) {
-            for(var i = 0; i < 3; i++) {
+
+    for(var lol = 0; lol < 10; lol++) {
+        for(var d of devices) {
+            var data = await get_darksky_data(d.center_lat, d.center_long)
+            //var data = JSON.parse(fs.readFileSync('kappa.json', 'utf8'))
+            for(var stream of devicesMap[d.device]) {
                 await post_Values(stream.stream_id, data[0][stream.stream], d.center_lat, d.center_long)
             }
         }
-        // fs.writeFileSync('kappa.json', JSON.stringify(data))
+        await sleep(1800000)
     }
+        // fs.writeFileSync('kappa.json', JSON.stringify(data))
 })()

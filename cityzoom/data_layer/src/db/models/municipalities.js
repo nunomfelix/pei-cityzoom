@@ -5,7 +5,8 @@ const config = require('config')
 const munsSchema = new mongoose.Schema({
     id: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     streams: {
         type: Object,
