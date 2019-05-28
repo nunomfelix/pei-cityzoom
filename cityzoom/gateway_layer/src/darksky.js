@@ -129,7 +129,7 @@ test_posts() */
                 await post_Values(stream.stream_id, data[0][stream.stream], d.center_lat, d.center_long)
             }
         }
-        await sleep(1800000)
+        await sleep(1800000*.95)
     }
         // fs.writeFileSync('kappa.json', JSON.stringify(data))
 })()

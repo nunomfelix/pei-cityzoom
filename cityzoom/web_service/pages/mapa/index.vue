@@ -516,7 +516,7 @@ export default {
             return Math.ceil((new Date()).getTime() / 3600000) * 3600000
         },
         async updateValues() {
-            const res = await this.$axios.get(`http://localhost:8001/czb/streams/heatmap?interval_start=${Math.floor(this.getStartDate / 1000)}&interval_end=${Math.floor(this.getCurrentDate / 1000)}`, {
+            const res = await this.$axios.get(`http://localhost:8001/czb/streams/heatmap?interval_start=${Math.floor(this.getStartDate / (1000*60*24)) * (1000*60*24)}&interval_end=${Math.floor(this.getCurrentDate / (1000*60*24)) * (1000*60*24)}`, {
                 headers: {
                     Authorization: this.$store.state.jwt
                 }
@@ -727,6 +727,7 @@ export default {
     @include flex(center, center);
     background-color: rgba(255, 255, 255, 0.856);
     &.selected {
+        color: white;
         background-color: rgba(119, 119, 119, 0.856);
     }
     @include transition(transform, .2s, ease, 0s);
