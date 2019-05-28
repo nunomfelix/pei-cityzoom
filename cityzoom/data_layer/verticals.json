@@ -29,8 +29,8 @@
 					"fullunit": "Partes por Bilião",	
 					"type": "value"	,
 					"colors": ["lightblue", "purple", "black"],
-					"min": 73,
-					"max": 600
+					"min": 0,
+					"max": 160
 				},{
 					"name": "no2_stream",
 					"display": "Dióxido de nitrogénio",
