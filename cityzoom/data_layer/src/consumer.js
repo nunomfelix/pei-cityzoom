@@ -58,6 +58,7 @@ client.on('message',async (topic,data,info)=>{
             })
         }
 
+        // hexagons stuff
         var hexa = !dev.mobile && dev.hexagon ? await Hexas.findOne({id: dev.hexagon}) : null
 
         if(!hexa) {
@@ -71,7 +72,8 @@ client.on('message',async (topic,data,info)=>{
                 }
             }
         }
-    
+
+        // hexagon streams
         if(!hexa.streams || (!(stream.stream_name in hexa.streams))) {
             hexa.streams = {
                 ...(hexa.streams || {}),
@@ -94,8 +96,8 @@ client.on('message',async (topic,data,info)=>{
             }
         }
         
+        // municipalities streams
         var mun = await Muns.findOne({id: hexa.municipality})
-
     
         if(!mun.streams || (!(stream.stream_name in mun.streams))) {
             mun.streams = {

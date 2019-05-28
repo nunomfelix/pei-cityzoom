@@ -21,6 +21,9 @@ const hexagonSchema = new mongoose.Schema({
     streams: {
         
     },
+    hours: {
+        
+    }
     // average: {
     //     type: Number,
     //     required: true,
