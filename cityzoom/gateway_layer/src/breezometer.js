@@ -11,12 +11,18 @@ const keys = [
     'f7bab5c50ffb49218bd4750284df006e',
     'db69e8084d414d7fbe4ea16b0c2a86e5',
     'a61869cdc9ee4893a5200ddbf35f2442',
-    'fc78b642ea0c43978a1f80b7b529b8f3'
+    'fc78b642ea0c43978a1f80b7b529b8f3',
+    '3fd5da64b8494c5e9247cb89393f7152',
+    '18cff0fa345d47c191ea62ed7c884f88',
+    'e2922410f76e4a93bae7beea7757d8a7',
+    '51e7d40fca2349bf808fe62c655bff49',
+    'db0d510ed58f4bcb9364e2daf2d01095'
 ]
 
 async function get_breezometer_data(lat, long, key = 'f55cfd01f2ab42ccb517e40844a18797') {
 
     var tmp = {}
+    console.log('https://api.breezometer.com/air-quality/v2/current-conditions?lat='+lat+'&lon='+long+'&key='+key+'&features=pollutants_concentrations')
     var city_info = await axios.get('https://api.breezometer.com/air-quality/v2/current-conditions?lat='+lat+'&lon='+long+'&key='+key+'&features=pollutants_concentrations')
     tmp['co_stream'] = city_info.data.data.pollutants.co.concentration.value
     tmp['no2_stream'] = city_info.data.data.pollutants.no2.concentration.value
@@ -78,15 +84,21 @@ function sleep(ms) {
 return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-/* async function test(_posts) {
+/* async function test_posts() {
     await create_Device("12345qwerty", "12345qwerty", "Temperature", "Aveiro")
     await sleep(2000)
     await create_Stream("12345qwerty", "12345qwerty" ,"12345qwerty", "Temperature")
     await sleep(2000)
     await post_Values("12345qwerty", 25, 41.2373, -8.401238)
-} 
+    var i = 0
+    for(var k=0; k<20; k++) {
+        var data = await get_breezometer_data('40.633317', '-8.659720', keys[i])
+        console.log(data[0])
+        i = (i+1) % keys.length
+    }
+}
 
-test_posts() */
+test_posts()*/
 
 (async function main() {
     const devices = []
@@ -109,7 +121,7 @@ test_posts() */
         var center_long = longMin + ((longMax - longMin)/2)
         var center_lat = latMin + ((latMax - latMin)/2)
 
-        var device = "device_beezometer" +obj[hex]['id']
+        var device = "device_breezometer" +obj[hex]['id']
         await create_Device(device, device, ["AirQuality"], obj[hex]['municipality'])
         devices.push({
             device,
@@ -118,7 +130,7 @@ test_posts() */
         })
         // k++
         // if(k == 2)
-        break;
+        //break;
     }
     await sleep(2000);
     const devicesMap = {}
@@ -135,22 +147,18 @@ test_posts() */
         }
         devicesMap[devices[d].device] = streams
     }
+    //i is a circular buffer that goes arround our API keys.
+    //This way we can make a request with one key at a time.
     var i = 0
     for(var d of devices) {
-        var data
         try {
-            data = await get_breezometer_data(d.center_lat, d.center_long, keys[i])
+            var data = await get_breezometer_data(d.center_lat, d.center_long, keys[i])
             for(var stream of devicesMap[d.device]) {
                 await post_Values(stream.stream_id, data[0][stream.stream], d.center_lat, d.center_long)
             }
-        } catch {
-            i++
-            data = await get_breezometer_data(d.center_lat, d.center_long, keys[i])
-            for(var stream of devicesMap[d.device]) {
-                await post_Values(stream.stream_id, data[0][stream.stream], d.center_lat, d.center_long)
-            }
+            i = (i+1) % keys.length
+        }catch {
+            console.log('Failed to fetch data from API!')
         }
-        
-        // fs.writeFileSync('kappa.json', JSON.stringify(data))
     }
 })()

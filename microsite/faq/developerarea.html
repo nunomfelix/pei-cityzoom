@@ -89,10 +89,10 @@
                                         The project is currently using the following technologies/devices:
                                     </span>
                                     <ul>
-                                        <li>A real sensor</li>
+                                        <li>Real Sensors</li>
                                         <li>LoRa</li>
                                         <li>External data API's</li>
-                                        <li>Apache Kafka</li>
+                                        <li>MQTT</li>
                                         <li>MongoDB</li>
                                         <li>Node.js</li>
                                         <li>JSON Web Token</li>
@@ -106,15 +106,27 @@
                                 </div>
                                 <div>
                                     <span>
-                                            <p>Nodejs is the language used throughout the backend. The communication with the external API's
-                                                is done using that same resource. The sensor, on the other hand, makes use of the LoRa protocol
-                                                to send data to our broker.</p>
-                                            <p>Our broker is built with Apache Kafka, making use of a Nodejs library (kafkajs) to facilitate the 
-                                                usage of Kafka. The broker makes use of a database built with MongoDB to save it's data permanently.</p>
-                                            <p>The communication between the broker and the client side is also built making use of Nodejs. 
-                                                There is another database to save clients' information, also made in MongoDB. The needed 
-                                                authentication for user actions are supported with JSON Web Tokens.</p>
-                                            <p>The client interacts with a website built with Nuxt.js and Vue.js.</p>
+                                            <p>There are two sources of data: external API's and sensors. We use http requests to retrieve data 
+                                                from the API's and to send the sensors and API's data to our platform. The sensors communicate 
+                                                with a gateway, and this is the one responsible for sending the sensor's data to our upper layers.
+                                            </p>
+                                            <p style="margin-top: 10px">
+                                                Our broker is built with MQTT. It uses a database in MongoDB to save it's data permanently.
+                                                The sensors and external API's communicate with the broker through an API. The API's documentation 
+                                                is available <a style="text-decoration: underline" href="Data_Layer_API.pdf">here</a>. If you wish to 
+                                                add any data to our system, you can follow that document that details how the requests must be done to 
+                                                interact with our broker, given that you have permission to do so.
+                                            </p>
+                                            <p style="margin-top: 10px">
+                                                The broker communicates with the client side through an entity that handles authentications 
+                                                (supported with JSON Web Tokens). It also has a database in MongoDB to hold users information. 
+                                                The communication with this entity is done through an API which is documented 
+                                                <a style="text-decoration: underline" href="Service_Layer_API.pdf">here</a>. 
+                                            </p>
+                                            <p style="margin-top: 10px">The client interacts with a website built with Nuxt.js and Vue.js.
+                                                The divisions in the map are taken from geojson files. They represent the devices that give us 
+                                                information. 
+                                            </p>
                                     </span>
                                 </div>
                             </div>

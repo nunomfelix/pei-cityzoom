@@ -1,6 +1,22 @@
 const axios = require('axios')
 const fs = require('fs')
 
+const keys = [
+    'f962475109da7278cd8ca1ba22186bee',
+    'b91f7d76e6e8638fa72345c58bce52ec',
+    'fe7d68e03c713063c78269cc2bf17638',
+    'fe3cb56d1611717b5acb72f5243ff0e5',
+    '6cadc7e63e8619b65f50c76ca7a9af98',
+    'ea4a9ad246f278a30b4c30d8ba3c3c7a',
+    'f5e30cf666320006447f251880cad6bc',
+    'fbb30e0ea463e37ed450a00bc83504ac',
+    '3fc9ee6fa7dc55d6a886f828a49f91b0',
+    '8dad0ed09ef497c23ddf5708b62e4c57',
+    '042bc0cf651d915dd3a97b94cbc79756',
+    '96869db2c419796643976aa5db11363a',
+    'ba476533bfa6dcdb18261f70e4b12dbe'
+]
+
 async function get_darksky_data(lat, long, key = 'b91f7d76e6e8638fa72345c58bce52ec') {
 
     var tmp = {}
@@ -96,7 +112,7 @@ test_posts() */
         var center_lat = latMin + ((latMax - latMin)/2)
 
         var device = "device_" + obj[hex]['id']
-        await create_Device(device, device, ["Temperature", "AirQuality"], obj[hex]['municipality'])
+        await create_Device(device, device, ["Weather", "AirQuality"], obj[hex]['municipality'])
         devices.push({
             device,
             center_long,
@@ -121,24 +137,16 @@ test_posts() */
         }
         devicesMap[devices[d].device] = streams
     }
-    const fake = false
+    var i = 0
     for(var d of devices) {
-        var data
         try {
-            if(!fake)
-                data = await get_darksky_data(d.center_lat, d.center_long)
-            else
-                data = JSON.parse(fs.readFileSync('kappa.json', 'utf8'))
+            var data = await get_darksky_data(d.center_lat, d.center_long, key[i])
             for(var stream of devicesMap[d.device]) {
                 await post_Values(stream.stream_id, data[0][stream.stream], d.center_lat, d.center_long)
             }
+            i = (i+1) % keys.length
         } catch {
-            fake = true
-            data = JSON.parse(fs.readFileSync('kappa.json', 'utf8'))
-            for(var stream of devicesMap[d.device]) {
-                await post_Values(stream.stream_id, data[0][stream.stream], d.center_lat, d.center_long)
-            }
+            console.log('Failed to fetch data from API!')
         }
-        // fs.writeFileSync('kappa.json', JSON.stringify(data))
     }
 })()
