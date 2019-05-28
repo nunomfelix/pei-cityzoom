@@ -45,7 +45,6 @@ router.post('', validation(validators.validateCreateDevice, 'body', 'Invalid dev
 
 router.get('', async (req, res) => {
     devicesDebug('[DEBUG] Fetching all Devices')
-    var result = {}
     const start = req.query.interval_start ? req.query.interval_start : 0
     const compass = Number(Date.now())
     const end = req.query.interval_end ? req.query.interval_end : compass
@@ -53,27 +52,8 @@ router.get('', async (req, res) => {
         devicesDebug('[ERROR] Interval is wrong')
         return res.status(400).send({error: 'Bad interval defined'})
     }
-    user_devs =[]
     var allDevices = await devices.find({created_at: { $gte: start, $lte: end}})
-
-    for (var i = 0; i < allDevices.length; i++) {
-        let doc = allDevices[i]
-        user_devs.push({
-            ...doc,
-            created_at: Number(doc.created_at)
-        })
-    }
-
-    result['total_devices']
-    await devices.countDocuments({created_at: { $gte: start, $lte: end}}, (err, count) => {
-        result['total_devices'] = count 
-    })
-    devicesDebug('[DEBUG] Fetched with success')
-    if (start != 0) { result['start'] = start }
-    if (end != compass) { result['end'] = end }
-    result['user_devices'] = user_devs
-    
-    res.status(200).send(result)
+    res.status(200).send(allDevices)
 })
 
 // get device by ID
