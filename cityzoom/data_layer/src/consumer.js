@@ -58,9 +58,7 @@ client.on('message',async (topic,data,info)=>{
             })
         }
 
-        /*var hexa = !dev.mobile && dev.hexagon ? await Hexas.findOne({id: dev.hexagon}) : null
-        
-        console.log(dev)
+        var hexa = !dev.mobile && dev.hexagon ? await Hexas.findOne({id: dev.hexagon}) : null
 
         if(!hexa) {
             const hexagons = await Hexas.find()
@@ -73,25 +71,57 @@ client.on('message',async (topic,data,info)=>{
                 }
             }
         }
+    
+        if(!hexa.streams || (!(stream.stream_name in hexa.streams))) {
+            hexa.streams = {
+                ...(hexa.streams || {}),
+                [stream.stream_name]: {
+                    max: data_json.value,
+                    min: data_json.value,
+                    average: data_json.value,
+                    count: 1
+                }
+            }
+        } else {
+            hexa.streams = {
+                ...hexa.streams,
+                [stream.stream_name]: {
+                    max: data_json.value > hexa.streams[stream.stream_name].max ? data_json : hexa.streams[stream.stream_name].max,
+                    min: data_json.value < hexa.streams[stream.stream_name].min ? data_json : hexa.streams[stream.stream_name].min,
+                    average: (hexa.streams[stream.stream_name].average * hexa.streams[stream.stream_name].count + data_json.value) / (hexa.streams[stream.stream_name].count + 1),
+                    count: hexa.streams[stream.stream_name].count + 1
+                }
+            }
+        }
         
-        hexa.streams = {
-            ...hexa.streams,
-            [stream.stream_name]: {
-                average: (hexa.streams[stream.stream_name].average * hexa.streams[stream.stream_name].count + data_json.value) / (hexa.streams[stream.stream_name].count + 1),
-                count: hexa.streams[stream.stream_name].count + 1
-            }
-        }
         var mun = await Muns.findOne({id: hexa.municipality})
-        mun.streams = {
-            ...mun.streams,
-            [stream.stream_name]: {
-                average: (mun.streams[stream.stream_name].average * mun.streams[stream.stream_name].count + data_json.value) / (mun.streams[stream.stream_name].count + 1),
-                count: mun.streams[stream.stream_name].count + 1
+
+    
+        if(!mun.streams || (!(stream.stream_name in mun.streams))) {
+            mun.streams = {
+                ...(mun.streams || {}),
+                [stream.stream_name]: {
+                    max: data_json.value,
+                    min: data_json.value,
+                    average: data_json.value,
+                    count: 1
+                }
+            }
+        } else {
+            mun.streams = {
+                ...mun.streams,
+                [stream.stream_name]: {
+                    max: data_json.value > mun.streams[stream.stream_name].max ? data_json : mun.streams[stream.stream_name].max,
+                    min: data_json.value < mun.streams[stream.stream_name].min ? data_json : mun.streams[stream.stream_name].min,
+                    average: (mun.streams[stream.stream_name].average * mun.streams[stream.stream_name].count + data_json.value) / (mun.streams[stream.stream_name].count + 1),
+                    count: mun.streams[stream.stream_name].count + 1
+                }
             }
         }
+
         await Device.updateOne({device_ID: stream.device_ID}, {hexagon: hexa.id})
         await hexa.save()
-        await mun.save()*/
+        await mun.save()
 
         //Saves the value in the database
         Values.create(data_json).then(()=>{

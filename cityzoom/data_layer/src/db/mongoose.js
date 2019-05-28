@@ -15,9 +15,9 @@ mongoose.connect(connectionUrl+database, {
     useNewUrlParser: true,
     useCreateIndex: true
 }, async () => {
-    //await devices.deleteMany({})
-    //await streams.deleteMany({})
-    //await values.deleteMany({})
+    await devices.deleteMany({})
+    await streams.deleteMany({})
+    await values.deleteMany({})
     await muns.deleteMany({})
     fs.readFile('verticals.json', async (err, data) => { 
         await verticals.deleteMany({}) 
@@ -45,25 +45,13 @@ mongoose.connect(connectionUrl+database, {
                     id: h.id,
                     coordinates: h.coordinates,
                     municipality: h.municipality,
-                    streams: streams_array.reduce((map, stream) => {
-                        map[stream] = {
-                            average: 0,
-                            count: 0,
-                        }
-                        return map
-                    }, {})
+                    streams: {}
                 })
             }))
             await muns.insertMany([...municipalities].map(m =>
                 new muns({
                     id: m,
-                    streams: streams_array.reduce((map, stream) => {
-                        map[stream] = {
-                            average: 0,
-                            count: 0,
-                        }
-                        return map
-                    }, {})
+                    streams: {}
                 })
             ))
         })
