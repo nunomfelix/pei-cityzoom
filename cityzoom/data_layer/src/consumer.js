@@ -15,6 +15,8 @@ const Stream = require('./db/models/streams')
 const Hexas = require('./db/models/hexagons')
 const Muns = require('./db/models/municipalities')
 const Values = require('./db/models/values')
+const Mutex = require('async-mutex').Mutex
+const mutex = new Mutex();
 
 client.on('connect',()=>{
     consumerDebug('Listening to MQTT broker!')
@@ -48,88 +50,103 @@ client.on('message',async (topic,data,info)=>{
         }
     }else if(topic == rootTopic+'values'){
         const stream = await Stream.findOne({stream_ID:data_json.stream_ID})
-        let dev = await Device.findOne({device_ID:stream.device_ID}) 
-        if (dev.mobile || ( !dev.mobile && dev.locations.length == 0)) {
-            await Device.updateOne({device_ID:stream.device_ID}, {$push: {locations: {timestamp: data_json.timestamp, latitude: data_json.latitude, longitude: data_json.longitude}}})
-            .then(()=>{
-                consumerDebug(`Updated the location of device ${stream.device_ID}`)
-            }).catch(()=>{
-                consumerDebug(`Error updating the location of device ${stream.device_ID}`)
-            })
-        }
-
-        // hexagons stuff
-        var hexa = !dev.mobile && dev.hexagon ? await Hexas.findOne({id: dev.hexagon}) : null
-
-        if(!hexa) {
-            const hexagons = await Hexas.find()
-            var a = turf.point([data_json.longitude, data_json.latitude])
-            for (hexagon of hexagons) {
-                var b = turf.polygon([hexagon.coordinates])
-                if (booleanPointInPolygon(a, b)) {
-                    hexa = hexagon
-                    break;
-                }
+        mutex.acquire().then(async(release) => {
+            let dev = await Device.findOne({device_ID:stream.device_ID}) 
+            if (dev.mobile || ( !dev.mobile && dev.locations.length == 0)) {
+                Device.updateOne({device_ID:stream.device_ID}, {$push: {locations: {timestamp: data_json.timestamp, latitude: data_json.latitude, longitude: data_json.longitude}}})
+                .then(()=>{
+                    consumerDebug(`Updated the location of device ${stream.device_ID}`)
+                }).catch(()=>{
+                    consumerDebug(`Error updating the location of device ${stream.device_ID}`)
+                })
             }
-        }
-
-        // hexagon streams
-        if(!hexa.streams || (!(stream.stream_name in hexa.streams))) {
-            hexa.streams = {
-                ...(hexa.streams || {}),
-                [stream.stream_name]: {
-                    max: data_json.value,
-                    min: data_json.value,
-                    average: data_json.value,
-                    count: 1
-                }
-            }
-        } else {
-            hexa.streams = {
-                ...hexa.streams,
-                [stream.stream_name]: {
-                    max: data_json.value > hexa.streams[stream.stream_name].max ? data_json : hexa.streams[stream.stream_name].max,
-                    min: data_json.value < hexa.streams[stream.stream_name].min ? data_json : hexa.streams[stream.stream_name].min,
-                    average: (hexa.streams[stream.stream_name].average * hexa.streams[stream.stream_name].count + data_json.value) / (hexa.streams[stream.stream_name].count + 1),
-                    count: hexa.streams[stream.stream_name].count + 1
-                }
-            }
-        }
-        
-        // municipalities streams
-        var mun = await Muns.findOne({id: hexa.municipality})
+            var hexa = !dev.mobile && dev.hexagon ? await Hexas.findOne({id: dev.hexagon}) : null
     
-        if(!mun.streams || (!(stream.stream_name in mun.streams))) {
-            mun.streams = {
-                ...(mun.streams || {}),
-                [stream.stream_name]: {
-                    max: data_json.value,
-                    min: data_json.value,
-                    average: data_json.value,
-                    count: 1
+            if(!hexa) {
+                const hexagons = await Hexas.find()
+                var a = turf.point([data_json.longitude, data_json.latitude])
+                for (hexagon of hexagons) {
+                    var b = turf.polygon([hexagon.coordinates])
+                    if (booleanPointInPolygon(a, b)) {
+                        hexa = hexagon
+                        break;
+                    }
                 }
             }
-        } else {
-            mun.streams = {
-                ...mun.streams,
-                [stream.stream_name]: {
-                    max: data_json.value > mun.streams[stream.stream_name].max ? data_json : mun.streams[stream.stream_name].max,
-                    min: data_json.value < mun.streams[stream.stream_name].min ? data_json : mun.streams[stream.stream_name].min,
-                    average: (mun.streams[stream.stream_name].average * mun.streams[stream.stream_name].count + data_json.value) / (mun.streams[stream.stream_name].count + 1),
-                    count: mun.streams[stream.stream_name].count + 1
+    
+            const date = new Date(data_json.timestamp)
+            const time_id = Math.floor(date / (1000*60*60)) * (1000*60*60)
+        
+            if(!hexa.streams || (!(stream.stream_name in hexa.streams)) || (!(time_id in hexa.streams[stream.stream_name]))) {
+                hexa.streams = {
+                    ...(hexa.streams || {}),
+                    [stream.stream_name]: {
+                        ...(hexa.streams && stream.stream_name in hexa.streams ? hexa.streams[stream.stream_name] : {}),
+                        [time_id]: {
+                            max: data_json.value,
+                            min: data_json.value,
+                            average: data_json.value,
+                            count: 1
+                        }
+                    }
+                }
+            } else {
+                hexa.streams = {
+                    ...hexa.streams,
+                    [stream.stream_name]: {
+                        ...hexa.streams[stream.stream_name],
+                        [time_id]: {
+                            max: data_json.value > hexa.streams[stream.stream_name][time_id].max ? data_json.value : hexa.streams[stream.stream_name][time_id].max,
+                            min: data_json.value < hexa.streams[stream.stream_name][time_id].min ? data_json.value : hexa.streams[stream.stream_name][time_id].min,
+                            average: (hexa.streams[stream.stream_name][time_id].average * hexa.streams[stream.stream_name][time_id].count + data_json.value) / (hexa.streams[stream.stream_name][time_id].count + 1),
+                            count: hexa.streams[stream.stream_name][time_id].count + 1
+                        }
+                    }
                 }
             }
-        }
+            
+            var mun = await Muns.findOne({id: hexa.municipality})
+        
+            if(!mun.streams || (!(stream.stream_name in mun.streams)) || (!(time_id in mun.streams[stream.stream_name]))) {
+                mun.streams = {
+                    ...(mun.streams || {}),
+                    [stream.stream_name]: {
+                        ...(mun.streams && stream.stream_name in mun.streams ? mun.streams[stream.stream_name] : {}),
+                        [time_id]: {
+                            max: data_json.value,
+                            min: data_json.value,
+                            average: data_json.value,
+                            count: 1
+                        }
+                    }
+                }
+            } else {
+                mun.streams = {
+                    ...mun.streams,
+                    [stream.stream_name]: {
+                        ...mun.streams[stream.stream_name],
+                        [time_id]: {
+                            max: data_json.value > mun.streams[stream.stream_name][time_id].max ? data_json.value : mun.streams[stream.stream_name][time_id].max,
+                            min: data_json.value < mun.streams[stream.stream_name][time_id].min ? data_json.value : mun.streams[stream.stream_name][time_id].min,
+                            average: (mun.streams[stream.stream_name][time_id].average * mun.streams[stream.stream_name][time_id].count + data_json.value) / (mun.streams[stream.stream_name][time_id].count + 1),
+                            count: mun.streams[stream.stream_name][time_id].count + 1
+                        }
+                    }
+                }
+            }
+    
+            await Device.updateOne({device_ID: stream.device_ID}, {hexagon: hexa.id})
+            await hexa.save()
+            await mun.save()
 
-        await Device.updateOne({device_ID: stream.device_ID}, {hexagon: hexa.id})
-        await hexa.save()
-        await mun.save()
-
-        //Saves the value in the database
-        Values.create(data_json).then(()=>{
-            consumerDebug('Values published in the database')
-        }).catch((err)=>{
-            consumerDebug(err)
+            //Saves the value in the database
+            Values.create(data_json).then(()=>{
+                consumerDebug('Values published in the database')
+            }).catch((err)=>{
+                consumerDebug(err)
+            })
+            
+            release()
         })
     }
 })

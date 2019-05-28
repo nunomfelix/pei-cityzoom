@@ -81,14 +81,78 @@ router.get('', async (req, res) => {
 })
 
 router.get('/heatmap', async (req, res) => {
-    streamsDebug('[DEBUG] Fetching Heatmap Values')
-    
-    const hexagons = (await Hexagons.find({}, 'id streams')).reduce((map, hex) => {
-        map[hex.id] = hex.streams
+    streamsDebug('[DEBUG] Fetching all stream values')
+    var start = req.query.interval_start ? req.query.interval_start : Number(new Date(0))
+    var end = req.query.interval_end ? req.query.interval_end : Number(new Date())
+    if (req.query.interval_end < req.query.interval_start || req.query.interval_start < 0) {
+        streamsDebug('[ERROR] Interval is wrong')
+        return res.status(400).send({error: 'Bad interval defined'})
+    }
+
+    console.log(req.query)
+
+    const hexagons = (await Hexagons.find({})).reduce((map, hex) => {
+        let streams = {}
+        for (var stream in hex.streams) {
+            Object.keys(hex.streams[stream]).forEach((time_id) => {
+                if (Number(start) <= Number(time_id) && Number(end) >= Number(time_id)) {
+                    if(!(stream in streams)) {
+                        streams = {
+                            ...streams,
+                            [stream]: {
+                                max: hex.streams[stream][time_id].max,
+                                min: hex.streams[stream][time_id].min,
+                                average: hex.streams[stream][time_id].average,
+                                count: hex.streams[stream][time_id].count
+                            }
+                        }
+                    } else {
+                        streams = {
+                            ...streams,
+                            [stream]: {
+                                max: hex.streams[stream][time_id].max > streams[stream].max ? hex.streams[stream][time_id].max : streams[stream].max,
+                                min: hex.streams[stream][time_id].min < streams[stream].min ? hex.streams[stream][time_id].min : streams[stream].min,
+                                average: (hex.streams[stream][time_id].average * hex.streams[stream][time_id].count + streams[stream].average * streams[stream].count) / (streams[stream].count + hex.streams[stream][time_id].count),
+                                count: hex.streams[stream][time_id].count + streams[stream].count
+                            }
+                        }
+                    }
+                }
+            })
+        }
+        map[hex.id] = streams
         return map
     }, {})
     const muns = (await Muns.find({}, 'id streams')).reduce((map, mun) => {
-        map[mun.id] = mun.streams
+        let streams = {}
+        for (var stream in mun.streams) {
+            Object.keys(mun.streams[stream]).forEach((time_id) => {
+                if (Number(start) <= Number(time_id) && Number(end) >= Number(time_id)) {
+                    if(!(stream in streams)) {
+                        streams = {
+                            ...streams,
+                            [stream]: {
+                                max: mun.streams[stream][time_id].max,
+                                min: mun.streams[stream][time_id].min,
+                                average: mun.streams[stream][time_id].average,
+                                count: mun.streams[stream][time_id].count
+                            }
+                        }
+                    } else {
+                        streams = {
+                            ...streams,
+                            [stream]: {
+                                max: mun.streams[stream][time_id].max > streams[stream].max ? mun.streams[stream][time_id].max : streams[stream].max,
+                                min: mun.streams[stream][time_id].min < streams[stream].min ? mun.streams[stream][time_id].min : streams[stream].min,
+                                average: (mun.streams[stream][time_id].average * mun.streams[stream][time_id].count + streams[stream].average * streams[stream].count) / (streams[stream].count + mun.streams[stream][time_id].count),
+                                count: mun.streams[stream][time_id].count + streams[stream].count
+                            }
+                        }
+                    }
+                }
+            })
+        }
+        map[mun.id] = streams
         return map
     }, {})
     
@@ -162,17 +226,18 @@ router.post('/:id/values', validation(validators.validatePostValue, 'body', 'Inv
     }
 
     await streams.countDocuments({stream_ID :to_broker.stream_ID}, (err, count) => {
-        if (count == 0){
+        if (count == 0) {
             streamsDebug(`[ERROR] Stream ${to_broker.stream_ID} not found`)
             return res.status(404).send({'Error':`Stream ${to_broker.stream_ID} not found`})
         }
-    })
-    streamsDebug(`[DEBUG] Stream ${to_broker.stream_ID} exists`)
-    
-    producer.publish('cityzoom/values',to_broker)
 
-    streamsDebug('[DEBUG] Value created with success')
-    return res.status(204).send()
+        streamsDebug(`[DEBUG] Stream ${to_broker.stream_ID} exists`)
+        
+        producer.publish('cityzoom/values',to_broker)
+    
+        streamsDebug('[DEBUG] Value created with success')
+        return res.status(204).send()
+    })
 })
 
 

@@ -1,10 +1,24 @@
 <template>
     <div class="mapMargin mapHeight" style="position:relative">
         <div class="mapHeight" id="map"></div>
-        <div v-if="selected_county" :style="{ 'background-color': municipalityValues[selected_county.get('id')].color}" class="ol-popup top">
+        <div v-if="getStream && selected_county" :style="{ 'background-color': municipalityValues[selected_county.get('id')].color}" class="ol-popup top">
             <div style="background-color: rgba(0,0,0, .5)">
-                <span class="big"> {{selected_county.get('Freguesia')}} </span>
-                <span class="big"> {{municipalityValues[selected_county.get('id')].value ? municipalityValues[selected_county.get('id')].value.toFixed(2) : 'No Values'}} {{getVerticals[selected_vertical].streams[selected_stream].unit}}</span>
+                <span class="xbig bold"> {{selected_county.get('Freguesia')}} <br> {{getStream.display}} </span>
+                <div v-if="getStream.name in heatmap.muns[selected_county.get('id')]" class="measure-show">
+                    <div class="measure-button small">
+                        <div class="arrow-down" :style="{'border-top': '1.6rem solid ' + getStream.colors[0]}"></div>
+                    </div>
+                    <span class="big">{{heatmap.muns[selected_county.get('id')][getStream.name].min.toFixed(2)}}{{getStream.unit}}</span>
+                    <div class="measure-button small">
+                        <div class="average" :style="{'background-color': '#' + rainbowHeatMap.colourAt(50)}"></div>
+                    </div>
+                    <span class="big">{{heatmap.muns[selected_county.get('id')][getStream.name].average.toFixed(2)}}{{getStream.unit}}</span>
+                    <div class="measure-button small">
+                        <div class="arrow-up" :style="{'border-bottom': '1.6rem solid ' + getStream.colors[1]}"></div>
+                    </div>
+                    <span class="big">{{heatmap.muns[selected_county.get('id')][getStream.name].max.toFixed(2)}}{{getStream.unit}}</span>
+                </div>
+                <div v-else class="normal">No Values</div>
                 <div class="scale-band-wrapper">
                     <div :class="{selected: index == municipalityValues[selected_county.get('id')].index}" v-for="index in 100" :key="index" :style="{'background-color': '#' + rainbowHeatMap.colourAt(index)}"></div>
                 </div>
@@ -12,14 +26,83 @@
         </div>
 
         <div id="hover_popup" class="ol-popup" :style="{ 'background-color': hovered_geo ? municipalityValues[hovered_geo.get('id')].color : 'none'}">
-            <div v-if="hovered_geo" style="background-color: rgba(0,0,0, .5)">
-                <span class="normal"> {{hovered_geo.get('Freguesia')}} </span>
-                <span class="normal"> {{municipalityValues[hovered_geo.get('id')].value ? municipalityValues[hovered_geo.get('id')].value.toFixed(2) : 'No Values'}} {{getVerticals[selected_vertical].streams[selected_stream].unit}}</span>
-                <div class="scale-band-wrapper">
+            <div v-if="getStream && hovered_geo" style="background-color: rgba(0,0,0, .5)">
+                <span class="big"> {{hovered_geo.get('Freguesia')}} </span>
+                <div v-if="getStream.name in heatmap.muns[hovered_geo.get('id')]" class="measure-show">
+                    <div class="measure-button small">
+                        <div class="arrow-down" :style="{'border-top': '1.6rem solid ' + getStream.colors[0]}"></div>
+                    </div>
+                    <span class="big">{{heatmap.muns[hovered_geo.get('id')][getStream.name].min.toFixed(2)}}{{getStream.unit}}</span>
+                    <div class="measure-button small">
+                        <div class="average" :style="{'background-color': '#' + rainbowHeatMap.colourAt(50)}"></div>
+                    </div>
+                    <span class="big">{{heatmap.muns[hovered_geo.get('id')][getStream.name].average.toFixed(2)}}{{getStream.unit}}</span>
+                    <div class="measure-button small">
+                        <div class="arrow-up" :style="{'border-bottom': '1.6rem solid ' + getStream.colors[1]}"></div>
+                    </div>
+                    <span class="big">{{heatmap.muns[hovered_geo.get('id')][getStream.name].max.toFixed(2)}}{{getStream.unit}}</span>
+                </div>
+                <div v-else class="normal">No Values</div>
+                <!-- <div class="scale-band-wrapper">
                     <div :class="{selected: index == municipalityValues[hovered_geo.get('id')].index}" v-for="index in 100" :key="index" :style="{'background-color': '#' + rainbowHeatMap.colourAt(index)}"></div>
+                </div> -->
+            </div>
+        </div>
+
+        <div v-if="getStream" class="measure-menu">
+            <div class="measure-menu_top">
+                <div class="measure-button" @click="measure_selected = 'min'; updateHeatMap()" :class="{selected: measure_selected == 'min'}" >
+                    <div class="arrow-down" :style="{'border-top': '2.2rem solid ' + getStream.colors[0]}">
+                    </div>
+                </div>
+                <div class="measure-button" @click="measure_selected = 'average'; updateHeatMap()" :class="{selected: measure_selected == 'average'}" >
+                    <div class="average" :style="{'background-color': '#' + rainbowHeatMap.colourAt(50)}">
+                    </div>
+                </div>
+                <div class="measure-button" @click="measure_selected = 'max'; updateHeatMap()" :class="{selected: measure_selected == 'max'}" >
+                    <div class="arrow-up" :style="{'border-bottom': '2.2rem solid ' + getStream.colors[1]}">
+                    </div>
+                </div>
+            </div>
+            <div class="measure-menu_bottom">
+                <div class="measure-menu_bottom_date">
+                    <div @click="current_scale > 0 ? current_time -= current_scale : current_time = (new Date(current_time)).addMonths(1 * current_scale); updateValues();" class="arrow"><img src="icons/arrow.png" alt=""></div>
+                    <div class="measure-menu_bottom_date_wrapper">
+                        <div class="date normal">
+                            <div :style="{color: current_scale == 86400000 || current_scale == 604800000 ? 'red' : 'black'}">{{getStartDate.getDate().toString().padStart(2, '0')}}</div>/
+                            <div :style="{color: current_scale == -1 ? 'red' : 'black'}">{{(getStartDate.getMonth() + 1).toString().padStart(2, '0')}}</div>/
+                            <div :style="{color: current_scale == -12 ? 'red' : 'black'}" style="margin-right: 1.5rem">{{getStartDate.getFullYear()}}</div> 
+                            <div :style="{color: current_scale == 3600000 ? 'red' : 'black'}" >{{getStartDate.getHours().toString().padStart(2, '0')}}h</div>       
+                        </div>
+                        <div class="date normal">
+                            <div :style="{color: current_scale == 86400000 || current_scale == 604800000 ? 'red' : 'black'}">{{getCurrentDate.getDate().toString().padStart(2, '0')}}</div>/
+                            <div :style="{color: current_scale == -1 ? 'red' : 'black'}">{{(getCurrentDate.getMonth() + 1).toString().padStart(2, '0')}}</div>/
+                            <div :style="{color: current_scale == -12 ? 'red' : 'black'}" style="margin-right: 1.5rem">{{getCurrentDate.getFullYear()}}</div> 
+                            <div :style="{color: current_scale == 3600000 ? 'red' : 'black'}">{{getCurrentDate.getHours().toString().padStart(2, '0')}}h</div>  
+                        </div>
+                    </div>
+                    <div :class="{disabled: current_time == this.getCurrentTimeHour()}" @click="increaseInterval(); updateValues();" class="arrow"><img src="icons/arrow.png" alt=""></div>
+                </div>
+                <div class="measure-menu_bottom_picker">
+                    <div @click="current_scale = 3600000; updateValues()" class="measure-button fit xsmall bold" :class="{selected: current_scale == 3600000}">
+                        HOUR
+                    </div>
+                    <div @click="current_scale = 86400000; updateValues()" class="measure-button fit xsmall bold" :class="{selected: current_scale == 86400000}">
+                        DAY
+                    </div>
+                    <div @click="current_scale = 604800000; updateValues()" class="measure-button fit xsmall bold" :class="{selected: current_scale == 604800000}">
+                        WEEK
+                    </div>
+                    <div @click="current_scale = -1; updateValues()" class="measure-button fit xsmall bold" :class="{selected: current_scale == -1}">
+                        MONTH
+                    </div>
+                    <div @click="current_scale = -12; updateValues()" class="measure-button fit xsmall bold" :class="{selected: current_scale == -12}">
+                        YEAR
+                    </div>
                 </div>
             </div>
         </div>
+        
 
         <div class="map-menu left" :class="{show: selected_county != null, active: selected_county == null}">
             <div class="map-menu_button" @click="deselect_county()">
@@ -27,16 +110,16 @@
         </div>
 
         <div class="map-menu show">
-            <div v-if="selected_vertical != null && selected_stream != null" class="map-menu_left">
-                <div @mousedown="selectStream(i)" :class="{active: stream.name == getVerticals[selected_vertical].streams[selected_stream].name}" :title="stream.display" v-for="(stream, i) in getVerticals[selected_vertical].streams" :key="i" class="map-menu_button">
-                    <img :src="`icons/streams/${getVerticals[selected_vertical].streams[i].name}.png`" alt="">
+            <div v-if="getStream" class="map-menu_left">
+                <div @mousedown="selectStream(i)" :class="{active: stream.name == getStream.name}" :title="stream.display" v-for="(stream, i) in getVertical.streams" :key="i" class="map-menu_button">
+                    <img :src="`icons/streams/${getVertical.streams[i].name}.png`" alt="">
                 </div>
             </div>
             <div class="map-menu_center">
 
             </div>
-            <div v-if="selected_vertical != null" class="map-menu_right">
-                <div @mousedown="selectVertical(i)" :class="{active: vertical.name == getVerticals[selected_vertical].name}" :title="vertical.display" v-for="(vertical, i) in getVerticals" :key="i" class="map-menu_button">
+            <div v-if="getVertical" class="map-menu_right">
+                <div @mousedown="selectVertical(i)" :class="{active: vertical.name == getVertical.name}" :title="vertical.display" v-for="(vertical, i) in getVerticals" :key="i" class="map-menu_button">
                     <img :src="`icons/${vertical.name}.png`" alt="">
                 </div>
             </div>
@@ -47,6 +130,31 @@
 </template>
 
 <script>
+
+Date.isLeapYear = function (year) { 
+    return (((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0)); 
+};
+
+Date.getDaysInMonth = function (year, month) {
+    return [31, (Date.isLeapYear(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month];
+};
+
+Date.prototype.isLeapYear = function () { 
+    return Date.isLeapYear(this.getFullYear()); 
+};
+
+Date.prototype.getDaysInMonth = function () { 
+    return Date.getDaysInMonth(this.getFullYear(), this.getMonth());
+};
+
+Date.prototype.addMonths = function (value) {
+    var n = this.getDate();
+    this.setDate(1);
+    this.setMonth(this.getMonth() + value);
+    this.setDate(Math.min(n, this.getDaysInMonth()));
+    return this;
+};
+
 var h3 = require('h3-js');
 var Rainbow = require('rainbowvis.js');
 const drone_stream = require('static/get_stream_values_response.json');
@@ -89,10 +197,10 @@ export default {
             
             testValues: {},
             testValuesOrdered: [],
-            rainbowHeatMap: null,
+            rainbowHeatMap: new Rainbow(),
 
-            selected_vertical: null,
-            selected_stream: null,
+            selected_vertical: 0,
+            selected_stream: 0,
             selected_county: null,
             hovered_geo: null,
 
@@ -104,70 +212,20 @@ export default {
             shown_features: [],
             hidden_hex: [],
 
-            data: { 'Águeda':
-                { temperature_stream: 18.58,
-                    pressure_stream: 1014.08,
-                    humidity_stream: 0.82,
-                    ozone_stream: 314.83 },
-                Estarreja:
-                { temperature_stream: 16.62,
-                    pressure_stream: 1014.21,
-                    humidity_stream: 0.92,
-                    ozone_stream: 314.61 },
-                Murtosa:
-                { temperature_stream: 16.17,
-                    pressure_stream: 1014.26,
-                    humidity_stream: 1,
-                    ozone_stream: 314.54 },
-                'Oliveira de Azeméis':
-                { temperature_stream: 18.4,
-                    pressure_stream: 1014.15,
-                    humidity_stream: 0.75,
-                    ozone_stream: 314.54 },
-                'Oliveira do Bairro':
-                { temperature_stream: 17.94,
-                    pressure_stream: 1014.14,
-                    humidity_stream: 0.92,
-                    ozone_stream: 315.04 },
-                Ovar:
-                { temperature_stream: 17.91,
-                    pressure_stream: 1014.25,
-                    humidity_stream: 0.84,
-                    ozone_stream: 314.46 },
-                Vagos:
-                { temperature_stream: 17.52,
-                    pressure_stream: 1014.25,
-                    humidity_stream: 0.97,
-                    ozone_stream: 314.56 },
-                'Vale de Cambra':
-                { temperature_stream: 18.06,
-                    pressure_stream: 1014.1,
-                    humidity_stream: 0.73,
-                    ozone_stream: 314.21 },
-                'Ílhavo':
-                { temperature_stream: 17.53,
-                    pressure_stream: 1014.27,
-                    humidity_stream: 0.96,
-                    ozone_stream: 314.56 },
-                'Albergaria-a-Velha':
-                { temperature_stream: 18.34,
-                    pressure_stream: 1014.15,
-                    humidity_stream: 0.81,
-                    ozone_stream: 314.78 },
-                Anadia:
-                { temperature_stream: 18.47,
-                    pressure_stream: 1014.07,
-                    humidity_stream: 0.61,
-                    ozone_stream: 315.32 },
-                Aveiro:
-                { temperature_stream: 16.75,
-                    pressure_stream: 1014.23,
-                    humidity_stream: 0.98,
-                    ozone_stream: 314.66 } 
-            }
+            heatmap: {},
+            measure_selected: 'average',
+            current_scale: 3600000,
+            current_time: null
         }
     },
     computed: {
+        getStartDate() {
+            return this.current_scale > 0 ? new Date(this.current_time - this.current_scale)
+                : (new Date(this.current_time)).addMonths(1 * this.current_scale);
+        },
+        getCurrentDate() {
+            return new Date(this.current_time)
+        },
         getVerticals() {
             return this.$store.state.verticals
         },
@@ -176,7 +234,13 @@ export default {
         },
         getHeatmap() {
             return this.$store.state.heatmap
-        }
+        },
+        getVertical() {
+            return this.selected_vertical != null ? this.getVerticals[this.selected_vertical] : null
+        },
+        getStream() {
+            return this.getVertical && this.selected_stream != null ? this.getVertical.streams[this.selected_stream] : null
+        },
     },
     async mounted() {
         this.req.Ol = require( 'ol');
@@ -248,7 +312,8 @@ export default {
             updateWhileAnimating: true,
             style: (feature) => {
                 return feature == this.selected_county ? this.geoStyle.active : this.geoStyle.default 
-            }
+            },
+            renderMode: 'hybrid'
         })
 
         this.hoverPopup = document.getElementById('hover_popup');
@@ -278,6 +343,7 @@ export default {
             }),
             renderBuffer: window.innerWidth,
             updateWhileAnimating: true,
+            renderMode: 'hybrid'
         })
 
         const centerpos = [-8.661682, 40.6331731];
@@ -303,55 +369,13 @@ export default {
             })
         })
 
-        // const res = await this.$axios.get('/a.json')
-        // for(var munic in res.data) {
-        //     let count = 0
-        //     for(var area of res.data[munic]) {
-        //         for(var hex of area) {
-        //             const pol = hex.map(p => this.req.proj.transform(p, 'EPSG:4326', 'EPSG:3857'))
-        //             const a = new Feature({
-        //                 geometry: new this.req.geom.Polygon([pol]),
-        //                 municipality: munic,
-        //                 id: munic + count++
-        //             })
-        //             //this.hex_layer.getSource().addFeature(a)
-        //         }
-        //     }
-        // }
-
         this.hex_layer.getSource().on('change', () => {
             if(this.hex_layer.getSource().getState() == 'ready' && !this.loaded) {
                 this.loaded = true
-                this.rainbowHeatMap = new Rainbow()
 
                 this.geoJsonExtent = this.req.extent.createEmpty()
                 this.geo_layer.getSource().getFeatures().forEach(feature => {
                     this.geoJsonExtent = this.req.extent.extend(this.geoJsonExtent, feature.getGeometry().getExtent())
-                })
-
-                this.hex_layer.getSource().getFeatures().forEach((feature) => {
-                    
-                    const tmp = Math.random() * 35 + 5;
-
-                    if(!(feature.get('municipality') in this.municipalityValues)) {
-                        this.municipalityValues[feature.get('municipality')] = {
-                            value: 0,
-                            count: 0,
-                            color: null,
-                            style: null
-                        }
-                    }
-
-                    this.hexagonValues[feature.get('id')] = {
-                        value: tmp,
-                        color: null,
-                        style: null
-                    }
-
-                })
-
-                this.map.getView().fit(this.geoJsonExtent, {
-                    duration: 500
                 })
  
                 setTimeout(() => {
@@ -360,7 +384,9 @@ export default {
                     })
                 },0)
 
-                this.selectVertical(0)
+                this.current_time = this.getCurrentTimeHour()
+                this.updateValues(this.current_time)
+                //this.selectVertical(0)
             }
         })
 
@@ -397,6 +423,7 @@ export default {
                             const feat = new Feature({
                                 geometry: new this.req.geom.Point(this.req.proj.transform([location[1],location[0]], 'EPSG:4326', 'EPSG:3857')),
                                 id: device.device_id,
+                                hexagon: device.hexagon
                             })
                             this.devices_layer.getSource().addFeature(feat)
                             this.shown_features.push(feat);
@@ -436,18 +463,20 @@ export default {
                     maxZoom: 18
                 }))
 
+                if(this.selected_county)
+                    this.addHiddenHex(this.selected_county)
                 this.hovered_geo = null
                 this.selected_county = geo_feature 
                 this.shown_features = []
                 this.devices_layer.getSource().clear()
 
                 for(var device of this.getDevices) {
-                    console.log(device.vertical.includes(this.getVerticals[this.selected_vertical].name))
                     if(device.hexagon && device.hexagon.substring(0, 6) == this.selected_county.get('id') && device.vertical.includes(this.getVerticals[this.selected_vertical].name)) {
                         var location = [device.locations[device.locations.length - 1].latitude, device.locations[device.locations.length - 1].longitude]
                         const feat = new Feature({
                             geometry: new this.req.geom.Point(this.req.proj.transform([location[1],location[0]], 'EPSG:4326', 'EPSG:3857')),
                             id: device.device_id,
+                            hexagon: device.hexagon
                         })
                         this.devices_layer.getSource().addFeature(feat)
                         this.shown_features.push(feat);
@@ -477,35 +506,35 @@ export default {
             click_interaction.getFeatures().clear()
         })
 
-        //this.createFeature(vectorSource, []);
-        // var feat = new Feature({
-        //     geometry: new this.req.geom.Point(this.req.proj.transform([drone_stream.values[0].longitude, drone_stream.values[0].latitude], 'EPSG:4326',     
-        //     'EPSG:3857'))
-        //     //id: device.id
-        // })
-        // vectorSource.addFeature(feat)
-        // var i = 1;
-        // setInterval(() => {
-        //     vectorSource.removeFeature(feat);
-        //     feat = new Feature({
-        //         geometry: new this.req.geom.Point(this.req.proj.transform([drone_stream.values[i].longitude, drone_stream.values[i].latitude], 'EPSG:4326',     
-        //         'EPSG:3857'))
-        //         //id: device.id
-        //     })
-        //     vectorSource.addFeature(feat)
-        //     i++
-        // },150)
-
     },
     methods: {
+        increaseInterval() {
+            const tmp = this.current_scale > 0 ? this.current_time += this.current_scale : this.current_time = (new Date(this.current_time)).addMonths(-1 * this.current_scale); 
+            const date = this.getCurrentTimeHour()
+            this.current_time = tmp > date ? date : tmp;
+        },
+        getCurrentTimeHour() {
+            return Math.ceil((new Date()).getTime() / 3600000) * 3600000
+        },
+        async updateValues() {
+            const res = await this.$axios.get(`http://localhost:8001/czb/streams/heatmap?interval_start=${Math.floor(this.getStartDate)}&interval_end=${Math.floor(this.getCurrentDate)}`, {
+                headers: {
+                    Authorization: this.$store.state.jwt
+                }
+            })
+            
+            this.heatmap = res.data
+            this.updateHeatMap()
+        },
         clearHoverPopup() {
             this.hovered_geo = null
             document.body.style.cursor = "default"
             this.hoverOverlay.setPosition(null)
         },
         clearGeoDevices(geo) {
-            for(var feature of this.shown_features) {
-                if(this.getDevices.find(d => d.device_id == feature.get('id')).municipality == geo.get('id')) {
+            const tmp = [...this.shown_features]
+            for(var feature of tmp) {
+                if(feature.get('hexagon').substring(0, 6) == geo.get('id')) {
                     this.devices_layer.getSource().removeFeature(feature)
                     this.shown_features.splice(this.shown_features.findIndex(f => f == feature), 1)
                 }
@@ -586,19 +615,20 @@ export default {
             }
         },
         updateHeatMap() {
+
             const stream = this.getVerticals[this.selected_vertical].streams[this.selected_stream]
             this.rainbowHeatMap.setNumberRange(1, 100);
             this.rainbowHeatMap.setSpectrum(stream.colors[0] , stream.colors[1]); 
 
-            for(var i in this.getHeatmap.muns) {
-                if(!(stream.name in this.getHeatmap.muns)) {
-                    this.municipalityValues[i].value = null
+            for(var i in this.heatmap.muns) {
+                if(!(i in this.municipalityValues))
+                    this.municipalityValues[i] = {}
+                if(!(stream.name in this.heatmap.muns[i])) {
                     this.municipalityValues[i].index = null
                     this.municipalityValues[i].color = '#ffffff00';
                 } else {
-                    const value = this.getHeatmap.muns[i][stream.name].average
+                    const value = this.heatmap.muns[i][stream.name].average
                     const index = (value - stream.min) * 100 / (stream.max - stream.min)
-                    this.municipalityValues[i].value = value
                     this.municipalityValues[i].index = Math.round(index)
                     this.municipalityValues[i].color = '#' + this.rainbowHeatMap.colourAt(Math.round(index)) + 'D0';
                 }
@@ -613,21 +643,21 @@ export default {
                 })
             }
 
-            for(var i in this.getHeatmap.hexagons) {
-                if(!(stream.name in this.getHeatmap.hexagons)) {
-                    this.hexagonValues[i].value = null
+            for(var i in this.heatmap.hexagons) {
+                if(!(i in this.hexagonValues))
+                    this.hexagonValues[i] = {}
+                if(!(stream.name in this.heatmap.hexagons[i])) {
                     this.hexagonValues[i].index = null
-                    this.hexagonValues[i].color = '#ffffff00';
+                    this.hexagonValues[i].color = '#ffffffa0';
                 } else {
-                    const value = this.getHeatmap.hexagons[i][stream.name].average
+                    const value = this.heatmap.hexagons[i][stream.name][this.measure_selected]
                     const index = (value - stream.min) * 100 / (stream.max - stream.min)
-                    this.hexagonValues[i].value = value
                     this.hexagonValues[i].index = Math.round(index)
-                    this.hexagonValues[i].color = value == 0 ? '#ffffff' : '#' + this.rainbowHeatMap.colourAt(Math.round(index));
+                    this.hexagonValues[i].color = '#' + this.rainbowHeatMap.colourAt(Math.round(index)) + 'FF';;
                 }
                 this.hexagonValues[i].style = new this.req.style.Style({
                     fill: new this.req.style.Fill({
-                        color: this.hexagonValues[i].color + 'FF',
+                        color: this.hexagonValues[i].color,
                     }),
                     stroke: new this.req.style.Stroke({
                         color: 'black',
@@ -649,18 +679,16 @@ export default {
 }
 </script>
 
-
 <style lang="scss" scope>
 @import '~/assets/mixins.scss';
 
 .ol-popup {
 
     @include shadow(0px, 0px, 4px, 0px, rgba(0,0,0,0.2));
-    pointer-events: none;
     z-index: 3332;
     position: absolute;
     text-align: center;
-    filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
+    filter: drop-shadow(0 1px 4px rgba(0,0,0,0.6));
     font-weight: 900;
     white-space: nowrap;
     left: 50%;
@@ -669,8 +697,10 @@ export default {
     &:not(.top) {
         transform: translate(-50%, -50%);
         width: max-content;
+        pointer-events: none;
     }
     &.top {
+        cursor: default;
         top: 2rem;
         transform: translate(-50%, 0);
         background-color: rgb(255, 255, 255);
@@ -685,6 +715,148 @@ export default {
         color: white;
         padding: 1rem 2rem;
         border-radius: 10px;
+        & > *{
+            margin-bottom: .5rem;
+        }
+    }
+}
+
+.measure-button {
+    @include shadow(0px, 0px, 8px, 2px, rgba(0,0,0,0.2));
+    width: 4rem;
+    height: 4rem;
+    border-radius: 5px;
+    @include flex(center, center);
+    background-color: rgba(255, 255, 255, 0.856);
+    &.selected {
+        color: white;
+        background-color: rgba(119, 119, 119, 0.856);
+    }
+    @include transition(transform, .2s, ease, 0s);
+    &:hover:not(.selected):not(.small) {
+        transform: scale(1.05);
+        cursor: pointer;
+        &:active {
+            transform: scale(1);
+        }
+    }
+    & .arrow-up {
+        width: 0; 
+        height: 0; 
+        border-left: 1.4rem solid transparent;
+        border-right: 1.4rem solid transparent;
+    }
+    & .arrow-down {
+        width: 0; 
+        height: 0; 
+        border-left: 1.4rem solid transparent;
+        border-right: 1.4rem solid transparent;
+    }
+    & .average {
+        width: 2.75rem;
+        height: 1rem;
+    }
+    &.small {
+        width: 3.4rem;
+        height: 3.4rem;
+        & .arrow-up {
+            border-left: 1rem solid transparent;
+            border-right: 1rem solid transparent;
+        }
+        & .arrow-down {
+            border-left: 1rem solid transparent;
+            border-right: 1rem solid transparent;
+        }
+        & .average {
+            width: 2.25rem;
+            height: .75rem;
+        }
+    }
+    &.fit {
+        width: max-content;
+        height: max-content;
+        padding: .5rem;
+    }
+}
+
+.measure-show {
+    @include flex(center, center);
+    width: 100%;
+    & > :not(:first-child) {
+        margin-left: .75rem;
+    }
+}
+
+.measure-menu {
+    @include flex(center, center, column);
+    position:absolute;
+    top: 2rem;
+    right: 2rem;
+    padding: .75rem;
+    @include shadow(0px, 0px, 8px, 2px, rgba(0,0,0,0.2));
+    background-color: rgba(255,255,255,.75);
+    border-radius: 5px;
+    &_top {
+        @include flex(center, center);
+        margin-bottom: .75rem;
+        & > div {
+            &:not(:first-child) {
+                margin-left: .75rem;
+            }
+        }
+    }
+    &_bottom {
+        @include flex(center, center, column);
+        &_date {
+            @include flex(space-evenly, center);
+            width: 100%;
+            & .arrow {
+                & img {
+                    width: 4rem;
+                }
+                @include transition(transform, .2s, ease, 0s);
+                &:hover:not(.disabled) {
+                    cursor: pointer;
+                    transform: scale(1.4);
+                    &:first-of-type {
+                        transform: rotate(180deg) scale(1.4);
+                    }
+                    &:active {
+                        transition: none;
+                        transform: scale(1);
+                        &:first-of-type {
+                            transform: rotate(180deg) scale(1);
+                        }
+                    }
+                }
+                &.disabled {
+                    transform: scale(.8);
+                    background-color: rgba(255, 0, 0, 0.342);
+                    border-radius: 50%;
+                    pointer-events: none;
+                }
+                &:first-of-type {
+                    margin-right: .75rem;
+                    transform: rotate(180deg);
+                }
+                &:last-of-type {
+                    margin-left: .75rem;
+                }
+            }
+            & .date {
+                @include flex(center, center);
+            }
+        }  
+        &_picker {
+            margin-top: .75rem;
+            @include flex(center, center);
+            & > div {
+                &:not(:first-child) {
+                    margin-left: .5rem;
+                }
+            }
+
+        }      
     }
 }
 

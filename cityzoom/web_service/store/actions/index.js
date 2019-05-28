@@ -43,7 +43,7 @@ export default{
                     Authorization: payload
                 }
             })
-            commit('SET_STORE', { verticals: verticals.data, devices: devices.data, heatmap: heatmap.data })
+            commit('SET_STORE', { verticals: verticals.data, devices: devices.data, heatmap: heatmap.data }) 
         } catch (err) {
             console.error('Error', err.message)
             return err.message
