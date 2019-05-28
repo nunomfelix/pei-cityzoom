@@ -75,7 +75,7 @@ client.on('message',async (topic,data,info)=>{
             }
     
             const date = new Date(data_json.timestamp)
-            const time_id = Math.floor(date / (1000*60*24)) * (1000*60*24)
+            const time_id = Math.floor(date / (1000*60*60)) * (1000*60*60)
         
             if(!hexa.streams || (!(stream.stream_name in hexa.streams)) || (!(time_id in hexa.streams[stream.stream_name]))) {
                 hexa.streams = {

@@ -516,7 +516,7 @@ export default {
             return Math.ceil((new Date()).getTime() / 3600000) * 3600000
         },
         async updateValues() {
-            const res = await this.$axios.get(`http://localhost:8001/czb/streams/heatmap?interval_start=${Math.floor(this.getStartDate / (1000*60*24)) * (1000*60*24)}&interval_end=${Math.floor(this.getCurrentDate / (1000*60*24)) * (1000*60*24)}`, {
+            const res = await this.$axios.get(`http://localhost:8001/czb/streams/heatmap?interval_start=${Math.floor(this.getStartDate)}&interval_end=${Math.floor(this.getCurrentDate)}`, {
                 headers: {
                     Authorization: this.$store.state.jwt
                 }
