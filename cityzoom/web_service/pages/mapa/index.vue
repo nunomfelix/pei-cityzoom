@@ -102,6 +102,7 @@
                 </div>
             </div>
         </div>
+        
 
         <div class="map-menu left" :class="{show: selected_county != null, active: selected_county == null}">
             <div class="map-menu_button" @click="deselect_county()">
@@ -521,6 +522,7 @@ export default {
                     Authorization: this.$store.state.jwt
                 }
             })
+            
             this.heatmap = res.data
             console.log()
             this.updateHeatMap()
