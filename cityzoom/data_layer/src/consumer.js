@@ -3,6 +3,7 @@ const config = require('config')
 const colors = require('colors')
 const mqtt = require('mqtt')
 const turf = require('@turf/helpers')
+const booleanPointInPolygon = require('@turf/boolean-point-in-polygon').default
 const consumerDebug = require('debug')('app:Consumer')
 //Broker connection
 const client = mqtt.connect('mqtt://'+config.get('BROKER_HOST')+':'+config.get('BROKER_PORT'),{clientId: 'cityzoom_consumer'})
@@ -13,6 +14,7 @@ const Device = require('./db/models/devices')
 const Stream = require('./db/models/streams')
 const Hexas = require('./db/models/hexagons')
 const Muns = require('./db/models/municipalities')
+const Values = require('./db/models/values')
 
 client.on('connect',()=>{
     consumerDebug('Listening to MQTT broker!')
@@ -38,12 +40,12 @@ client.on('message',async (topic,data,info)=>{
             })
     }//If a new stream was added
     else if(topic == rootTopic+'streams'){
-        await Stream.create(data_json)
-            .then(() => {
-                consumerDebug('Stream created with success')
-            }).catch(()=>{
-                consumerDebug('Error publishing stream')
-            })
+        try {
+            const res = await Stream.create(data_json)
+            consumerDebug('Stream created with success')
+        } catch(e) {
+            consumerDebug('Error publishing stream')
+        }
     }else if(topic == rootTopic+'values'){
         const stream = await Stream.findOne({stream_ID:data_json.stream_ID})
         let dev = await Device.findOne({device_ID:stream.device_ID}) 
@@ -56,26 +58,46 @@ client.on('message',async (topic,data,info)=>{
             })
         }
 
-        const hexagons = Hexas.find()
-        for (hexagon in hexagons) {
-            var a = turf.point([data_json.latitude, data_json.longitude])
-            var b = turf.polygon(data_json.coordinates)
-            if (turf.BooleanPointInPolygon(pt, poly)) {
-                hexagon.average = (hexagon.average * hexagon.values_til_now + data_json.value) / (hexagon.values_til_now + 1)
-                hexagon.values_til_now = hexagon.values_til_now + 1
-                var muns = await Muns.findOne({'municipality': hexagon.municipality})
-                muns.average = (muns.average * muns.values_til_now + data_json.value) / (muns.values_til_now + 1)
-                muns.values_til_now = muns.values_til_now + 1 
-                await Device.updateOne({device_ID: stream.device_ID}, {'municipality': muns.municipality})
+        /*var hexa = !dev.mobile && dev.hexagon ? await Hexas.findOne({id: dev.hexagon}) : null
+        
+        console.log(dev)
+
+        if(!hexa) {
+            const hexagons = await Hexas.find()
+            var a = turf.point([data_json.longitude, data_json.latitude])
+            for (hexagon of hexagons) {
+                var b = turf.polygon([hexagon.coordinates])
+                if (booleanPointInPolygon(a, b)) {
+                    hexa = hexagon
+                    break;
+                }
             }
         }
+        
+        hexa.streams = {
+            ...hexa.streams,
+            [stream.stream_name]: {
+                average: (hexa.streams[stream.stream_name].average * hexa.streams[stream.stream_name].count + data_json.value) / (hexa.streams[stream.stream_name].count + 1),
+                count: hexa.streams[stream.stream_name].count + 1
+            }
+        }
+        var mun = await Muns.findOne({id: hexa.municipality})
+        mun.streams = {
+            ...mun.streams,
+            [stream.stream_name]: {
+                average: (mun.streams[stream.stream_name].average * mun.streams[stream.stream_name].count + data_json.value) / (mun.streams[stream.stream_name].count + 1),
+                count: mun.streams[stream.stream_name].count + 1
+            }
+        }
+        await Device.updateOne({device_ID: stream.device_ID}, {hexagon: hexa.id})
+        await hexa.save()
+        await mun.save()*/
 
         //Saves the value in the database
-        Value.create(data_json).then(()=>{
+        Values.create(data_json).then(()=>{
             consumerDebug('Values published in the database')
-        }).catch(()=>{
-            consumerDebug('Error publishing value in the database')
+        }).catch((err)=>{
+            consumerDebug(err)
         })
-
     }
 })

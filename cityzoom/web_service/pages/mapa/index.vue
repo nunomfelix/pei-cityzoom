@@ -173,6 +173,9 @@ export default {
         },
         getDevices() {
             return this.$store.state.devices
+        },
+        getHeatmap() {
+            return this.$store.state.heatmap
         }
     },
     async mounted() {
@@ -207,7 +210,7 @@ export default {
 
         this.geoStyle.default = new this.req.style.Style({
             fill: new this.req.style.Fill({
-                color: 'rgba(255,255,255,.20)'
+                color: 'rgba(255,255,255,0)'
             }),
             stroke: new this.req.style.Stroke({
                 color:'rgb(48, 145, 198)',
@@ -326,7 +329,6 @@ export default {
                     this.geoJsonExtent = this.req.extent.extend(this.geoJsonExtent, feature.getGeometry().getExtent())
                 })
 
-                console.log(this.hex_layer.getSource().getFeatures().length)
                 this.hex_layer.getSource().getFeatures().forEach((feature) => {
                     
                     const tmp = Math.random() * 35 + 5;
@@ -339,10 +341,6 @@ export default {
                             style: null
                         }
                     }
-
-                    this.municipalityValues[feature.get('municipality')].value = this.municipalityValues[feature.get('municipality')].value ? 
-                        (this.municipalityValues[feature.get('municipality')].value * this.municipalityValues[feature.get('municipality')].count + tmp) / (this.municipalityValues[feature.get('municipality')].count + 1) : tmp
-                    this.municipalityValues[feature.get('municipality')].count++
 
                     this.hexagonValues[feature.get('id')] = {
                         value: tmp,
@@ -393,7 +391,7 @@ export default {
                 this.hoverOverlay.setPosition([center[0], (center[1] + bottom[1]) / 2]) 
                 if(this.selected_county != null) {
                     for(var device of this.getDevices) {
-                        if(device.municipality == this.hovered_geo.get('id') && this.hovered_geo.get('id') != this.selected_county && device.vertical.includes(this.getVerticals[this.selected_vertical].name)) {
+                        if(device.hexagon && device.hexagon.substring(0, 6) == this.hovered_geo.get('id') && this.hovered_geo.get('id') != this.selected_county && device.vertical.includes(this.getVerticals[this.selected_vertical].name)){
                             var location = device.mobile ? [device.locations[device.locations.length - 1].latitude, device.locations[device.locations.length - 1].longitude] :
                                                 [device.locations[0].latitude, device.locations[0].longitude]
                             const feat = new Feature({
@@ -444,9 +442,9 @@ export default {
                 this.devices_layer.getSource().clear()
 
                 for(var device of this.getDevices) {
-                    if(device.municipality == geo_feature.get('id') && device.vertical.includes(this.getVerticals[this.selected_vertical].name)) {
-                        var location = device.mobile ? [device.locations[device.locations.length - 1].latitude, device.locations[device.locations.length - 1].longitude] :
-                                            [device.locations[0].latitude, device.locations[0].longitude]
+                    console.log(device.vertical.includes(this.getVerticals[this.selected_vertical].name))
+                    if(device.hexagon && device.hexagon.substring(0, 6) == this.selected_county.get('id') && device.vertical.includes(this.getVerticals[this.selected_vertical].name)) {
+                        var location = [device.locations[device.locations.length - 1].latitude, device.locations[device.locations.length - 1].longitude]
                         const feat = new Feature({
                             geometry: new this.req.geom.Point(this.req.proj.transform([location[1],location[0]], 'EPSG:4326', 'EPSG:3857')),
                             id: device.device_id,
@@ -521,7 +519,6 @@ export default {
                     this.hidden_hex.splice(this.hidden_hex.findIndex(f => f == feature), 1)
                 }
             }
-            console.log(this.hidden_hex.length)
         },
         deselect_county() {
             this.map.setView(new this.req.Ol.View({
@@ -533,6 +530,7 @@ export default {
             this.map.getView().fit(this.geoJsonExtent, {
                 duration: 500
             })
+            this.addHiddenHex(this.selected_county)
             this.selected_county = null
             this.devices_layer.getSource().clear()
             this.shown_features = []
@@ -592,56 +590,43 @@ export default {
             this.rainbowHeatMap.setNumberRange(1, 100);
             this.rainbowHeatMap.setSpectrum(stream.colors[0] , stream.colors[1]); 
 
-            for(var i in this.municipalityValues) {
-                const tmp = (this.municipalityValues[i].value - stream.min) * 100 / (stream.max - stream.min)
-                this.municipalityValues[i].index = Math.round(tmp)
-                this.municipalityValues[i].color = '#' + this.rainbowHeatMap.colourAt(Math.round(tmp));
+            for(var i in this.getHeatmap.muns) {
+                const value = this.getHeatmap.muns[i][stream.name].average
+                const index = (value - stream.min) * 100 / (stream.max - stream.min)
+                this.municipalityValues[i].value = value
+                this.municipalityValues[i].index = Math.round(index)
+                this.municipalityValues[i].color = value == 0 ? '#ffffff' : '#' + this.rainbowHeatMap.colourAt(Math.round(index));
                 this.municipalityValues[i].style = new this.req.style.Style({
                     fill: new this.req.style.Fill({
                         color: this.municipalityValues[i].color + 'D0'
                     }),
                     stroke: new this.req.style.Stroke({
                         color: 'black',
-                        width: this.map.getView().getZoom() / 20 * 2.5
+                        width: this.map.getView().getZoom() / 20 * 1.5
                     })
                 })
             }
 
-            for(var i in this.hexagonValues) {
-                const tmp = (this.hexagonValues[i].value - stream.min) * 100 / (stream.max - stream.min)
-                this.hexagonValues[i].index = Math.round(tmp)
-                this.hexagonValues[i].color = '#' + this.rainbowHeatMap.colourAt(Math.round(tmp));
+            for(var i in this.getHeatmap.hexagons) {
+                const value = this.getHeatmap.hexagons[i][stream.name].average
+                const index = (value - stream.min) * 100 / (stream.max - stream.min)
+                this.hexagonValues[i].value = value
+                this.hexagonValues[i].index = Math.round(index)
+                this.hexagonValues[i].color = value == 0 ? '#ffffff' : '#' + this.rainbowHeatMap.colourAt(Math.round(index));
                 this.hexagonValues[i].style = new this.req.style.Style({
                     fill: new this.req.style.Fill({
                         color: this.hexagonValues[i].color + 'FF',
                     }),
                     stroke: new this.req.style.Stroke({
                         color: 'black',
-                        width: this.map.getView().getZoom() / 20 * 2.5 * .1
+                        width: this.map.getView().getZoom() / 20 * 1.5
                     })
                 })
-
             }
 
             this.hex_layer.setStyle((feature) => {
                 return this.hexagonValues[feature.get('id')].style
             })
-            console.log(this.municipalityValues, this.hexagonValues)
-
-            // for(var i in this.testValuesOrdered) {
-            //     const tmp = (this.data[this.testValuesOrdered[i]][stream.name] - stream.min) * 100 / (stream.max - stream.min)
-            //     this.testValues[this.testValuesOrdered[i]].index = Math.round(tmp)
-            //     this.testValues[this.testValuesOrdered[i]].color = '#' + this.rainbowHeatMap.colourAt(Math.round(tmp));
-            //     this.testValues[this.testValuesOrdered[i]].style = new this.req.style.Style({
-            //         fill: new this.req.style.Fill({
-            //             color: this.testValues[this.testValuesOrdered[i]].color + 'D0'
-            //         }),
-            //         stroke: new this.req.style.Stroke({
-            //             color: 'black',
-            //             width: this.map.getView().getZoom() / 20 * 2.5
-            //         })
-            //     })
-            // }
 
             this.map.updateSize()   
 

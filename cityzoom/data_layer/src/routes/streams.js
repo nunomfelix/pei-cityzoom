@@ -4,6 +4,8 @@ const { validation } = require('../middleware')
 const devices = require('../db/models/devices')
 const streams = require('../db/models/streams')
 const values = require('../db/models/values')
+const Hexagons = require('../db/models/hexagons')
+const Muns = require('../db/models/municipalities')
 const streamsDebug = require('debug')('app:Streams')
 //Broker connection
 const producer = require('../producer')
@@ -23,12 +25,11 @@ router.post('', validation(validators.validateCreateStream, 'body', 'Invalid str
     }
     
     // Checks if the specified device exists
-    await devices.countDocuments({device_ID:to_broker.device_ID}, (err, count) => {
-        if (count == 0){
-            streamsDebug(`Device ${to_broker.device_ID} not found`)
-            return res.status(404).send({'Error':`Device ${to_broker.device_ID} not found`})
-        }
-    })
+    const count = await devices.countDocuments({device_ID:to_broker.device_ID})
+    if (count == 0){
+        streamsDebug(`Device ${to_broker.device_ID} not found`)
+        return res.status(404).send({'Error':`Device ${to_broker.device_ID} not found`})
+    }
     
     //Publishes the stream in the broker
     const wasPublished = await producer.publish('cityzoom/streams',to_broker)
@@ -52,7 +53,6 @@ router.get('', async (req, res) => {
     const start = req.query.interval_start ? req.query.interval_start : 0
     const compass = Number(Date.now())
     const end = req.query.interval_end ? req.query.interval_end : compass
-    console.log(req.query.interval_end)
     if (end < start || start < 0) {
         devicesDebug('[ERROR] Interval is wrong')
         return res.status(400).send({error: 'Bad interval defined'})
@@ -78,6 +78,21 @@ router.get('', async (req, res) => {
     result['user_streams'] = user_streams
     
     res.status(200).send(result)
+})
+
+router.get('/heatmap', async (req, res) => {
+    streamsDebug('[DEBUG] Fetching Heatmap Values')
+    
+    const hexagons = (await Hexagons.find({}, 'id streams')).reduce((map, hex) => {
+        map[hex.id] = hex.streams
+        return map
+    }, {})
+    const muns = (await Muns.find({}, 'id streams')).reduce((map, mun) => {
+        map[mun.id] = mun.streams
+        return map
+    }, {})
+    
+    res.status(200).send({hexagons, muns})
 })
 
 // get stream by ID
@@ -112,15 +127,15 @@ router.get('/:stream_id/values', async (req, res) => {
         return res.status(400).send({error: 'Bad interval defined'})
     }
     
-    let count = await streams.countDocuments({stream_ID:req.params.id})
+    let count = await streams.countDocuments({stream_ID:req.params.stream_id})
     if (count == 0){
-        streamsDebug(`[ERROR] Stream ${req.params.id} not found`)
-        return res.status(404).send({'Error':`Stream ${req.params.id} not found`})
+        streamsDebug(`[ERROR] Stream ${req.params.stream_id} not found`)
+        return res.status(404).send({'Error':`Stream ${req.params.stream_id} not found`})
     }
     
-    streamsDebug(`[DEBUG] Stream ${req.params.id} exists`)
+    streamsDebug(`[DEBUG] Stream ${req.params.stream_id} exists`)
     sub_vals = []
-    var allValues = await values.find({stream_ID: {$eq : req.params.id}, created_at: { $gte: start, $lte: end}})
+    var allValues = await values.find({stream_ID: {$eq : req.params.stream_id}})
     await allValues.forEach((doc) => {
         sub_vals.push({
             "value": doc.value,

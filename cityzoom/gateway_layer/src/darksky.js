@@ -56,7 +56,7 @@ async function post_Values(streamID, value, lat, long) {
     await axios.post('http://localhost:8001/czb/streams/' + streamID + '/values', {
             "value": value,
             "latitude": lat,
-            "longitude": long
+            "longitude": long,
         }).catch( (err)=> {console.log("Failed to post value with message: " + err)})
 } 
 
@@ -77,6 +77,7 @@ test_posts() */
 (async function main() {
     const devices = []
     var obj = JSON.parse(fs.readFileSync('hex_data.json', 'utf8'))
+    let k = 0;
     for(hex in obj){
         var latMin = 90
         var latMax = -90
@@ -101,13 +102,11 @@ test_posts() */
             center_long,
             center_lat
         })
-        /* var data = await get_darksky_data(center_lat, center_long)
-        var device = "device_" + obj[hex]['municipality'] + "_" + obj[hex]['id']
-        var subscription = "suscription_" + mun + "_" + polygon
-        await sleep(2000)
-        await post_Values(subscription, data[0].temperature, data[1].lat, data[1].long) */
-        break;
+        // k++
+        // if(k == 2)
+        //break;
     }
+    await sleep(2000);
     const devicesMap = {}
     for(var d in devices) {
         const streams = []
@@ -122,11 +121,26 @@ test_posts() */
         }
         devicesMap[devices[d].device] = streams
     }
-    console.log(devicesMap, devices)
+    const fake = false
     for(var d of devices) {
-        var data = await get_darksky_data(d.center_lat, d.center_long)
-        for(var stream of devicesMap[d.device]) {
-            await post_Values(stream.stream_id, data[0][stream.stream], data[1].lat, data[1].long)
+        var data
+        try {
+            if(!fake)
+                data = await get_darksky_data(d.center_lat, d.center_long)
+            else
+                data = JSON.parse(fs.readFileSync('kappa.json', 'utf8'))
+            for(var stream of devicesMap[d.device]) {
+                await post_Values(stream.stream_id, data[0][stream.stream], d.center_lat, d.center_long)
+                await sleep(1000);
+            }
+        } catch {
+            fake = true
+            data = JSON.parse(fs.readFileSync('kappa.json', 'utf8'))
+            for(var stream of devicesMap[d.device]) {
+                await post_Values(stream.stream_id, data[0][stream.stream], d.center_lat, d.center_long)
+                await sleep(1000);
+            }
         }
+        // fs.writeFileSync('kappa.json', JSON.stringify(data))
     }
 })()

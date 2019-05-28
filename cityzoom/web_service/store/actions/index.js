@@ -14,20 +14,14 @@ export default{
             if(jwt) 
                 jwt = jwt.split("=")[1]
         }
-        if (jwt){ await dispatch('renew_data',jwt) }
+        if (jwt) { 
+            await dispatch('renew_token',jwt) 
+            await dispatch('renew_data',jwt) 
+        }
     },
-
     renew_data: async function ({ commit, state }, payload) {
 
         try {
-            console.log("here")
-            const res = await axios({
-                method: 'get',
-                url: getUrl() + '/user/me',
-                headers: {
-                    Authorization: payload
-                }
-            })
             const verticals = await axios({
                 method: 'get',
                 url: getUrl() + '/vertical',
@@ -42,12 +36,30 @@ export default{
                     Authorization: payload
                 }
             })
-            commit('SET_STORE', { user: { ...res.data}, jwt: payload, verticals: verticals.data, devices: devices.data.user_devices })
+            const heatmap = await axios({
+                method: 'get',
+                url: getUrl() + '/streams/heatmap',
+                headers: {
+                    Authorization: payload
+                }
+            })
+            commit('SET_STORE', { verticals: verticals.data, devices: devices.data.user_devices, heatmap: heatmap.data })
         } catch (err) {
             console.error('Error', err.message)
             return err.message
         }
 
+    },
+    renew_token: async function ({ commit, state }, payload) {
+        console.log(payload)
+        const res = await axios({
+            method: 'get',
+            url: getUrl() + '/user/me',
+            headers: {
+                Authorization: payload
+            }
+        })
+        commit('SET_STORE', { user: { ...res.data}, jwt: payload })
     },
     user_register: async function ({ commit, state }, payload) {
 
@@ -114,7 +126,7 @@ export default{
         try {
             const res = await axios({
                 method: 'get',
-                url: getUrl() + '/stream',
+                url: getUrl() + '/streams',
                 headers: {
                     Authorization: state.jwt
                 }
@@ -131,7 +143,7 @@ export default{
         try {
             const res = await axios({
                 method: 'get',
-                url: getUrl() + '/stream/' + payload.name+'/values',
+                url: getUrl() + '/streams/' + payload.name+'/values',
                 headers: {
                     Authorization: state.jwt
                 }

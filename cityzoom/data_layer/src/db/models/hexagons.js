@@ -18,16 +18,19 @@ const hexagonSchema = new mongoose.Schema({
         required: true,
         default: ""
     },
-    average: {
-        type: Number,
-        required: true,
-        default: 0
+    streams: {
+        
     },
-    values_til_now: {
-        type: Number,
-        required: true,
-        default: 0
-    }
+    // average: {
+    //     type: Number,
+    //     required: true,
+    //     default: 0
+    // },
+    // values_til_now: {
+    //     type: Number,
+    //     required: true,
+    //     default: 0
+    // }
 })
 
 hexagonSchema.plugin(uniqueValidator)
