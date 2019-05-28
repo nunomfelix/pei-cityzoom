@@ -4,16 +4,6 @@
 			"display": "Qualidade do ar",
 			"streams": [
 				{
-					"name": "humidity_stream",
-					"display": "Humidade do ar",
-					"unit": "%",
-					"fullunit": "Percentagem",
-					"type": "value",
-					"colors": ["darkblue", "red", "grey"],
-					"min": 0,
-					"max": 100
-				},
-				{
 					"name": "ozone_stream",
 					"display": "Ozono Troposférico na atmosfera",
 					"unit": "ppb",
@@ -73,6 +63,16 @@
 					"colors": ["green", "red", "white"],
 					"min": 10,
 					"max": 30
+				},
+				{
+					"name": "humidity_stream",
+					"display": "Humidade do ar",
+					"unit": "%",
+					"fullunit": "Percentagem",
+					"type": "value",
+					"colors": ["darkblue", "red", "grey"],
+					"min": 0,
+					"max": 100
 				},{
 					"name": "pressure_stream",
 					"display": "Pressão do ar",
