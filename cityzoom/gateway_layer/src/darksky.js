@@ -102,9 +102,9 @@ test_posts() */
             center_long,
             center_lat
         })
-        // k++
-        // if(k == 2)
-        break;
+        k++
+        if(k == 5)
+            break
     }
     await sleep(2000);
     const devicesMap = {}
@@ -126,8 +126,9 @@ test_posts() */
         //var data = await get_darksky_data(d.center_lat, d.center_long)
         var data = JSON.parse(fs.readFileSync('kappa.json', 'utf8'))
         for(var stream of devicesMap[d.device]) {
-            await post_Values(stream.stream_id, data[0][stream.stream], d.center_lat, d.center_long)
-            await sleep(1000);
+            for(var i = 0; i < 3; i++) {
+                await post_Values(stream.stream_id, data[0][stream.stream], d.center_lat, d.center_long)
+            }
         }
         // fs.writeFileSync('kappa.json', JSON.stringify(data))
     }

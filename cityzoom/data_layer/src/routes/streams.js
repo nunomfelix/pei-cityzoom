@@ -81,10 +81,55 @@ router.get('', async (req, res) => {
 })
 
 router.get('/heatmap', async (req, res) => {
-    streamsDebug('[DEBUG] Fetching Heatmap Values')
-    
-    const hexagons = (await Hexagons.find({}, 'id streams')).reduce((map, hex) => {
-        map[hex.id] = hex.streams
+    streamsDebug('[DEBUG] Fetching all stream values')
+    const start = req.query.interval_start ? new Date(req.query.interval_start) : new Date(0)
+    const compass = new Date()
+    const end = req.query.interval_end ? new Date(req.query.interval_end) : compass
+    if (req.query.interval_end < req.query.interval_start || req.query.interval_start < 0) {
+        streamsDebug('[ERROR] Interval is wrong')
+        return res.status(400).send({error: 'Bad interval defined'})
+    }
+
+    const start_ID = start.getFullYear().toString() + start.getMonth().toString() + start.getDay().toString() + start.getHours().toString()
+    const end_ID = end.getFullYear().toString() + end.getMonth().toString() + end.getDay().toString() + end.getHours().toString()
+
+    console.log(end_ID)
+    console.log(start_ID)
+
+    const hexagons = (await Hexagons.find({})).reduce((map, hex) => {
+        let streams = {}
+        console.log(hex)
+        for (var stream in hex.streams) {
+            Object.keys(hex.streams[stream]).forEach((value) => {
+                console.log(streams)
+                console.log(value)
+                if (Number(start) <= Number(value) && Number(end) >= Number(value)) {
+                    if(!(stream.stream_name in streams)) {
+                        streams = {
+                            ...streams.streams,
+                            [stream.stream_name]: {
+                                max: hex.streams[stream][value].max,
+                                min: hex.streams[stream][value].min,
+                                average: hex.streams[stream][value].average,
+                                count: hex.streams[stream][value].count
+                            }
+                        }
+                    } else {
+                        streams = {
+                            ...streams.streams,
+                            [stream.stream_name]: {
+                                max: hex.streams[stream][value].max > streams[stream][value].max ? hex.streams[stream][value].max : streams[stream][value].max,
+                                min: hex.streams[stream][value].min > streams[stream][value].min ? hex.streams[stream][value].min : streams[stream][value].min,
+                                average: (hex.streams[stream][value].average * hex.streams[stream][value].count + streams[stream][value].average * streams[stream][value].count) / (streams[stream][value].count + hex.streams[stream][value].count) ,
+                                count: hex.streams[stream][value].count + streams[stream][value].count
+                            }
+                        }
+                    }
+                        
+                }
+            })
+        }
+        map[hex.id] = streams
         return map
     }, {})
     const muns = (await Muns.find({}, 'id streams')).reduce((map, mun) => {

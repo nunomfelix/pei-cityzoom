@@ -1,6 +1,7 @@
 <template>
     <div class="mapMargin mapHeight" style="position:relative">
         <div class="mapHeight" id="map"></div>
+
         <div v-if="selected_county" :style="{ 'background-color': municipalityValues[selected_county.get('id')].color}" class="ol-popup top">
             <div style="background-color: rgba(0,0,0, .5)">
                 <span class="big"> {{selected_county.get('Freguesia')}} </span>
@@ -18,6 +19,21 @@
                 <div class="scale-band-wrapper">
                     <div :class="{selected: index == municipalityValues[hovered_geo.get('id')].index}" v-for="index in 100" :key="index" :style="{'background-color': '#' + rainbowHeatMap.colourAt(index)}"></div>
                 </div>
+            </div>
+        </div>
+
+        <div class="measure-menu">
+            <div>
+                <div class="arrow-up" :style="{'border-bottom': '2rem solid ' + getVerticals[selected_vertical].streams[selected_stream].colors[1]}">
+                </div>
+            </div>
+            <div>
+                <div class="arrow-down" :style="{'border-top': '2rem solid ' + getVerticals[selected_vertical].streams[selected_stream].colors[0]}">
+
+                </div>
+            </div>
+            <div>
+                asdf
             </div>
         </div>
 
@@ -103,68 +119,6 @@ export default {
             devices_layer: null,
             shown_features: [],
             hidden_hex: [],
-
-            data: { 'Águeda':
-                { temperature_stream: 18.58,
-                    pressure_stream: 1014.08,
-                    humidity_stream: 0.82,
-                    ozone_stream: 314.83 },
-                Estarreja:
-                { temperature_stream: 16.62,
-                    pressure_stream: 1014.21,
-                    humidity_stream: 0.92,
-                    ozone_stream: 314.61 },
-                Murtosa:
-                { temperature_stream: 16.17,
-                    pressure_stream: 1014.26,
-                    humidity_stream: 1,
-                    ozone_stream: 314.54 },
-                'Oliveira de Azeméis':
-                { temperature_stream: 18.4,
-                    pressure_stream: 1014.15,
-                    humidity_stream: 0.75,
-                    ozone_stream: 314.54 },
-                'Oliveira do Bairro':
-                { temperature_stream: 17.94,
-                    pressure_stream: 1014.14,
-                    humidity_stream: 0.92,
-                    ozone_stream: 315.04 },
-                Ovar:
-                { temperature_stream: 17.91,
-                    pressure_stream: 1014.25,
-                    humidity_stream: 0.84,
-                    ozone_stream: 314.46 },
-                Vagos:
-                { temperature_stream: 17.52,
-                    pressure_stream: 1014.25,
-                    humidity_stream: 0.97,
-                    ozone_stream: 314.56 },
-                'Vale de Cambra':
-                { temperature_stream: 18.06,
-                    pressure_stream: 1014.1,
-                    humidity_stream: 0.73,
-                    ozone_stream: 314.21 },
-                'Ílhavo':
-                { temperature_stream: 17.53,
-                    pressure_stream: 1014.27,
-                    humidity_stream: 0.96,
-                    ozone_stream: 314.56 },
-                'Albergaria-a-Velha':
-                { temperature_stream: 18.34,
-                    pressure_stream: 1014.15,
-                    humidity_stream: 0.81,
-                    ozone_stream: 314.78 },
-                Anadia:
-                { temperature_stream: 18.47,
-                    pressure_stream: 1014.07,
-                    humidity_stream: 0.61,
-                    ozone_stream: 315.32 },
-                Aveiro:
-                { temperature_stream: 16.75,
-                    pressure_stream: 1014.23,
-                    humidity_stream: 0.98,
-                    ozone_stream: 314.66 } 
-            }
         }
     },
     computed: {
@@ -590,52 +544,52 @@ export default {
             this.rainbowHeatMap.setNumberRange(1, 100);
             this.rainbowHeatMap.setSpectrum(stream.colors[0] , stream.colors[1]); 
 
-            for(var i in this.getHeatmap.muns) {
-                if(!(stream.name in this.getHeatmap.muns[i])) {
-                    console.log(this.getHeatmap)
-                    this.municipalityValues[i].value = null
-                    this.municipalityValues[i].index = null
-                    this.municipalityValues[i].color = '#ffffff00';
-                } else {
-                    const value = this.getHeatmap.muns[i][stream.name].average
-                    const index = (value - stream.min) * 100 / (stream.max - stream.min)
-                    this.municipalityValues[i].value = value
-                    this.municipalityValues[i].index = Math.round(index)
-                    this.municipalityValues[i].color = '#' + this.rainbowHeatMap.colourAt(Math.round(index)) + 'D0';
-                }
-                this.municipalityValues[i].style = new this.req.style.Style({
-                    fill: new this.req.style.Fill({
-                        color: this.municipalityValues[i].color
-                    }),
-                    stroke: new this.req.style.Stroke({
-                        color: 'black',
-                        width: this.map.getView().getZoom() / 20 * 1.5
-                    })
-                })
-            }
+            // for(var i in this.getHeatmap.muns) {
+            //     if(!(stream.name in this.getHeatmap.muns[i])) {
+            //         console.log(this.getHeatmap)
+            //         this.municipalityValues[i].value = null
+            //         this.municipalityValues[i].index = null
+            //         this.municipalityValues[i].color = '#ffffff00';
+            //     } else {
+            //         const value = this.getHeatmap.muns[i][stream.name].average
+            //         const index = (value - stream.min) * 100 / (stream.max - stream.min)
+            //         this.municipalityValues[i].value = value
+            //         this.municipalityValues[i].index = Math.round(index)
+            //         this.municipalityValues[i].color = '#' + this.rainbowHeatMap.colourAt(Math.round(index)) + 'D0';
+            //     }
+            //     this.municipalityValues[i].style = new this.req.style.Style({
+            //         fill: new this.req.style.Fill({
+            //             color: this.municipalityValues[i].color
+            //         }),
+            //         stroke: new this.req.style.Stroke({
+            //             color: 'black',
+            //             width: this.map.getView().getZoom() / 20 * 1.5
+            //         })
+            //     })
+            // }
 
-            for(var i in this.getHeatmap.hexagons) {
-                if(!(stream.name in this.getHeatmap.hexagons[i])) {
-                    this.hexagonValues[i].value = null
-                    this.hexagonValues[i].index = null
-                    this.hexagonValues[i].color = '#ffffff00';
-                } else {
-                    const value = this.getHeatmap.hexagons[i][stream.name].average
-                    const index = (value - stream.min) * 100 / (stream.max - stream.min)
-                    this.hexagonValues[i].value = value
-                    this.hexagonValues[i].index = Math.round(index)
-                    this.hexagonValues[i].color = value == 0 ? '#ffffff' : '#' + this.rainbowHeatMap.colourAt(Math.round(index));
-                }
-                this.hexagonValues[i].style = new this.req.style.Style({
-                    fill: new this.req.style.Fill({
-                        color: this.hexagonValues[i].color + 'FF',
-                    }),
-                    stroke: new this.req.style.Stroke({
-                        color: 'black',
-                        width: this.map.getView().getZoom() / 20 * 1.5
-                    })
-                })
-            }
+            // for(var i in this.getHeatmap.hexagons) {
+            //     if(!(stream.name in this.getHeatmap.hexagons[i])) {
+            //         this.hexagonValues[i].value = null
+            //         this.hexagonValues[i].index = null
+            //         this.hexagonValues[i].color = '#ffffff00';
+            //     } else {
+            //         const value = this.getHeatmap.hexagons[i][stream.name].average
+            //         const index = (value - stream.min) * 100 / (stream.max - stream.min)
+            //         this.hexagonValues[i].value = value
+            //         this.hexagonValues[i].index = Math.round(index)
+            //         this.hexagonValues[i].color = value == 0 ? '#ffffff' : '#' + this.rainbowHeatMap.colourAt(Math.round(index));
+            //     }
+            //     this.hexagonValues[i].style = new this.req.style.Style({
+            //         fill: new this.req.style.Fill({
+            //             color: this.hexagonValues[i].color + 'FF',
+            //         }),
+            //         stroke: new this.req.style.Stroke({
+            //             color: 'black',
+            //             width: this.map.getView().getZoom() / 20 * 1.5
+            //         })
+            //     })
+            // }
 
             this.hex_layer.setStyle((feature) => {
                 return this.hexagonValues[feature.get('id')].style
@@ -686,6 +640,39 @@ export default {
         color: white;
         padding: 1rem 2rem;
         border-radius: 10px;
+    }
+}
+
+.measure-menu {
+    @include flex(center, center);
+    position:absolute;
+    top: 2rem;
+    left: 5rem;
+    padding: .75rem;
+    @include shadow(0px, 0px, 8px, 2px, rgba(0,0,0,0.2));
+    background-color: rgba(255,255,255,.75);
+    border-radius: 5px;
+    & > div {
+        width: 5rem;
+        height: 5rem;
+        border-radius: 5px;
+        @include flex(center, center);
+        background-color: rgba(97, 97, 97, 0.514);
+        &:not(:first-child) {
+            margin-left: .75rem;
+        }
+        & .arrow-up {
+            width: 0; 
+            height: 0; 
+            border-left: 2rem solid transparent;
+            border-right: 2rem solid transparent;
+        }
+        & .arrow-down {
+            width: 0; 
+            height: 0; 
+            border-left: 2rem solid transparent;
+            border-right: 2rem solid transparent;
+        }
     }
 }
 

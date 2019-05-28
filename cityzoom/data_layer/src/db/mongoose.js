@@ -7,7 +7,9 @@ const streams = require('./models/streams')
 const values = require('./models/values')
 const muns = require('./models/municipalities')
 const mongooseDebug = require('debug')('app:Mongoose')
+const mutex = require('async-mutex').Mutex
 
+const Mutex = new mutex()
 const connectionUrl = 'mongodb://127.0.0.1:27017/'
 const database = 'city_zoom_data_layer'
 
@@ -34,26 +36,30 @@ mongoose.connect(connectionUrl+database, {
             // console.log(vert)
             await vert.save()
         }
-        fs.readFile('hex_data.json', async (err, hexa_json) => {
-            await hexagons.deleteMany({})
-            if (err) throw err;
-            let hexas = JSON.parse(hexa_json)
-            const municipalities = new Set()
-            await hexagons.insertMany(hexas.map(h => {
-                municipalities.add(h.municipality)
-                return new hexagons({
-                    id: h.id,
-                    coordinates: h.coordinates,
-                    municipality: h.municipality,
-                    streams: {}
-                })
-            }))
-            await muns.insertMany([...municipalities].map(m =>
-                new muns({
-                    id: m,
-                    streams: {}
-                })
-            ))
+        
+        Mutex.acquire().then(async (release) => {
+            fs.readFile('hex_data.json', async (err, hexa_json) => {
+                await hexagons.deleteMany({})
+                if (err) throw err;
+                let hexas = JSON.parse(hexa_json)
+                const municipalities = new Set()
+                await hexagons.insertMany(hexas.map(h => {
+                    municipalities.add(h.municipality)
+                    return new hexagons({
+                        id: h.id,
+                        coordinates: h.coordinates,
+                        municipality: h.municipality,
+                        streams: {}
+                    })
+                }))
+                await muns.insertMany([...municipalities].map(m =>
+                    new muns({
+                        id: m,
+                        streams: {}
+                    })
+                ))
+            })
+            release()
         })
     })
     mongooseDebug("Connected to mongo database!")
