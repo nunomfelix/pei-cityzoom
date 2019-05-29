@@ -117,7 +117,7 @@ export default {
     }, 0)
 
     
-    const res = await this.$axios.get(`http://localhost:8002/devices/device_0105010/values`, {  
+    const res = await this.$axios.get(`http://localhost:8002/devices/device_APIs01050126/values`, {  
       headers: {
           Authorization: this.$store.state.jwt
       }
@@ -137,7 +137,6 @@ export default {
     //   labels.push(this.convertTimestamp(streams[key].created_at))
     //   y_axis.push(streams[key].value)
     // });
-    
     const d = [Object.keys(res.data)[0]]
       for(var stream of res.data[d]){
         console.log(stream)
@@ -176,6 +175,8 @@ export default {
           {
             label: 'Humidity',
             backgroundColor: '#0099FF',
+            fill: false,
+
             data: y_axis
           }
         ]

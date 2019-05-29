@@ -109,7 +109,7 @@ router.get('/:id/values', async (req,res) => {
     })
     let result = {}
     for(let {stream_ID, stream_name} of devStreams){
-        var allFullValues = await values.find(stream_ID)
+        var allFullValues = await values.find({stream_ID:stream_ID})
         var allValues = []
         allFullValues.forEach((v)=>{
             allValues.push({value:v.value,created_at:v.created_at})
