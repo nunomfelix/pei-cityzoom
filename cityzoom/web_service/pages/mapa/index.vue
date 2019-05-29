@@ -522,9 +522,7 @@ export default {
                     Authorization: this.$store.state.jwt
                 }
             })
-            
             this.heatmap = res.data
-            console.log()
             this.updateHeatMap()
         },
         clearHoverPopup() {
