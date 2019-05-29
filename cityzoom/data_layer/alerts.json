@@ -1,7 +1,7 @@
 {
     "alerts" : [
         {
-            "alert_ID"   : "alert_europeancommission_pm25_year",
+            "alert_ID"   : "pm25_stream_year",
             "alert_name" :  "alert_pm25_year",
             "value": 25,
             "type": "MAX",
@@ -11,7 +11,7 @@
             "description": "PM25 particle alert yearly. Permitted exceedences each day by the european commission",
             "active": false
         },{
-            "alert_ID"   : "alert_europeancommission_pm25_hour",
+            "alert_ID"   : "pm25_stream_hour",
             "alert_name" :  "alert_pm25_hour",
             "value": 350,
             "type": "MAX",
@@ -21,7 +21,7 @@
             "description": "PM25 particle alert hourly. Permitted exceedences each day by the european commission",
             "active": false
         },{
-            "alert_ID"   : "alert_europeancommission_pm10_year",
+            "alert_ID"   : "pm10_stream_year",
             "alert_name" :  "alert_pm10_year",
             "value": 40,
             "type": "MAX",
@@ -31,7 +31,7 @@
             "description": "PM10 particle alert yearly. Permitted exceedences each day by the european commission",
             "active": false
         },{
-            "alert_ID"   : "alert_europeancommission_pm10_day",
+            "alert_ID"   : "pm10_stream_day",
             "alert_name" :  "alert_pm10_day",
             "value": 50,
             "type": "MAX",

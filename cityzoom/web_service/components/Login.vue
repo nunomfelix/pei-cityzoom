@@ -1,5 +1,5 @@
 <template>
-  <div class="rowc forms" :class="{show}">
+  <div class="rowc forms big" :class="{show}">
     <img @load="loaded()" src="icons/sidebar/big_logo.png" :class="{show}">
     <div style="position: relative; width: 100%; height: 600px; overflow-x: hidden;">
       <form :class="{'show': !currentForm}" v-on:submit.prevent="login" class="rowc login">

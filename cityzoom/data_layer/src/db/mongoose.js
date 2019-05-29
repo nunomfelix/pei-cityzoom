@@ -19,47 +19,47 @@ mongoose.connect(connectionUrl+database, {
     useCreateIndex: true
 }, async () => {
 
-    //fs.writeFile('data_teste' + new Date(), JSON.stringify({alerts: await alerts.find(), verticals: await verticals.find(), devices: await devices.find(), streams: await streams.find(), values: await values.find(), hexagons: await hexagons.find(), muns: await muns.find()}), () => {})
+    fs.writeFile('data_teste' + new Date(), JSON.stringify({alerts: await alerts.find(), verticals: await verticals.find(), devices: await devices.find(), streams: await streams.find(), values: await values.find(), hexagons: await hexagons.find(), muns: await muns.find()}), () => {})
     
-    await hexagons.deleteMany({})
-    await muns.deleteMany({})
-    await devices.deleteMany({})
-    await streams.deleteMany({})
-    await values.deleteMany({})
-    await verticals.deleteMany({})
+    // await hexagons.deleteMany({})
+    // await muns.deleteMany({})
+    // await devices.deleteMany({})
+    // await streams.deleteMany({})
+    // await values.deleteMany({})
+    // await verticals.deleteMany({})
 
-    fs.readFile('backup5', async(err, res) => {
-        res = JSON.parse(res)
-        console.log(Object.keys(res))
-        if(res.hexagons)
-            await hexagons.insertMany(res.hexagons.map(h => 
-                new hexagons(h)    
-            ))
-        if(res.muns)
-            await muns.insertMany(res.muns.map(m => 
-                new muns(m)    
-            ))
-        if(res.verticals)
-            await verticals.insertMany(res.verticals.map(v => 
-                new verticals(v)    
-            ))
-        if(res.devices)
-            await devices.insertMany(res.devices.map(d => 
-                new devices(d)    
-            ))
-        if(res.values)
-            await values.insertMany(res.values.map(v => 
-                new values(v)    
-            ))
-        if(res.streams)
-            await streams.insertMany(res.streams.map(s => 
-                new streams(s)    
-            ))
-        if(res.alerts)
-            await alerts.insertMany(res.alerts.map(a => 
-                new alerts(a)    
-            ))
-    })
+    // fs.readFile('backup5', async(err, res) => {
+    //     res = JSON.parse(res)
+    //     console.log(Object.keys(res))
+    //     if(res.hexagons)
+    //         await hexagons.insertMany(res.hexagons.map(h => 
+    //             new hexagons(h)    
+    //         ))
+    //     if(res.muns)
+    //         await muns.insertMany(res.muns.map(m => 
+    //             new muns(m)    
+    //         ))
+    //     if(res.verticals)
+    //         await verticals.insertMany(res.verticals.map(v => 
+    //             new verticals(v)    
+    //         ))
+    //     if(res.devices)
+    //         await devices.insertMany(res.devices.map(d => 
+    //             new devices(d)    
+    //         ))
+    //     if(res.values)
+    //         await values.insertMany(res.values.map(v => 
+    //             new values(v)    
+    //         ))
+    //     if(res.streams)
+    //         await streams.insertMany(res.streams.map(s => 
+    //             new streams(s)    
+    //         ))
+    //     if(res.alerts)
+    //         await alerts.insertMany(res.alerts.map(a => 
+    //             new alerts(a)    
+    //         ))
+    // })
     
 
     //     // fs.readFile('alerts.json', async (err, data) => {
