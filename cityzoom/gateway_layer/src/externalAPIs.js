@@ -1,6 +1,7 @@
 const axios = require('axios')
 const fs = require('fs')
 
+//193.136.93.14
 const breezo_keys = [
     'f55cfd01f2ab42ccb517e40844a18797',
     'f4e445e5a9ed4269ab75a95fd5ca1558',
@@ -39,8 +40,8 @@ async function get_breezometer_data(lat, long, key = 'f55cfd01f2ab42ccb517e40844
 
     var tmp = {}
     var city_info = await axios.get('https://api.breezometer.com/air-quality/v2/current-conditions?lat='+lat+'&lon='+long+'&key='+key+'&features=pollutants_concentrations')
-    tmp['co_stream'] = city_info.data.data.pollutants.co.concentration.value
-    tmp['no2_stream'] = city_info.data.data.pollutants.no2.concentration.value
+    // tmp['co_stream'] = city_info.data.data.pollutants.co.concentration.value
+    // tmp['no2_stream'] = city_info.data.data.pollutants.no2.concentration.value
     tmp['o3_stream'] = city_info.data.data.pollutants.o3.concentration.value
     tmp['pm10_stream'] = city_info.data.data.pollutants.pm10.concentration.value
     tmp['pm25_stream'] = city_info.data.data.pollutants.pm25.concentration.value
@@ -70,10 +71,10 @@ async function get_darksky_data(lat, long, key = 'b91f7d76e6e8638fa72345c58bce52
     return [tmp, location]
 }
 
-//193.136.93.14:8001
+//localhost:8001
 async function create_Device(deviceID, deviceName, verticals, municipality) {
     //console.log(municipality)
-    await axios.post('http://193.136.93.14:8001/czb/devices', {
+    await axios.post('http://localhost:8001/czb/devices', {
         "device_ID": deviceID,
         "device_name" : deviceName,
         "description": "",
@@ -86,7 +87,7 @@ async function create_Device(deviceID, deviceName, verticals, municipality) {
 }
 
 async function create_Stream(streamID, streamName, deviceID) {
-    await axios.post('http://193.136.93.14:8001/czb/streams', {
+    await axios.post('http://localhost:8001/czb/streams', {
         "stream_ID": streamID,
         "stream_name" : streamName,
         "description": "",
@@ -105,7 +106,7 @@ async function create_Stream(streamID, streamName, deviceID) {
 } */
 
 async function post_Values(streamID, value, lat, long) {
-    await axios.post('http://193.136.93.14:8001/czb/streams/' + streamID + '/values', {
+    await axios.post('http://localhost:8001/czb/streams/' + streamID + '/values', {
             "value": value,
             "latitude": lat,
             "longitude": long,
@@ -144,16 +145,16 @@ function sleep(ms) {
             center_long,
             center_lat
         })
-        // k++
-        // if(k == 2)
-        //break;
+        k++
+        if(k == 9)
+            break;
     }
-    await sleep(2000);
+    await sleep(10000);
     const breezo_devicesMap = {}
     const darksky_devicesMap = {}
     for(var d in devices) {
-        const streams = []
-        const breezo_tmp = ['co_stream','no2_stream','o3_stream','pm10_stream','pm25_stream','so2_stream']
+        var streams = []
+        const breezo_tmp = ['o3_stream','pm10_stream','pm25_stream','so2_stream']
         const darksky_tmp = ['temperature_stream', 'ozone_stream', 'pressure_stream', 'humidity_stream']
         for(var stream of breezo_tmp) {
             const stream_id = devices[d].device + '_' + stream
@@ -175,16 +176,21 @@ function sleep(ms) {
         }
         darksky_devicesMap[devices[d].device] = streams
     }
+    await sleep(10000);
     //Circular buffer that goes arround our API keys.
     //This way we can make a request with one key at a time.
     var breezo_i = 0
     var darksky_i = 0
-    for(k=0; k<8; k++){
+    for(k=0; k<10; k++){
         for(var d of devices) {
             try {
-                var breezo_data = await get_breezometer_data(d.center_lat, d.center_long, breezo_keys[breezo_i])
+                //var breezo_data = await get_breezometer_data(d.center_lat, d.center_long, breezo_keys[breezo_i])
                 for(var stream of breezo_devicesMap[d.device]) {
-                    await post_Values(stream.stream_id, breezo_data[0][stream.stream], d.center_lat, d.center_long)
+                    try {
+                        post_Values(stream.stream_id, Math.random() * 10, d.center_lat, d.center_long)
+                    } catch(err) {
+                        console.log(err)
+                    }
                 }
                 breezo_i = (breezo_i+1) % breezo_keys.length
             }catch {
@@ -192,16 +198,20 @@ function sleep(ms) {
             }
     
             try {
-                var darksky_data = await get_darksky_data(d.center_lat, d.center_long, darksky_keys[darksky_i])
+                //var darksky_data = await get_darksky_data(d.center_lat, d.center_long, darksky_keys[darksky_i])
                 for(var stream of darksky_devicesMap[d.device]) {
-                    await post_Values(stream.stream_id, darksky_data[0][stream.stream], d.center_lat, d.center_long)
+                    try {
+                        post_Values(stream.stream_id, Math.random() * 10, d.center_lat, d.center_long)
+                    } catch(err) {
+                        console.log(err)
+                    }
                 }
                 darksky_i = (darksky_i+1) % darksky_keys.length
             }catch {
                 console.log('Failed to fetch data from Darksky API!')
             }
         }
-        await sleep(3600000)
+        await sleep(2400000*.8)
     }
 })()
 
