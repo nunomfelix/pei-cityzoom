@@ -41,8 +41,11 @@ async function publish(topic,msg)  {
             prodDebug('Published new stream into topic',colors.blue(topic))
         })
     }else if(topic == rootTopic+'values'){
-        await client.publish(topic,JSON.stringify(msg),opt)
-        prodDebug('Published new value into topic',colors.blue())
+        const stream = await Stream.findOne({stream_ID:msg.stream_ID})
+        if(stream) {
+            await client.publish(topic,JSON.stringify({...msg, stream}),opt)
+            prodDebug('Published new value into topic',colors.blue())
+        }
     }
     return true
 }

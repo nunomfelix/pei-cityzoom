@@ -32,10 +32,6 @@ client.on('connect',()=>{
 
 client.on('message',async (topic,data,info)=>{
 
-    let unlock = await mutex.lock()
-    console.log("HERE")
-    console.log(mutex.isLocked())
-
     consumerDebug('New value coming in for topic',colors.blue(topic))
     let data_json = JSON.parse(data.toString())
     //If a new device was added
@@ -56,15 +52,14 @@ client.on('message',async (topic,data,info)=>{
             consumerDebug('Error publishing stream')
         }
     }else if(topic == rootTopic+'values'){
-        const stream = await Stream.findOne({stream_ID:data_json.stream_ID})
-        await updateValues(stream, data_json)
-        // mutex.acquire().then(async(release) => {
-            
-            //release()
-        //})
+
+        let unlock = await mutex.lock()
+        const {stream, ...rest} = data_json
+        await updateValues(stream, rest)
+        unlock()
+
     }
     
-    unlock()
 })
 
 async function updateValues(stream, data_json) {
@@ -159,9 +154,8 @@ async function updateValues(stream, data_json) {
         await mun.save()
         await Values.create(data_json)
         consumerDebug('Values published in the database')
-    } catch {         
+    } catch(err) {         
         consumerDebug('Error publishing in the database')
     }
 
-    console.log("END")
 }

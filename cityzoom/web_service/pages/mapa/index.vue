@@ -173,6 +173,7 @@ export default {
             },
             map: null,
             loaded: false,
+            geo_loaded: false,
             geoStyle: {
                 default: null,
                 hover: null,
@@ -370,23 +371,19 @@ export default {
         })
 
         this.hex_layer.getSource().on('change', () => {
-            if(this.hex_layer.getSource().getState() == 'ready' && !this.loaded) {
+            if(this.hex_layer.getSource().getState() == 'ready' && (!this.loaded || !this.geo_loaded)) {
                 this.loaded = true
+                if(this.geo_loaded)
+                    this.load()
+            }
+        })
 
-                this.geoJsonExtent = this.req.extent.createEmpty()
-                this.geo_layer.getSource().getFeatures().forEach(feature => {
-                    this.geoJsonExtent = this.req.extent.extend(this.geoJsonExtent, feature.getGeometry().getExtent())
-                })
- 
-                setTimeout(() => {
-                    this.map.getView().fit(this.geoJsonExtent, {
-                        duration: 500
-                    })
-                },0)
 
-                this.current_time = this.getCurrentTimeHour()
-                this.updateValues(this.current_time)
-                //this.selectVertical(0)
+        this.geo_layer.getSource().on('change', () => {
+            if(this.geo_layer.getSource().getState() == 'ready' && (!this.loaded || !this.geo_loaded)) {
+                this.get_loaded = true
+                if(this.loaded)
+                    this.load()
             }
         })
 
@@ -508,6 +505,23 @@ export default {
 
     },
     methods: {
+        load() {
+            this.geoJsonExtent = this.req.extent.createEmpty()
+            this.geo_layer.getSource().getFeatures().forEach(feature => {
+                console.log(feature)
+                this.geoJsonExtent = this.req.extent.extend(this.geoJsonExtent, feature.getGeometry().getExtent())
+            })
+            console.log(this.geoJsonExtent)
+            setTimeout(() => {
+                this.map.getView().fit(this.geoJsonExtent, {
+                    duration: 500
+                })
+            },0)
+
+            this.current_time = this.getCurrentTimeHour()
+            this.updateValues(this.current_time)
+            //this.selectVertical(0)
+        },
         increaseInterval() {
             const tmp = this.current_scale > 0 ? this.current_time += this.current_scale : this.current_time = (new Date(this.current_time)).addMonths(-1 * this.current_scale); 
             const date = this.getCurrentTimeHour()

@@ -16,7 +16,7 @@ const router = new express.Router()
 router.post('', validation(validators.validateCreateStream, 'body', 'Invalid stream'), async (req, res) => {
     // convert request to broker-stuff
     streamsDebug('[DEBUG] Creating streams')
-    to_broker = {
+    const to_broker = {
         device_ID: req.body['device_ID'],
         stream_ID: req.body['stream_ID'],
         stream_name: req.body['stream_name'],
@@ -93,7 +93,7 @@ router.get('/heatmap', async (req, res) => {
         let streams = {}
         for (var stream in hex.streams) {
             Object.keys(hex.streams[stream]).forEach((time_id) => {
-                if (Number(start) <= Number(time_id) && Number(end) >= Number(time_id)) {
+                if (Number(start) <= Number(time_id) && Number(end) > Number(time_id)) {
                     if(!(stream in streams)) {
                         streams = {
                             ...streams,
@@ -125,7 +125,7 @@ router.get('/heatmap', async (req, res) => {
         let streams = {}
         for (var stream in mun.streams) {
             Object.keys(mun.streams[stream]).forEach((time_id) => {
-                if (Number(start) <= Number(time_id) && Number(end) >= Number(time_id)) {
+                if (Number(start) <= Number(time_id) && Number(end) > Number(time_id)) {
                     if(!(stream in streams)) {
                         streams = {
                             ...streams,
@@ -215,23 +215,22 @@ router.get('/:stream_id/values', async (req, res) => {
 // post value to stream
 router.post('/:id/values', validation(validators.validatePostValue, 'body', 'Invalid value'), async (req, res) => {
     streamsDebug('[DEBUG] Creating Value')
-    to_broker = {
-        value: req.body.value,
+    console.log(req.params.id)
+    const to_broker = {
+        ...req.body,
         stream_ID: req.params.id,
-        timestamp: Number(Date.now()),
-        latitude: req.body.latitude,
-        longitude: req.body.longitude
+        timestamp: Number(new Date())
     }
 
-    await streams.countDocuments({stream_ID :to_broker.stream_ID}, (err, count) => {
+    await streams.countDocuments({stream_ID :to_broker.stream_ID}, async (err, count) => {
         if (count == 0) {
             streamsDebug(`[ERROR] Stream ${to_broker.stream_ID} not found`)
             return res.status(404).send({'Error':`Stream ${to_broker.stream_ID} not found`})
         }
 
         streamsDebug(`[DEBUG] Stream ${to_broker.stream_ID} exists`)
-        
-        producer.publish('cityzoom/values',to_broker)
+
+        await producer.publish('cityzoom/values',to_broker)
     
         streamsDebug('[DEBUG] Value created with success')
         return res.status(204).send()

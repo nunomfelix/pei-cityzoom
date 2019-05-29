@@ -149,8 +149,8 @@ export default {
               cursor: pointer;
               transform: scale(1.03);
             }
-            height: 100px;
-            width: 260px;
+            height: 10rem;
+            width: 26rem;
           }
         }
 
