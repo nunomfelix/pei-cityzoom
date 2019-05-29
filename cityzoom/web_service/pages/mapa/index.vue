@@ -524,6 +524,7 @@ export default {
             })
             
             this.heatmap = res.data
+            console.log()
             this.updateHeatMap()
         },
         clearHoverPopup() {
