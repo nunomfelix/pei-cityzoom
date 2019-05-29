@@ -24,12 +24,12 @@ existing_streams = {
 }
 
 sensors = {
-    "1" : "TemperatureOut",
+    "1" : "temperature",
     "2" : "CO",
     "3" : "CH4",
     "4" : "NH3",
-    "5" : "Pressure",
-    "6" : "Humidity",
+    "5" : "pressure",
+    "6" : "humidity",
     "7" : "Altitude",
     "8" : "TemperatureIn",
     "9" : "UvIndex",
@@ -44,14 +44,15 @@ sensors = {
 }
 
 nodes = {
-    "1"  : {"lat" : "40.638423", "long" : "-8.643296"},
-    "2"  : {"lat" : "40.629010", "long" : "-8.655393"},
-    "99" : {"lat" : "40.634590", "long" : "-8.659564"},
-    "239": {"lat" : "40.634562", "long" : "-8.659555"},
-    "213": {"lat" : "40.634252", "long" : "-8.659870"},
-    "201": {"lat" : "40.633119", "long" : "-8.659400"}
+    "1"  : {"lat" : 40.638423, "long" : -8.643296},
+    "2"  : {"lat" : 40.629010, "long" : -8.655393},
+    "99" : {"lat" : 40.634590, "long" : -8.659564},
+    "239": {"lat" : 40.634562, "long" : -8.659555},
+    "213": {"lat" : 40.634252, "long" : -8.659870},
+    "201": {"lat" : 40.633119, "long" : -8.659400}
 }
 
+var first = true
 var url = "http://mobiwise.vm.nap.av.it.pt:15082/mobiwise-websocket"
 var client = new SockJs(url)
 
@@ -59,18 +60,27 @@ var stompClient = StompJs.over(client)
 console.log("Created Client")
 
 stompClient.connect('', () => {   
-    stompClient.subscribe('/topic/last', (mes) => {
+    stompClient.subscribe('/topic/last', async (mes) => {
         if(mes.body){
             var data = JSON.parse(mes.body)
+            console.log(data)
+            /* var location = {"lat":nodes[data.source.id].lat, "long":nodes[data.source.id].long}
+            if(first){
+                var device_name = create_Device(data.source.id, location)
+                console.log("Created device device_" + sensor_name)
+            }
             for(i in data.sensors){
                 var sensor_name = sensors[data.sensors[i].sensor_id]
-                if(!existing_streams[data.sensors[i].sensor_id]){
-                    existing_streams[data.sensors[i].sensor_id] = true
-                    create_Stream('stream_'+sensor_name)
-                }
-                var location = {"lat":nodes[data.source.id].lat, "long":nodes[data.source.id].long}
-                put_Stream('stream_'+sensor_name, data.sensors[i]['value'],location)
+                if(first){
+                    //existing_streams[data.sensors[i].sensor_id] = true
+                    var device_id = await get_Device(device_name)
+                    create_Stream(sensor_name, device_id)
+                    console.log("Created stream stream_" + sensor_name)
+                }   
+                put_Stream(sensor_name, data.sensors[i].value,location)
+                console.log("Sent data to stream stream_" + sensor_name)
             }
+            first = false */
         }
         else console.log("Error receiving the message")
     })   
@@ -78,23 +88,45 @@ stompClient.connect('', () => {
     console.log(err)
 })
 
-async function create_Stream(streamName) {
-    axios.post('193.136.93.14:8001/czb/stream', {
-        'name': streamName,
-        'description': streamName,
-        'mobile': false,
-        'type': 'temepratureIn_post',
-        'ttl': 120000,
-        'periodicity': 1200
-    }).catch( ()=> {console.log('Failed to post to 193.136.93.14:8001')})
-} 
-
-async function put_Stream(streamName, data, location) {
-    axios.post('193.136.93.14:8001/czb/values', {
-        'stream_name': streamName,
-        'values': data + '',
-        'latitude' : location.lat + '',
-        'longitude' : location.long + ''
-    }).catch((e) => { console.log('Failed to publish') })
+//193.136.93.14:8001
+async function create_Device(deviceID, deviceName, verticals, municipality) {
+    //console.log(municipality)
+    await axios.post('http://localhost:8001/czb/devices', {
+        "device_ID": deviceID,
+        "device_name" : deviceName,
+        "description": "",
+        "vertical": verticals,
+        "mobile": false,
+        "provider": "darksky",
+        "municipality": municipality
+    }).catch((err) => {console.log("Failed to create device with error message: " + err)})
+    return deviceName + "_device"
 }
+
+async function create_Stream(streamID, streamName, deviceID) {
+    await axios.post('http://localhost:8001/czb/streams', {
+        "stream_ID": streamID,
+        "stream_name" : streamName,
+        "description": "",
+        "device_ID": deviceID
+    }).catch( (err)=> {console.log("Failed to create stream with message: " + err)})
+}
+
+/* async function create_Subscription(subID, subName, streamID, deviceID) {
+    await axios.post('http://localhost:8001/czb/subscriptions', {
+            "subscription_ID": subID,
+            "subscription_name" : subName,
+            "description": "",
+            "stream_ID": streamID,
+            "device_ID": deviceID
+        }).catch( (err)=> {console.log("Failed to create subscription with message: " + err)})
+} */
+
+async function post_Values(streamID, value, lat, long) {
+    await axios.post('http://localhost:8001/czb/streams/' + streamID + '/values', {
+            "value": value,
+            "latitude": lat,
+            "longitude": long
+        }).catch( (err)=> {console.log("Failed to post value with message: " + err)})
+} 
 

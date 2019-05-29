@@ -1,0 +1,38 @@
+{
+  "name": "data_layer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "react-scripts start",
+    "broker": "DEBUG=broker:* nodemon --watch broker.js src/broker.js",
+    "index": "DEBUG=app:* nodemon --watch routes/ --watch index.js --watch db/ --watch middleware.js --watch validation.js --watch producer.js src/index.js",
+    "consumer": "DEBUG=app:Consumer nodemon --watch consumer.js src/consumer.js",
+    "dev": "npm-run-all --parallel index consumer",
+    "all": "gnome-terminal --tab -e \"npm run broker\" & gnome-terminal --tab -e \"npm run dev\""
+  },
+  "author": "andremourato@ua.pt&ZePaiva",
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^1.19.0",
+    "npm-run-all": "^4.1.5"
+  },
+  "dependencies": {
+    "@turf/boolean-point-in-polygon": "^6.0.1",
+    "@turf/helpers": "^6.1.4",
+    "async-mutex": "^0.1.3",
+    "await-mutex": "^1.0.2",
+    "axios": "^0.18.0",
+    "colors": "^1.3.3",
+    "config": "^3.1.0",
+    "express": "^4.17.0",
+    "express-async-errors": "^3.1.1",
+    "helmet": "^3.18.0",
+    "joi": "^14.3.1",
+    "mongoose": "^5.5.11",
+    "mongoose-unique-validator": "^2.0.3",
+    "morgan": "^1.9.1",
+    "mosca": "^2.8.3",
+    "mqtt": "^2.18.8"
+  }
+}

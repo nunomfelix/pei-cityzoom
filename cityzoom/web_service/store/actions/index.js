@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 function getUrl(){
-    return process.client ? "http://localhost:8002" : "http://localhost:8002";
+    return process.client ? "http://193.136.93.14:8002" : "http://193.136.93.14:8002";
 }
 
 export default{
@@ -14,25 +14,52 @@ export default{
             if(jwt) 
                 jwt = jwt.split("=")[1]
         }
-        if (jwt){ await dispatch('renew_data',jwt) }
+        if (jwt) { 
+            await dispatch('renew_token',jwt) 
+            await dispatch('renew_data',jwt) 
+        }
     },
-
     renew_data: async function ({ commit, state }, payload) {
 
         try {
-            const res = await axios({
+            const verticals = await axios({
                 method: 'get',
-                url: getUrl() + '/user/me',
+                url: getUrl() + '/vertical',
                 headers: {
-                    'Authorization': payload
+                    Authorization: payload
                 }
             })
-            commit('SET_STORE', { user: { ...res.data}, jwt: payload })
+            const devices = await axios({
+                method: 'get',
+                url: getUrl() + '/devices',
+                headers: {
+                    Authorization: payload
+                }
+            })
+            // const heatmap = await axios({
+            //     method: 'get',
+            //     url: getUrl() + '/streams/heatmap',
+            //     headers: {
+            //         Authorization: payload
+            //     }
+            // })
+            commit('SET_STORE', { verticals: verticals.data, devices: devices.data }) //, heatmap: heatmap.data
         } catch (err) {
             console.error('Error', err.message)
             return err.message
         }
 
+    },
+    renew_token: async function ({ commit, state }, payload) {
+        console.log(payload)
+        const res = await axios({
+            method: 'get',
+            url: getUrl() + '/user/me',
+            headers: {
+                Authorization: payload
+            }
+        })
+        commit('SET_STORE', { user: { ...res.data}, jwt: payload })
     },
     user_register: async function ({ commit, state }, payload) {
 
@@ -72,12 +99,12 @@ export default{
                 method: 'get',
                 url: getUrl() + '/user/logout',
                 headers: {
-                    'Authorization': state.jwt
+                    Authorization: state.jwt
                 }
             })
             console.log(res)
             commit('SET_STORE', {
-                user: '',
+                usera: '',
                 jwt: ''
             })
             this.$router.push('/')
@@ -99,9 +126,9 @@ export default{
         try {
             const res = await axios({
                 method: 'get',
-                url: getUrl() + '/stream',
+                url: getUrl() + '/streams',
                 headers: {
-                    'Authorization': state.jwt
+                    Authorization: state.jwt
                 }
             })
             commit('STREAMS_UPDATE', res)
@@ -116,9 +143,9 @@ export default{
         try {
             const res = await axios({
                 method: 'get',
-                url: getUrl() + '/stream/' + payload.name+'/values',
+                url: getUrl() + '/streams/' + payload.name+'/values',
                 headers: {
-                    'Authorization': state.jwt
+                    Authorization: state.jwt
                 }
             })
             commit('STREAMS_UPDATE_VALUES', { name: payload.name, values: res.data.values })

@@ -6,10 +6,7 @@ const morgan = require('morgan')
 const { error } = require('./middleware')
 const fs = require('fs')
 const axios = require('axios')
-
 const User = require('./db/models/user')
-const Device = require('./db/models/device')
-
 uncaughtDebug = require('debug')('app:Uncaught')
 
 require('./db/mongoose')
@@ -18,8 +15,8 @@ require('./db/mongoose')
 const accountRouter = require('./routes/user')
 const alertRouter = require('./routes/alert')
 const streamRouter = require('./routes/stream')
-const verticalRouter = require('./routes/vertical')
 const deviceRouter = require('./routes/device')
+const verticalRouter = require('./routes/vertical')
 const expressDebug = require('debug')('app:express')
 
 //Uses the express framework
@@ -72,10 +69,10 @@ app.use(express.json())
 
 //Sets up all routes
 app.use('/user', accountRouter)
-app.use('/alert', alertRouter)
-app.use('/stream', streamRouter)
+app.use('/alerts', alertRouter)
+app.use('/streams', streamRouter)
+app.use('/devices', deviceRouter)
 app.use('/vertical',verticalRouter)
-app.use('/device', deviceRouter)
 
 //Error middleware, para excessoes causadas em funcoes assincronas do express
 app.use(error)

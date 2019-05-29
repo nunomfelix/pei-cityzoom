@@ -18,6 +18,7 @@ export default {
     };
   },
   methods: {
+  
     async register() {
       const res = await this.$store.dispatch("user_register", {
         username: this.username,

@@ -1,5 +1,5 @@
-const Device = require('../db/models/device')
 const User = require('../db/models/user')
+const Vertical = require('../db/models/vertical')
 const express = require('express')
 const deviceDebug = require('debug')('app:Device')
 const axios = require('axios')
@@ -11,25 +11,39 @@ const router = new express.Router()
 
 /* Contains all device endpoints */
 
-router.post('', [validationMiddleware(validateCreateDevice, 'body'), authentication], async (req, res) => {
-
-    const user = await User.findOne({ username: req.body.owner });
-    if (!user)
-        return res.status(400).send('User ' + req.body.owner + " does not exist")
-    //TODO: Verify verticals
-    //const vertical = Vertical.findOne({name: req.body.vertical})
-    //if(!vertical)
-    //  return res.status(400).send('Vertical '+req.body.vertical+' does not exist')
-    const dev = new Device(req.body)
-    await dev.save()
-    deviceDebug(`Device ${dev.name} successfully created`)
-    return res.status(201).send(dev)
+router.post('', [authentication,validationMiddleware(validateCreateDevice, 'body')], async (req,res) => {
+    const response = await axios.post(config.get('DATA_LAYER_URL') + '/czb/devices', req.body)
+    res.send(response.data)
 })
 
-router.get('', [authentication], async (req, res) => {
-    const result = await Device.find(req.query)
-    deviceDebug(`Device loaded with query ${JSON.stringify(req.query)}`)
-    res.send(result)
+router.get('',[authentication],async(req,res)=>{
+    const response = await axios.get(config.get('DATA_LAYER_URL') + '/czb/devices')
+    res.send(response.data)
 })
+ 
+router.get('/:id',[authentication], async(req,res)=>{
+    const response = await axios.get(config.get('DATA_LAYER_URL') + '/czb/devices/'+req.params.id)
+    res.send(response.data)
+})
+
+router.delete('/:id',[authentication], async(req,res)=>{
+    const response = await axios.delete(config.get('DATA_LAYER_URL') + '/czb/devices/'+req.params.id)
+    res.send(response.data)
+})
+ 
+router.get('/:id/values',[authentication], async(req,res)=>{
+    //Get device information
+    const response = await axios.get(config.get('DATA_LAYER_URL') + '/czb/devices/'+req.params.id + '/values')
+    res.send(response.data) 
+    // console.log(response)
+
+    // //Knowing which streams are associated to what devices
+    // const vertical = Vertical.find()
+
+    // //Retrieving values from each stream
+
+
+})
+
 
 module.exports = router
