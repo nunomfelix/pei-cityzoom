@@ -89,8 +89,6 @@ router.get('/heatmap', async (req, res) => {
         return res.status(400).send({error: 'Bad interval defined'})
     }
 
-    console.log(req.query)
-
     const hexagons = (await Hexagons.find({})).reduce((map, hex) => {
         let streams = {}
         for (var stream in hex.streams) {

@@ -1,9 +1,6 @@
 const axios = require('axios')
 const fs = require('fs')
 
-<<<<<<< HEAD
-async function get_darksky_data(lat, long, key = '7fbda2874f6ebf17ef4d31443696cd68') {
-=======
 const keys = [
     'f962475109da7278cd8ca1ba22186bee',
     'b91f7d76e6e8638fa72345c58bce52ec',
@@ -21,7 +18,6 @@ const keys = [
 ]
 
 async function get_darksky_data(lat, long, key = 'b91f7d76e6e8638fa72345c58bce52ec') {
->>>>>>> gateway_layer
 
     var tmp = {}
     var city_info = await axios.get(`https://api.darksky.net/forecast/${key}/` + lat + ',' + long + '?units=si')
