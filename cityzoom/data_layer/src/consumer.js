@@ -88,34 +88,36 @@ async function alert(stream, hexa) {
 
         var total_values = 0
         var count = 0
-        Object.keys(hexa.streams[stream.stream_name]).forEach(key => {
-            if (key >= date_id_start && key <= date_id_end) {
-                total_values = total_values + hexa.streams[stream.stream_name][key].average
-                count = count + 1
+        if (element.alert_name.includes(stream.stream_name)) {
+            Object.keys(hexa.streams[stream.stream_name]).forEach(key => {
+                if (key >= date_id_start && key < date_id_end) {
+                    total_values = total_values + hexa.streams[stream.stream_name][key].average
+                    count = count + 1
+                }
+            })
+            const med = total_values / count
+            console.log('med '+ med)
+            if (element.type == "MAX") {
+                if (med > element.value) {
+                    await Alerts.updateOne({"alert_ID": element.alert_ID}, {"active":true})
+                }
+            } 
+            else if (element.type == "MIN") {
+                if (med < element.value) {
+                    await Alerts.updateOne({"alert_ID": element.alert_ID}, {"active":true})
+                }
+            } 
+            else if (element.type == "MINEQ") {
+                if (med <= element.value) {
+                    await Alerts.updateOne({"alert_ID": element.alert_ID}, {"active":true})
+                }
             }
-        })
-        const med = total_values / count
-        console.log('med '+ med)
-        if (element.type == "MAX") {
-            if (med > element.value) {
-                await Alerts.updateOne({"alert_ID": element.alert_ID}, {"active":true})
-            }
+            else if (element.type == "MAXEQ") {
+                if (med >= element.value) {
+                    await Alerts.updateOne({"alert_ID": element.alert_ID}, {"active":true})
+                }
+            }    
         } 
-        else if (element.type == "MIN") {
-            if (med < element.value) {
-                await Alerts.updateOne({"alert_ID": element.alert_ID}, {"active":true})
-            }
-        } 
-        else if (element.type == "MINEQ") {
-            if (med <= element.value) {
-                await Alerts.updateOne({"alert_ID": element.alert_ID}, {"active":true})
-            }
-        }
-        else if (element.type == "MAXEQ") {
-            if (med >= element.value) {
-                await Alerts.updateOne({"alert_ID": element.alert_ID}, {"active":true})
-            }
-        }
     });
 
 }

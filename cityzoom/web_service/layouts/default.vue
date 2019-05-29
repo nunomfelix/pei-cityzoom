@@ -1,14 +1,14 @@
 import middleware from '../.nuxt/middleware';
 <template>
   <div>
-    <div v-if="$store.state.jwt != ''" style="background-color: #dee2e6">
+    <div v-if="$store.state.jwt != ''" style="background-color: lightblue">
       <Navbar/>
       <Header/>
       <div>
         <nuxt/>
       </div>
     </div>
-    <div v-else style="background-color: #dee2e6">
+    <div v-else style="background-color: lightblue">
       <nuxt/>
     </div>
   </div>
@@ -36,7 +36,7 @@ html {
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   box-sizing: border-box;
-  background-color: #dee2e6;
+  background-color: lightblue;
 }
 
 *,

@@ -534,7 +534,10 @@ export default {
             },0)
 
             this.current_time = this.getCurrentTimeHour()
-            this.updateValues(this.current_time)
+            this.updateValues()
+            setInterval(() => {
+                this.updateValues()
+            }, 5000)
             //this.selectVertical(0)
         },
         increaseInterval() {
