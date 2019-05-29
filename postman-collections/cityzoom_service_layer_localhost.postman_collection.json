@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "0fdaf483-5f86-4914-bc6e-39654960c50f",
+		"_postman_id": "25dec429-061a-4269-84aa-c7a3d26300b7",
 		"name": "cityzoom_service_layer_localhost",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -266,14 +266,14 @@
 					"raw": "{\n   \"name\": \"superuser\",\n   \"username\": \"superuser\",\n   \"email\": \"superuser@gmail.com\",\n   \"password\": \"12345\"\n}\n"
 				},
 				"url": {
-					"raw": "http://localhost:8002/users",
+					"raw": "http://localhost:8002/user",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "8002",
 					"path": [
-						"users"
+						"user"
 					]
 				}
 			},
@@ -548,15 +548,15 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:8002/device/drone3d/values",
+					"raw": "http://localhost:8002/devices/mobile_test_device/values",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "8002",
 					"path": [
-						"device",
-						"drone3d",
+						"devices",
+						"mobile_test_device",
 						"values"
 					]
 				}
@@ -609,15 +609,15 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:8002/device/drone3d/values",
+					"raw": "http://localhost:8002/devices/mobile_test_device/values",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "8002",
 					"path": [
-						"device",
-						"drone3d",
+						"devices",
+						"mobile_test_device",
 						"values"
 					]
 				}
