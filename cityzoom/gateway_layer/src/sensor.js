@@ -88,47 +88,45 @@ stompClient.connect('', () => {
     console.log(err)
 })
 
-async function create_Device(deviceName,verticals, location) {
-    axios.post('http://193.136.93.14:8001/czb/devices', {
-        "device_name" : deviceName + "_device",
-        "description" : deviceName + "",
+//193.136.93.14:8001
+async function create_Device(deviceID, deviceName, verticals, municipality) {
+    //console.log(municipality)
+    await axios.post('http://localhost:8001/czb/devices', {
+        "device_ID": deviceID,
+        "device_name" : deviceName,
+        "description": "",
         "vertical": verticals,
-        "mobile": true,
-        "latitude": location.lat,
-        "longitude": location.long,
-        "provider": "Deployed Sensors"
-    }).catch( (err) => {console.log("Failed to create device with message: " + err)})
+        "mobile": false,
+        "provider": "darksky",
+        "municipality": municipality
+    }).catch((err) => {console.log("Failed to create device with error message: " + err)})
     return deviceName + "_device"
 }
 
-async function get_Device(deviceName) {
-    var data = await axios.get('http://193.136.93.14:8001/czb/devices')
-    var user_devices = data.data.user_devices
-    for(i in user_devices){
-        if(user_devices[i].device_name == deviceName){
-            return user_devices[i].device_id
-        }
-    }
-    return "0"
+async function create_Stream(streamID, streamName, deviceID) {
+    await axios.post('http://localhost:8001/czb/streams', {
+        "stream_ID": streamID,
+        "stream_name" : streamName,
+        "description": "",
+        "device_ID": deviceID
+    }).catch( (err)=> {console.log("Failed to create stream with message: " + err)})
 }
 
-async function create_Stream(streamName, deviceID) {
-    axios.post('http://193.136.93.14:8001/czb/stream', {
-            "stream" : streamName + "_stream",
-            "description" : streamName + "",
-            "device_id" : deviceID + "",
-            "type" : streamName + "",
-            "ttl" : 120000,
-            "periodicity" : 1200
-        }).catch( (err)=> {console.log("Failed creation with message: " + err)})
+/* async function create_Subscription(subID, subName, streamID, deviceID) {
+    await axios.post('http://localhost:8001/czb/subscriptions', {
+            "subscription_ID": subID,
+            "subscription_name" : subName,
+            "description": "",
+            "stream_ID": streamID,
+            "device_ID": deviceID
+        }).catch( (err)=> {console.log("Failed to create subscription with message: " + err)})
+} */
+
+async function post_Values(streamID, value, lat, long) {
+    await axios.post('http://localhost:8001/czb/streams/' + streamID + '/values', {
+            "value": value,
+            "latitude": lat,
+            "longitude": long
+        }).catch( (err)=> {console.log("Failed to post value with message: " + err)})
 } 
-
-async function put_Stream(streamName, data, location) {
-    axios.post('http://193.136.93.14:8001/czb/values', {
-        "stream_name": streamName + "_stream",
-        "value": data + "",
-        "latitude" : location.lat,
-        "longitude" : location.long
-    }).catch((err) => { console.log('Failed to publish with message: ' + err) })
-}
 
