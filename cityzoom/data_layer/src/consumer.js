@@ -59,8 +59,6 @@ client.on('message',async (topic,data,info)=>{
         await updateValues(stream, rest)
         unlock()
 
-
-
     }
     
 })
@@ -88,7 +86,7 @@ async function alert(stream, hexa) {
 
         var total_values = 0
         var count = 0
-        if (element.alert_name.includes(stream.stream_name)) {
+        if (element.alert_ID.includes(stream.stream_name)) {
             Object.keys(hexa.streams[stream.stream_name]).forEach(key => {
                 if (key >= date_id_start && key < date_id_end) {
                     total_values = total_values + hexa.streams[stream.stream_name][key].average
