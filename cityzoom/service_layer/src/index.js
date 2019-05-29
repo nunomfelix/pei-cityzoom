@@ -69,7 +69,7 @@ app.use(express.json())
 
 //Sets up all routes
 app.use('/user', accountRouter)
-app.use('/alert', alertRouter)
+app.use('/alerts', alertRouter)
 app.use('/streams', streamRouter)
 app.use('/devices', deviceRouter)
 app.use('/vertical',verticalRouter)

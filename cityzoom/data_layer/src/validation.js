@@ -28,43 +28,42 @@ function validatePostValue(object) {
     const schema = joi.object().keys({
         value: joi.number().required(),
         latitude: joi.number().required(),
-        longitude: joi.number().required()
+        longitude: joi.number().required(),
+        timestamp: joi.number().optional()
     })
     return joi.validate(object, schema)
 }
 
 function validateCreateAlert(object) {
     const schema = joi.object().keys({
-        alert_ID: joi.number().required().,
+        alert_ID: joi.string().required(),
         alert_name: joi.string().required(),
         thresholds: joi.array().items(
             joi.object().keys({
-                stream_ID: joi.string().required(),
                 value: joi.number().required(),
                 type: joi.string().required().valid(['MAX','MIN','MINEQ','MAXEQ'])
-            })
+            }).required()
         ),
         level: joi.string().required().valid('neutral','bad','really bad'),
         description: joi.string().optional(),
-        active: joi.boolean().required()
+        active: joi.boolean().optional(),
+        notify_mail: joi.boolean().optional()
     })
+    return joi.validate(object,schema)
 }
 
-function validatePostAlert(object){
+function validatePatchAlert(object){
     const schema = joi.object().keys({
-        alert_name   : joi.string().required(),
-        threshold    : joi.string().required(),
-        type        : joi.string().required(),
-        stream_ID   : joi.string().required(),
-        level       : joi.string().required(),
-        notify_mail : joi.boolean().required()
+        parameter : joi.string().required(),
+        value     : joi.string().required()
     })
-    return joi.validate(object, schema)
+    return joi.validate(object,schema)
 }
 
 module.exports = {
     validateCreateDevice,
     validateCreateStream,
     validatePostValue,
-    validatePostAlert
+    validateCreateAlert,
+    validatePatchAlert
 }

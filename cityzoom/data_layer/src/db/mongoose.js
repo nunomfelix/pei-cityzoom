@@ -5,6 +5,7 @@ const hexagons = require('./models/hexagons')
 const devices = require('./models/devices')
 const streams = require('./models/streams')
 const values = require('./models/values')
+const alerts = require('./models/alerts')
 const muns = require('./models/municipalities')
 const mongooseDebug = require('debug')('app:Mongoose')
 const mutex = require('async-mutex').Mutex
@@ -62,6 +63,18 @@ mongoose.connect(connectionUrl+database, {
             //     ))
             // })
         })
+
+        //fs.readFile('alerts.json', async (err, data) => {
+        //    await alerts.deleteMany({})
+        //    let alert = JSON.parse(data)
+        //    alert.alerts.forEach(async (value) => {
+        //        const alt = new alerts(value)
+        //        await alt.save()
+        //    })
+        //    for (var a in alert.alerts) {
+        //        
+        //    }
+        //})
         release()
     })
     mongooseDebug("Connected to mongo database!")

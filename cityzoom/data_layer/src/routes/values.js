@@ -14,6 +14,9 @@ const valuesSchema = new mongoose.Schema({
     },
     longitude:{
         type: Number
+    },
+    timestamp:{
+        type: Number
     }
 })
 

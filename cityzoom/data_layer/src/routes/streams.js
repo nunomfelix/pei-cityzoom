@@ -88,10 +88,7 @@ router.get('/heatmap', async (req, res) => {
         streamsDebug('[ERROR] Interval is wrong')
         return res.status(400).send({error: 'Bad interval defined'})
     }
-
-    console.log(req.query)
-
-    const hexagons = (await Hexagons.find({})).reduce((map, hex) => {
+        const hexagons = (await Hexagons.find({})).reduce((map, hex) => {
         let streams = {}
         for (var stream in hex.streams) {
             Object.keys(hex.streams[stream]).forEach((time_id) => {
