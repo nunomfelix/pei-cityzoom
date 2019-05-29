@@ -19,9 +19,8 @@
                 <LineGraph :ref="item.i" :name="item.i" :values="values"/>
             </div>
             -->
-            <div class="small">
-              <line-chart :ref="item.i" :name="item.i" :chart-data="datacollection" :options="options"/>
-              <button @click="fillData()">Randomize</button>
+            <div v-if="show" class="small">
+              <line-chart  :chart-data="datacollection" :options="options"/>
             </div>
             </slot>
           </div>
@@ -50,8 +49,8 @@ export default {
 
   data(){
       return {
+      show: false,
       item: item,
-      layout: testLayout,
       datacollection: null,
       position: null,
       options:{
@@ -84,7 +83,6 @@ export default {
     var y_axis = []
     const d = [Object.keys(res.data)[0]]
       for(var stream of res.data[d]){
-        console.log(stream)
           y_axis.push(Math.round(stream.value))
           labels.push(this.convertTimestamp(stream.created_at))
         }
@@ -92,6 +90,7 @@ export default {
     console.log(y_axis)
     console.log(labels)
     this.fillData(labels,y_axis)
+    this.show = true
   },
   
   methods:{
@@ -111,10 +110,10 @@ export default {
       return Math.floor(Math.random() * (50 - 5 + 1)) + 5
     },
     convertTimestamp(t){
-      var dt = new Date(t*1000);
-      var day = dt.getDay();
-      var hr = dt.getHours();
-      var m = "0" + dt.getMinutes();
+      var dt = new Date(t);
+      var day = dt.getDate().toString().padStart(2, '0');
+      var hr = dt.getHours().toString().padStart(2, '0');
+      var m = dt.getMinutes().toString().padStart(2, '0');
       return day+':'+hr+ ':' + m.substr(-2)
     }
 

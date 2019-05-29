@@ -388,17 +388,15 @@ export default {
         this.hex_layer.getSource().on('change', () => {
             if(this.hex_layer.getSource().getState() == 'ready' && (!this.loaded || !this.geo_loaded)) {
                 this.loaded = true
-                if(this.geo_loaded)
-                    this.load()
+                this.load()
             }
         })
 
 
         this.geo_layer.getSource().on('change', () => {
             if(this.geo_layer.getSource().getState() == 'ready' && (!this.loaded || !this.geo_loaded)) {
-                this.get_loaded = true
-                if(this.loaded)
-                    this.load()
+                this.geo_loaded = true
+                this.load()
             }
         })
 
@@ -522,11 +520,10 @@ export default {
     methods: {
         load() {
             this.geoJsonExtent = this.req.extent.createEmpty()
+            console.log("HERE1")
             this.geo_layer.getSource().getFeatures().forEach(feature => {
-                console.log(feature)
                 this.geoJsonExtent = this.req.extent.extend(this.geoJsonExtent, feature.getGeometry().getExtent())
             })
-            console.log(this.geoJsonExtent)
             setTimeout(() => {
                 this.map.getView().fit(this.geoJsonExtent, {
                     duration: 500
@@ -554,6 +551,7 @@ export default {
                     Authorization: this.$store.state.jwt
                 }
             })
+            console.log(res.data)
             this.heatmap = res.data
             this.updateHeatMap()
         },
