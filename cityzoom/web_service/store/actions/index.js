@@ -36,14 +36,14 @@ export default{
                     Authorization: payload
                 }
             })
-            const heatmap = await axios({
-                method: 'get',
-                url: getUrl() + '/streams/heatmap',
-                headers: {
-                    Authorization: payload
-                }
-            })
-            commit('SET_STORE', { verticals: verticals.data, devices: devices.data.user_devices, heatmap: heatmap.data })
+            // const heatmap = await axios({
+            //     method: 'get',
+            //     url: getUrl() + '/streams/heatmap',
+            //     headers: {
+            //         Authorization: payload
+            //     }
+            // })
+            commit('SET_STORE', { verticals: verticals.data, devices: devices.data }) //, heatmap: heatmap.data
         } catch (err) {
             console.error('Error', err.message)
             return err.message

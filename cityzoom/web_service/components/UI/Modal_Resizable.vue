@@ -14,8 +14,14 @@
 
           <div class="modal-body">
             <slot name="body">
+            <!--
             <div v-if="item.type=='lines'">
                 <LineGraph :ref="item.i" :name="item.i" :values="values"/>
+            </div>
+            -->
+            <div class="small">
+              <line-chart :ref="item.i" :name="item.i" :chart-data="datacollection" :options="options"/>
+              <button @click="fillData()">Randomize</button>
             </div>
             </slot>
           </div>
@@ -34,15 +40,85 @@
   </transition>
 </template>
 <script>
+ 
 var item = { x: 0, y: 0, w: 12, h: 14, i: "line_a", type: 'lines', data:'fake' };
 export default {
   props:{values: Object}
   ,
   name: 'Modal_Resizable',
+  
+
   data(){
       return {
-        item: item}   
-  }
+      item: item,
+      layout: testLayout,
+      datacollection: null,
+      position: null,
+      options:{
+        elements:{
+          line:{
+            tension:0
+          }
+        }, 
+        scales: {
+          xAxes: [{
+              type: 'time',
+          time: {
+              parser: "DD:HH:mm",
+              unit: 'hour'}
+          }]
+        }
+    }
+    }
+  },
+  mounted: async function() {
+   const res = await this.$axios.get(`http://localhost:8002/devices/device_APIs0105010/values`, {  
+      headers: {
+          Authorization: this.$store.state.jwt
+      }
+    })
+
+    this.data=res.data
+
+    var labels = []
+    var y_axis = []
+    const d = [Object.keys(res.data)[0]]
+      for(var stream of res.data[d]){
+        console.log(stream)
+          y_axis.push(Math.round(stream.value))
+          labels.push(this.convertTimestamp(stream.created_at))
+        }
+
+    console.log(y_axis)
+    console.log(labels)
+    this.fillData(labels,y_axis)
+  },
+  
+  methods:{
+    fillData (labels,y_axis) {
+      this.datacollection = {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Humidity',
+            backgroundColor: '#0099FF',
+            data: y_axis
+          }
+        ]
+      }
+    },
+    getRandomInt () {
+      return Math.floor(Math.random() * (50 - 5 + 1)) + 5
+    },
+    convertTimestamp(t){
+      var dt = new Date(t*1000);
+      var day = dt.getDay();
+      var hr = dt.getHours();
+      var m = "0" + dt.getMinutes();
+      return day+':'+hr+ ':' + m.substr(-2)
+    }
+
+  },
 }
 </script>
 

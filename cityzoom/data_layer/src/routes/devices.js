@@ -45,7 +45,6 @@ router.post('', validation(validators.validateCreateDevice, 'body', 'Invalid dev
 
 router.get('', async (req, res) => {
     devicesDebug('[DEBUG] Fetching all Devices')
-    var result = {}
     const start = req.query.interval_start ? req.query.interval_start : 0
     const compass = Number(Date.now())
     const end = req.query.interval_end ? req.query.interval_end : compass
@@ -53,27 +52,8 @@ router.get('', async (req, res) => {
         devicesDebug('[ERROR] Interval is wrong')
         return res.status(400).send({error: 'Bad interval defined'})
     }
-    user_devs =[]
     var allDevices = await devices.find({created_at: { $gte: start, $lte: end}})
-
-    for (var i = 0; i < allDevices.length; i++) {
-        let doc = allDevices[i]
-        user_devs.push({
-            ...doc,
-            created_at: Number(doc.created_at)
-        })
-    }
-
-    result['total_devices']
-    await devices.countDocuments({created_at: { $gte: start, $lte: end}}, (err, count) => {
-        result['total_devices'] = count 
-    })
-    devicesDebug('[DEBUG] Fetched with success')
-    if (start != 0) { result['start'] = start }
-    if (end != compass) { result['end'] = end }
-    result['user_devices'] = user_devs
-    
-    res.status(200).send(result)
+    res.status(200).send(allDevices)
 })
 
 // get device by ID
@@ -107,24 +87,34 @@ router.delete('/:id', async (req, res) => {
     res.status(204).send()
 })
 
+// get values by stream
 router.get('/:id/values', async (req,res) => {
     const dev = await devices.findOne({device_ID:req.params.id})
     if (!dev) { return res.status(404).send({'Status':'Not Found'}) }
+    const start = req.query.interval_start ? req.query.interval_start : 0
+    const compass = Number(Date.now())
+    const end = req.query.interval_end ? req.query.interval_end : compass
+    if (end < start || start < 0) {
+        streamsDebug('[ERROR] Interval is wrong')
+        return res.status(400).send({error: 'Bad interval defined'})
+    }
     // get all device streams
     var allDeviceStreams = await streams.find({device_ID: dev.device_ID})
     devStreams = []
     allDeviceStreams.forEach((stream) => {
-        devStreams.push(stream.stream_ID)
+        devStreams.push({
+            stream_ID: stream.stream_ID,
+            stream_name: stream.stream_name
+        })
     })
     let result = {}
-    for(let i in devStreams){
-        let s = devStreams[i]
-        var allFullValues = await values.find({stream_ID: devStreams[i]})
+    for(let {stream_ID, stream_name} of devStreams){
+        var allFullValues = await values.find({stream_ID:stream_ID})
         var allValues = []
         allFullValues.forEach((v)=>{
             allValues.push({value:v.value,created_at:v.created_at})
         })
-        result[devStreams[i]] = allValues
+        result[stream_name] = allValues
     }
     res.status(200).send(result)
 })

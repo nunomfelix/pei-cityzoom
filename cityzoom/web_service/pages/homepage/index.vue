@@ -33,12 +33,26 @@
           <div v-if="item.type=='series'">
             <SeriesGraph :ref="item.i" :data="item.data && item.data == 'fake' ? null : data" :name="item.i"/>
           </div>
-          <div v-if="item.type=='stacked'">
+          <div v-else-if="item.type=='stacked'">
             <StackedBar :ref="item.i" :name="item.i"/>
           </div>
-          <div v-if="item.type=='lines'">
+          <div v-else-if="item.type=='lines'">
+            <!--
             <LineGraph :ref="item.i" :name="item.i" :values="values"/>
+            -->
+            
+            <div class="small">
+              <line-chart :ref="item.i" :name="item.i" :chart-data="datacollection" :options="options"/>
+              <button @click="fillData()">Randomize</button>
+            </div>
+            
           </div>
+          
+          <div v-else-if="item.type" class="small">
+              <BarChart/>
+          </div>
+    </div>
+          <!--
           <div v-if="item.type=='widget_weather'">
             <no-ssr>
               <WeatherWidget 
@@ -52,47 +66,92 @@
               </WeatherWidget>
             </no-ssr>
           </div>
-        </div>
+          -->
+        
       </grid-item>
     </grid-layout>
   </div>
 </template>
 
 <script>
+import moment from 'moment'
 const drone_stream = require('static/get_stream_values_response.json');
+
 var testLayout = [
   { x: 0, y: 0, w: 14, h: 14, i: "line_a", type: 'lines', data:'fake' },
   //{ x: 0, y: 0, w: 8, h: 14, i: "series_a", type: 'series', data:'fake' },
-  { x: 0, y: 0, w: 8, h: 5, i: "dfffd", type: 'widget_weather'}
+  //{ x: 0, y: 0, w: 8, h: 5, i: "dfffd", type: 'widget_weather'},
   // { x: 8, y: 0, w: 4, h: 14, i: "series_c", type: 'series', data: 'fake' },
   // { x: 0, y: 14, w: 13, h: 14, i: "series_b", type: 'series', data: 'fake' },
+  { x: 0, y: 14, w: 13, h: 14, i: "bar_a", type: 'bar', data: 'fake' }
 ];
 
 export default {
+
+
   data() {
     return {
       layout: testLayout,
-      values: drone_stream,
+      datacollection: null,
       position: null,
+      options:{
+        elements:{
+          line:{
+            tension:0
+          }
+        }, 
+        scales: {
+          xAxes: [{
+              type: 'time',
+          time: {
+              parser: "DD:HH:mm",
+              unit: 'hour'}
+          }]
+        }
+    }
     };
   }, 
   mounted: async function() {
     setTimeout(() => {
       this.getLocation()
     }, 0)
-    const data = []
-    const res = await this.$store.dispatch('get_streams');
-    for(let i in res) {
-      const values = await this.$store.dispatch('get_stream_values', {name: res[i].name})
-      for(let v in values) {
-        data.push({
-          dataset: res[i].name,
-          key: values[v].timestamp,
-          value: values[v].value
-        })
+
+    
+    const res = await this.$axios.get(`http://localhost:8002/devices/device_APIs0105010/values`, {  
+      headers: {
+          Authorization: this.$store.state.jwt
       }
-    }
-    this.data = data
+    })
+
+    this.data=res.data
+
+    var labels = []
+    var y_axis = []
+    // var streams = []
+    //console.log(res.data.config)
+    // Object.keys(data).forEach((key) => {
+    //   streams.push(res.data[key])
+    // });
+    // Object.keys(streams).forEach((key) => {
+    //   console.log(key,streams[key])
+    //   labels.push(this.convertTimestamp(streams[key].created_at))
+    //   y_axis.push(streams[key].value)
+    // });
+    const d = [Object.keys(res.data)[0]]
+      for(var stream of res.data[d]){
+        console.log(stream)
+          y_axis.push(Math.round(stream.value))
+          labels.push(this.convertTimestamp(stream.created_at))
+        }
+    
+    
+
+    // var result = [{ x: "18:00", y: "230" }, { x: "19:00", y: "232" }, { x: "20:00", y: "236" }, { x: "22:00", y: "228" }];
+    // var labels = result.map(e => moment(e.x, 'HH:mm'));
+    // var data = result.map(e => +e.y);
+    console.log(y_axis)
+    console.log(labels)
+    this.fillData(labels,y_axis)
   },
   methods: {
     onResize(i) {
@@ -108,7 +167,32 @@ export default {
           this.position.coords.longitude = this.position.Coordinates.longitude.toString()
           });
       }
+    },
+    fillData (labels,y_axis) {
+      this.datacollection = {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Humidity',
+            backgroundColor: '#0099FF',
+            fill: false,
+
+            data: y_axis
+          }
+        ]
+      }
+    },
+    getRandomInt () {
+      return Math.floor(Math.random() * (50 - 5 + 1)) + 5
+    },
+    convertTimestamp(t){
+      var dt = new Date(t*1000);
+      var day = dt.getDay();
+      var hr = dt.getHours();
+      var m = "0" + dt.getMinutes();
+      return day+':'+hr+ ':' + m.substr(-2)
     }
+
   }
 };
 </script>
@@ -124,7 +208,15 @@ export default {
   @include shadow(3px, 2px, 3px, 0px, #4d4c4c);
   @include unselectable();
 }
+  .small {
+    max-width: 500px;
+    margin:  150px auto;
+  }
+  .smalli{
+    max-width:200px;
+    position:relative;
 
+  }
 .widget {
   position: relative;
   height: 100%;
