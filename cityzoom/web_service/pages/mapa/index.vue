@@ -673,7 +673,7 @@ export default {
                         color: this.hexagonValues[i].color,
                     }),
                     stroke: new this.req.style.Stroke({
-                        color: 'black',
+                        color: this.hexagonValues[i].index ? 'black' : 'transparent',
                         width: this.map.getView().getZoom() / 20 * 1.5
                     })
                 })
