@@ -87,9 +87,17 @@ router.delete('/:id', async (req, res) => {
     res.status(204).send()
 })
 
+// get values by stream
 router.get('/:id/values', async (req,res) => {
     const dev = await devices.findOne({device_ID:req.params.id})
     if (!dev) { return res.status(404).send({'Status':'Not Found'}) }
+    const start = req.query.interval_start ? req.query.interval_start : 0
+    const compass = Number(Date.now())
+    const end = req.query.interval_end ? req.query.interval_end : compass
+    if (end < start || start < 0) {
+        streamsDebug('[ERROR] Interval is wrong')
+        return res.status(400).send({error: 'Bad interval defined'})
+    }
     // get all device streams
     var allDeviceStreams = await streams.find({device_ID: dev.device_ID})
     devStreams = []

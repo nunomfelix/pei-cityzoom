@@ -5,6 +5,7 @@ const hexagons = require('./models/hexagons')
 const devices = require('./models/devices')
 const streams = require('./models/streams')
 const values = require('./models/values')
+const alerts = require('./models/alerts')
 const muns = require('./models/municipalities')
 const mongooseDebug = require('debug')('app:Mongoose')
 const mutex = require('async-mutex').Mutex
@@ -20,14 +21,14 @@ mongoose.connect(connectionUrl+database, {
 
     //fs.writeFile('data_teste' + new Date(), JSON.stringify({verticals: await verticals.find(), devices: await devices.find(), streams: await streams.find(), values: await values.find(), hexagons: await hexagons.find(), muns: await muns.find()}), () => {})
     
-    await hexagons.deleteMany({})
-    await muns.deleteMany({})
-    await devices.deleteMany({})
-    await streams.deleteMany({})
-    await values.deleteMany({})
-    await verticals.deleteMany({})
+    // await hexagons.deleteMany({})
+    // await muns.deleteMany({})
+    // await devices.deleteMany({})
+    // await streams.deleteMany({})
+    // await values.deleteMany({})
+    // await verticals.deleteMany({})
 
-    fs.readFile('backup2', async(err, res) => {
+    fs.readFile('backup3', async(err, res) => {
         res = JSON.parse(res)
         console.log(Object.keys(res))
         if(res.hexagons)
@@ -54,8 +55,19 @@ mongoose.connect(connectionUrl+database, {
             await streams.insertMany(res.streams.map(s => 
                 new streams(s)    
             ))
-    })
+    
 
+        //fs.readFile('alerts.json', async (err, data) => {
+        //    await alerts.deleteMany({})
+        //    let alert = JSON.parse(data)
+        //    alert.alerts.forEach(async (value) => {
+        //        const alt = new alerts(value)
+        //        await alt.save()
+        //    })
+        //    for (var a in alert.alerts) {
+        //        
+        //    }
+        //})
         // fs.readFile('verticals.json', async (err, data) => { 
         //     await verticals.deleteMany({}) 
         //     if (err) throw err;
@@ -70,7 +82,10 @@ mongoose.connect(connectionUrl+database, {
         //         streams_array.push(...vertical.vertical[v].streams.map(s => s.name))
         //         // console.log(vert)
         //         await vert.save()
-        //     }
+        //     })
+    })
+
+        
         //     // fs.readFile('hex_data.json', async (err, hexa_json) => {
         //     //     if (err) throw err;
         //     //     let hexas = JSON.parse(hexa_json)
