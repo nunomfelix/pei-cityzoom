@@ -43,7 +43,7 @@
             
             <div class="small">
               <line-chart :ref="item.i" :name="item.i" :chart-data="datacollection" :options="options"/>
-              <button @click="fillData">Randomize</button>
+              <button @click="fillData()">Randomize</button>
             </div>
             
           </div>

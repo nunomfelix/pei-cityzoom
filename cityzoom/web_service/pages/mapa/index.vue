@@ -522,7 +522,6 @@ export default {
                     Authorization: this.$store.state.jwt
                 }
             })
-            
             this.heatmap = res.data
             this.updateHeatMap()
         },

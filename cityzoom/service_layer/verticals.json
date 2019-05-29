@@ -4,39 +4,55 @@
 			"display": "Qualidade do ar",
 			"streams": [
 				{
-					"name": "pressure_stream",
-					"display": "Pressão do ar",
-					"unit": "B",
-					"fullunit": "Bars",
-					"type": "value",
-					"colors": ["white", "lightblue", "white"],
-					"min": 870,
-					"max": 1084.8
-				},
-				{
-					"name": "humidity_stream",
-					"display": "Humidade do ar",
-					"unit": "%",
-					"fullunit": "percentagem",
-					"type": "value",
-					"colors": ["lightblue", "darkblue", "grey"],
-					"min": 0,
-					"max": 1
-				},
-				{
 					"name": "ozone_stream",
-					"display": "Ozono na atmosfera",
-					"unit": "SU",
-					"fullunit": "Dobson",	
+					"display": "Ozono Troposférico na atmosfera",
+					"unit": "ppb",
+					"fullunit": "Micro grama por metro cúbico",	
 					"type": "value"	,
-					"colors": ["lightblue", "purple", "black"],
+					"colors": ["white", "red", "black"],
 					"min": 73,
 					"max": 600
+				},{ 
+					"name": "co_stream",
+					"display": "Monoxido de Carbono",
+					"unit": "ppb",
+					"fullunit": "Partes por Bilião",	
+					"type": "value"	,
+					"colors": ["lightblue", "purple", "black"],
+					"min": 0,
+					"max": 160
+				},{
+					"name": "no2_stream",
+					"display": "Dióxido de nitrogénio",
+					"unit": "µg/m3",
+					"fullunit": "Micro grama por metro cúbico",	
+					"type": "value"	,
+					"colors": ["white", "red", "black"],
+					"min": 0,
+					"max": 200
+				},{
+					"name": "pm10_stream",
+					"display": "Partículas PM10",
+					"unit": "µg/m3",
+					"fullunit": "Micro grama por metro cúbico",	
+					"type": "value"	,
+					"colors": ["white", "red", "black"],
+					"min": 0,
+					"max": 100
+				},{
+					"name": "pm25_stream",
+					"display": "Partículas PM2.5",
+					"unit": "µg/m3",
+					"fullunit": "Micro grama por metro cúbico",	
+					"type": "value"	,
+					"colors": ["white", "red", "black"],
+					"min": 0,
+					"max": 200
 				}
 			]
 		},
-    	"Temperature": {
-			"display": "Temperatura",
+    	"Weather": {
+			"display": "Condições Atmosféricas",
 			"streams": [
 				{
 					"name": "temperature_stream",
@@ -47,6 +63,25 @@
 					"colors": ["green", "red", "white"],
 					"min": 10,
 					"max": 30
+				},
+				{
+					"name": "humidity_stream",
+					"display": "Humidade do ar",
+					"unit": "%",
+					"fullunit": "Percentagem",
+					"type": "value",
+					"colors": ["darkblue", "red", "grey"],
+					"min": 0,
+					"max": 100
+				},{
+					"name": "pressure_stream",
+					"display": "Pressão do ar",
+					"unit": "hPa",
+					"fullunit": "Hectopascals ",
+					"type": "value",
+					"colors": ["white", "lightblue", "white"],
+					"min": 870,
+					"max": 1084
 				}
 			]
 		}

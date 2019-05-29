@@ -20,6 +20,19 @@ const app = express()
 //Uses specified port in env variable. Uses port 8002 as if none is given
 const port = process.env.PORT || 8001
 
+app.use((req, res, next) => {
+    var allowedOrigins = ['http://127.0.0.1:3000', 'http://localhost:3000', 'http://193.136.93.14:3000',];
+    var origin = req.headers.origin;
+    // if (allowedOrigins.indexOf(origin) > -1) {
+    //     res.setHeader('Access-Control-Allow-Origin', origin);
+    // }
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.header('Access-Control-Allow-Credentials', true);
+    return next();
+});
+
 process.on('uncaughtException', (ex) => {
     fs.appendFileSync('uncaught.log', new Date().toISOString() + " - uncaughtException - " + ex + '\n');
     uncaughtDebug(ex)

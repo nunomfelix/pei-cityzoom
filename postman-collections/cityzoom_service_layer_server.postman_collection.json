@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "c4343fd8-9e76-4dc8-933b-aa5db8dad61d",
+		"_postman_id": "db2d777f-6c38-491b-8869-c7e2a14b08cf",
 		"name": "cityzoom_service_layer_server",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -145,7 +145,7 @@
 						"id": "7f10edd5-9854-4774-aa20-7fbe79a4b7eb",
 						"exec": [
 							"const echoPostRequest = {",
-							"  url: 'http://localhost:8002/user/login',",
+							"  url: 'http://193.136.93.14:8002/user/login',",
 							"  method: 'POST',",
 							"  header: 'Content-Type:application/json',",
 							"  body: {",
@@ -182,10 +182,13 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:8002/devices",
+					"raw": "http://193.136.93.14:8002/devices",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"193",
+						"136",
+						"93",
+						"14"
 					],
 					"port": "8002",
 					"path": [
@@ -204,7 +207,7 @@
 						"id": "cd62c386-911c-40e7-927c-beadefa85711",
 						"exec": [
 							"const echoPostRequest = {",
-							"  url: 'http://localhost:8002/user/login',",
+							"  url: 'http://193.136.93.14:8002/user/login',",
 							"  method: 'POST',",
 							"  header: 'Content-Type:application/json',",
 							"  body: {",
@@ -241,10 +244,13 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:8002/devices/mobile_test_device",
+					"raw": "http://193.136.93.14:8002/devices/mobile_test_device",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"193",
+						"136",
+						"93",
+						"14"
 					],
 					"port": "8002",
 					"path": [
@@ -272,14 +278,17 @@
 					"raw": "{\n       \"name\": \"superuser\",\n       \"username\": \"superuser\",\n       \"email\": \"superuser@gmail.com\",\n       \"password\": \"12345\"\n }\n"
 				},
 				"url": {
-					"raw": "http://localhost:8002/users",
+					"raw": "http://193.136.93.14:8002/user",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"193",
+						"136",
+						"93",
+						"14"
 					],
 					"port": "8002",
 					"path": [
-						"users"
+						"user"
 					]
 				}
 			},
@@ -294,7 +303,7 @@
 						"id": "36910d07-c13f-4ae1-9818-6845477a2663",
 						"exec": [
 							"const echoPostRequest = {",
-							"  url: 'http://localhost:8002/user/login',",
+							"  url: 'http://193.136.93.14:8002/user/login',",
 							"  method: 'POST',",
 							"  header: 'Content-Type:application/json',",
 							"  body: {",
@@ -331,10 +340,13 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:8002/streams/",
+					"raw": "http://193.136.93.14:8002/streams/",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"193",
+						"136",
+						"93",
+						"14"
 					],
 					"port": "8002",
 					"path": [
@@ -354,7 +366,7 @@
 						"id": "e87f7a5a-1f17-4c46-bbaf-e06a3c2e249e",
 						"exec": [
 							"const echoPostRequest = {",
-							"  url: 'http://localhost:8002/user/login',",
+							"  url: 'http://193.136.93.14:8002/user/login',",
 							"  method: 'POST',",
 							"  header: 'Content-Type:application/json',",
 							"  body: {",
@@ -391,10 +403,13 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:8002/streams",
+					"raw": "http://193.136.93.14:8002/streams",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"193",
+						"136",
+						"93",
+						"14"
 					],
 					"port": "8002",
 					"path": [
@@ -413,7 +428,7 @@
 						"id": "35692778-246e-426a-ba93-465054757f9f",
 						"exec": [
 							"const echoPostRequest = {",
-							"  url: 'http://localhost:8002/user/login',",
+							"  url: 'http://193.136.93.14:8002/user/login',",
 							"  method: 'POST',",
 							"  header: 'Content-Type:application/json',",
 							"  body: {",
@@ -450,10 +465,13 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:8002/streams/test_temperature_stream/values",
+					"raw": "http://193.136.93.14:8002/streams/test_temperature_stream/values",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"193",
+						"136",
+						"93",
+						"14"
 					],
 					"port": "8002",
 					"path": [
@@ -494,10 +512,13 @@
 					"raw": "{\n  \"username\": \"superuser\",\n  \"password\": \"12345\"\n}\n"
 				},
 				"url": {
-					"raw": "http://localhost:8002/user/login",
+					"raw": "http://193.136.93.14:8002/user/login",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"193",
+						"136",
+						"93",
+						"14"
 					],
 					"port": "8002",
 					"path": [
@@ -517,7 +538,7 @@
 						"id": "3428e396-7eb5-4416-b099-c0c195a170dd",
 						"exec": [
 							"const echoPostRequest = {",
-							"  url: 'http://localhost:8002/user/login',",
+							"  url: 'http://193.136.93.14:8002/user/login',",
 							"  method: 'POST',",
 							"  header: 'Content-Type:application/json',",
 							"  body: {",
@@ -554,15 +575,18 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:8002/device/drone3d/values",
+					"raw": "http://193.136.93.14:8002/devices/mobile_test_device/values",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"193",
+						"136",
+						"93",
+						"14"
 					],
 					"port": "8002",
 					"path": [
-						"device",
-						"drone3d",
+						"devices",
+						"mobile_test_device",
 						"values"
 					]
 				}
@@ -578,7 +602,7 @@
 						"id": "b5034aac-86f9-4446-955d-b72118c0cada",
 						"exec": [
 							"const echoPostRequest = {",
-							"  url: 'http://localhost:8002/user/login',",
+							"  url: 'http://193.136.93.14:8002/user/login',",
 							"  method: 'POST',",
 							"  header: 'Content-Type:application/json',",
 							"  body: {",
@@ -615,15 +639,18 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:8002/device/drone3d/values",
+					"raw": "http://193.136.93.14:8002/devices/mobile_test_device/values",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"193",
+						"136",
+						"93",
+						"14"
 					],
 					"port": "8002",
 					"path": [
-						"device",
-						"drone3d",
+						"devices",
+						"mobile_test_device",
 						"values"
 					]
 				}
@@ -639,7 +666,7 @@
 						"id": "61254d88-199f-4521-a043-8fd986e54dbd",
 						"exec": [
 							"const echoPostRequest = {",
-							"  url: 'http://localhost:8002/user/login',",
+							"  url: 'http://193.136.93.14:8002/user/login',",
 							"  method: 'POST',",
 							"  header: 'Content-Type:application/json',",
 							"  body: {",
@@ -679,10 +706,13 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:8002/vertical",
+					"raw": "http://193.136.93.14:8002/vertical",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"193",
+						"136",
+						"93",
+						"14"
 					],
 					"port": "8002",
 					"path": [
