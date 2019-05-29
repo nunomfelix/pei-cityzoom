@@ -141,13 +141,12 @@ test();
 
     for(var lol = 0; lol < 10; lol++) {
         for(var d of devices) {
-            var data = get_darksky_data(d.center_lat, d.center_long)
+            //var data = get_darksky_data(d.center_lat, d.center_long)
             //var data = JSON.parse(fs.readFileSync('kappa.json', 'utf8'))
             for(var stream of devicesMap[d.device]) {
-               await post_Values(stream.stream_id, data[0][stream.stream], d.center_lat, d.center_long)
+               await post_Values(stream.stream_id, Math.random() * 10, d.center_lat, d.center_long)
             }
         }
-        await sleep(1800000*.95)
     }
         // fs.writeFileSync('kappa.json', JSON.stringify(data))
 })()
