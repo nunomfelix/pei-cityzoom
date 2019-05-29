@@ -42,8 +42,8 @@
             -->
             
             <div class="small">
-              <LineChart :ref="item.i" :name="item.i" :chartData="datacollectionline" :options="options"/>
-              <button @click="fillDataLine()">Randomize</button>
+              <line-chart :ref="item.i" :name="item.i" :chart-data="datacollection" :options="options"/>
+              <button @click="fillData">Randomize</button>
             </div>
             
           </div>
@@ -74,8 +74,9 @@
 </template>
 
 <script>
+import moment from 'moment'
 const drone_stream = require('static/get_stream_values_response.json');
-console.log(drone_stream)
+
 var testLayout = [
   { x: 0, y: 0, w: 14, h: 14, i: "line_a", type: 'lines', data:'fake' },
   //{ x: 0, y: 0, w: 8, h: 14, i: "series_a", type: 'series', data:'fake' },
@@ -86,54 +87,72 @@ var testLayout = [
 ];
 
 export default {
+
+
   data() {
     return {
       layout: testLayout,
-      values: drone_stream,
+      datacollection: null,
       position: null,
-      datacolletionline:null,
       options:{
         elements:{
           line:{
-            tension:0,
-            spanGaps:true
+            tension:0
           }
-        },
+        }, 
         scales: {
-            yAxes: [{
-                ticks: {
-                    beginAtZero: true
-                }
-            }],
-            xAxes: [{
-                type: 'time',
-            time: {
-              unit: 'month',
-              tooltipFormat: 'lll',
-            }
-            }]
+          xAxes: [{
+              type: 'time',
+          time: {
+              parser: "DD:HH:mm",
+              unit: 'hour'}
+          }]
         }
-      }
+    }
     };
   }, 
   mounted: async function() {
     setTimeout(() => {
       this.getLocation()
     }, 0)
-    this.fillDataLine()
-    const data = []
-    const res = await this.$store.dispatch('get_streams');
-    for(let i in res) {
-      const values = await this.$store.dispatch('get_stream_values', {name: res[i].name})
-      for(let v in values) {
-        data.push({
-          dataset: res[i].name,
-          key: values[v].timestamp,
-          value: values[v].value
-        })
+
+    
+    const res = await this.$axios.get(`http://localhost:8002/devices/device_0105010/values`, {  
+      headers: {
+          Authorization: this.$store.state.jwt
       }
-    }
-    this.data = data
+    })
+
+    this.data=res.data
+
+    var labels = []
+    var y_axis = []
+    // var streams = []
+    //console.log(res.data.config)
+    // Object.keys(data).forEach((key) => {
+    //   streams.push(res.data[key])
+    // });
+    // Object.keys(streams).forEach((key) => {
+    //   console.log(key,streams[key])
+    //   labels.push(this.convertTimestamp(streams[key].created_at))
+    //   y_axis.push(streams[key].value)
+    // });
+    
+    const d = [Object.keys(res.data)[0]]
+      for(var stream of res.data[d]){
+        console.log(stream)
+          y_axis.push(Math.round(stream.value))
+          labels.push(this.convertTimestamp(stream.created_at))
+        }
+    
+    
+
+    // var result = [{ x: "18:00", y: "230" }, { x: "19:00", y: "232" }, { x: "20:00", y: "236" }, { x: "22:00", y: "228" }];
+    // var labels = result.map(e => moment(e.x, 'HH:mm'));
+    // var data = result.map(e => +e.y);
+    console.log(y_axis)
+    console.log(labels)
+    this.fillData(labels,y_axis)
   },
   methods: {
     onResize(i) {
@@ -150,27 +169,28 @@ export default {
           });
       }
     },
-    fillDataLine () {
-        this.datacollectionline = {
-          datasets: [
-            {
-              label: 'Data One',
-              backgroundColor: '#1a8cff',
-              data: [14,13,15,20,18,17,15,14],
-            }
-            // ,
-            // {
-            //   label: 'Data Two',
-            //   backgroundColor: '#ff5050',
-            //   data: [15,13,15,20]
-            // }
-            ]
-
-        }
+    fillData (labels,y_axis) {
+      this.datacollection = {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Humidity',
+            backgroundColor: '#0099FF',
+            data: y_axis
+          }
+        ]
+      }
     },
     getRandomInt () {
       return Math.floor(Math.random() * (50 - 5 + 1)) + 5
-      }
+    },
+    convertTimestamp(t){
+      var dt = new Date(t*1000);
+      var day = dt.getDay();
+      var hr = dt.getHours();
+      var m = "0" + dt.getMinutes();
+      return day+':'+hr+ ':' + m.substr(-2)
+    }
 
   }
 };

@@ -18,13 +18,13 @@ mongoose.connect(connectionUrl+database, {
     useCreateIndex: true
 }, async () => {
 
-    fs.writeFile('data_teste_16h-21h.json', JSON.stringify({hexagons: await hexagons.find(), muns: await muns.find()}), () => {})
+    //fs.writeFile('data_teste_16h-21h.json', JSON.stringify({hexagons: await hexagons.find(), muns: await muns.find()}), () => {})
 
     Mutex.acquire().then(async (release) => {
-        // await devices.deleteMany({})
-        // await streams.deleteMany({})
-        // await values.deleteMany({})
-        // await muns.deleteMany({})
+        await devices.deleteMany({})
+        await streams.deleteMany({})
+        await values.deleteMany({})
+        await muns.deleteMany({})
         fs.readFile('verticals.json', async (err, data) => { 
             await verticals.deleteMany({}) 
             if (err) throw err;
@@ -40,27 +40,27 @@ mongoose.connect(connectionUrl+database, {
                 // console.log(vert)
                 await vert.save()
             }
-            // fs.readFile('hex_data.json', async (err, hexa_json) => {
-            //     await hexagons.deleteMany({})
-            //     if (err) throw err;
-            //     let hexas = JSON.parse(hexa_json)
-            //     const municipalities = new Set()
-            //     await hexagons.insertMany(hexas.map(h => {
-            //         municipalities.add(h.municipality)
-            //         return new hexagons({
-            //             id: h.id,
-            //             coordinates: h.coordinates,
-            //             municipality: h.municipality,
-            //             streams: {}
-            //         })
-            //     }))
-            //     await muns.insertMany([...municipalities].map(m =>
-            //         new muns({
-            //             id: m,
-            //             streams: {}
-            //         })
-            //     ))
-            // })
+            fs.readFile('hex_data.json', async (err, hexa_json) => {
+                await hexagons.deleteMany({})
+                if (err) throw err;
+                let hexas = JSON.parse(hexa_json)
+                const municipalities = new Set()
+                await hexagons.insertMany(hexas.map(h => {
+                    municipalities.add(h.municipality)
+                    return new hexagons({
+                        id: h.id,
+                        coordinates: h.coordinates,
+                        municipality: h.municipality,
+                        streams: {}
+                    })
+                }))
+                await muns.insertMany([...municipalities].map(m =>
+                    new muns({
+                        id: m,
+                        streams: {}
+                    })
+                ))
+            })
         })
         release()
     })
