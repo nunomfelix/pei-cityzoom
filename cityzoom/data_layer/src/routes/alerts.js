@@ -38,6 +38,14 @@ router.get('/list',async (req,res)=>{
     res.send(values)
 })
 
+// dismiss alert
+router.put('/:id', async (req,res) => {
+    var exists = alerts.findOne({alert_ID: req.params.id})
+    if (!exists) { return res.status(404).send({'Status':'Alert not found'})}
+    await alerts.updateOne({alert_ID: req.params.id},{active:false})
+    res.status(204).send()
+})
+
 /*//Read alert details
 router.get('/:alert_id',async (req,res)=>{
     const doc = await alerts.findOne({alert_ID:req.params.alert_id})
