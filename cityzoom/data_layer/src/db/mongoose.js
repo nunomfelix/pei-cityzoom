@@ -19,16 +19,16 @@ mongoose.connect(connectionUrl+database, {
     useCreateIndex: true
 }, async () => {
 
-    //fs.writeFile('data_teste' + new Date(), JSON.stringify({verticals: await verticals.find(), devices: await devices.find(), streams: await streams.find(), values: await values.find(), hexagons: await hexagons.find(), muns: await muns.find()}), () => {})
+    //fs.writeFile('data_teste' + new Date(), JSON.stringify({alerts: await alerts.find(), verticals: await verticals.find(), devices: await devices.find(), streams: await streams.find(), values: await values.find(), hexagons: await hexagons.find(), muns: await muns.find()}), () => {})
     
-    // await hexagons.deleteMany({})
-    // await muns.deleteMany({})
-    // await devices.deleteMany({})
-    // await streams.deleteMany({})
-    // await values.deleteMany({})
-    // await verticals.deleteMany({})
+    await hexagons.deleteMany({})
+    await muns.deleteMany({})
+    await devices.deleteMany({})
+    await streams.deleteMany({})
+    await values.deleteMany({})
+    await verticals.deleteMany({})
 
-    fs.readFile('backup3', async(err, res) => {
+    fs.readFile('backup5', async(err, res) => {
         res = JSON.parse(res)
         console.log(Object.keys(res))
         if(res.hexagons)
@@ -55,35 +55,38 @@ mongoose.connect(connectionUrl+database, {
             await streams.insertMany(res.streams.map(s => 
                 new streams(s)    
             ))
+        if(res.alerts)
+            await alerts.insertMany(res.alerts.map(a => 
+                new alerts(a)    
+            ))
+    })
     
 
-        //fs.readFile('alerts.json', async (err, data) => {
-        //    await alerts.deleteMany({})
-        //    let alert = JSON.parse(data)
-        //    alert.alerts.forEach(async (value) => {
-        //        const alt = new alerts(value)
-        //        await alt.save()
-        //    })
-        //    for (var a in alert.alerts) {
-        //        
-        //    }
-        //})
-        // fs.readFile('verticals.json', async (err, data) => { 
-        //     await verticals.deleteMany({}) 
-        //     if (err) throw err;
-        //     let vertical = JSON.parse(data)
-        //     const streams_array = []
-        //     for(var v in vertical.vertical) {
-        //         const vert = new verticals({
-        //             name: v,
-        //             display: vertical.vertical[v].display,
-        //             streams: vertical.vertical[v].streams,
-        //         })
-        //         streams_array.push(...vertical.vertical[v].streams.map(s => s.name))
-        //         // console.log(vert)
-        //         await vert.save()
-        //     })
-    })
+    //     // fs.readFile('alerts.json', async (err, data) => {
+    //     //    await alerts.deleteMany({})
+    //     //    let alert = JSON.parse(data)
+    //     //    alert.alerts.forEach(async (value) => {
+    //     //        const alt = new alerts(value)
+    //     //        await alt.save()
+    //     //    })
+    //     //    for (var a in alert.alerts) {
+               
+    //     //    }
+    //     // })
+    //     // fs.readFile('verticals.json', async (err, data) => { 
+    //     //     await verticals.deleteMany({}) 
+    //     //     if (err) throw err;
+    //     //     let vertical = JSON.parse(data)
+    //     //     const streams_array = []
+    //     //     for(var v in vertical.vertical) {
+    //     //         const vert = new verticals({
+    //     //             name: v,
+    //     //             display: vertical.vertical[v].display,
+    //     //             streams: vertical.vertical[v].streams,
+    //     //         })
+    //     //         await vert.save()
+    //     //     }
+    //     // })
 
         
         //     // fs.readFile('hex_data.json', async (err, hexa_json) => {

@@ -5,16 +5,22 @@
             <div style="background-color: rgba(0,0,0, .5)">
                 <span class="xbig bold"> {{selected_county.get('Freguesia')}} <br> {{getStream.display}} </span>
                 <div v-if="getStream.name in heatmap.muns[selected_county.get('id')]" class="measure-show">
-                    <div class="measure-button small">
-                        <div class="arrow-down" :style="{'border-top': '1.6rem solid ' + getStream.colors[0]}"></div>
+                    <div :style="{'background-color': getStream.colors[0]}" class="disabled measure-button">
+                        <div class="measure-wrapper">
+                            MIN
+                        </div>
                     </div>
                     <span class="big">{{heatmap.muns[selected_county.get('id')][getStream.name].min.toFixed(2)}}{{getStream.unit}}</span>
-                    <div class="measure-button small">
-                        <div class="average" :style="{'background-color': '#' + rainbowHeatMap.colourAt(50)}"></div>
+                    <div :style="{'background-color': '#' + rainbowHeatMap.colourAt(50)}" class="disabled measure-button">
+                        <div class="measure-wrapper">
+                            AVG
+                        </div>
                     </div>
                     <span class="big">{{heatmap.muns[selected_county.get('id')][getStream.name].average.toFixed(2)}}{{getStream.unit}}</span>
-                    <div class="measure-button small">
-                        <div class="arrow-up" :style="{'border-bottom': '1.6rem solid ' + getStream.colors[1]}"></div>
+                    <div :style="{'background-color': getStream.colors[1]}" class="disabled measure-button">
+                        <div class="measure-wrapper">
+                            MAX
+                        </div>
                     </div>
                     <span class="big">{{heatmap.muns[selected_county.get('id')][getStream.name].max.toFixed(2)}}{{getStream.unit}}</span>
                 </div>
@@ -29,16 +35,22 @@
             <div v-if="getStream && hovered_geo" style="background-color: rgba(0,0,0, .5)">
                 <span class="big"> {{hovered_geo.get('Freguesia')}} </span>
                 <div v-if="getStream.name in heatmap.muns[hovered_geo.get('id')]" class="measure-show">
-                    <div class="measure-button small">
-                        <div class="arrow-down" :style="{'border-top': '1.6rem solid ' + getStream.colors[0]}"></div>
+                    <div :style="{'background-color': getStream.colors[0]}" class="disabled measure-button">
+                        <div class="measure-wrapper">
+                            MIN
+                        </div>
                     </div>
                     <span class="big">{{heatmap.muns[hovered_geo.get('id')][getStream.name].min.toFixed(2)}}{{getStream.unit}}</span>
-                    <div class="measure-button small">
-                        <div class="average" :style="{'background-color': '#' + rainbowHeatMap.colourAt(50)}"></div>
+                    <div :style="{'background-color': '#' + rainbowHeatMap.colourAt(50)}" class="disabled measure-button">
+                        <div class="measure-wrapper">
+                            AVG
+                        </div>
                     </div>
                     <span class="big">{{heatmap.muns[hovered_geo.get('id')][getStream.name].average.toFixed(2)}}{{getStream.unit}}</span>
-                    <div class="measure-button small">
-                        <div class="arrow-up" :style="{'border-bottom': '1.6rem solid ' + getStream.colors[1]}"></div>
+                    <div :style="{'background-color': getStream.colors[1]}" class="disabled measure-button">
+                        <div class="measure-wrapper">
+                            MAX
+                        </div>
                     </div>
                     <span class="big">{{heatmap.muns[hovered_geo.get('id')][getStream.name].max.toFixed(2)}}{{getStream.unit}}</span>
                 </div>
@@ -51,16 +63,19 @@
 
         <div v-if="getStream" class="measure-menu">
             <div class="measure-menu_top">
-                <div class="measure-button" @click="measure_selected = 'min'; updateHeatMap()" :class="{selected: measure_selected == 'min'}" >
-                    <div class="arrow-down" :style="{'border-top': '2.2rem solid ' + getStream.colors[0]}">
+                <div :style="{'background-color': getStream.colors[0]}" class="measure-button" @click="measure_selected = 'min'; updateHeatMap()" :class="{selected: measure_selected == 'min'}" >
+                    <div class="measure-wrapper">
+                        MIN
                     </div>
                 </div>
-                <div class="measure-button" @click="measure_selected = 'average'; updateHeatMap()" :class="{selected: measure_selected == 'average'}" >
-                    <div class="average" :style="{'background-color': '#' + rainbowHeatMap.colourAt(50)}">
+                <div :style="{'background-color': '#' + rainbowHeatMap.colourAt(50)}" class="measure-button" @click="measure_selected = 'average'; updateHeatMap()" :class="{selected: measure_selected == 'average'}" >
+                    <div class="measure-wrapper">
+                        AVG
                     </div>
                 </div>
-                <div class="measure-button" @click="measure_selected = 'max'; updateHeatMap()" :class="{selected: measure_selected == 'max'}" >
-                    <div class="arrow-up" :style="{'border-bottom': '2.2rem solid ' + getStream.colors[1]}">
+                <div :style="{'background-color': getStream.colors[1]}" class="measure-button" @click="measure_selected = 'max'; updateHeatMap()" :class="{selected: measure_selected == 'max'}" >
+                    <div class="measure-wrapper">
+                        MAX
                     </div>
                 </div>
             </div>
@@ -741,12 +756,20 @@ export default {
     border-radius: 5px;
     @include flex(center, center);
     background-color: rgba(255, 255, 255, 0.856);
-    &.selected {
+    & .measure-wrapper {
         color: white;
-        background-color: rgba(119, 119, 119, 0.856);
+        font-weight: bold;
+        background-color: rgba(0, 0, 0, 0.556);
+        padding: .35rem;
+        border-radius: 5px;    
+        @include flex(center,center);
+    }
+    &.selected {
+        transform: scale(.9);
+        filter:brightness(.7);
     }
     @include transition(transform, .2s, ease, 0s);
-    &:hover:not(.selected):not(.small) {
+    &:hover:not(.selected):not(.small):not(.disabled) {
         transform: scale(1.05);
         cursor: pointer;
         &:active {
@@ -961,9 +984,8 @@ export default {
         &.selected {
             border: 3px solid darkred;
             box-sizing: border-box;
-            width: 5%;
-            min-width: 1rem;
-            height: 2.5rem;
+            width: 1px;
+            height: 3rem;
         }
         height: 100%;
     }

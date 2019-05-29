@@ -54,57 +54,6 @@ client.on('message',async (topic,data,info)=>{
         }
     }else if(topic == rootTopic+'values'){
 
-        var alts = await Alerts.find({})
-        alts.forEach( async (element) => {
-            const now = new Date()
-            console.log(now.getTime() - (1000*60*60*24*365))
-            let date_id_start = 0
-            let date_id_end = 0
-            if (element.frequency == "YEAR"){
-                date_id_start = now.getTime() - (1000*60*60*24*365)
-                date_id_end = now.getTime()
-            }
-            else if (element.frequency == "DAY") {
-                date_id_start = now.getTime() - (1000*60*60*24)
-                date_id_end = now.getTime()
-            }
-            else if (element.frequency == "HOUR") {
-                date_id_start = now.getTime() - (1000*60*60)
-                date_id_end = now.getTime()
-            }
-
-            var total_values = 0
-            var count = 0
-            Object.keys(hexa.streams[stream.stream_name]).forEach(key => {
-                if (key >= date_id_start && key <= date_id_end) {
-                    total_values = total_values + hexa.streams[stream.stream_name][key].average
-                    count = count + 1
-                }
-            })
-            const med = total_values / count
-            console.log('med '+ med)
-            if (element.type == "MAX") {
-                if (med > element.value) {
-                    await Alerts.updateOne({"alert_ID": element.alert_ID}, {"active":true})
-                }
-            } 
-            else if (element.type == "MIN") {
-                if (med < element.value) {
-                    await Alerts.updateOne({"alert_ID": element.alert_ID}, {"active":true})
-                }
-            } 
-            else if (element.type == "MINEQ") {
-                if (med <= element.value) {
-                    await Alerts.updateOne({"alert_ID": element.alert_ID}, {"active":true})
-                }
-            }
-            else if (element.type == "MAXEQ") {
-                if (med >= element.value) {
-                    await Alerts.updateOne({"alert_ID": element.alert_ID}, {"active":true})
-                }
-            }
-        });
-
         let unlock = await mutex.lock()
         const {stream, ...rest} = data_json
         await updateValues(stream, rest)
@@ -115,6 +64,61 @@ client.on('message',async (topic,data,info)=>{
     }
     
 })
+
+async function alert(stream, hexa) {
+
+    var alts = await Alerts.find({})
+    alts.forEach( async (element) => {
+        const now = new Date()
+        console.log(now.getTime() - (1000*60*60*24*365))
+        let date_id_start = 0
+        let date_id_end = 0
+        if (element.frequency == "YEAR"){
+            date_id_start = now.getTime() - (1000*60*60*24*365)
+            date_id_end = now.getTime()
+        }
+        else if (element.frequency == "DAY") {
+            date_id_start = now.getTime() - (1000*60*60*24)
+            date_id_end = now.getTime()
+        }
+        else if (element.frequency == "HOUR") {
+            date_id_start = now.getTime() - (1000*60*60)
+            date_id_end = now.getTime()
+        }
+
+        var total_values = 0
+        var count = 0
+        Object.keys(hexa.streams[stream.stream_name]).forEach(key => {
+            if (key >= date_id_start && key <= date_id_end) {
+                total_values = total_values + hexa.streams[stream.stream_name][key].average
+                count = count + 1
+            }
+        })
+        const med = total_values / count
+        console.log('med '+ med)
+        if (element.type == "MAX") {
+            if (med > element.value) {
+                await Alerts.updateOne({"alert_ID": element.alert_ID}, {"active":true})
+            }
+        } 
+        else if (element.type == "MIN") {
+            if (med < element.value) {
+                await Alerts.updateOne({"alert_ID": element.alert_ID}, {"active":true})
+            }
+        } 
+        else if (element.type == "MINEQ") {
+            if (med <= element.value) {
+                await Alerts.updateOne({"alert_ID": element.alert_ID}, {"active":true})
+            }
+        }
+        else if (element.type == "MAXEQ") {
+            if (med >= element.value) {
+                await Alerts.updateOne({"alert_ID": element.alert_ID}, {"active":true})
+            }
+        }
+    });
+
+}
 
 async function updateValues(stream, data_json) {
 
@@ -140,6 +144,8 @@ async function updateValues(stream, data_json) {
             }
         }
     }
+
+    alert(stream, hexa)
 
     const date = new Date(data_json.timestamp)
     const time_id = Math.floor(date / (1000*60*60)) * (1000*60*60)
