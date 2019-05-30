@@ -1,11 +1,17 @@
 package com.example.cityzoomapp;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.View;
+import android.os.PowerManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -13,9 +19,13 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    Sensor proximitySensor;
+    TextView proximityText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,14 +33,6 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -38,6 +40,40 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
+
+        //Sensors
+        SensorManager sensorManager =
+                (SensorManager) getSystemService(SENSOR_SERVICE);
+        proximitySensor =
+                sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+        if(proximitySensor == null) {
+            Log.e("app", "Proximity sensor not available.");
+            finish(); // Close app
+        }
+        proximityText = findViewById(R.id.proximityValue);
+
+        // Create listener
+        SensorEventListener proximitySensorListener = new SensorEventListener() {
+            @Override
+            public void onSensorChanged(SensorEvent sensorEvent) {
+                if(sensorEvent.values[0] < proximitySensor.getMaximumRange()) {
+                    proximityText.setBackgroundColor(Color.RED);
+                    //proximityText.setText("Somethings is close");
+                }else{
+                    proximityText.setBackgroundColor(Color.GREEN);
+                    //proximityText.setText("Nothing is close");
+                }
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int i) {
+            }
+        };
+
+        // Register it, specifying the polling interval in
+        // microseconds
+        sensorManager.registerListener(proximitySensorListener,
+                proximitySensor, 2 * 1000 * 1000);
     }
 
     @Override
