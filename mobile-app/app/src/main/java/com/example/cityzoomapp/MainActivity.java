@@ -1,7 +1,6 @@
 package com.example.cityzoomapp;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -12,32 +11,34 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.BatteryManager;
 import android.os.Bundle;
-import android.os.PowerManager;
+import android.os.Handler;
+import android.os.Message;
+import android.provider.Settings;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.util.Log;
-import android.view.MenuItem;
-import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
-
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -45,6 +46,19 @@ public class MainActivity extends AppCompatActivity
     Sensor proximitySensor;
     TextView proximityText;
     TextView batteryTxt;
+    int PERIOD = 1000; //in ms
+    boolean sendingData = false;
+    Thread waitingForCancel = null;
+    String USERNAME = "superuser";
+    String PASSWORD = "12345";
+    //Sensors
+    Sensor pressureSensor = null;
+    SensorManager sensorManager;
+    //Screen Brightness
+    int brightness;
+    TextView brightnessText;
+    Handler updateUIHandler = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,9 +74,11 @@ public class MainActivity extends AppCompatActivity
         //toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
 
-        //Sensors
-        SensorManager sensorManager =
+        //Sensor manager
+        sensorManager =
                 (SensorManager) getSystemService(SENSOR_SERVICE);
+
+        //Proximity
         proximitySensor =
                 sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
         if (proximitySensor == null) {
@@ -107,6 +123,102 @@ public class MainActivity extends AppCompatActivity
         }
         locationManager.requestLocationUpdates(
                 LocationManager.GPS_PROVIDER, 100, 0, locationListener);
+        //Button
+        final Button clickButton = (Button) findViewById(R.id.sendButton);
+        clickButton.setOnClickListener( new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                if(!sendingData) {
+                    sendingData = true;
+                    clickButton.setText("STOP");
+                    clickButton.setBackgroundColor(Color.RED);
+                   //Launches new thread that waits for the cancel
+                    waitingForCancel = new Thread(){
+                        @Override
+                        public void run(){
+                            try{
+                                while(sendingData){
+                                    sendHTTPRequest();
+                                    System.out.println("SENDING HTTP REQUEST");
+                                    Thread.sleep(PERIOD);
+                                }
+                            } catch (InterruptedException e) { //The user stopped sending information
+                            }catch(IOException ioe){
+                                ioe.getStackTrace();
+                            }
+                        }
+                    };
+                    waitingForCancel.start();
+                }else{
+                    sendingData = false;
+                    waitingForCancel.interrupt();
+                    clickButton.setText("SEND");
+                    clickButton.setBackgroundColor(Color.GREEN);
+                }
+            }
+        });
+    }
+
+    public void sendHTTPRequest() throws IOException{
+        String url = "http://193.136.93.14:8002/devices";
+        URL obj = new URL(url);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+        // optional default is GET
+        con.setRequestMethod("GET");
+        //add request header
+        String token= null;
+        try{
+            token = loginRequest();
+        }catch(Exception e){}
+        con.setRequestProperty ("Authorization", "Bearer "+token);
+        //con.setRequestProperty("User-Agent", "Mozilla/5.0");
+        int responseCode = con.getResponseCode();
+        System.out.println("\nSending 'GET' request to URL : " + url);
+        System.out.println("Response Code : " + responseCode);
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+        //print in String
+        System.out.println(response.toString());
+    }
+
+    /* Returns the session token */
+    private String loginRequest()throws Exception{
+        String url = "http://193.136.93.14:8002/user/login";
+        URL obj = new URL(url);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+        // optional default is GET
+        con.setRequestMethod("POST");
+        con.setRequestProperty ("content-type", "application/json");
+        // For POST only - START
+        con.setDoOutput(true);
+        OutputStream os = con.getOutputStream();
+        String POST_PARAMS = "{\"username\":\""+USERNAME+"\",\"password\":\""+PASSWORD+"\"}";
+        os.write(POST_PARAMS.getBytes());
+        os.flush();
+        os.close();
+        // For POST only - END
+        int responseCode = con.getResponseCode();
+        System.out.println("\nSending 'POST' request to URL : " + url);
+        System.out.println("Response Code : " + responseCode);
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+        //print in String
+        JSONObject jj = new JSONObject(response.toString());
+        String token = jj.getString("jwt");
+        return token;
     }
 
     /*---------- Listener class to get coordinates ------------- */
@@ -120,8 +232,6 @@ public class MainActivity extends AppCompatActivity
             TextView latTxt = (TextView) findViewById(R.id.latTxt);
             longTxt.setText(longitude);
             latTxt.setText(latitude);
-            Log.d("app","long:"+longitude);
-            Log.d("app","lat:"+latitude);
 
             /*------- To get city name from coordinates -------- */
             /*String cityName = null;
@@ -208,5 +318,7 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+
+
     }
 }
