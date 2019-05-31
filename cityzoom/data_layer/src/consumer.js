@@ -37,6 +37,7 @@ client.on('connect',()=>{
     
 client.on('message',async (topic,data,info)=>{
     //If a new device was added
+    const data_json = JSON.parse(data)
     if(topic==rootTopic+'devices'){
         Device.create(data_json)
             .then(() => {

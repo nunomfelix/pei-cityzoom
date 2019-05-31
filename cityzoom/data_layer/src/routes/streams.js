@@ -132,7 +132,7 @@ router.get('/heatmap', async (req, res) => {
                             [stream]: {
                                 max: mun.streams[stream][time_id].max,
                                 min: mun.streams[stream][time_id].min,
-                                average: mun.streams[stream][time_id].average,
+                                average: mun.streams[stream][time_id].total / mun.streams[stream][time_id].count,
                                 count: mun.streams[stream][time_id].count
                             }
                         }
@@ -142,7 +142,7 @@ router.get('/heatmap', async (req, res) => {
                             [stream]: {
                                 max: mun.streams[stream][time_id].max > streams[stream].max ? mun.streams[stream][time_id].max : streams[stream].max,
                                 min: mun.streams[stream][time_id].min < streams[stream].min ? mun.streams[stream][time_id].min : streams[stream].min,
-                                average: (mun.streams[stream][time_id].average * mun.streams[stream][time_id].count + streams[stream].average * streams[stream].count) / (streams[stream].count + mun.streams[stream][time_id].count),
+                                average: (mun.streams[stream][time_id].total + streams[stream].total) / (streams[stream].count + mun.streams[stream][time_id].count),
                                 count: mun.streams[stream][time_id].count + streams[stream].count
                             }
                         }

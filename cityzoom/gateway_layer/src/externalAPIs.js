@@ -180,34 +180,37 @@ function sleep(ms) {
     //This way we can make a rrsequest with one key at a time.
     var breezo_i = 0
     var darksky_i = 0
-    for(var d of devices) {
-        try {
-            //var breezo_data = await get_breezometer_data(d.center_lat, d.center_long, breezo_keys[breezo_i])
-            for(var stream of breezo_devicesMap[d.device]) {
-                try {
-                    post_Values(stream.stream_id, Math.random() * 10/*breezo_data[0][stream.stream]*/, d.center_lat, d.center_long)
-                } catch(err) {
-                    console.log(err)
+    for(k=0; k<100; k++){
+        for(var d of devices) {
+            try {
+                //var breezo_data = await get_breezometer_data(d.center_lat, d.center_long, breezo_keys[breezo_i])
+                for(var stream of breezo_devicesMap[d.device]) {
+                    try {
+                        post_Values(stream.stream_id, Math.random() * 10/*breezo_data[0][stream.stream]*/, d.center_lat, d.center_long)
+                    } catch(err) {
+                        console.log(err)
+                    }
                 }
+                breezo_i = (breezo_i+1) % breezo_keys.length
+            }catch(err) {
+                console.log('Failed to fetch data from Breezometer API!')
             }
-            breezo_i = (breezo_i+1) % breezo_keys.length
-        }catch(err) {
-            console.log('Failed to fetch data from Breezometer API!')
+    
+            // try {
+            //     //var darksky_data = await get_darksky_data(d.center_lat, d.center_long, darksky_keys[darksky_i])
+            //     for(var stream of darksky_devicesMap[d.device]) {
+            //         try {
+            //             post_Values(stream.stream_id, Math.random() * 10/*darksky_data[0][stream.stream]*/, d.center_lat, d.center_long)
+            //         } catch(err) {
+            //             console.log(err)
+            //         }
+            //     }
+            //     darksky_i = (darksky_i+1) % darksky_keys.length
+            // }catch(err) {
+            //     console.log('Failed to fetch data from Darksky API!')
+            // }
         }
-
-        // try {
-        //     //var darksky_data = await get_darksky_data(d.center_lat, d.center_long, darksky_keys[darksky_i])
-        //     for(var stream of darksky_devicesMap[d.device]) {
-        //         try {
-        //             post_Values(stream.stream_id, Math.random() * 10/*darksky_data[0][stream.stream]*/, d.center_lat, d.center_long)
-        //         } catch(err) {
-        //             console.log(err)
-        //         }
-        //     }
-        //     darksky_i = (darksky_i+1) % darksky_keys.length
-        // }catch(err) {
-        //     console.log('Failed to fetch data from Darksky API!')
-        // }
+        await sleep(100);
     }
 })()
 
