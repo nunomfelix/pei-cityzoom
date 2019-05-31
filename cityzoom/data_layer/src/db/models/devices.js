@@ -47,11 +47,6 @@ const deviceSchema = new mongoose.Schema({
         trim: true,
         default: ""
     },
-    hexagon: {
-        type: String,
-        required: false,
-        default: 0
-    }
 })
 
 deviceSchema.plugin(uniqueValidator)

@@ -8,9 +8,6 @@ const values = require('./models/values')
 const alerts = require('./models/alerts')
 const muns = require('./models/municipalities')
 const mongooseDebug = require('debug')('app:Mongoose')
-const mutex = require('async-mutex').Mutex
-
-const Mutex = new mutex()
 const connectionUrl = 'mongodb://127.0.0.1:27017/'
 const database = 'city_zoom_data_layer'
 
@@ -27,11 +24,12 @@ mongoose.connect(connectionUrl+database, {
     await streams.deleteMany({})
     await values.deleteMany({})
     await verticals.deleteMany({})
+    await alerts.deleteMany({})
 
-    fs.readFile('backup6', async(err, res) => {
+    fs.readFile('backup_start3', async(err, res) => {
         res = JSON.parse(res)
         console.log(Object.keys(res))
-        if(res.hexagons)
+        if(res.hexagons)-
             await hexagons.insertMany(res.hexagons.map(h => 
                 new hexagons(h)    
             ))
@@ -47,7 +45,7 @@ mongoose.connect(connectionUrl+database, {
             await devices.insertMany(res.devices.map(d => 
                 new devices(d)    
             ))
-        if(res.values)
+        if(res.values && false)
             await values.insertMany(res.values.map(v => 
                 new values(v)    
             ))

@@ -121,7 +121,7 @@ test();
             center_lat
         })
         k++
-        if(k == 69)
+        if(k == 1)
             break;
     }
     const devicesMap = {}
@@ -139,14 +139,14 @@ test();
         devicesMap[devices[d].device] = streams
     }
 
-    for(var lol = 0; lol < 10; lol++) {
-        for(var d of devices) {
+    for(var d of devices) {
+        for(var lol = 0; lol < 100; lol++) {
             //var data = get_darksky_data(d.center_lat, d.center_long)
             //var data = JSON.parse(fs.readFileSync('kappa.json', 'utf8'))
             for(var stream of devicesMap[d.device]) {
-               await post_Values(stream.stream_id, Math.random() * 10, d.center_lat, d.center_long)
+                post_Values(stream.stream_id, Math.random() * 10, d.center_lat, d.center_long)
             }
         }
     }
-        // fs.writeFileSync('kappa.json', JSON.stringify(data))
+    // fs.writeFileSync('kappa.json', JSON.stringify(data))
 })()
