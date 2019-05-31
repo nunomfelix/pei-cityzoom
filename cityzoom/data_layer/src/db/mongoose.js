@@ -8,9 +8,6 @@ const values = require('./models/values')
 const alerts = require('./models/alerts')
 const muns = require('./models/municipalities')
 const mongooseDebug = require('debug')('app:Mongoose')
-const mutex = require('async-mutex').Mutex
-
-const Mutex = new mutex()
 const connectionUrl = 'mongodb://127.0.0.1:27017/'
 const database = 'city_zoom_data_layer'
 

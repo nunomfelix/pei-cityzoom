@@ -16,14 +16,8 @@ const Hexas = require('./db/models/hexagons')
 const Muns = require('./db/models/municipalities')
 const Values = require('./db/models/values')
 const Alerts = require('./db/models/alerts')
-// const Mutex = require('async-mutex').Mutex
-// const mutex = new Mutex();
-const Mutex = require('await-mutex').default
-const {
-    Worker, isMainThread, parentPort, workerData
-} = require('worker_threads')
-let mutex = new Mutex();
-let worker = null
+const Mutex = require('async-mutex').Mutex
+let mutex = new Mutex()
 
 client.on('connect',()=>{
     consumerDebug('Listening to MQTT broker!')
@@ -36,9 +30,8 @@ client.on('connect',()=>{
 })
     
 client.on('message',async (topic,data,info)=>{
-    //If a new device was added
     const data_json = JSON.parse(data)
-    if(topic==rootTopic+'devices'){
+    if(topic==rootTopic+'devices') {
         Device.create(data_json)
             .then(() => {
                 consumerDebug('Device created with success')
@@ -46,14 +39,13 @@ client.on('message',async (topic,data,info)=>{
             .catch(() => {
                 consumerDebug(`Error publishing device`)
             })
-    }//If a new stream was added
-    else if(topic == rootTopic+'streams'){
+    } else if(topic == rootTopic+'streams') {
         Stream.create(data_json).then(() => {
             consumerDebug('Stream created with success')
         }).catch((e) => {
             consumerDebug('Error publishing stream')
         })
-    }else if(topic == rootTopic+'values'){
+    } else if(topic == rootTopic+'values') {
         const {stream, ...rest} = data_json
         await updateValues(stream, rest)
     }
@@ -62,78 +54,82 @@ client.on('message',async (topic,data,info)=>{
 
 async function updateValues(stream, data_json) {
 
-    let dev = await Device.findOne({device_ID:stream.device_ID}) 
+    //alert(stream, hexa)
+    Values.create(data_json)
+    
+    mutex.acquire().then(async (release) => {
 
-    var hexa = !dev.mobile && dev.hexagon ? await Hexas.findOne({id: dev.hexagon}) : null
-    if(!hexa) {
-        const hexagons = await Hexas.find()
-        var a = turf.point([data_json.longitude, data_json.latitude])
-        for (hexagon of hexagons) {
-            var b = turf.polygon([hexagon.coordinates])
-            if (booleanPointInPolygon(a, b)) {
-                hexa = hexagon
-                break;
+        let dev = await Device.findOne({device_ID:stream.device_ID}) 
+        var hexa = !dev.mobile && dev.hexagon ? await Hexas.findOne({id: dev.hexagon}) : null
+        if(!hexa) {
+            const hexagons = await Hexas.find()
+            var a = turf.point([data_json.longitude, data_json.latitude])
+            for (hexagon of hexagons) {
+                var b = turf.polygon([hexagon.coordinates])
+                if (booleanPointInPolygon(a, b)) {
+                    hexa = hexagon
+                    break;
+                }
             }
         }
-    }
-
-    //alert(stream, hexa)
-
-    Values.create(data_json)
-
-    const date = new Date(data_json.timestamp)
-    const time_id = Math.floor(date / (1000*60*60)) * (1000*60*60)
-
-    await Hexas.updateOne({id: hexa.id}, {
-        $inc: {
-            [`streams.${stream.stream_name}.${time_id}.total`]: data_json.value,
-            [`streams.${stream.stream_name}.${time_id}.count`]: 1
-        },
-        $max: {
-            [`streams.${stream.stream_name}.${time_id}.max`]: data_json.value
-        },
-        $min: {
-            [`streams.${stream.stream_name}.${time_id}.min`]: data_json.value
-        }
-    })
     
-    var mun = await Muns.findOne({id: hexa.municipality})
+        const date = new Date(data_json.timestamp)
+        const time_id = Math.floor(date / (1000*60*60)) * (1000*60*60)
+    
+        await Hexas.updateOne({id: hexa.id}, {
+            $inc: {
+                [`streams.${stream.stream_name}.${time_id}.total`]: data_json.value,
+                [`streams.${stream.stream_name}.${time_id}.count`]: 1
+            },
+            $max: {
+                [`streams.${stream.stream_name}.${time_id}.max`]: data_json.value
+            },
+            $min: {
+                [`streams.${stream.stream_name}.${time_id}.min`]: data_json.value
+            }
+        })
+        
+        var mun = await Muns.findOne({id: hexa.municipality})
+    
+        await Muns.updateOne({id: mun.id}, {
+            $inc: { 
+                [`streams.${stream.stream_name}.${time_id}.total`]: data_json.value,
+                [`streams.${stream.stream_name}.${time_id}.count`]: 1
+            },
+            $max: {
+                [`streams.${stream.stream_name}.${time_id}.max`]: data_json.value
+            },
+            $min: {
+                [`streams.${stream.stream_name}.${time_id}.min`]: data_json.value
+            }
+        })
 
-    await Muns.updateOne({id: mun.id}, {
-        $inc: {
-            [`streams.${stream.stream_name}.${time_id}.total`]: data_json.value,
-            [`streams.${stream.stream_name}.${time_id}.count`]: 1
-        },
-        $max: {
-            [`streams.${stream.stream_name}.${time_id}.max`]: data_json.value
-        },
-        $min: {
-            [`streams.${stream.stream_name}.${time_id}.min`]: data_json.value
-        }
-    })
-
-    if(dev.mobile) {
-        await Device.updateOne({device_ID: stream.device_ID}, {
-            hexagon: hexa.id,
-            $push: {
-                locations: {
+        if(dev.mobile) {
+            await Device.updateOne({device_ID: stream.device_ID}, {
+                hexagon: hexa.id,
+                $push: {
+                    locations: {
+                        timestamp: data_json.timestamp, 
+                        latitude: data_json.latitude, 
+                        longitude: data_json.longitude
+                    }
+                }
+            })
+        } else {
+            await Device.updateOne({device_ID: stream.device_ID}, {
+                hexagon: hexa.id,
+                municipality: hexa.municipality,
+                locations: [{
                     timestamp: data_json.timestamp, 
                     latitude: data_json.latitude, 
                     longitude: data_json.longitude
-                }
-            }
-        })
-    } else {
-        await Device.updateOne({device_ID: stream.device_ID}, {
-            hexagon: hexa.id,
-            municipality: hexa.municipality,
-            locations: [{
-                timestamp: data_json.timestamp, 
-                latitude: data_json.latitude, 
-                longitude: data_json.longitude
-            }]
-        })
-    }
+                }]
+            })
+        }
+
+        release()
+
+    })
 
 }
 
@@ -189,4 +185,8 @@ async function alert(stream, hexa) {
             }    
         } 
     });
+}
+
+async function updateHex(dev, stream, data_json) {
+
 }
