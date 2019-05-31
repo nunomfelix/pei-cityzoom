@@ -144,11 +144,11 @@ function sleep(ms) {
             center_long,
             center_lat
         })
-        // k++
-        // if(k == 500)
-        //     break;
+        k++
+        if(k == 10)
+            break;
     }
-    await sleep(2000);
+    await sleep(200);
     const breezo_devicesMap = {}
     const darksky_devicesMap = {}
     for(var d in devices) {
@@ -175,7 +175,7 @@ function sleep(ms) {
         }
         darksky_devicesMap[devices[d].device] = streams
     }
-    await sleep(2000);
+    await sleep(200);
     //Circular buffer that goes arround our API keys.
     //This way we can make a rrsequest with one key at a time.
     var breezo_i = 0

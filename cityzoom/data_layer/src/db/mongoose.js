@@ -16,7 +16,7 @@ mongoose.connect(connectionUrl+database, {
     useCreateIndex: true
 }, async () => {
 
-    //fs.writeFile('data_teste' + new Date(), JSON.stringify({alerts: await alerts.find(), verticals: await verticals.find(), devices: await devices.find(), streams: await streams.find(), values: await values.find(), hexagons: await hexagons.find(), muns: await muns.find()}), () => {})
+    fs.writeFile('data_teste' + new Date(), JSON.stringify({alerts: await alerts.find(), verticals: await verticals.find(), devices: await devices.find(), streams: await streams.find(), values: await values.find(), hexagons: await hexagons.find(), muns: await muns.find()}), () => {})
     
     await hexagons.deleteMany({})
     await muns.deleteMany({})
@@ -26,7 +26,7 @@ mongoose.connect(connectionUrl+database, {
     await verticals.deleteMany({})
     await alerts.deleteMany({})
 
-    fs.readFile('backup_start', async(err, res) => {
+    fs.readFile('backup_start3', async(err, res) => {
         res = JSON.parse(res)
         console.log(Object.keys(res))
         if(res.hexagons)-
