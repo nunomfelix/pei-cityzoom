@@ -46,6 +46,7 @@ client.on('message',async (topic,data,info)=>{
             consumerDebug('Error publishing stream')
         })
     } else if(topic == rootTopic+'values') {
+        data_json.created_at = data_json.timestamp
         const {stream, ...rest} = data_json
         await updateValues(stream, rest)
     }
@@ -94,8 +95,6 @@ async function updateValues(stream, data_json) {
             }
         }
     }).explain("executionStats")
-
-    console.log(tmp)
 
     await Muns.updateOne({id: hex.municipality}, {
         $inc: { 

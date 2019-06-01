@@ -23,19 +23,19 @@ router.post('/values', async (req,res) => {
         provider: "Mobile app",
         description: "This is a device from the mobile app"
     }
-    let deviceCreated = false
     try{
         const responseCreateDevice = await axios.post(config.get('DATA_LAYER_URL')+"/czb/devices/",createDeviceBody)
         mobileDebug('Created device',colors.blue(createDeviceBody.device_ID),'!')
-        deviceCreated = true
     }catch(e){
         mobileDebug('Device',colors.blue(createDeviceBody.device_ID),'already exists')
     }
+    await sleep(50)
+    
     //If the device was created, creates the corresponding streams
     let streams = ["proximity","battery"] //To be loaded from a file later maybe
 
     for(i in streams){
-        //Creates proximity stream
+        //Creates stream
         const requestCreateStreamBody = {
             device_ID: createDeviceBody.device_ID,
             stream_ID: "mobile_app_stream_id_"+streams[i]+"_"+username,
@@ -47,22 +47,27 @@ router.post('/values', async (req,res) => {
         }catch(e){
             mobileDebug('Stream',colors.yellow(requestCreateStreamBody.stream_ID),'already exists!')
         }
-            
+        await sleep(50)            
         let requestPublishValue = {
             value: req.body[streams[i]],
             latitude: req.body.latitude,
             longitude: req.body.longitude,
-            timestamp: req.body.timestamp ? req.body.timestamp : Date.now()
+            timestamp: req.body.timestamp != undefined ? req.body.timestamp : Date.now()
         }
         try{
             const responsePublishValue = await axios.post(config.get('DATA_LAYER_URL')+"/czb/streams/"+requestCreateStreamBody.stream_ID+"/values",requestPublishValue)
-            console.log(responsePublishValue)
             mobileDebug('Value',colors.red(requestPublishValue.value),'published into stream',colors.yellow(requestCreateStreamBody.stream_ID),'with success!')
         }catch(e){
             mobileDebug('Value',colors.red(requestPublishValue.value),'could not be published into stream',colors.yellow(requestCreateStreamBody.stream_ID),'!')
+            return res.status(409).send({'Error':'Could not find stream'+requestCreateStreamBody.stream_ID})
         }
+        await sleep(50)
     }
     res.status(204).send()
 })
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 module.exports = router
