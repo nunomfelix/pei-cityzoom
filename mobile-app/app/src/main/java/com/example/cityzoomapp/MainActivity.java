@@ -43,9 +43,17 @@ import java.net.URL;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    /* Endpoints to where the data will be sent */
     final String IP_ADDRESS = "192.168.1.71";
     final String USERNAME = "superuser";
     final String PASSWORD = "12345";
+    String URL_LOGIN = "http://"+IP_ADDRESS+":8002/user/login";
+    String URL_POST = "http://"+IP_ADDRESS+":8003/mobileapp/values";
+
+    int proximityValue;
+    int batteryValue;
+    String longitudeValue;
+    String latitudeValue;
 
     Sensor proximitySensor;
     TextView proximityText;
@@ -95,9 +103,11 @@ public class MainActivity extends AppCompatActivity
             public void onSensorChanged(SensorEvent sensorEvent) {
                 if (sensorEvent.values[0] < proximitySensor.getMaximumRange()) {
                     proximityText.setBackgroundColor(Color.RED);
+                    proximityValue = 1;
                     //proximityText.setText("Somethings is close");
                 } else {
                     proximityText.setBackgroundColor(Color.GREEN);
+                    proximityValue = 0;
                     //proximityText.setText("Nothing is close");
                 }
             }
@@ -146,7 +156,7 @@ public class MainActivity extends AppCompatActivity
                                     Thread.sleep(PERIOD);
                                 }
                             } catch (InterruptedException e) { //The user stopped sending information
-                            }catch(IOException ioe){
+                            }catch(Exception ioe){
                                 ioe.getStackTrace();
                             }
                         }
@@ -161,22 +171,42 @@ public class MainActivity extends AppCompatActivity
             }
         });
     }
-
+    /*{
+        “proximity”: 0,
+        “battery”: 53,
+        “latitude”:-8.2718,
+        “longitude”:40.912732,
+        “timestamp”: 1559322280399
+    }
+    */
     public void sendHTTPRequest() throws IOException{
-        String url = "http://"+IP_ADDRESS+":8002/devices";
+        String url = URL_POST;
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         // optional default is GET
-        con.setRequestMethod("GET");
+        con.setRequestMethod("POST");
         //add request header
         String token= null;
         try{
-            token = loginRequest();
+            token = USERNAME+":"+PASSWORD;
+            //token = loginRequest();
         }catch(Exception e){}
-        con.setRequestProperty ("Authorization", "Bearer "+token);
+        String encoded = encode(token.getBytes());
+        System.out.println("encoded:"+encoded);
+        con.setRequestProperty("Authorization", "Basic "+encoded);
+        con.setRequestProperty ("content-type", "application/json");
+        // For POST only - START
+        con.setDoOutput(true);
+        OutputStream os = con.getOutputStream();
+        String POST_PARAMS = "{\"proximity\":"+proximityValue+",\"battery\":"+batteryValue+",\"latitude\":"+latitudeValue+", \"longitude\":"+longitudeValue+"}";
+        System.out.println(POST_PARAMS);
+        os.write(POST_PARAMS.getBytes());
+        os.flush();
+        os.close();
+        // For POST only - END
         //con.setRequestProperty("User-Agent", "Mozilla/5.0");
         int responseCode = con.getResponseCode();
-        System.out.println("\nSending 'GET' request to URL : " + url);
+        System.out.println("\nSending 'POST' request to URL : " + url);
         System.out.println("Response Code : " + responseCode);
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(con.getInputStream()));
@@ -192,7 +222,7 @@ public class MainActivity extends AppCompatActivity
 
     /* Returns the session token */
     private String loginRequest()throws Exception{
-        String url = "http://"+IP_ADDRESS+":8002/user/login";
+        String url = URL_LOGIN;
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         // optional default is GET
@@ -230,6 +260,8 @@ public class MainActivity extends AppCompatActivity
         public void onLocationChanged(Location loc) {
             String longitude = ""+loc.getLongitude();
             String latitude = ""+loc.getLatitude();
+            longitudeValue = longitude;
+            latitudeValue = latitude;
             TextView longTxt = (TextView) findViewById(R.id.longTxt);
             TextView latTxt = (TextView) findViewById(R.id.latTxt);
             longTxt.setText(longitude);
@@ -268,6 +300,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void onReceive(Context ctxt, Intent intent) {
             int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
+            batteryValue = level;
             batteryTxt.setText(String.valueOf(level) + "%");
         }
     };
@@ -320,7 +353,38 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
 
-
+    public static String encode(byte[] data)
+    {
+        char[] tbl = {
+                'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P',
+                'Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f',
+                'g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v',
+                'w','x','y','z','0','1','2','3','4','5','6','7','8','9','+','/' };
+        StringBuilder buffer = new StringBuilder();
+        int pad = 0;
+        for (int i = 0; i < data.length; i += 3) {
+            int b = ((data[i] & 0xFF) << 16) & 0xFFFFFF;
+            if (i + 1 < data.length) {
+                b |= (data[i+1] & 0xFF) << 8;
+            } else {
+                pad++;
+            }
+            if (i + 2 < data.length) {
+                b |= (data[i+2] & 0xFF);
+            } else {
+                pad++;
+            }
+            for (int j = 0; j < 4 - pad; j++) {
+                int c = (b & 0xFC0000) >> 18;
+                buffer.append(tbl[c]);
+                b <<= 6;
+            }
+        }
+        for (int j = 0; j < pad; j++) {
+            buffer.append("=");
+        }
+        return buffer.toString();
     }
 }
