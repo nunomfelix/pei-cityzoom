@@ -16,6 +16,7 @@ const hexagonSchema = new mongoose.Schema({
     },
     location: {},
     streams: {},
+    satellite: {}
 })
 
 hexagonSchema.index({location: "2dsphere"}); // schema level

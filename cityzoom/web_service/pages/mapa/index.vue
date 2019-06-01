@@ -389,6 +389,7 @@ export default {
             if(this.hex_layer.getSource().getState() == 'ready' && (!this.loaded || !this.geo_loaded)) {
                 this.loaded = true
                 this.load()
+                console.log("HEREA")
             }
         })
 
@@ -397,6 +398,7 @@ export default {
             if(this.geo_layer.getSource().getState() == 'ready' && (!this.loaded || !this.geo_loaded)) {
                 this.geo_loaded = true
                 this.load()
+                console.log("HEREB")
             }
         })
 
@@ -520,7 +522,6 @@ export default {
     methods: {
         load() {
             this.geoJsonExtent = this.req.extent.createEmpty()
-            console.log("HERE1")
             this.geo_layer.getSource().getFeatures().forEach(feature => {
                 this.geoJsonExtent = this.req.extent.extend(this.geoJsonExtent, feature.getGeometry().getExtent())
             })
@@ -532,9 +533,9 @@ export default {
 
             this.current_time = this.getCurrentTimeHour()
             this.updateValues()
-            setInterval(() => {
-                this.updateValues()
-            }, 5000)
+            // setInterval(() => {
+            //     this.updateValues()
+            // }, 5000)
             //this.selectVertical(0)
         },
         increaseInterval() {
@@ -551,7 +552,7 @@ export default {
                     Authorization: this.$store.state.jwt
                 }
             })
-            console.log(res.data)
+            delete this.heatmap
             this.heatmap = res.data
             this.updateHeatMap()
         },

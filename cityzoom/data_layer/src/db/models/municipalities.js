@@ -13,6 +13,7 @@ const munsSchema = new mongoose.Schema({
         required: true,
         default: {}
     },
+    satellite: {}
 })
 
 munsSchema.plugin(uniqueValidator)

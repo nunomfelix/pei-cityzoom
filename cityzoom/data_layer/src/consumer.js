@@ -84,6 +84,19 @@ async function updateValues(stream, data_json) {
         useFindAndModify: false
     })
 
+    const tmp = await Hexas.find({
+        location: {
+            $geoIntersects: {
+                $geometry: {
+                    type: "Point",
+                    coordinates: [data_json.longitude, data_json.latitude]
+                }
+            }
+        }
+    }).explain("executionStats")
+
+    console.log(tmp)
+
     await Muns.updateOne({id: hex.municipality}, {
         $inc: { 
             [`streams.${stream.stream_name}.${time_id}.total`]: data_json.value,

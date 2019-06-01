@@ -91,27 +91,27 @@ router.get('/heatmap', async (req, res) => {
 
     const hexagons = (await Hexagons.find({})).reduce((map, hex) => {
         let streams = {}
-        for (var stream in hex.streams) {
-            Object.keys(hex.streams[stream]).forEach((time_id) => {
+        for (var stream in hex.satellite) {
+            Object.keys(hex.satellite[stream]).forEach((time_id) => {
                 if (Number(start) <= Number(time_id) && Number(end) > Number(time_id)) {
                     if(!(stream in streams)) {
                         streams = {
                             ...streams,
                             [stream]: {
-                                max: hex.streams[stream][time_id].max,
-                                min: hex.streams[stream][time_id].min,
-                                average: hex.streams[stream][time_id].total / hex.streams[stream][time_id].count,
-                                count: hex.streams[stream][time_id].count
+                                max: hex.satellite[stream][time_id].max,
+                                min: hex.satellite[stream][time_id].min,
+                                average: hex.satellite[stream][time_id].total / hex.satellite[stream][time_id].count,
+                                count: hex.satellite[stream][time_id].count
                             }
                         }
                     } else {
                         streams = {
                             ...streams,
                             [stream]: {
-                                max: hex.streams[stream][time_id].max > streams[stream].max ? hex.streams[stream][time_id].max : streams[stream].max,
-                                min: hex.streams[stream][time_id].min < streams[stream].min ? hex.streams[stream][time_id].min : streams[stream].min,
-                                average: (hex.streams[stream][time_id].total + streams[stream].total) / (streams[stream].count + hex.streams[stream][time_id].count),
-                                count: hex.streams[stream][time_id].count + streams[stream].count
+                                max: hex.satellite[stream][time_id].max > streams[stream].max ? hex.satellite[stream][time_id].max : streams[stream].max,
+                                min: hex.satellite[stream][time_id].min < streams[stream].min ? hex.satellite[stream][time_id].min : streams[stream].min,
+                                average: (streams[stream].average * streams[stream].count + hex.satellite[stream][time_id].total) / (streams[stream].count + hex.satellite[stream][time_id].count),
+                                count: hex.satellite[stream][time_id].count + streams[stream].count
                             }
                         }
                     }

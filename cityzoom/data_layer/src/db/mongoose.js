@@ -16,7 +16,7 @@ mongoose.connect(connectionUrl+database, {
     useCreateIndex: true
 }, async () => {
 
-    fs.writeFile('data_teste' + new Date(), JSON.stringify({alerts: await alerts.find(), verticals: await verticals.find(), devices: await devices.find(), streams: await streams.find(), values: await values.find(), hexagons: await hexagons.find(), muns: await muns.find()}), () => {})
+    //fs.writeFile('data_teste' + new Date(), JSON.stringify({alerts: await alerts.find(), verticals: await verticals.find(), devices: await devices.find(), streams: await streams.find(), values: await values.find(), hexagons: await hexagons.find(), muns: await muns.find()}), () => {})
     
     await hexagons.deleteMany({})
     await muns.deleteMany({})
@@ -26,39 +26,52 @@ mongoose.connect(connectionUrl+database, {
     await verticals.deleteMany({})
     await alerts.deleteMany({})
 
-    fs.readFile('backup_start3', async(err, res) => {
+    fs.readFile('backup_start_main', async(err, res) => {
         res = JSON.parse(res)
-        console.log(Object.keys(res))
-        if(res.hexagons)-
+        mongooseDebug("Starting up")
+        if(res.hexagons) {
             await hexagons.insertMany(res.hexagons.map(h => 
                 new hexagons(h)    
             ))
-        if(res.muns)
+            mongooseDebug("Loaded hexagons")
+        }
+        if(res.muns) {
             await muns.insertMany(res.muns.map(m => 
                 new muns(m)    
             ))
-        if(res.verticals)
+            mongooseDebug("Loaded municipalities")
+        }
+        if(res.verticals) {
             await verticals.insertMany(res.verticals.map(v => 
                 new verticals(v)    
             ))
-        if(res.devices)
+            mongooseDebug("Loaded verticals")
+        }
+        if(res.devices) {
             await devices.insertMany(res.devices.map(d => 
                 new devices(d)    
             ))
-        if(res.values && false)
+            mongooseDebug("Loaded devices")
+        }
+        if(res.values) {
             await values.insertMany(res.values.map(v => 
                 new values(v)    
             ))
-        if(res.streams)
+            mongooseDebug("Loaded values")
+        }
+        if(res.streams) {
             await streams.insertMany(res.streams.map(s => 
                 new streams(s)    
             ))
-        if(res.alerts)
+            mongooseDebug("Loaded streams")
+        }
+        if(res.alerts) {
             await alerts.insertMany(res.alerts.map(a => 
                 new alerts(a)    
             ))
+            mongooseDebug("Loaded alerts")
+        }
     })
-    
 
     //     // fs.readFile('alerts.json', async (err, data) => {
     //     //    await alerts.deleteMany({})

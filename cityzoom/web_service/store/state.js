@@ -3,5 +3,5 @@ export default () => ({
     jwt: '',
     verticals: [],
     devices: [],
-    heatmap: {}
+    heatmap: {},
 })

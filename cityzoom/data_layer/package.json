@@ -6,7 +6,7 @@
   "scripts": {
     "start": "react-scripts start",
     "broker": "DEBUG=broker:* nodemon --watch broker.js src/broker.js",
-    "index": "DEBUG=app: nodemon --watch routes/ --watch index.js --watch db/ --watch middleware.js --watch validation.js --watch producer.js src/index.js",
+    "index": "DEBUG=app:Mongoose nodemon --watch routes/ --watch index.js --watch db/ --watch middleware.js --watch validation.js --watch producer.js src/index.js",
     "consumer": "DEBUG=app:Consumer nodemon --watch consumer.js src/consumer.js",
     "dev": "npm-run-all --parallel index consumer",
     "all": "gnome-terminal --tab -e \"npm run broker\" & gnome-terminal --tab -e \"npm run dev\""
