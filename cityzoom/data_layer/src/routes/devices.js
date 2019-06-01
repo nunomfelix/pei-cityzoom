@@ -1,5 +1,5 @@
 const express = require('express')
-const validators = require('../validation')
+const {validateCreateDevice} = require('../validation')
 const { validation } = require('../middleware')
 const devicesDebug = require('debug')('app:Devices')
 const devices = require('../db/models/devices')
@@ -11,7 +11,7 @@ const producer = require('../producer')
 const router = new express.Router()
 
 // create a device
-router.post('', validation(validators.validateCreateDevice, 'body', 'Invalid device'), async (req, res) => {
+router.post('', validation(validateCreateDevice, 'body', 'Invalid device'), async (req, res) => {
     // convert request to broker-stuff
     const to_broker = {
         device_ID: req.body['device_ID'],

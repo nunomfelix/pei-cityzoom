@@ -25,8 +25,8 @@ router.post('', validation(validators.validateCreateStream, 'body', 'Invalid str
     }
     
     // Checks if the specified device exists
-    const count = await devices.countDocuments({device_ID:to_broker.device_ID})
-    if (count == 0){
+    const result = await devices.findOne({device_ID:to_broker.device_ID})
+    if (!result){
         streamsDebug(`Device ${to_broker.device_ID} not found`)
         return res.status(404).send({'Error':`Device ${to_broker.device_ID} not found`})
     }
@@ -91,27 +91,27 @@ router.get('/heatmap', async (req, res) => {
 
     const hexagons = (await Hexagons.find({})).reduce((map, hex) => {
         let streams = {}
-        for (var stream in hex.streams) {
-            Object.keys(hex.streams[stream]).forEach((time_id) => {
+        for (var stream in hex.satellite) {
+            Object.keys(hex.satellite[stream]).forEach((time_id) => {
                 if (Number(start) <= Number(time_id) && Number(end) > Number(time_id)) {
                     if(!(stream in streams)) {
                         streams = {
                             ...streams,
                             [stream]: {
-                                max: hex.streams[stream][time_id].max,
-                                min: hex.streams[stream][time_id].min,
-                                average: hex.streams[stream][time_id].average,
-                                count: hex.streams[stream][time_id].count
+                                max: hex.satellite[stream][time_id].max,
+                                min: hex.satellite[stream][time_id].min,
+                                average: hex.satellite[stream][time_id].total / hex.satellite[stream][time_id].count,
+                                count: hex.satellite[stream][time_id].count
                             }
                         }
                     } else {
                         streams = {
                             ...streams,
                             [stream]: {
-                                max: hex.streams[stream][time_id].max > streams[stream].max ? hex.streams[stream][time_id].max : streams[stream].max,
-                                min: hex.streams[stream][time_id].min < streams[stream].min ? hex.streams[stream][time_id].min : streams[stream].min,
-                                average: (hex.streams[stream][time_id].average * hex.streams[stream][time_id].count + streams[stream].average * streams[stream].count) / (streams[stream].count + hex.streams[stream][time_id].count),
-                                count: hex.streams[stream][time_id].count + streams[stream].count
+                                max: hex.satellite[stream][time_id].max > streams[stream].max ? hex.satellite[stream][time_id].max : streams[stream].max,
+                                min: hex.satellite[stream][time_id].min < streams[stream].min ? hex.satellite[stream][time_id].min : streams[stream].min,
+                                average: (streams[stream].average * streams[stream].count + hex.satellite[stream][time_id].total) / (streams[stream].count + hex.satellite[stream][time_id].count),
+                                count: hex.satellite[stream][time_id].count + streams[stream].count
                             }
                         }
                     }
@@ -132,7 +132,7 @@ router.get('/heatmap', async (req, res) => {
                             [stream]: {
                                 max: mun.streams[stream][time_id].max,
                                 min: mun.streams[stream][time_id].min,
-                                average: mun.streams[stream][time_id].average,
+                                average: mun.streams[stream][time_id].total / mun.streams[stream][time_id].count,
                                 count: mun.streams[stream][time_id].count
                             }
                         }
@@ -142,7 +142,7 @@ router.get('/heatmap', async (req, res) => {
                             [stream]: {
                                 max: mun.streams[stream][time_id].max > streams[stream].max ? mun.streams[stream][time_id].max : streams[stream].max,
                                 min: mun.streams[stream][time_id].min < streams[stream].min ? mun.streams[stream][time_id].min : streams[stream].min,
-                                average: (mun.streams[stream][time_id].average * mun.streams[stream][time_id].count + streams[stream].average * streams[stream].count) / (streams[stream].count + mun.streams[stream][time_id].count),
+                                average: (mun.streams[stream][time_id].total + streams[stream].total) / (streams[stream].count + mun.streams[stream][time_id].count),
                                 count: mun.streams[stream][time_id].count + streams[stream].count
                             }
                         }
@@ -215,26 +215,20 @@ router.get('/:stream_id/values', async (req, res) => {
 // post value to stream
 router.post('/:id/values', validation(validators.validatePostValue, 'body', 'Invalid value'), async (req, res) => {
     streamsDebug('[DEBUG] Creating Value')
-    console.log(req.params.id)
     const to_broker = {
         ...req.body,
         stream_ID: req.params.id,
-        timestamp: Number(new Date())
+        timestamp: req.body.timestamp ? req.body.timestamp : Number(new Date())
     }
 
-    await streams.countDocuments({stream_ID :to_broker.stream_ID}, async (err, count) => {
-        if (count == 0) {
-            streamsDebug(`[ERROR] Stream ${to_broker.stream_ID} not found`)
-            return res.status(404).send({'Error':`Stream ${to_broker.stream_ID} not found`})
-        }
-
-        streamsDebug(`[DEBUG] Stream ${to_broker.stream_ID} exists`)
-
-        await producer.publish('cityzoom/values',to_broker)
-    
-        streamsDebug('[DEBUG] Value created with success')
-        return res.status(204).send()
-    })
+    //Publishes the stream in the broker
+    const wasPublished = await producer.publish('cityzoom/values',to_broker)
+    if(!wasPublished){
+        streamsDebug(`[Error] Stream ${to_broker.stream_ID} doesn't exist`)
+        return res.status(409).send({'Error':`Stream ${to_broker.stream_ID} doesn't exist`}) 
+    }
+    streamsDebug('[DEBUG] Value created with success')
+    return res.status(204).send()
 })
 
 

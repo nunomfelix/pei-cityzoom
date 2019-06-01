@@ -80,8 +80,7 @@ async function create_Device(deviceID, deviceName, verticals, municipality) {
         "description": "",
         "vertical": verticals,
         "mobile": false,
-        "provider": "beezometer",
-        "municipality": municipality
+        "provider": "beezometer"
     }).catch((err) => {console.log("Failed to create device with error message: " + err)})
     return deviceName + "_device"
 }
@@ -145,11 +144,11 @@ function sleep(ms) {
             center_long,
             center_lat
         })
-        // k++
-        // if(k == 9)
-        //     break;
+        k++
+        if(k == 10)
+            break;
     }
-    await sleep(2000);
+    await sleep(200);
     const breezo_devicesMap = {}
     const darksky_devicesMap = {}
     for(var d in devices) {
@@ -176,43 +175,48 @@ function sleep(ms) {
         }
         darksky_devicesMap[devices[d].device] = streams
     }
-    await sleep(2000);
+    await sleep(200);
     //Circular buffer that goes arround our API keys.
-    //This way we can make a request with one key at a time.
+    //This way we can make a rrsequest with one key at a time.
     var breezo_i = 0
     var darksky_i = 0
-    for(k=0; k<100; k++){
+    const promises = []
         for(var d of devices) {
             try {
-                var breezo_data = await get_breezometer_data(d.center_lat, d.center_long, breezo_keys[breezo_i])
+                //var breezo_data = await get_breezometer_data(d.center_lat, d.center_long, breezo_keys[breezo_i])
                 for(var stream of breezo_devicesMap[d.device]) {
-                    try {
-                        post_Values(stream.stream_id, breezo_data[0][stream.stream], d.center_lat, d.center_long)
-                    } catch(err) {
-                        console.log(err)
-                    }
+                    const tmp = d
+                    const tmp_stream = stream
+                    promises.push((resolve) => {
+                        post_Values(tmp_stream.stream_id, Math.random() * 10/*breezo_data[0][stream.stream]*/, tmp.center_lat, tmp.center_long)
+                        resolve('done')
+                    })
+                    // try {
+                    //     post_Values(stream.stream_id, Math.random() * 10/*breezo_data[0][stream.stream]*/, d.center_lat, d.center_long)
+                    // } catch(err) {
+                    //     console.log(err)
+                    // }
                 }
                 breezo_i = (breezo_i+1) % breezo_keys.length
             }catch(err) {
                 console.log('Failed to fetch data from Breezometer API!')
             }
     
-            try {
-                var darksky_data = await get_darksky_data(d.center_lat, d.center_long, darksky_keys[darksky_i])
-                for(var stream of darksky_devicesMap[d.device]) {
-                    try {
-                        post_Values(stream.stream_id, darksky_data[0][stream.stream], d.center_lat, d.center_long)
-                    } catch(err) {
-                        console.log(err)
-                    }
-                }
-                darksky_i = (darksky_i+1) % darksky_keys.length
-            }catch(err) {
-                console.log('Failed to fetch data from Darksky API!')
-            }
-        }
-        await sleep(2400000*.5)
+            // try {
+            //     //var darksky_data = await get_darksky_data(d.center_lat, d.center_long, darksky_keys[darksky_i])
+            //     for(var stream of darksky_devicesMap[d.device]) {
+            //         try {
+            //             post_Values(stream.stream_id, Math.random() * 10/*darksky_data[0][stream.stream]*/, d.center_lat, d.center_long)
+            //         } catch(err) {
+            //             console.log(err)
+            //         }
+            //     }
+            //     darksky_i = (darksky_i+1) % darksky_keys.length
+            // }catch(err) {
+            //     console.log('Failed to fetch data from Darksky API!')
+            // }
     }
+    console.log(Promise.all(promises.map(p => new Promise(p))))
 })()
 
 

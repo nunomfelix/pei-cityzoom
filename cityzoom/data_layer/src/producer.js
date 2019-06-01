@@ -49,7 +49,6 @@ async function publish(topic,msg)  {
         }
     }else if(topic == rootTopic+'alerts'){
         result = await Alert.findOne({alert_ID:msg.alert_ID})
-        console.log(result)
         if(result){
             prodDebug('Alert',colors.blue(msg.stream_ID),'already exists!')
             return false
