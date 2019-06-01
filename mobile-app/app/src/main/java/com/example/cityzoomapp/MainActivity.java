@@ -43,14 +43,16 @@ import java.net.URL;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    final String IP_ADDRESS = "192.168.1.71";
+    final String USERNAME = "superuser";
+    final String PASSWORD = "12345";
+
     Sensor proximitySensor;
     TextView proximityText;
     TextView batteryTxt;
     int PERIOD = 1000; //in ms
     boolean sendingData = false;
     Thread waitingForCancel = null;
-    String USERNAME = "superuser";
-    String PASSWORD = "12345";
     //Sensors
     Sensor pressureSensor = null;
     SensorManager sensorManager;
@@ -161,7 +163,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void sendHTTPRequest() throws IOException{
-        String url = "http://193.136.93.14:8002/devices";
+        String url = "http://"+IP_ADDRESS+":8002/devices";
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         // optional default is GET
@@ -190,7 +192,7 @@ public class MainActivity extends AppCompatActivity
 
     /* Returns the session token */
     private String loginRequest()throws Exception{
-        String url = "http://193.136.93.14:8002/user/login";
+        String url = "http://"+IP_ADDRESS+":8002/user/login";
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         // optional default is GET
