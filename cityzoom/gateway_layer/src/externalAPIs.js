@@ -16,8 +16,48 @@ const breezo_keys = [
     '3fd5da64b8494c5e9247cb89393f7152',
     '18cff0fa345d47c191ea62ed7c884f88',
     'e2922410f76e4a93bae7beea7757d8a7',
-    //'51e7d40fca2349bf808fe62c655bff49',
-    //'db0d510ed58f4bcb9364e2daf2d01095'
+    'c0c8d52c93dc4267a550f6622b8bfd0c',
+    '51e7d40fca2349bf808fe62c655bff49',
+    'db0d510ed58f4bcb9364e2daf2d01095',
+    '0c434581acc54ecc91ef8db18b7cfc64',
+    '6f1a3af505ab43efa4d18eb6f7bab653',
+    'a70edc6b1b0b4033bad557bf0de3d249',
+    'ceb05e0ba10246369635f5b5cc36f244',
+    'cf1c63b379a44a2e890c5bce8b60e4ab',
+    '11d6e9e877fd46ac8fd3f8c4a0f2ce2a',
+    '38019c51d038428790477ce0368e549a',
+    '6f1a3af505ab43efa4d18eb6f7bab653',
+    '423e3c4170b949a994ab76e54ae390fb',
+    'e40568ce710a4619810854dfc6231814',
+    'f0d8171df51d48d8bba9d819674d7d00',
+    '44e50a12eeca4914b5effacbc648fbf8',
+    '8c8ed63a491e4c09a63217cfe3dca12e',
+    '7b033f2524ca4bdb9c6563748001c475',
+    'd955f2e040f746c2b38abd07eb3d4f4b',
+    '70df097d055e47f49888b122579df21c',
+    '8b87538cfe5f420fad87caa3e21d9e95',
+    'deb6bcf0a10547858ae6d739ba1f2c00',
+    '22b8a0d4869f4503ae8fb0b25b13dbe2',
+    '91f55691c0ab46c6877ef1f4e8b7be89',
+    '8d3b2deb02cf4aafbb6f6847aa2436a0',
+    '5883221f45dd442b83d1b427b3f55432',
+    'b9b1f9ed5f1f4c7c9af76fb32f3e8f2a',
+    'a9e6cb07d1764d73b50003c345f42970',
+    '97a814b4e1d047e3ad10c43175e85780',
+    '096159fb622d431386fde8c628c026b1',
+    '301fb1e4c67f4ac4a8acb4da790d4d33',
+    'f2b54e3da91f46c1af9156c942d9d7bd',
+    '0b706439fb6b44bb98ff4fd10ac18e44',
+    'ae0cf50153a643e49969bda353dbaf3a',
+    '97e9125ed4d64113b51679fbdd90f70e',
+    'f8021a48f9f246379729353c9a9dbfc1',
+    '771155ccf4584d729b07eb86e2e784ee',
+    'a5397d50a0904294b89f98fa73b017d1',
+    '3e927d200b6e48bf86ecea840da50544',
+    'fd840a084300447bbbcbee6475f023a4',
+    'c0d6f9dbd02d47cea48aead9169149e2',
+    '64c8cc1203c2406bad4a843ff35b6ce6',
+    '1754f3a173f24dcbb63d9a1b880af16d',
 ]
 
 const darksky_keys = [
@@ -33,8 +73,52 @@ const darksky_keys = [
     '8dad0ed09ef497c23ddf5708b62e4c57',
     '042bc0cf651d915dd3a97b94cbc79756',
     '96869db2c419796643976aa5db11363a',
-    'ba476533bfa6dcdb18261f70e4b12dbe'
+    'ba476533bfa6dcdb18261f70e4b12dbe',
+    'f44e534bd0f691693e1e132e443a0de4',
+    '81940e6ae198d35da489ffe38e8b1c15',
+    'cc64ab59625cb650c87ae665987744c9',
+    '8fba66feb057eb1595ee759e575ddd78',
+    'fe52c0d9e44237ed18324840a7abcc63',
+    '5b853daf6b35f471876d08533fe075b3',
+    '0ef30b671e97352332cc96984daf432a',
+    'c281a5b644e2566c54c5dbbf34f9b1cf',
+    '865328edd1d97b1d07a8ece42827178d',
+    'a513445da8bd1b299a09f8ee9d86553b',
+    'f3ef2a43aa21c60ddef84d4c3ee69ef0',
+    '51f605be98cb3926a482266412d71d1e',
+    'b183e9c5f8769bd3751d7bb24bd91ede',
+    'c66c265f6afeb6257df27e4eaf5af851',
+    '5c6b9d052c757e648c863a64b46441f8',
+    '6c70cb2e4242ee7d4bccf3e25725c9a8',
+    '1c276829620f5911e92545df8733fd74',
+    '1ba4f7380b4c93374685a58aba444098',
+    'db86e66ccac6868b630fee470d140c6c',
+    '04f6ab6e27726d07f02488655bb350ed',
+    '047ebce8c1397837d5ab6b03748a806b',
+    '4ee021be72c74dfc0b9a1c2695b671c1',
+    'b28cbd79bd3da228026c12c324c4ac71',
+    '9348459b7a62eeca8bdb27f5d567838e',
+    '254b8413aef55f08aa2eab9435d264a1',
+    '6938dfc6d975278e299c35fa59738043',
+    '6a0f7ab45ddb2972d7fc8c31893a825a',
+    'f891812b2d1b5d0b414eac9371aaafdd',
+    '4c02689043e952939ec5b1398b4872e0',
+    '262f537367fe50c2cd4fb699fc25d6a2',
+    'ad5eb08180aa92c45e006000b19572ef',
+    '254adc3be3d507ef050df108e144a87a',
+    'fde39ea5fbbb866a8c88455f79bf0965',
+    'b828b7103f2b01deca147c9a232577b9',
+    'dbb83d6c040e110ec13062c3465002b2',
+    '73ef0e48df2ae9c8fd0f949fe442e167',
+    '0b2111ee5b82de9a68f7006cd1ae8890',
+    '00b3398a08c0a420ee410de24b484086',
+    '91a6ad78cf2a02fa29c775f5c8646fa5',
+    'bf323a3daaa64f6b4d1750a32390f4e5',
 ]
+
+console.log("Breezo: ", breezo_keys.length)
+console.log("Darksy: ", darksky_keys.length)
+process.exit()
 
 async function get_breezometer_data(lat, long, key = 'f55cfd01f2ab42ccb517e40844a18797') {
 
@@ -190,15 +274,21 @@ function sleep(ms) {
 
             // promises.push(() => {
             //     return new Promise(async (resolve) => {
-                try {
-                    var breezo_data = await get_breezometer_data(d.center_lat, d.center_long, breezo_keys[breezo_i])
-                    for(var stream of breezo_devicesMap[d.device]) {
-                        post_Values(tmp.device, stream.stream, breezo_data[0][stream.stream], tmp.center_lat, tmp.center_long)
+                let tryAgain = true
+                while(tryAgain) {
+                    try {
+                        var breezo_data = await get_breezometer_data(d.center_lat, d.center_long, breezo_keys[breezo_i])
+                        for(var stream of breezo_devicesMap[d.device]) {
+                            post_Values(tmp.device, stream.stream, breezo_data[0][stream.stream], tmp.center_lat, tmp.center_long)
+                        }
+                        breezo_i = (breezo_i + 1) % breezo_keys.length
+                        tryAgain = false
+                    } catch(err) {
+                        console.log("Failed breezo")
+                        breezo_keys.splice(breezo_i, 1);
+                        breezo_i = (breezo_i + 1) % breezo_keys.length
+                        tryAgain = true
                     }
-                    breezo_i = (breezo_i + 1) % breezo_keys.length
-                } catch(err) {
-                    console.log("Failed breezo")
-                    breezo_i = (breezo_i + 1) % breezo_keys.length
                 }
             //         resolve()
             //     })
@@ -206,15 +296,21 @@ function sleep(ms) {
     
             // promises.push(() => {
             //     return new Promise(async (resolve) => {
-                try {
-                    var darksky_data = await get_darksky_data(d.center_lat, d.center_long, darksky_keys[darksky_i])
-                    for(var stream of darksky_devicesMap[d.device]) {
-                        post_Values(tmp.device, stream.stream, darksky_data[0][stream.stream], tmp.center_lat, tmp.center_long)
+                tryAgain = true
+                while(tryAgain) {
+                    try {
+                        var darksky_data = await get_darksky_data(d.center_lat, d.center_long, darksky_keys[darksky_i])
+                        for(var stream of darksky_devicesMap[d.device]) {
+                            post_Values(tmp.device, stream.stream, darksky_data[0][stream.stream], tmp.center_lat, tmp.center_long)
+                        }
+                        darksky_i = (darksky_i + 1) % darksky_keys.length
+                        tryAgain = false
+                    } catch(err) {
+                        console.log("Failed darksy")
+                        darksky_keys.splice(darksky_i, 1);
+                        darksky_i = (darksky_i + 1) % darksky_keys.length
+                        tryAgain = true
                     }
-                    darksky_i = (darksky_i + 1) % darksky_keys.length
-                } catch(err) {
-                    console.log("Failed darksy")
-                    darksky_i = (darksky_i + 1) % darksky_keys.length
                 }
             //         resolve()
             //     })
