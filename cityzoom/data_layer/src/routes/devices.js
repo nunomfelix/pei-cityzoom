@@ -16,12 +16,10 @@ router.post('', validation(validators.validateCreateDevice, 'body', 'Invalid dev
     const to_broker = {
         device_ID: req.body['device_ID'],
         device_name: req.body['device_name'],
-        vertical: req.body['vertical'],
         mobile: req.body['mobile'],
         provider: req.body['provider'],
         created_at: Number(Date.now()), 
         description: 'description' in req.body ? req.body.description : "",
-        municipality: req.body['municipality'],
         locations: []
     }
     
@@ -36,7 +34,6 @@ router.post('', validation(validators.validateCreateDevice, 'body', 'Invalid dev
         status: 'Creation successful',
         device_ID: req.body['device_ID'],
         device_name: req.body['device_name'],
-        vertical: req.body['vertical'],
         mobile: req.body['mobile'],
         provider: req.body['provider'],
         created_at: Number(Date.now())
@@ -73,7 +70,7 @@ router.get('/:id', async (req, res) => {
         mobile: doc.mobile,
         provider: doc.provider,
         created_at: Number(doc.created_at),
-        vertical: doc.vertical,
+        verticals: doc.verticals,
         description: doc.description,
         locations: doc.locations,
         streams: devStreams

@@ -82,79 +82,140 @@ router.get('', async (req, res) => {
 
 router.get('/heatmap', async (req, res) => {
     streamsDebug('[DEBUG] Fetching all stream values')
-    var start = req.query.interval_start ? req.query.interval_start : Number(new Date(0))
-    var end = req.query.interval_end ? req.query.interval_end : Number(new Date())
-    if (req.query.interval_end < req.query.interval_start || req.query.interval_start < 0) {
+    var stream_name = req.query.stream_name ? {stream_name: req.query.stream_name} : {} 
+    var start = req.query.interval_start ? Number(req.query.interval_start) : Number(new Date(0))
+    var end = req.query.interval_end ? Number(req.query.interval_end) : Number(new Date())
+    if (end < start || start < 0) {
         streamsDebug('[ERROR] Interval is wrong')
         return res.status(400).send({error: 'Bad interval defined'})
     }
 
-    const hexagons = (await Hexagons.find({})).reduce((map, hex) => {
-        let streams = {}
-        for (var stream in hex.satellite) {
-            Object.keys(hex.satellite[stream]).forEach((time_id) => {
-                if (Number(start) <= Number(time_id) && Number(end) > Number(time_id)) {
-                    if(!(stream in streams)) {
-                        streams = {
-                            ...streams,
-                            [stream]: {
-                                max: hex.satellite[stream][time_id].max,
-                                min: hex.satellite[stream][time_id].min,
-                                average: hex.satellite[stream][time_id].total / hex.satellite[stream][time_id].count,
-                                count: hex.satellite[stream][time_id].count
-                            }
-                        }
-                    } else {
-                        streams = {
-                            ...streams,
-                            [stream]: {
-                                max: hex.satellite[stream][time_id].max > streams[stream].max ? hex.satellite[stream][time_id].max : streams[stream].max,
-                                min: hex.satellite[stream][time_id].min < streams[stream].min ? hex.satellite[stream][time_id].min : streams[stream].min,
-                                average: (streams[stream].average * streams[stream].count + hex.satellite[stream][time_id].total) / (streams[stream].count + hex.satellite[stream][time_id].count),
-                                count: hex.satellite[stream][time_id].count + streams[stream].count
-                            }
-                        }
-                    }
-                }
-            })
+    var before = new Date()
+    ////const tmp = await Hexagons.find().populate('values').group()
+    const tmp = await values.aggregate([{
+        $match: {
+            ...stream_name,
+            $and: [{created_at: {$gte: start}},{created_at: {$lt: end}}]
         }
-        map[hex.id] = streams
-        return map
-    }, {})
-    const muns = (await Muns.find({}, 'id streams')).reduce((map, mun) => {
-        let streams = {}
-        for (var stream in mun.streams) {
-            Object.keys(mun.streams[stream]).forEach((time_id) => {
-                if (Number(start) <= Number(time_id) && Number(end) > Number(time_id)) {
-                    if(!(stream in streams)) {
-                        streams = {
-                            ...streams,
-                            [stream]: {
-                                max: mun.streams[stream][time_id].max,
-                                min: mun.streams[stream][time_id].min,
-                                average: mun.streams[stream][time_id].total / mun.streams[stream][time_id].count,
-                                count: mun.streams[stream][time_id].count
-                            }
-                        }
-                    } else {
-                        streams = {
-                            ...streams,
-                            [stream]: {
-                                max: mun.streams[stream][time_id].max > streams[stream].max ? mun.streams[stream][time_id].max : streams[stream].max,
-                                min: mun.streams[stream][time_id].min < streams[stream].min ? mun.streams[stream][time_id].min : streams[stream].min,
-                                average: (mun.streams[stream][time_id].total + streams[stream].total) / (streams[stream].count + mun.streams[stream][time_id].count),
-                                count: mun.streams[stream][time_id].count + streams[stream].count
-                            }
-                        }
-                    }
-                }
-            })
+    }, {
+        $group: {
+            _id: {
+                id: "$hexagon",
+                municipality: "$municipality"
+            },
+            min: {$min: "$value"},
+            max: {$max: "$value"},
+            average: {$avg: "$value"},
+            count: {$sum: 1},
         }
-        map[mun.id] = streams
-        return map
-    }, {})
+    }, {
+        $project: {
+            _id: 0,
+            municipality: "$_id.municipality",
+            hexas: {
+                id: "$_id.id",
+                min: "$min",
+                max: "$max",
+                average: "$average",
+                count: "$count",
+            }
+        },
+    }, {
+        $group: {
+            _id: {
+                id: "$municipality",
+            },
+            hexas: {
+                $push: "$hexas"
+            },
+            min: {$min: "$hexas.min"},
+            max: {$max: "$hexas.max"},
+            average: {$avg: "$hexas.average"},
+            count: {$sum: "$hexas.count"},
+        }
+    }, {
+        $project: {
+            _id: 0,
+            id: "$_id.id",
+            min: 1,
+            max: 1,
+            average: 1,
+            count: 1,
+            hexas: 1
+        },
+    }])
+
+    var after = new Date()
+    console.log(after-before)
     
-    res.status(200).send({hexagons, muns})
+    res.send(tmp)
+
+    // const hexagons = (await Hexagons.find({})).reduce((map, hex) => {
+    //     let streams = {}
+    //     for (var stream in hex.satellite) {
+    //         Object.keys(hex.satellite[stream]).forEach((time_id) => {
+    //             if (Number(start) <= Number(time_id) && Number(end) > Number(time_id)) {
+    //                 if(!(stream in streams)) {
+    //                     streams = {
+    //                         ...streams,
+    //                         [stream]: {
+    //                             max: hex.satellite[stream][time_id].max,
+    //                             min: hex.satellite[stream][time_id].min,
+    //                             average: hex.satellite[stream][time_id].total / hex.satellite[stream][time_id].count,
+    //                             count: hex.satellite[stream][time_id].count
+    //                         }
+    //                     }
+    //                 } else {
+    //                     streams = {
+    //                         ...streams,
+    //                         [stream]: {
+    //                             max: hex.satellite[stream][time_id].max > streams[stream].max ? hex.satellite[stream][time_id].max : streams[stream].max,
+    //                             min: hex.satellite[stream][time_id].min < streams[stream].min ? hex.satellite[stream][time_id].min : streams[stream].min,
+    //                             average: (streams[stream].average * streams[stream].count + hex.satellite[stream][time_id].total) / (streams[stream].count + hex.satellite[stream][time_id].count),
+    //                             count: hex.satellite[stream][time_id].count + streams[stream].count
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         })
+    //     }
+    //     map[hex.id] = streams
+    //     return map
+    // }, {})
+    // const muns = (await Muns.find({}, 'id streams')).reduce((map, mun) => {
+    //     let streams = {}
+    //     for (var stream in mun.streams) {
+    //         Object.keys(mun.streams[stream]).forEach((time_id) => {
+    //             if (Number(start) <= Number(time_id) && Number(end) > Number(time_id)) {
+    //                 if(!(stream in streams)) {
+    //                     streams = {
+    //                         ...streams,
+    //                         [stream]: {
+    //                             max: mun.streams[stream][time_id].max,
+    //                             min: mun.streams[stream][time_id].min,
+    //                             average: mun.streams[stream][time_id].total / mun.streams[stream][time_id].count,
+    //                             count: mun.streams[stream][time_id].count
+    //                         }
+    //                     }
+    //                 } else {
+    //                     streams = {
+    //                         ...streams,
+    //                         [stream]: {
+    //                             max: mun.streams[stream][time_id].max > streams[stream].max ? mun.streams[stream][time_id].max : streams[stream].max,
+    //                             min: mun.streams[stream][time_id].min < streams[stream].min ? mun.streams[stream][time_id].min : streams[stream].min,
+    //                             average: (mun.streams[stream][time_id].total + streams[stream].total) / (streams[stream].count + mun.streams[stream][time_id].count),
+    //                             count: mun.streams[stream][time_id].count + streams[stream].count
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         })
+    //     }
+    //     map[mun.id] = streams
+    //     return map
+    // }, {})
+    
+    //res.status(200).send({hexagons, muns})
 })
 
 // get stream by ID
@@ -214,24 +275,22 @@ router.get('/:stream_id/values', async (req, res) => {
 
 // post value to stream
 router.post('/:id/values', validation(validators.validatePostValue, 'body', 'Invalid value'), async (req, res) => {
-    streamsDebug('[DEBUG] Creating Value')
-    console.log(req.params.id)
+
+    streamsDebug('[DEBUG] Receiving Value')
     const to_broker = {
         ...req.body,
-        stream_ID: req.params.id,
-        timestamp: Number(new Date())
+        stream_name: req.params.id,
+        received_at: Number(new Date()),
     }
 
-    await streams.countDocuments({stream_ID :to_broker.stream_ID}, async (err, count) => {
+    await devices.countDocuments({device_ID :to_broker.device_ID}, async (err, count) => {
         if (count == 0) {
-            streamsDebug(`[ERROR] Stream ${to_broker.stream_ID} not found`)
-            return res.status(404).send({'Error':`Stream ${to_broker.stream_ID} not found`})
+            streamsDebug(`[ERROR] Device ${to_broker.device_ID} not found`)
+            return res.status(404).send({'Error':`Device ${to_broker.device_ID} not found`})
         }
 
-        streamsDebug(`[DEBUG] Stream ${to_broker.stream_ID} exists`)
-
+        streamsDebug(`[DEBUG] Device ${to_broker.device_ID} exists`)
         await producer.publish('cityzoom/values',to_broker)
-    
         streamsDebug('[DEBUG] Value created with success')
         return res.status(204).send()
     })

@@ -3,7 +3,12 @@ const uniqueValidator = require('mongoose-unique-validator')
 const config = require('config')
 
 const valuesSchema = new mongoose.Schema({
-    stream_ID: {
+    stream_name: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    device_ID: {
         type: String,
         required: true,
         trim: true
@@ -19,20 +24,23 @@ const valuesSchema = new mongoose.Schema({
         trim: true,
         default: Date.now
     },
-    latitude: {
-        type: Number,
-        required: true,
-        trim: true
-    },
-    longitude: {
-        type: Number,
-        required: true,
-        trim: true
-    }
+    hexagon: {},
+    municipality: {}
+    // latitude: {
+    //     type: Number,
+    //     required: true,
+    //     trim: true
+    // },
+    // longitude: {
+    //     type: Number,
+    //     required: true,
+    //     trim: true
+    // }
 })
 
+valuesSchema.index({ stream_name: 1, created_at: 1})
 valuesSchema.plugin(uniqueValidator)
 
-const Values = mongoose.model('Values', valuesSchema)
+const Values = mongoose.model('values', valuesSchema)
 
 module.exports = Values

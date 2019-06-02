@@ -42,14 +42,10 @@ async function publish(topic,msg)  {
             prodDebug('Published new stream into topic',colors.blue(topic))
         })
     }else if(topic == rootTopic+'values'){
-        const stream = await Stream.findOne({stream_ID:msg.stream_ID})
-        if(stream) {
-            await client.publish(topic,JSON.stringify({...msg, stream}),opt)
-            prodDebug('Published new value into topic',colors.blue())
-        }
+        await client.publish(topic,JSON.stringify({...msg}),opt)
+        prodDebug('Published new value into topic',colors.blue())
     }else if(topic == rootTopic+'alerts'){
         result = await Alert.findOne({alert_ID:msg.alert_ID})
-        console.log(result)
         if(result){
             prodDebug('Alert',colors.blue(msg.stream_ID),'already exists!')
             return false

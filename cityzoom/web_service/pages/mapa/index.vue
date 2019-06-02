@@ -87,18 +87,23 @@
                             <div :style="{color: current_scale == 86400000 || current_scale == 604800000 ? 'red' : 'black'}">{{getStartDate.getDate().toString().padStart(2, '0')}}</div>/
                             <div :style="{color: current_scale == -1 ? 'red' : 'black'}">{{(getStartDate.getMonth() + 1).toString().padStart(2, '0')}}</div>/
                             <div :style="{color: current_scale == -12 ? 'red' : 'black'}" style="margin-right: 1.5rem">{{getStartDate.getFullYear()}}</div> 
-                            <div :style="{color: current_scale == 3600000 ? 'red' : 'black'}" >{{getStartDate.getHours().toString().padStart(2, '0')}}h</div>       
+                            <div :style="{color: current_scale == 3600000 ? 'red' : 'black'}" >{{getStartDate.getHours().toString().padStart(2, '0')}}:</div>
+                            <div :style="{color: current_scale == 60000 ? 'red' : 'black'}" >{{getStartDate.getMinutes().toString().padStart(2, '0')}}h</div>      
                         </div>
                         <div class="date normal">
                             <div :style="{color: current_scale == 86400000 || current_scale == 604800000 ? 'red' : 'black'}">{{getCurrentDate.getDate().toString().padStart(2, '0')}}</div>/
                             <div :style="{color: current_scale == -1 ? 'red' : 'black'}">{{(getCurrentDate.getMonth() + 1).toString().padStart(2, '0')}}</div>/
                             <div :style="{color: current_scale == -12 ? 'red' : 'black'}" style="margin-right: 1.5rem">{{getCurrentDate.getFullYear()}}</div> 
-                            <div :style="{color: current_scale == 3600000 ? 'red' : 'black'}">{{getCurrentDate.getHours().toString().padStart(2, '0')}}h</div>  
+                            <div :style="{color: current_scale == 3600000 ? 'red' : 'black'}">{{getCurrentDate.getHours().toString().padStart(2, '0')}}:</div>
+                            <div :style="{color: current_scale == 60000 ? 'red' : 'black'}" >{{getStartDate.getMinutes().toString().padStart(2, '0')}}h</div>  
                         </div>
                     </div>
                     <div :class="{disabled: current_time == this.getCurrentTimeHour()}" @click="increaseInterval(); updateValues();" class="arrow"><img src="icons/arrow.png" alt=""></div>
                 </div>
                 <div class="measure-menu_bottom_picker">
+                    <div @click="current_scale = 60000; updateValues()" class="measure-button fit xsmall bold" :class="{selected: current_scale == 60000}">
+                        MIN
+                    </div>
                     <div @click="current_scale = 3600000; updateValues()" class="measure-button fit xsmall bold" :class="{selected: current_scale == 3600000}">
                         HOUR
                     </div>
@@ -215,8 +220,8 @@ export default {
             testValuesOrdered: [],
             rainbowHeatMap: new Rainbow(),
 
-            selected_vertical: 0,
-            selected_stream: 0,
+            selected_vertical: null,
+            selected_stream: null,
             selected_county: null,
             hovered_geo: null,
 
@@ -389,7 +394,6 @@ export default {
             if(this.hex_layer.getSource().getState() == 'ready' && (!this.loaded || !this.geo_loaded)) {
                 this.loaded = true
                 this.load()
-                console.log("HEREA")
             }
         })
 
@@ -398,7 +402,6 @@ export default {
             if(this.geo_layer.getSource().getState() == 'ready' && (!this.loaded || !this.geo_loaded)) {
                 this.geo_loaded = true
                 this.load()
-                console.log("HEREB")
             }
         })
 
@@ -532,10 +535,10 @@ export default {
             },0)
 
             this.current_time = this.getCurrentTimeHour()
-            this.updateValues()
-            // setInterval(() => {
-            //     this.updateValues()
-            // }, 5000)
+            this.selectVertical(0)
+            setInterval(() => {
+                this.updateValues()
+            }, 1000)
             //this.selectVertical(0)
         },
         increaseInterval() {
@@ -547,7 +550,7 @@ export default {
             return Math.ceil((new Date()).getTime() / 3600000) * 3600000
         },
         async updateValues() {
-            const res = await this.$axios.get(`http://localhost:8001/czb/streams/heatmap?interval_start=${Math.floor(this.getStartDate)}&interval_end=${Math.floor(this.getCurrentDate)}`, {
+            const res = await this.$axios.get(`http://localhost:8001/czb/streams/heatmap?interval_start=${Math.floor(this.getStartDate)}&interval_end=${Math.floor(this.getCurrentDate)}&stream_name=${this.getStream.name}`, {
                 headers: {
                     Authorization: this.$store.state.jwt
                 }
@@ -627,8 +630,6 @@ export default {
         selectVertical(i) {
             if(i != this.selected_vertical) {
                 this.selected_vertical = i
-                this.selected_stream = 0
-                this.updateHeatMap()
                 for(var feature in this.shown_features) {
                     if(!(this.getDevices.find(d => d.device_id == this.shown_features[feature].get('id')).vertical.includes(this.getVerticals[this.selected_vertical].name))) {
                         this.devices_layer.getSource().removeFeature(this.shown_features[feature])
@@ -636,71 +637,119 @@ export default {
                     }
                 }
                 this.devices_layer.getSource().dispatchEvent('change');
+                this.selectStream(0)
             }
         },
         selectStream(i) {
             if(i != this.selected_stream) {
                 this.selected_stream = i
-                this.updateHeatMap()
+                this.updateValues()
             }
         },
         updateHeatMap() {
+
+            delete this.municipalityValues
+            this.municipalityValues = {}
+            delete this.hexagonValues
+            this.hexagonValues = {}
 
             const stream = this.getVerticals[this.selected_vertical].streams[this.selected_stream]
             this.rainbowHeatMap.setNumberRange(1, 100);
             this.rainbowHeatMap.setSpectrum(stream.colors[0] , stream.colors[1]); 
 
-            for(var i in this.heatmap.muns) {
-                if(!(i in this.municipalityValues))
-                    this.municipalityValues[i] = {}
-                if(!(stream.name in this.heatmap.muns[i])) {
-                    this.municipalityValues[i].index = null
-                    this.municipalityValues[i].color = '#ffffff00';
-                } else {
-                    const value = this.heatmap.muns[i][stream.name].average
-                    const index = (value - stream.min) * 100 / (stream.max - stream.min)
-                    this.municipalityValues[i].index = Math.round(index)
-                    this.municipalityValues[i].color = '#' + this.rainbowHeatMap.colourAt(Math.round(index)) + 'D0';
-                }
-                this.municipalityValues[i].style = new this.req.style.Style({
+            for(var mun of this.heatmap) {
+
+                if(!(mun.id in this.municipalityValues))
+                    this.municipalityValues[mun.id] = {}
+                    
+                const value = mun.average
+                const index = (value - stream.min) * 100 / (stream.max - stream.min)
+                this.municipalityValues[mun.id].index = Math.round(index)
+                this.municipalityValues[mun.id].color = '#' + this.rainbowHeatMap.colourAt(Math.round(index)) + 'D0';
+                this.municipalityValues[mun.id].style = new this.req.style.Style({
                     fill: new this.req.style.Fill({
-                        color: this.municipalityValues[i].color
+                        color: this.municipalityValues[mun.id].color
                     }),
                     stroke: new this.req.style.Stroke({
                         color: 'black',
                         width: this.map.getView().getZoom() / 20 * 1.5
                     })
                 })
+
+                for(var hex of mun.hexas) {
+
+                    if(!(hex.id in this.hexagonValues))
+                        this.hexagonValues[hex.id] = {}
+                    
+                    const value = hex[this.measure_selected]
+                    const index = (value - stream.min) * 100 / (stream.max - stream.min)
+                    this.hexagonValues[hex.id].index = Math.round(index)
+                    this.hexagonValues[hex.id].color = '#' + this.rainbowHeatMap.colourAt(Math.round(index)) + 'FF';
+                    this.hexagonValues[hex.id].style = new this.req.style.Style({
+                        fill: new this.req.style.Fill({
+                            color: this.hexagonValues[hex.id].color
+                        }),
+                        stroke: new this.req.style.Stroke({
+                            color: this.hexagonValues[hex.id].index ? 'black' : 'transparent',
+                            width: this.map.getView().getZoom() / 20 * 1.5
+                        })
+                    })
+
+                }
+
             }
 
-            for(var i in this.heatmap.hexagons) {
-                if(!(i in this.hexagonValues))
-                    this.hexagonValues[i] = {}
-                if(!(stream.name in this.heatmap.hexagons[i])) {
-                    this.hexagonValues[i].index = null
-                    this.hexagonValues[i].color = '#ffffffa0';
-                } else {
-                    const value = this.heatmap.hexagons[i][stream.name][this.measure_selected]
-                    const index = (value - stream.min) * 100 / (stream.max - stream.min)
-                    this.hexagonValues[i].index = Math.round(index)
-                    this.hexagonValues[i].color = '#' + this.rainbowHeatMap.colourAt(Math.round(index)) + 'FF';;
-                }
-                this.hexagonValues[i].style = new this.req.style.Style({
-                    fill: new this.req.style.Fill({
-                        color: this.hexagonValues[i].color,
-                    }),
-                    stroke: new this.req.style.Stroke({
-                        color: this.hexagonValues[i].index ? 'black' : 'transparent',
-                        width: this.map.getView().getZoom() / 20 * 1.5
-                    })
-                })
-            }
+            // for(var i in this.heatmap.muns) {
+            //     if(!(i in this.municipalityValues))
+            //         this.municipalityValues[i] = {}
+            //     if(!(stream.name in this.heatmap.muns[i])) {
+            //         this.municipalityValues[i].index = null
+            //         this.municipalityValues[i].color = '#ffffff00';
+            //     } else {
+            //         const value = this.heatmap.muns[i][stream.name].average
+            //         const index = (value - stream.min) * 100 / (stream.max - stream.min)
+            //         this.municipalityValues[i].index = Math.round(index)
+            //         this.municipalityValues[i].color = '#' + this.rainbowHeatMap.colourAt(Math.round(index)) + 'D0';
+            //     }
+            //     this.municipalityValues[i].style = new this.req.style.Style({
+            //         fill: new this.req.style.Fill({
+            //             color: this.municipalityValues[i].color
+            //         }),
+            //         stroke: new this.req.style.Stroke({
+            //             color: 'black',
+            //             width: this.map.getView().getZoom() / 20 * 1.5
+            //         })
+            //     })
+            // }
+
+            // for(var i in this.heatmap.hexagons) {
+            //     if(!(i in this.hexagonValues))
+            //         this.hexagonValues[i] = {}
+            //     if(!(stream.name in this.heatmap.hexagons[i])) {
+            //         this.hexagonValues[i].index = null
+            //         this.hexagonValues[i].color = '#ffffffa0';
+            //     } else {
+            //         const value = this.heatmap.hexagons[i][stream.name][this.measure_selected]
+            //         const index = (value - stream.min) * 100 / (stream.max - stream.min)
+            //         this.hexagonValues[i].index = Math.round(index)
+            //         this.hexagonValues[i].color = '#' + this.rainbowHeatMap.colourAt(Math.round(index)) + 'FF';;
+            //     }
+            //     this.hexagonValues[i].style = new this.req.style.Style({
+            //         fill: new this.req.style.Fill({
+            //             color: this.hexagonValues[i].color,
+            //         }),
+            //         stroke: new this.req.style.Stroke({
+            //             color: this.hexagonValues[i].index ? 'black' : 'transparent',
+            //             width: this.map.getView().getZoom() / 20 * 1.5
+            //         })
+            //     })
+            // }
 
             this.hex_layer.setStyle((feature) => {
-                return this.hexagonValues[feature.get('id')].style
+                return feature.get('id') in this.hexagonValues ? this.hexagonValues[feature.get('id')].style : null
             })
 
-            this.map.updateSize()   
+            //this.map.updateSize()   
 
         }
 

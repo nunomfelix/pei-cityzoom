@@ -26,7 +26,7 @@ mongoose.connect(connectionUrl+database, {
     await verticals.deleteMany({})
     await alerts.deleteMany({})
 
-    fs.readFile('backup_start_main', async(err, res) => {
+    fs.readFile('backup_no_streams_75k', async(err, res) => {
         res = JSON.parse(res)
         mongooseDebug("Starting up")
         if(res.hexagons) {
@@ -72,53 +72,6 @@ mongoose.connect(connectionUrl+database, {
             mongooseDebug("Loaded alerts")
         }
     })
-
-    //     // fs.readFile('alerts.json', async (err, data) => {
-    //     //    await alerts.deleteMany({})
-    //     //    let alert = JSON.parse(data)
-    //     //    alert.alerts.forEach(async (value) => {
-    //     //        const alt = new alerts(value)
-    //     //        await alt.save()
-    //     //    })
-    //     //    for (var a in alert.alerts) {
-               
-    //     //    }
-    //     // })
-    //     // fs.readFile('verticals.json', async (err, data) => { 
-    //     //     await verticals.deleteMany({}) 
-    //     //     if (err) throw err;
-    //     //     let vertical = JSON.parse(data)
-    //     //     const streams_array = []
-    //     //     for(var v in vertical.vertical) {
-    //     //         const vert = new verticals({
-    //     //             name: v,
-    //     //             display: vertical.vertical[v].display,
-    //     //             streams: vertical.vertical[v].streams,
-    //     //         })
-    //     //         await vert.save()
-    //     //     }
-    //     // })
-
-        
-        //     // fs.readFile('hex_data.json', async (err, hexa_json) => {
-        //     //     if (err) throw err;
-        //     //     let hexas = JSON.parse(hexa_json)
-        //     //     const municipalities = new Set()
-        //     //     await hexagons.insertMany(hexas.map(h => {
-        //     //         municipalities.add(h.municipality)
-        //     //         return new hexagons({
-        //     //             id: h.id,
-        //     //             coordinates: h.coordinates,
-        //     //             municipality: h.municipality,
-        //     //             streams: {}
-        //     //         })
-        //     //     }))
-        //     //     await muns.insertMany([...municipalities].map(m =>
-        //     //         new muns({
-        //     //             id: m,
-        //     //             streams: {}
-        //     //         })
-        //     //     ))
-        //     // })
+    
     mongooseDebug("Connected to mongo database!")
 })
