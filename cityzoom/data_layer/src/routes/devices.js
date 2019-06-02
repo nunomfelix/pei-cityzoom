@@ -86,34 +86,69 @@ router.delete('/:id', async (req, res) => {
 
 // get values by stream
 router.get('/:id/values', async (req,res) => {
-    const dev = await devices.findOne({device_ID:req.params.id})
-    if (!dev) { return res.status(404).send({'Status':'Not Found'}) }
-    const start = req.query.interval_start ? req.query.interval_start : 0
-    const compass = Number(Date.now())
-    const end = req.query.interval_end ? req.query.interval_end : compass
+    // const dev = await devices.findOne({device_ID:req.params.id})
+    // if (!dev) { return res.status(404).send({'Status':'Not Found'}) }
+    // const start = req.query.interval_start ? req.query.interval_start : 0
+    // const compass = Number(Date.now())
+    // const end = req.query.interval_end ? req.query.interval_end : compass
+    // if (end < start || start < 0) {
+    //     streamsDebug('[ERROR] Interval is wrong')
+    //     return res.status(400).send({error: 'Bad interval defined'})
+    // }
+    // // get all device streams
+    // var allDeviceStreams = await streams.find({device_ID: dev.device_ID})
+    // devStreams = []
+    // allDeviceStreams.forEach((stream) => {
+    //     devStreams.push({
+    //         stream_ID: stream.stream_ID,
+    //         stream_name: stream.stream_name
+    //     })
+    // })
+    // let result = {}
+    // for(let {stream_ID, stream_name} of devStreams){
+    //     var allFullValues = await values.find({stream_ID:stream_ID})
+    //     var allValues = []
+    //     allFullValues.forEach((v)=>{
+    //         allValues.push({value:v.value,created_at:v.created_at})
+    //     })
+    //     result[stream_name] = allValues
+    // }
+    // console.log(result)
+    // res.status(200).send(result)
+
+    const device = await devices.find({device_ID:req.params.id})
+    if (!device) { return res.status(404).send({'Status':'Not found'})}
+    var start = req.query.interval_start ? Number(req.query.interval_start) : Number(new Date(0))
+    var end = req.query.interval_end ? Number(req.query.interval_end) : Number(new Date())
+    console.log(start)
+    console.log(end)
     if (end < start || start < 0) {
         streamsDebug('[ERROR] Interval is wrong')
         return res.status(400).send({error: 'Bad interval defined'})
     }
-    // get all device streams
-    var allDeviceStreams = await streams.find({device_ID: dev.device_ID})
-    devStreams = []
-    allDeviceStreams.forEach((stream) => {
-        devStreams.push({
-            stream_ID: stream.stream_ID,
-            stream_name: stream.stream_name
-        })
-    })
-    let result = {}
-    for(let {stream_ID, stream_name} of devStreams){
-        var allFullValues = await values.find({stream_ID:stream_ID})
-        var allValues = []
-        allFullValues.forEach((v)=>{
-            allValues.push({value:v.value,created_at:v.created_at})
-        })
-        result[stream_name] = allValues
-    }
-    res.status(200).send(result)
+
+    var before = new Date()
+    console.log(device[0]['device_ID'] )
+    const tmp = await values.aggregate([{
+        $match:{
+            "device_ID": device[0]['device_ID'],
+            $and: [{created_at: {$gte: start}},{created_at: {$lt: end}}]
+        }
+    },{
+        $group:{
+                _id: "$stream_name",
+                values: {
+                  $push: "$value"
+                }
+              }
+    }])
+
+    console.log(tmp)
+
+    var after = new Date()
+    console.log(after-before)
+    
+    res.send(tmp)
 })
 
 module.exports = router

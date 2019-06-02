@@ -92,6 +92,7 @@ router.get('/heatmap', async (req, res) => {
 
     var before = new Date()
     ////const tmp = await Hexagons.find().populate('values').group()
+    //console.log(...stream_name)
     const tmp = await values.aggregate([{
         $match: {
             ...stream_name,

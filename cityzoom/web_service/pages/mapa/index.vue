@@ -292,7 +292,7 @@ export default {
                 })
             }
         }
-
+        
         this.geoStyle.default = new this.req.style.Style({
             fill: new this.req.style.Fill({
                 color: 'rgba(255,255,255,0)'
@@ -404,6 +404,8 @@ export default {
                 this.load()
             }
         })
+        
+        this.showModal = true
 
         const hover_interaction = new interaction.Select({
             condition: (e) => {
@@ -468,6 +470,8 @@ export default {
 
         this.map.addInteraction(click_interaction);
         click_interaction.on('select', (e) => {
+
+
             document.body.style.cursor = "default"
             const geo_feature = e.selected[0]
             if(geo_feature.get('id') && geo_feature != this.selected_county) {
@@ -516,7 +520,7 @@ export default {
                 },0)
             } else if(e.selected.length > 1) {
                 const device_feature = e.selected[e.selected.length - 1]
-                this.showModal = true   
+                this.showModal = true
             }
             click_interaction.getFeatures().clear()
         })

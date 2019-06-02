@@ -51,6 +51,11 @@
           <div v-else-if="item.type" class="small">
               <BarChart/>
           </div>
+
+          
+          <div v-else-if="item.type" class="small">
+            <pie-chart :data="chartData"></pie-chart>
+          </div>
     </div>
           <!--
           <div v-if="item.type=='widget_weather'">
@@ -83,7 +88,8 @@ var testLayout = [
   //{ x: 0, y: 0, w: 8, h: 5, i: "dfffd", type: 'widget_weather'},
   // { x: 8, y: 0, w: 4, h: 14, i: "series_c", type: 'series', data: 'fake' },
   // { x: 0, y: 14, w: 13, h: 14, i: "series_b", type: 'series', data: 'fake' },
-  { x: 0, y: 14, w: 13, h: 14, i: "bar_a", type: 'bar', data: 'fake' }
+  { x: 0, y: 14, w: 13, h: 14, i: "bar_a", type: 'bar', data: 'fake' },
+  { x: 0, y: 14, w: 13, h: 14, i: "pie_a", type: 'pie', data: 'fake' }
 ];
 
 export default {
@@ -108,7 +114,17 @@ export default {
               unit: 'hour'}
           }]
         }
-    }
+    },
+    chartData: {
+        labels: ["Green", "Red", "Blue"],
+        datasets: [
+          {
+            label: "Data One",
+            backgroundColor: ["#41B883", "#E46651", "#00D8FF"],
+            data: [1, 10, 5]
+          }
+        ]
+      }
     };
   }, 
   mounted: async function() {
@@ -117,7 +133,7 @@ export default {
     }, 0)
 
     
-    const res = await this.$axios.get(`http://localhost:8002/devices/device_APIs0105010/values`, {  
+    const res = await this.$axios.get(`http://localhost:8002/devices/device_APIs0105012/values`, {  
       headers: {
           Authorization: this.$store.state.jwt
       }
@@ -125,8 +141,13 @@ export default {
 
     this.data=res.data
 
+    console.log('este aqui'+ this.res.data)
+    console.log('\n\n\n')
+
     var labels = []
     var y_axis = []
+
+    //console.log(this.data)
     // var streams = []
     //console.log(res.data.config)
     // Object.keys(data).forEach((key) => {
