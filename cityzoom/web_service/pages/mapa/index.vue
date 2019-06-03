@@ -1,60 +1,62 @@
 <template>
+
     <div class="mapMargin mapHeight" style="position:relative">
         <div class="mapHeight" id="map"></div>
-        <div v-if="getStream && selected_county" :style="{ 'background-color': municipalityValues[selected_county.get('id')].color}" class="ol-popup top">
+        <div v-if="getStream" :style="{ 'background-color': !loading_values && selected_county && selected_county.get('id') in municipalityValues ? municipalityValues[selected_county.get('id')].color : '#ffffffd0'}" class="ol-popup top">
             <div style="background-color: rgba(0,0,0, .5)">
-                <span class="xbig bold"> {{selected_county.get('Freguesia')}} <br> {{getStream.display}} </span>
-                <div v-if="getStream.name in heatmap.muns[selected_county.get('id')]" class="measure-show">
+                <span v-if="selected_county" class="normal bold"><span class="normal">{{selected_county.get('Freguesia')}}</span> <br> {{getStream.display}} </span>
+                <span v-else class="normal bold">{{getStream.display}} </span>
+                <div v-if="!loading_values && selected_county && selected_county.get('id') in municipalityValues" class="measure-show">
                     <div :style="{'background-color': getStream.colors[0]}" class="disabled measure-button">
                         <div class="measure-wrapper">
                             MIN
                         </div>
                     </div>
-                    <span class="big">{{heatmap.muns[selected_county.get('id')][getStream.name].min.toFixed(2)}}{{getStream.unit}}</span>
+                    <span class="normal">{{municipalityValues[selected_county.get('id')].min.toFixed(2)}}{{getStream.unit}}</span>
                     <div :style="{'background-color': '#' + rainbowHeatMap.colourAt(50)}" class="disabled measure-button">
                         <div class="measure-wrapper">
                             AVG
                         </div>
                     </div>
-                    <span class="big">{{heatmap.muns[selected_county.get('id')][getStream.name].average.toFixed(2)}}{{getStream.unit}}</span>
+                    <span class="normal">{{municipalityValues[selected_county.get('id')].average.toFixed(2)}}{{getStream.unit}}</span>
                     <div :style="{'background-color': getStream.colors[1]}" class="disabled measure-button">
                         <div class="measure-wrapper">
                             MAX
                         </div>
                     </div>
-                    <span class="big">{{heatmap.muns[selected_county.get('id')][getStream.name].max.toFixed(2)}}{{getStream.unit}}</span>
+                    <span class="normal">{{municipalityValues[selected_county.get('id')].max.toFixed(2)}}{{getStream.unit}}</span>
                 </div>
-                <div v-else class="normal">No Values</div>
+                <div v-else-if="!loading_values && selected_county" class="normal">No Values</div>
                 <div class="scale-band-wrapper">
-                    <div :class="{selected: index == municipalityValues[selected_county.get('id')].index}" v-for="index in 100" :key="index" :style="{'background-color': '#' + rainbowHeatMap.colourAt(index)}"></div>
+                    <div :class="{selected: !loading_values && selected_county && selected_county.get('id') in municipalityValues ? index == municipalityValues[selected_county.get('id')].index : false}" v-for="index in 100" :key="index" :style="{'background-color': '#' + rainbowHeatMap.colourAt(index)}"></div>
                 </div>
             </div>
         </div>
 
-        <div id="hover_popup" class="ol-popup" :style="{ 'background-color': hovered_geo ? municipalityValues[hovered_geo.get('id')].color : 'none'}">
-            <div v-if="getStream && hovered_geo" style="background-color: rgba(0,0,0, .5)">
-                <span class="big"> {{hovered_geo.get('Freguesia')}} </span>
-                <div v-if="getStream.name in heatmap.muns[hovered_geo.get('id')]" class="measure-show">
+        <div v-if="getStream && hovered_geo" id="hover_popup" class="ol-popup" :style="{ 'background-color': hovered_geo.get('id') in municipalityValues ? municipalityValues[hovered_geo.get('id')].color : '#ffffffd0'}">
+            <div style="background-color: rgba(0,0,0, .5)">
+                <span class="small"> {{hovered_geo.get('Freguesia')}} </span>
+                <div v-if="hovered_geo.get('id') in municipalityValues" class="measure-show">
                     <div :style="{'background-color': getStream.colors[0]}" class="disabled measure-button">
                         <div class="measure-wrapper">
                             MIN
                         </div>
                     </div>
-                    <span class="big">{{heatmap.muns[hovered_geo.get('id')][getStream.name].min.toFixed(2)}}{{getStream.unit}}</span>
+                    <span class="small">{{municipalityValues[hovered_geo.get('id')].min.toFixed(2)}}{{getStream.unit}}</span>
                     <div :style="{'background-color': '#' + rainbowHeatMap.colourAt(50)}" class="disabled measure-button">
                         <div class="measure-wrapper">
                             AVG
                         </div>
                     </div>
-                    <span class="big">{{heatmap.muns[hovered_geo.get('id')][getStream.name].average.toFixed(2)}}{{getStream.unit}}</span>
+                    <span class="small">{{municipalityValues[hovered_geo.get('id')].average.toFixed(2)}}{{getStream.unit}}</span>
                     <div :style="{'background-color': getStream.colors[1]}" class="disabled measure-button">
                         <div class="measure-wrapper">
                             MAX
                         </div>
                     </div>
-                    <span class="big">{{heatmap.muns[hovered_geo.get('id')][getStream.name].max.toFixed(2)}}{{getStream.unit}}</span>
+                    <span class="small">{{municipalityValues[hovered_geo.get('id')].max.toFixed(2)}}{{getStream.unit}}</span>
                 </div>
-                <div v-else class="normal">No Values</div>
+                <div v-else class="small">No Values</div>
                 <!-- <div class="scale-band-wrapper">
                     <div :class="{selected: index == municipalityValues[hovered_geo.get('id')].index}" v-for="index in 100" :key="index" :style="{'background-color': '#' + rainbowHeatMap.colourAt(index)}"></div>
                 </div> -->
@@ -81,22 +83,22 @@
             </div>
             <div class="measure-menu_bottom">
                 <div class="measure-menu_bottom_date">
-                    <div @click="current_scale > 0 ? current_time -= current_scale : current_time = (new Date(current_time)).addMonths(1 * current_scale); updateValues();" class="arrow"><img src="icons/arrow.png" alt=""></div>
+                    <div @click="current_scale > 0 ? current_time -= current_scale : current_time = (new Date(current_time)).addMonths(1 * current_scale); updateValues(false, false);" class="arrow"><img src="icons/arrow.png" alt=""></div>
                     <div class="measure-menu_bottom_date_wrapper">
                         <div class="date normal">
                             <div :style="{color: current_scale == 86400000 || current_scale == 604800000 ? 'red' : 'black'}">{{getStartDate.getDate().toString().padStart(2, '0')}}</div>/
                             <div :style="{color: current_scale == -1 ? 'red' : 'black'}">{{(getStartDate.getMonth() + 1).toString().padStart(2, '0')}}</div>/
                             <div :style="{color: current_scale == -12 ? 'red' : 'black'}" style="margin-right: 1.5rem">{{getStartDate.getFullYear()}}</div> 
-                            <div :style="{color: current_scale == 3600000 ? 'red' : 'black'}" >{{getStartDate.getHours().toString().padStart(2, '0')}}h</div>       
+                            <div :style="{color: current_scale == 3600000 ? 'red' : 'black'}" >{{getStartDate.getHours().toString().padStart(2, '0')}}h</div>
                         </div>
                         <div class="date normal">
                             <div :style="{color: current_scale == 86400000 || current_scale == 604800000 ? 'red' : 'black'}">{{getCurrentDate.getDate().toString().padStart(2, '0')}}</div>/
                             <div :style="{color: current_scale == -1 ? 'red' : 'black'}">{{(getCurrentDate.getMonth() + 1).toString().padStart(2, '0')}}</div>/
                             <div :style="{color: current_scale == -12 ? 'red' : 'black'}" style="margin-right: 1.5rem">{{getCurrentDate.getFullYear()}}</div> 
-                            <div :style="{color: current_scale == 3600000 ? 'red' : 'black'}">{{getCurrentDate.getHours().toString().padStart(2, '0')}}h</div>  
+                            <div :style="{color: current_scale == 3600000 ? 'red' : 'black'}">{{getCurrentDate.getHours().toString().padStart(2, '0')}}h</div>
                         </div>
                     </div>
-                    <div :class="{disabled: current_time == this.getCurrentTimeHour()}" @click="increaseInterval(); updateValues();" class="arrow"><img src="icons/arrow.png" alt=""></div>
+                    <div :class="{disabled: current_time == this.getCurrentTimeHour()}" @click="increaseInterval(); updateValues(false, false);" class="arrow"><img src="icons/arrow.png" alt=""></div>
                 </div>
                 <div class="measure-menu_bottom_picker">
                     <div @click="current_scale = 3600000; updateValues()" class="measure-button fit xsmall bold" :class="{selected: current_scale == 3600000}">
@@ -140,8 +142,9 @@
             </div>
         </div>
         <Loading :show="!loaded" type="absolute"/> 
-        <ModalResizable v-if="showModal" @close="showModal = false" :values="values"/>
+        <ModalResizable v-if="false" @close="showModal = false" :values="values"/>
     </div>
+    
 </template>
 
 <script>
@@ -211,12 +214,10 @@ export default {
             municipalityValues: {},
             hexagonValues: {},
             
-            testValues: {},
-            testValuesOrdered: [],
             rainbowHeatMap: new Rainbow(),
 
-            selected_vertical: 0,
-            selected_stream: 0,
+            selected_vertical: null,
+            selected_stream: null,
             selected_county: null,
             hovered_geo: null,
 
@@ -231,7 +232,12 @@ export default {
             heatmap: {},
             measure_selected: 'average',
             current_scale: 3600000,
-            current_time: null
+            current_time: null,
+
+            interval: null,
+            loading_values: false,
+
+            modifier: 0,
         }
     },
     computed: {
@@ -256,6 +262,9 @@ export default {
         },
         getStream() {
             return this.getVertical && this.selected_stream != null ? this.getVertical.streams[this.selected_stream] : null
+        },
+        getModifier() {
+            return this.modifier
         },
     },
     async mounted() {
@@ -287,7 +296,7 @@ export default {
                 })
             }
         }
-
+        
         this.geoStyle.default = new this.req.style.Style({
             fill: new this.req.style.Fill({
                 color: 'rgba(255,255,255,0)'
@@ -329,7 +338,6 @@ export default {
             style: (feature) => {
                 return feature == this.selected_county ? this.geoStyle.active : this.geoStyle.default 
             },
-            renderMode: 'hybrid'
         })
 
         this.hoverPopup = document.getElementById('hover_popup');
@@ -357,6 +365,9 @@ export default {
                 url: 'concelho_aveiro_hex.geojson',
                 format: new this.req.format.GeoJSON()
             }),
+            style: (feature) => {
+                return !this.loading_values && !feature.get('hidden') && feature.get('id') in this.hexagonValues ? this.hexagonValues[feature.get('id')].style : null
+            },
             renderBuffer: window.innerWidth,
             updateWhileAnimating: true,
             renderMode: 'hybrid'
@@ -386,23 +397,27 @@ export default {
         })
 
         this.hex_layer.getSource().on('change', () => {
-            if(this.hex_layer.getSource().getState() == 'ready' && (!this.loaded || !this.geo_loaded)) {
+            if(this.hex_layer.getSource().getState() == 'ready' && !this.loaded) {
                 this.loaded = true
-                this.load()
+                if(this.geo_loaded)
+                    this.load()
             }
         })
 
 
         this.geo_layer.getSource().on('change', () => {
-            if(this.geo_layer.getSource().getState() == 'ready' && (!this.loaded || !this.geo_loaded)) {
+            if(this.geo_layer.getSource().getState() == 'ready' && !this.geo_loaded) {
                 this.geo_loaded = true
-                this.load()
+                if(this.loaded)
+                    this.load()
             }
         })
+        
+        this.showModal = true
 
-        const hover_interaction = new interaction.Select({
+        this.hover_interaction = new interaction.Select({
             condition: (e) => {
-                return pointerMove(e) && !this.map.getView().getAnimating();
+                return pointerMove(e) && !this.loading_values;
             },
             layers: [this.geo_layer],
             style: (feature) => {
@@ -413,8 +428,8 @@ export default {
             multi: false
         })
 
-        this.map.addInteraction(hover_interaction);
-        hover_interaction.on('select', (e) => {
+        this.map.addInteraction(this.hover_interaction);
+        this.hover_interaction.on('select', (e) => {
             if(e.selected.length && e.selected[0] != this.selected_county) {
                 if(this.hovered_geo) {
                     this.clearGeoDevices(this.hovered_geo)
@@ -442,7 +457,7 @@ export default {
                 }
                 for(var feat of this.hex_layer.getSource().getFeatures()) {
                     if(feat.get('municipality') == this.hovered_geo.get('id')) {
-                        this.hex_layer.getSource().removeFeature(feat)
+                        feat.set('hidden',true)
                         this.hidden_hex.push(feat)
                     }
                 }
@@ -453,16 +468,17 @@ export default {
             }
         })
 
-        const click_interaction = new interaction.Select({
+        this.click_interaction = new interaction.Select({
             condition: (e) => {
-                return click(e);
+                return click(e) && !this.loading_values;
             },
             layers: [this.geo_layer, this.devices_layer],
             multi: true
         })
 
-        this.map.addInteraction(click_interaction);
-        click_interaction.on('select', (e) => {
+        this.map.addInteraction(this.click_interaction);
+        this.click_interaction.on('select', (e) => {
+
             document.body.style.cursor = "default"
             const geo_feature = e.selected[0]
             if(geo_feature.get('id') && geo_feature != this.selected_county) {
@@ -492,6 +508,14 @@ export default {
                         this.shown_features.push(feat);
                     }
                 }
+
+                for(var feat of this.hex_layer.getSource().getFeatures()) {
+                    if(!feat.get('hidden') && feat.get('municipality') == this.selected_county.get('id')) {
+                        feat.set('hidden', true)
+                        this.hidden_hex.push(feat)
+                    }
+                }
+
                 this.hoverOverlay.setPosition(null)
 
                 setTimeout(() => {
@@ -511,16 +535,41 @@ export default {
                 },0)
             } else if(e.selected.length > 1) {
                 const device_feature = e.selected[e.selected.length - 1]
-                this.showModal = true   
+                this.showModal = true
             }
-            click_interaction.getFeatures().clear()
+            this.click_interaction.getFeatures().clear()
         })
 
+    },
+    destroyed() {
+
+        this.map.removeInteraction(this.hover_interaction)
+        delete this.hover_interaction
+        this.map.removeInteraction(this.click_interaction)
+        delete this.click_interaction
+
+        this.hex_layer.getSource().clear
+        delete this.hex_layer
+        this.map.removeLayer(this.hex_layer)
+        this.geo_layer.getSource().clear
+        delete this.geo_layer
+        this.map.removeLayer(this.geo_layer)
+        this.devices_layer.getSource().clear
+        delete this.devices_layer
+        this.map.removeLayer(this.devices_layer)
+        this.map.setTarget(null)
+        delete this.map
+
+        clearInterval(this.interval)
+        delete this.heatmap
+        delete this.municipalityValues
+        delete this.hexagonValues
+
+        delete this.req
     },
     methods: {
         load() {
             this.geoJsonExtent = this.req.extent.createEmpty()
-            console.log("HERE1")
             this.geo_layer.getSource().getFeatures().forEach(feature => {
                 this.geoJsonExtent = this.req.extent.extend(this.geoJsonExtent, feature.getGeometry().getExtent())
             })
@@ -531,11 +580,10 @@ export default {
             },0)
 
             this.current_time = this.getCurrentTimeHour()
-            this.updateValues()
-            setInterval(() => {
-                this.updateValues()
-            }, 5000)
-            //this.selectVertical(0)
+            this.selectVertical(0)
+            this.interval = setInterval(() => {
+                this.updateValues(true, false)
+            }, 10000)
         },
         increaseInterval() {
             const tmp = this.current_scale > 0 ? this.current_time += this.current_scale : this.current_time = (new Date(this.current_time)).addMonths(-1 * this.current_scale); 
@@ -545,15 +593,19 @@ export default {
         getCurrentTimeHour() {
             return Math.ceil((new Date()).getTime() / 3600000) * 3600000
         },
-        async updateValues() {
-            const res = await this.$axios.get(`http://193.136.93.14:8001/czb/streams/heatmap?interval_start=${Math.floor(this.getStartDate)}&interval_end=${Math.floor(this.getCurrentDate)}`, {
+        async updateValues(refresh = false, load = true) {
+            if(load) {
+                this.loading_values = true
+                this.hex_layer.getSource().dispatchEvent('change');
+            }
+            const res = await this.$axios.get(`http://193.136.93.14:8001/czb/streams/heatmap?interval_start=${Math.floor(this.getStartDate)}&interval_end=${Math.floor(this.getCurrentDate)}&stream_name=${this.getStream.name}&satellite=true`, {
                 headers: {
                     Authorization: this.$store.state.jwt
                 }
             })
-            console.log(res.data)
+            delete this.heatmap
             this.heatmap = res.data
-            this.updateHeatMap()
+            this.updateHeatMap(refresh)
         },
         clearHoverPopup() {
             this.hovered_geo = null
@@ -573,7 +625,7 @@ export default {
             const tmp = [...this.hidden_hex]
             for(var feature of tmp) {
                 if(feature.get('municipality') == geo.get('id')) {
-                    this.hex_layer.getSource().addFeature(feature)
+                    feature.set('hidden', false)
                     this.hidden_hex.splice(this.hidden_hex.findIndex(f => f == feature), 1)
                 }
             }
@@ -624,83 +676,87 @@ export default {
             return [(Math.random() * (limits[0] - limits[1]) + limits[1]),(Math.random() * (limits[2] - limits[3]) + limits[3])]
         },
         selectVertical(i) {
-            if(i != this.selected_vertical) {
-                this.selected_vertical = i
-                this.selected_stream = 0
-                this.updateHeatMap()
-                for(var feature in this.shown_features) {
-                    if(!(this.getDevices.find(d => d.device_id == this.shown_features[feature].get('id')).vertical.includes(this.getVerticals[this.selected_vertical].name))) {
-                        this.devices_layer.getSource().removeFeature(this.shown_features[feature])
-                        this.shown_features.splice(feature, 1)
-                    }
+            this.selected_vertical = i
+            for(var feature in this.shown_features) {
+                if(!(this.getDevices.find(d => d.device_id == this.shown_features[feature].get('id')).vertical.includes(this.getVerticals[this.selected_vertical].name))) {
+                    this.devices_layer.getSource().removeFeature(this.shown_features[feature])
+                    this.shown_features.splice(feature, 1)
                 }
-                this.devices_layer.getSource().dispatchEvent('change');
             }
+            this.devices_layer.getSource().dispatchEvent('change');
+            this.selectStream(0)
         },
         selectStream(i) {
-            if(i != this.selected_stream) {
-                this.selected_stream = i
-                this.updateHeatMap()
-            }
-        },
-        updateHeatMap() {
-
+            this.selected_stream = i
             const stream = this.getVerticals[this.selected_vertical].streams[this.selected_stream]
             this.rainbowHeatMap.setNumberRange(1, 100);
             this.rainbowHeatMap.setSpectrum(stream.colors[0] , stream.colors[1]); 
+            this.updateValues()
+        },
+        updateHeatMap(refresh = false) {
+            
+            const stream = this.getVerticals[this.selected_vertical].streams[this.selected_stream]
 
-            for(var i in this.heatmap.muns) {
-                if(!(i in this.municipalityValues))
-                    this.municipalityValues[i] = {}
-                if(!(stream.name in this.heatmap.muns[i])) {
-                    this.municipalityValues[i].index = null
-                    this.municipalityValues[i].color = '#ffffff00';
-                } else {
-                    const value = this.heatmap.muns[i][stream.name].average
-                    const index = (value - stream.min) * 100 / (stream.max - stream.min)
-                    this.municipalityValues[i].index = Math.round(index)
-                    this.municipalityValues[i].color = '#' + this.rainbowHeatMap.colourAt(Math.round(index)) + 'D0';
-                }
-                this.municipalityValues[i].style = new this.req.style.Style({
-                    fill: new this.req.style.Fill({
-                        color: this.municipalityValues[i].color
-                    }),
-                    stroke: new this.req.style.Stroke({
-                        color: 'black',
-                        width: this.map.getView().getZoom() / 20 * 1.5
-                    })
-                })
+            if(!refresh) {
+                delete this.municipalityValues
+                this.municipalityValues = {}
+                delete this.hexagonValues
+                this.hexagonValues = {}
             }
 
-            for(var i in this.heatmap.hexagons) {
-                if(!(i in this.hexagonValues))
-                    this.hexagonValues[i] = {}
-                if(!(stream.name in this.heatmap.hexagons[i])) {
-                    this.hexagonValues[i].index = null
-                    this.hexagonValues[i].color = '#ffffffa0';
-                } else {
-                    const value = this.heatmap.hexagons[i][stream.name][this.measure_selected]
-                    const index = (value - stream.min) * 100 / (stream.max - stream.min)
-                    this.hexagonValues[i].index = Math.round(index)
-                    this.hexagonValues[i].color = '#' + this.rainbowHeatMap.colourAt(Math.round(index)) + 'FF';;
+            for(var mun of this.heatmap) {
+                const value = mun.average
+                const index = Math.round((value - stream.min) * 100 / (stream.max - stream.min))
+                this.municipalityValues[mun.id] = {
+                    ...this.municipalityValues[mun.id],
+                    min: mun.min,
+                    average: value,
+                    max: mun.max,
+                    count: mun.count,
+                    index
                 }
-                this.hexagonValues[i].style = new this.req.style.Style({
-                    fill: new this.req.style.Fill({
-                        color: this.hexagonValues[i].color,
-                    }),
-                    stroke: new this.req.style.Stroke({
-                        color: this.hexagonValues[i].index ? 'black' : 'transparent',
-                        width: this.map.getView().getZoom() / 20 * 1.5
+                if(!refresh) {
+                    this.municipalityValues[mun.id].color= '#' + this.rainbowHeatMap.colourAt(index) + 'D0',
+                    this.municipalityValues[mun.id].style =  new this.req.style.Style({
+                        fill: new this.req.style.Fill({
+                            color: '#' + this.rainbowHeatMap.colourAt(index) + 'D0',
+                        }),
+                        stroke: new this.req.style.Stroke({
+                            color: 'black',
+                            width: this.map.getView().getZoom() / 20 * 1.5
+                        })
                     })
-                })
+                }
+                for(var hex of mun.hexas) {
+                    const value = hex[this.measure_selected]
+                    const index = Math.round((value - stream.min) * 100 / (stream.max - stream.min))
+                    this.hexagonValues[hex.id] = {
+                        ...this.hexagonValues[hex.id],
+                        min: hex.min,
+                        average: hex.average,
+                        max: hex.max,
+                        count: hex.count,
+                        index,
+
+                    }
+                    if(!refresh) {
+                        this.hexagonValues[hex.id].color = '#' + this.rainbowHeatMap.colourAt(index) + 'FF',
+                        this.hexagonValues[hex.id].style =  new this.req.style.Style({
+                            fill: new this.req.style.Fill({
+                                color: '#' + this.rainbowHeatMap.colourAt(index) + 'FF',
+                            }),
+                            stroke: new this.req.style.Stroke({
+                                color: 'black',
+                                width: this.map.getView().getZoom() / 20 * 1.5
+                            })
+                        })
+                    }
+                }
             }
-
-            this.hex_layer.setStyle((feature) => {
-                return this.hexagonValues[feature.get('id')].style
-            })
-
-            this.map.updateSize()   
-
+            this.map.updateSize()  
+            this.loading_values = false
+            this.hex_layer.getSource().dispatchEvent('change');
+            this.modifier++
         }
 
     }
@@ -733,15 +789,19 @@ export default {
         top: 2rem;
         transform: translate(-50%, 0);
         background-color: rgb(255, 255, 255);
-        min-width: 10%;
         @include shadow(0px, 0px, 8px, 2px, rgba(0,0,0,0.2));
     }
     padding: .75rem;
     border-radius: 12px;
 
     & > div {
+        position: relative;
+        white-space: pre-wrap;
+        width: 100%;
+        height: max-content;
         @include flex(space-evenly, center, column);
         color: white;
+        box-sizing: border-box;
         padding: 1rem 2rem;
         border-radius: 10px;
         & > *{
@@ -819,6 +879,7 @@ export default {
 .measure-show {
     @include flex(center, center);
     width: 100%;
+    height: 100%;
     & > :not(:first-child) {
         margin-left: .75rem;
     }
@@ -911,7 +972,7 @@ export default {
 
     &:not(.left) {
         right: 2rem;
-        top: 50%;
+        top: 60%;
         transform: translateY(-50%);
     }
 
@@ -969,9 +1030,9 @@ export default {
     height: 2rem;
     @include flex(center, center);
     border-radius: 10px;
-    width: 100%;
+    width: 30rem;
     & > div {
-        width: 1%;
+        min-width: 1%;
         &:not(.selected) {
             border-top: 1px solid white;
             border-bottom: 1px solid white;
@@ -985,7 +1046,7 @@ export default {
         &.selected {
             border: 3px solid darkred;
             box-sizing: border-box;
-            width: 1px;
+            width: 1%;
             height: 3rem;
         }
         height: 100%;
