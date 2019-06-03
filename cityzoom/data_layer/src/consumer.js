@@ -15,6 +15,7 @@ const Verticals = require('./db/models/verticals')
 const Stream = require('./db/models/streams')
 const Hexas = require('./db/models/hexagons')
 const Muns = require('./db/models/municipalities')
+const Satellites = require('./db/models/satellite')
 const Values = require('./db/models/values')
 const Alerts = require('./db/models/alerts')
 const Mutex = require('async-mutex').Mutex
@@ -54,7 +55,6 @@ client.on('message',async (topic,data,info)=>{
 
 async function updateValues(data_json) {
 
-    
     const {longitude, latitude, ...rest} = data_json
 
     const hexa = await Hexas.findOne({
@@ -68,106 +68,36 @@ async function updateValues(data_json) {
         }
     })
 
-    await Values.create({
-        ...rest,
-        hexagon: hexa.id,
-        municipality: hexa.municipality
-    })
-
-    await Device.updateOne({device_ID: data_json.device_ID}, {
-        $set: {
-            location: [
-                longitude,
-                latitude
-            ]
-        },
-        $addToSet: {
-            verticals: (await Verticals.findOne({"streams.name": data_json.stream_name})).name,
-            streams: data_json.stream_name,
+    if(data_json.satellite) {
+        if(hexa) {
+            Satellites.create({
+                ...rest,
+                hexagon: hexa.id,
+                municipality: hexa.municipality
+            })
         }
-    })
+    } else {
+        Values.create({
+            ...rest,
+            hexagon: hexa ? hexa.id : null,
+            municipality: hexa ? hexa.municipality : null
+        })
+    
+        Device.updateOne({device_ID: data_json.device_ID}, {
+            $set: {
+                location: [
+                    longitude,
+                    latitude
+                ]
+            },
+            $addToSet: {
+                verticals: (await Verticals.findOne({"streams.name": data_json.stream_name})).name,
+                streams: data_json.stream_name,
+            }
+        })
+    }
 
     //alert(stream, hexa)
-
-    // const hex = await Hexas.findOneAndUpdate({
-    //     location: {
-    //         $geoIntersects: {
-    //             $geometry: {
-    //                 type: "Point",
-    //                 coordinates: [data_json.longitude, data_json.latitude]
-    //             }
-    //         }
-    //     }
-    // }, {
-    //     $inc: {
-    //         [`streams.${stream.stream_name}.${time_id}.total`]: data_json.value,
-    //         [`streams.${stream.stream_name}.${time_id}.count`]: 1
-    //     },
-    //     $max: {
-    //         [`streams.${stream.stream_name}.${time_id}.max`]: data_json.value
-    //     },
-    //     $min: {
-    //         [`streams.${stream.stream_name}.${time_id}.min`]: data_json.value
-    //     }
-    // }, {
-    //     useFindAndModify: false
-    // })
-
-    // const {longitude, latitude, ...rest} = data_json
-    // const mun = await Muns.findOneAndUpdate({},{
-    //     $push: {
-    //         "hexagons.$[elem].values": rest
-    //     },
-    // }, {
-    //     useAndModify: false,
-    //     multi: false,
-    //     arrayFilters: [{
-    //         "elem.location": {
-    //             $geoIntersects: {
-    //                 $geometry: {
-    //                     type: "Point",
-    //                     coordinates: [data_json.longitude, data_json.latitude]
-    //                 }
-    //             }
-    //         }
-    //     }]
-    // })
-
-    // await Muns.updateOne({id: hex.municipality}, {
-    //     $inc: { 
-    //         [`streams.${stream.stream_name}.${time_id}.total`]: data_json.value,
-    //         [`streams.${stream.stream_name}.${time_id}.count`]: 1
-    //     },
-    //     $max: {
-    //         [`streams.${stream.stream_name}.${time_id}.max`]: data_json.value
-    //     },
-    //     $min: {
-    //         [`streams.${stream.stream_name}.${time_id}.min`]: data_json.value
-    //     }
-    // })
-    
-    // let dev = await Device.findOne({device_ID: stream.device_ID})
-
-    // if(dev.mobile) {
-    //     await Device.updateOne({device_ID: stream.device_ID}, {
-    //         $push: {
-    //             locations: {
-    //                 timestamp: data_json.timestamp, 
-    //                 latitude: data_json.latitude, 
-    //                 longitude: data_json.longitude
-    //             }
-    //         }
-    //     })
-    // } else {
-    //     await Device.updateOne({device_ID: stream.device_ID}, {
-    //         locations: [{
-    //             timestamp: data_json.timestamp, 
-    //             latitude: data_json.latitude, 
-    //             longitude: data_json.longitude
-    //         }]
-    //     })
-    // }
-
 }
 
 async function alert(stream, hexa) {

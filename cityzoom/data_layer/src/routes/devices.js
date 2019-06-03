@@ -116,7 +116,7 @@ router.get('/:id/values', async (req,res) => {
     // console.log(result)
     // res.status(200).send(result)
 
-    const device = await devices.find({device_ID:req.params.id})
+    const device = await devices.findOne({device_ID:req.params.id})
     if (!device) { return res.status(404).send({'Status':'Not found'})}
     var start = req.query.interval_start ? Number(req.query.interval_start) : Number(new Date(0))
     var end = req.query.interval_end ? Number(req.query.interval_end) : Number(new Date())
@@ -128,26 +128,25 @@ router.get('/:id/values', async (req,res) => {
     }
 
     var before = new Date()
-    console.log(device[0]['device_ID'] )
     const tmp = await values.aggregate([{
         $match:{
-            "device_ID": device[0]['device_ID'],
+            device_ID: device.device_ID,
             $and: [{created_at: {$gte: start}},{created_at: {$lt: end}}]
         }
     },{
         $group:{
-                _id: "$stream_name",
-                values: {
-                  $push: "$value"
+            _id: "$stream_name",
+            values: {
+                $push: {
+                created_at: "$created_at",
+                value: "$value"
                 }
-              }
+            }
+        }
     }])
-
-    console.log(tmp)
 
     var after = new Date()
     console.log(after-before)
-    
     res.send(tmp)
 })
 

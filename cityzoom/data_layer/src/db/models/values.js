@@ -25,7 +25,12 @@ const valuesSchema = new mongoose.Schema({
         default: Date.now
     },
     hexagon: {},
-    municipality: {}
+    municipality: {},
+    satellite: {
+        type: Boolean,
+        required: true,
+        default: false
+    }
     // latitude: {
     //     type: Number,
     //     required: true,
@@ -38,7 +43,8 @@ const valuesSchema = new mongoose.Schema({
     // }
 })
 
-valuesSchema.index({ stream_name: 1, created_at: 1})
+valuesSchema.index({ stream_name: 1, created_at: 1 }, { name: 'heatmap_index' })
+valuesSchema.index({ device_ID: 1, created_at: 1 }, { name: 'device_index' })
 valuesSchema.plugin(uniqueValidator)
 
 const Values = mongoose.model('values', valuesSchema)

@@ -58,6 +58,10 @@ const breezo_keys = [
     'c0d6f9dbd02d47cea48aead9169149e2',
     '64c8cc1203c2406bad4a843ff35b6ce6',
     '1754f3a173f24dcbb63d9a1b880af16d',
+    'ee2eb703a148472a812c22f866469888',
+    '59e4eace0d5f4094b531d63b1a85244e',
+    '763780a6d3f04267b3731eeffced0f9c',
+    '34a502f162b24ed485b859fc19f82e27',
 ]
 
 const darksky_keys = [
@@ -114,11 +118,15 @@ const darksky_keys = [
     '00b3398a08c0a420ee410de24b484086',
     '91a6ad78cf2a02fa29c775f5c8646fa5',
     'bf323a3daaa64f6b4d1750a32390f4e5',
+    '1736c8b5667284684a3c33dc4d74284d',
+    'c6d67b702ed940799e44b7b36d7df5c9',
+    '76383e87904956e4ec65fa2bf8a0725c',
+    'b2522b5cd36f15dc4dd5fb582024026a',
+    'eca469d52049e580c30c2074967013c2',
 ]
 
 console.log("Breezo: ", breezo_keys.length)
 console.log("Darksy: ", darksky_keys.length)
-process.exit()
 
 async function get_breezometer_data(lat, long, key = 'f55cfd01f2ab42ccb517e40844a18797') {
 
@@ -188,13 +196,13 @@ async function create_Stream(streamID, streamName, deviceID) {
         }).catch( (err)=> {console.log("Failed to create subscription with message: " + err)})
 } */
 
-async function post_Values(device_ID, streamID, value, lat, long) {
+async function post_Values(streamID, value, lat, long) {
+    console.log(lat, long)
     await axios.post('http://localhost:8001/czb/streams/' + streamID + '/values', {
-            device_ID,
+            satellite: true,
             "value": value,
             "latitude": lat,
             "longitude": long,
-
         }).catch( (err)=> {console.log("Failed to post value with message: " + err)})
 } 
 
@@ -222,17 +230,18 @@ function sleep(ms) {
         
         var center_long = longMin + ((longMax - longMin)/2)
         var center_lat = latMin + ((latMax - latMin)/2)
+        console.log(center_long)
 
         var device = "device_APIs" +obj[hex]['id']
-        await create_Device(device, device, ["Weather", "AirQuality"], obj[hex]['municipality'])
+        //await create_Device(device, device, ["Weather", "AirQuality"], obj[hex]['municipality'])
         devices.push({
             device,
             center_long,
             center_lat
         })
-        // k++
-        // if(k == 10)
-        //     break;
+        k++
+        if(k == 10)
+            break;
     }
     await sleep(200);
     const breezo_devicesMap = {}
@@ -269,17 +278,15 @@ function sleep(ms) {
     let promises = []
     while(true) {
 
+        console.log(devices)
         for(var d of devices) {
-            const tmp = d
 
-            // promises.push(() => {
-            //     return new Promise(async (resolve) => {
                 let tryAgain = true
                 while(tryAgain) {
                     try {
-                        var breezo_data = await get_breezometer_data(d.center_lat, d.center_long, breezo_keys[breezo_i])
+                        //var breezo_data = await get_breezometer_data(d.center_lat, d.center_long, breezo_keys[breezo_i])
                         for(var stream of breezo_devicesMap[d.device]) {
-                            post_Values(tmp.device, stream.stream, breezo_data[0][stream.stream], tmp.center_lat, tmp.center_long)
+                            post_Values(stream.stream, Math.random() * 1, d.center_lat, d.center_long)
                         }
                         breezo_i = (breezo_i + 1) % breezo_keys.length
                         tryAgain = false
@@ -290,18 +297,13 @@ function sleep(ms) {
                         tryAgain = true
                     }
                 }
-            //         resolve()
-            //     })
-            // })
-    
-            // promises.push(() => {
-            //     return new Promise(async (resolve) => {
+
                 tryAgain = true
                 while(tryAgain) {
                     try {
-                        var darksky_data = await get_darksky_data(d.center_lat, d.center_long, darksky_keys[darksky_i])
+                        //var darksky_data = await get_darksky_data(d.center_lat, d.center_long, darksky_keys[darksky_i])
                         for(var stream of darksky_devicesMap[d.device]) {
-                            post_Values(tmp.device, stream.stream, darksky_data[0][stream.stream], tmp.center_lat, tmp.center_long)
+                            post_Values(stream.stream, Math.random() * 1, d.center_lat, d.center_long)
                         }
                         darksky_i = (darksky_i + 1) % darksky_keys.length
                         tryAgain = false
@@ -312,9 +314,6 @@ function sleep(ms) {
                         tryAgain = true
                     }
                 }
-            //         resolve()
-            //     })
-            // })
         }
         await sleep(1800000 * .66)
     }
