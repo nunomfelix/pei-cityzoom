@@ -582,8 +582,8 @@ export default {
             this.current_time = this.getCurrentTimeHour()
             this.selectVertical(0)
             this.interval = setInterval(() => {
-                this.updateValues(true, false)
-            }, 10000)
+                this.updateValues(false, false)
+            }, 1000)
         },
         increaseInterval() {
             const tmp = this.current_scale > 0 ? this.current_time += this.current_scale : this.current_time = (new Date(this.current_time)).addMonths(-1 * this.current_scale); 
@@ -694,16 +694,14 @@ export default {
             this.rainbowHeatMap.setSpectrum(stream.colors[0] , stream.colors[1]); 
             this.updateValues()
         },
-        updateHeatMap(refresh = false) {
+        updateHeatMap() {
             
             const stream = this.getVerticals[this.selected_vertical].streams[this.selected_stream]
 
-            if(!refresh) {
-                delete this.municipalityValues
-                this.municipalityValues = {}
-                delete this.hexagonValues
-                this.hexagonValues = {}
-            }
+            delete this.municipalityValues
+            this.municipalityValues = {}
+            delete this.hexagonValues
+            this.hexagonValues = {}
 
             for(var mun of this.heatmap) {
                 const value = mun.average
@@ -716,18 +714,16 @@ export default {
                     count: mun.count,
                     index
                 }
-                if(!refresh) {
-                    this.municipalityValues[mun.id].color= '#' + this.rainbowHeatMap.colourAt(index) + 'D0',
-                    this.municipalityValues[mun.id].style =  new this.req.style.Style({
-                        fill: new this.req.style.Fill({
-                            color: '#' + this.rainbowHeatMap.colourAt(index) + 'D0',
-                        }),
-                        stroke: new this.req.style.Stroke({
-                            color: 'black',
-                            width: this.map.getView().getZoom() / 20 * 1.5
-                        })
+                this.municipalityValues[mun.id].color= '#' + this.rainbowHeatMap.colourAt(index) + 'D0',
+                this.municipalityValues[mun.id].style =  new this.req.style.Style({
+                    fill: new this.req.style.Fill({
+                        color: '#' + this.rainbowHeatMap.colourAt(index) + 'D0',
+                    }),
+                    stroke: new this.req.style.Stroke({
+                        color: 'black',
+                        width: this.map.getView().getZoom() / 20 * 1.5
                     })
-                }
+                })
                 for(var hex of mun.hexas) {
                     const value = hex[this.measure_selected]
                     const index = Math.round((value - stream.min) * 100 / (stream.max - stream.min))
@@ -740,24 +736,23 @@ export default {
                         index,
 
                     }
-                    if(!refresh) {
-                        this.hexagonValues[hex.id].color = '#' + this.rainbowHeatMap.colourAt(index) + 'FF',
-                        this.hexagonValues[hex.id].style =  new this.req.style.Style({
-                            fill: new this.req.style.Fill({
-                                color: '#' + this.rainbowHeatMap.colourAt(index) + 'FF',
-                            }),
-                            stroke: new this.req.style.Stroke({
-                                color: 'black',
-                                width: this.map.getView().getZoom() / 20 * 1.5
-                            })
+                    this.hexagonValues[hex.id].color = '#' + this.rainbowHeatMap.colourAt(index) + 'FF',
+                    this.hexagonValues[hex.id].style =  new this.req.style.Style({
+                        fill: new this.req.style.Fill({
+                            color: '#' + this.rainbowHeatMap.colourAt(index) + 'FF',
+                        }),
+                        stroke: new this.req.style.Stroke({
+                            color: 'black',
+                            width: this.map.getView().getZoom() / 20 * 1.5
                         })
-                    }
+                    })
                 }
             }
+
             this.map.updateSize()  
             this.loading_values = false
             this.hex_layer.getSource().dispatchEvent('change');
-            this.modifier++
+
         }
 
     }
