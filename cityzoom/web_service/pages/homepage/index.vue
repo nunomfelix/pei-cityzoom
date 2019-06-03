@@ -44,7 +44,6 @@
             <div class="small">
               <div v-for="stream of streams_graphs" :key="stream">
                 <line-chart :ref="item.i" :chart-data="stream" :options="options"/>
-                <button @click="fillData()">Randomize</button>
               </div>
             </div>
           </div>
@@ -110,7 +109,7 @@ export default {
           xAxes: [{
               type: 'time',
           time: {
-              parser: "DD:HH:mm",
+              parser: "HH:mm:ss",
               unit: 'hour'}
           }]
         }
@@ -139,43 +138,13 @@ export default {
       }
     })
 
-    this.data=res.data
 
+   //createWidget with chartData 
+   //and default configs depending on graph
+   //x axis time scale
+   //y axis ??
+   //Array de streams 
 
-    var labels = []
-    var y_axis = []
-
-    //console.log(this.data)
-    // var streams = []
-    //console.log(res.data.config)
-    // Object.keys(data).forEach((key) => {
-    //   streams.push(res.data[key])
-    // });
-    // Object.keys(streams).forEach((key) => {
-    //   console.log(key,streams[key])
-    //   labels.push(this.convertTimestamp(streams[key].created_at))
-    //   y_axis.push(streams[key].value)
-    // });
-    /*
-    const d = [Object.keys(res.data)[0]]
-      for(var stream of res.data[d]){
-        console.log(stream)
-          y_axis.push(Math.round(stream.value))
-          labels.push(this.convertTimestamp(stream.created_at))
-        }
-    */
-
-  //  for (var stream in res.data){
-  //    console.log(res.data[stream])
-  //    y_axis.push(Math.round())
-  //    //createWidget with chartData 
-  //    //and default configs depending on graph
-  //    //x axis time scale
-  //    //y axis ??
-  //    //Array de streams 
-  //  }
-
-    //this.fillData(labels,y_axis)
     this.fillGraphsWithStreams(res.data)
     console.log('aqui\n')
     console.log(this.streams_graphs)
@@ -214,11 +183,15 @@ export default {
       for(var stream of streams){
         var labels = []
         var y_axis = []
-
-        for(var value in stream){
-          labels.push(this.convertTimestamp(stream[value].createdAt))
-          y_axis.push(stream[value].value)
+        console.log('esteaqui     ',stream.values[0].value,'\n')
+        for(var value in stream.values){
+          console.log(stream.values[value].created_at)
+          labels.push(this.convertTimestamp(stream.values[value].created_at))
+          y_axis.push(stream.values[value].value)
         }
+
+        console.log(labels)
+        console.log(y_axis)
 
         var datacollection = {
           labels: labels,
@@ -235,7 +208,7 @@ export default {
         this.streams_graphs.push(datacollection)
 
       }
-      console.log('sim cheguei aqui')
+      console.log(this.streams_graphs)
 
       
     },
@@ -243,11 +216,15 @@ export default {
       return Math.floor(Math.random() * (50 - 5 + 1)) + 5
     },
     convertTimestamp(t){
+      console.log(t)
       var dt = new Date(t*1000);
       var day = dt.getDay();
       var hr = dt.getHours();
       var m = "0" + dt.getMinutes();
-      return day+':'+hr+ ':' + m.substr(-2)
+      var seconds = "0" + dt.getSeconds();
+      console.log('teste data ',day+':'+hr+ ':' + m.substr(-2))
+      //day + ':' + 
+      return hr+ ':' + m.substr(-2) + ':' + seconds.substr(-2);
     },
     createWidget(stream){
       this.testLayout.push({ x: 0, y: 14, w: 13, h: 14, i: "line_a", type: 'line', data: 'fake' })
@@ -307,5 +284,3 @@ export default {
   }
 }
 </style>
-
-
