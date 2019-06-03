@@ -285,64 +285,71 @@ function sleep(ms) {
     var breezo_i = 0
     var darksky_i = 0
     let promises = []
+
+    const amount = devices.length / process.argv[2]
+    const start = amount * process.argv[3]
+    console.log(start, amount)
+
     while(true) {
 
         let promises = []
-        for(var d of devices) {
+        
+        for(var d in devices) {
 
-            const tmp = d
+            if(d >= start && d < start + amount) {
+                const tmp = devices[d]
 
-            promises.push(() => {
-                return new Promise(async (resolve) => {
-                    let tryAgain = true
-                    while(tryAgain) {
-                        try {
-                            var breezo_data = await get_breezometer_data(tmp.center_lat, tmp.center_long, breezo_keys[breezo_i])
-                            for(var stream of breezo_devicesMap[tmp.device]) {
-                                await post_Values(stream.stream, breezo_data[0][stream.stream], tmp.center_lat, tmp.center_long)
+                promises.push(() => {
+                    return new Promise(async (resolve) => {
+                        let tryAgain = true
+                        while(tryAgain) {
+                            try {
+                                var breezo_data = await get_breezometer_data(tmp.center_lat, tmp.center_long, breezo_keys[breezo_i])
+                                for(var stream of breezo_devicesMap[tmp.device]) {
+                                    post_Values(stream.stream, breezo_data[0][stream.stream], tmp.center_lat, tmp.center_long)
+                                }
+                                breezo_i = (breezo_i + 1) % breezo_keys.length
+                                tryAgain = false
+                            } catch(err) {
+                                console.log("Failed breezo")
+                                breezo_keys.splice(breezo_i, 1);
+                                breezo_i = (breezo_i) % breezo_keys.length
+                                tryAgain = true
                             }
-                            breezo_i = (breezo_i + 1) % breezo_keys.length
-                            tryAgain = false
-                        } catch(err) {
-                            console.log("Failed breezo")
-                            breezo_keys.splice(breezo_i, 1);
-                            breezo_i = (breezo_i) % breezo_keys.length
-                            tryAgain = true
                         }
-                    }
-                    resolve()        
+                        resolve()        
+                    })
                 })
-            })
-            
-
-            promises.push(() => {
-                return new Promise(async (resolve) => {
-                    tryAgain = true
-                    while(tryAgain) {
-                        try {
-                            var darksky_data = await get_darksky_data(tmp.center_lat, tmp.center_long, darksky_keys[darksky_i])
-                            for(var stream of darksky_devicesMap[tmp.device]) {
-                                await post_Values(stream.stream, darksky_data[0][stream.stream], tmp.center_lat, tmp.center_long)
+                
+    
+                promises.push(() => {
+                    return new Promise(async (resolve) => {
+                        tryAgain = true
+                        while(tryAgain) {
+                            try {
+                                var darksky_data = await get_darksky_data(tmp.center_lat, tmp.center_long, darksky_keys[darksky_i])
+                                for(var stream of darksky_devicesMap[tmp.device]) {
+                                    post_Values(stream.stream, darksky_data[0][stream.stream], tmp.center_lat, tmp.center_long)
+                                }
+                                darksky_i = (darksky_i + 1) % darksky_keys.length
+                                tryAgain = false
+                            } catch(err) {
+                                console.log("Failed darksy")
+                                darksky_keys.splice(darksky_i, 1);
+                                darksky_i = (darksky_i) % darksky_keys.length
+                                tryAgain = true
                             }
-                            darksky_i = (darksky_i + 1) % darksky_keys.length
-                            tryAgain = false
-                        } catch(err) {
-                            console.log("Failed darksy")
-                            darksky_keys.splice(darksky_i, 1);
-                            darksky_i = (darksky_i) % darksky_keys.length
-                            tryAgain = true
                         }
-                    }
-                    resolve()
+                        resolve()
+                    })
                 })
-            })
-
-            if(promises.length >= 20) {
-                await Promise.all(promises.map(p => p()))
-                await sleep(100)
-                promises = []
+    
+                if(promises.length >= 10) {
+                    await Promise.all(promises.map(p => p()))
+                    promises = []
+                }
             }
-
+            
         }
         await sleep(1800000 * .90)
     }

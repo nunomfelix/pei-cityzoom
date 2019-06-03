@@ -1,65 +1,65 @@
 <template>
-
     <div class="mapMargin mapHeight" style="position:relative">
         <div class="mapHeight" id="map"></div>
         <div v-if="getStream" :style="{ 'background-color': !loading_values && selected_county && selected_county.get('id') in municipalityValues ? municipalityValues[selected_county.get('id')].color : '#ffffffd0'}" class="ol-popup top">
             <div style="background-color: rgba(0,0,0, .5)">
-                <span v-if="selected_county" class="normal bold"><span class="normal">{{selected_county.get('Freguesia')}}</span> <br> {{getStream.display}} </span>
+                <span v-if="selected_county" class="normal bold"><span class="big">{{selected_county.get('Freguesia')}}</span> <br> {{getStream.display}} </span>
                 <span v-else class="normal bold">{{getStream.display}} </span>
                 <div v-if="!loading_values && selected_county && selected_county.get('id') in municipalityValues" class="measure-show">
                     <div :style="{'background-color': getStream.colors[0]}" class="disabled measure-button">
                         <div class="measure-wrapper">
-                            MIN
+                            <span>MIN</span> 
                         </div>
                     </div>
                     <span class="normal">{{municipalityValues[selected_county.get('id')].min.toFixed(2)}}{{getStream.unit}}</span>
                     <div :style="{'background-color': '#' + rainbowHeatMap.colourAt(50)}" class="disabled measure-button">
                         <div class="measure-wrapper">
-                            AVG
+                            <span>AVG</span> 
                         </div>
                     </div>
                     <span class="normal">{{municipalityValues[selected_county.get('id')].average.toFixed(2)}}{{getStream.unit}}</span>
                     <div :style="{'background-color': getStream.colors[1]}" class="disabled measure-button">
                         <div class="measure-wrapper">
-                            MAX
+                            <span>MAX</span> 
                         </div>
                     </div>
                     <span class="normal">{{municipalityValues[selected_county.get('id')].max.toFixed(2)}}{{getStream.unit}}</span>
                 </div>
                 <div v-else-if="!loading_values && selected_county" class="normal">No Values</div>
                 <div class="scale-band-wrapper">
-                    <div :class="{selected: !loading_values && selected_county && selected_county.get('id') in municipalityValues ? index == municipalityValues[selected_county.get('id')].index : false}" v-for="index in 100" :key="index" :style="{'background-color': '#' + rainbowHeatMap.colourAt(index)}"></div>
+                    <div :class="{
+                        selected: (!loading_values && selected_county && selected_county.get('id') in municipalityValues) ? (index == municipalityValues[selected_county.get('id')].index || index == municipalityValues[selected_county.get('id')].indexMin || index == municipalityValues[selected_county.get('id')].indexMax) : false}" 
+                        v-for="index in 100" 
+                        :key="index" :style="{'background-color': '#' + rainbowHeatMap.colourAt(index)}">
+                        </div>
                 </div>
             </div>
         </div>
 
-        <div v-if="getStream && hovered_geo" id="hover_popup" class="ol-popup" :style="{ 'background-color': hovered_geo.get('id') in municipalityValues ? municipalityValues[hovered_geo.get('id')].color : '#ffffffd0'}">
-            <div style="background-color: rgba(0,0,0, .5)">
+        <div v-if="getStream" id="hover_popup" class="ol-popup" :style="{ 'background-color': hovered_geo ? (hovered_geo.get('id') in municipalityValues ? municipalityValues[hovered_geo.get('id')].color : '#ffffffd0') : '#ffffff00'}">
+            <div v-if="hovered_geo" style="background-color: rgba(0,0,0, .5)">
                 <span class="small"> {{hovered_geo.get('Freguesia')}} </span>
                 <div v-if="hovered_geo.get('id') in municipalityValues" class="measure-show">
                     <div :style="{'background-color': getStream.colors[0]}" class="disabled measure-button">
                         <div class="measure-wrapper">
-                            MIN
+                            <span>MIN</span> 
                         </div>
                     </div>
                     <span class="small">{{municipalityValues[hovered_geo.get('id')].min.toFixed(2)}}{{getStream.unit}}</span>
                     <div :style="{'background-color': '#' + rainbowHeatMap.colourAt(50)}" class="disabled measure-button">
                         <div class="measure-wrapper">
-                            AVG
+                            <span>AVG</span> 
                         </div>
                     </div>
                     <span class="small">{{municipalityValues[hovered_geo.get('id')].average.toFixed(2)}}{{getStream.unit}}</span>
                     <div :style="{'background-color': getStream.colors[1]}" class="disabled measure-button">
                         <div class="measure-wrapper">
-                            MAX
+                            <span>MAX</span> 
                         </div>
                     </div>
                     <span class="small">{{municipalityValues[hovered_geo.get('id')].max.toFixed(2)}}{{getStream.unit}}</span>
                 </div>
                 <div v-else class="small">No Values</div>
-                <!-- <div class="scale-band-wrapper">
-                    <div :class="{selected: index == municipalityValues[hovered_geo.get('id')].index}" v-for="index in 100" :key="index" :style="{'background-color': '#' + rainbowHeatMap.colourAt(index)}"></div>
-                </div> -->
             </div>
         </div>
 
@@ -67,17 +67,17 @@
             <div class="measure-menu_top">
                 <div :style="{'background-color': getStream.colors[0]}" class="measure-button" @click="measure_selected = 'min'; updateHeatMap()" :class="{selected: measure_selected == 'min'}" >
                     <div class="measure-wrapper">
-                        MIN
+                        <span>MIN</span> 
                     </div>
                 </div>
                 <div :style="{'background-color': '#' + rainbowHeatMap.colourAt(50)}" class="measure-button" @click="measure_selected = 'average'; updateHeatMap()" :class="{selected: measure_selected == 'average'}" >
                     <div class="measure-wrapper">
-                        AVG
+                        <span>AVG</span> 
                     </div>
                 </div>
                 <div :style="{'background-color': getStream.colors[1]}" class="measure-button" @click="measure_selected = 'max'; updateHeatMap()" :class="{selected: measure_selected == 'max'}" >
                     <div class="measure-wrapper">
-                        MAX
+                        <span>MAX</span> 
                     </div>
                 </div>
             </div>
@@ -339,16 +339,6 @@ export default {
                 return feature == this.selected_county ? this.geoStyle.active : this.geoStyle.default 
             },
         })
-
-        this.hoverPopup = document.getElementById('hover_popup');
-        this.hoverOverlay = new this.req.Ol.Overlay({
-            element: this.hoverPopup,
-            autoPan: false,
-            positioning: 'top-center',
-            autoPanAnimation: {
-                duration: 250
-            }
-        })
         
         this.devices_layer = new layer.Vector({
             source: new source.Vector(),
@@ -377,6 +367,8 @@ export default {
         const center = this.req.proj.transform(centerpos, 'EPSG:4326', 'EPSG:3857');
         const maxExtent = [-9.5, 37, -6.2, 42.5];
         //const maxExtent = [-180, -90, 180, 90];
+
+
         this.map = new this.req.Ol.Map({
             target: 'map',
             layers: [
@@ -387,7 +379,7 @@ export default {
                 this.hex_layer,  
                 this.geo_layer,     
             ],
-            overlays: [this.hoverOverlay],
+            //overlays: [this.hoverOverlay],
             view: new this.req.Ol.View({
                 zoom: 8,
                 center,
@@ -439,7 +431,9 @@ export default {
                 document.body.style.cursor = "pointer"
                 const center = this.req.extent.getCenter(this.hovered_geo.getGeometry().getExtent()),
                       bottom = this.req.extent.getBottomRight(this.hovered_geo.getGeometry().getExtent())
-                this.hoverOverlay.setPosition([center[0], (center[1] + bottom[1]) / 2]) 
+                setTimeout(() => {
+                    this.hoverOverlay.setPosition([center[0], center[1]])
+                }, 0)
                 if(this.selected_county != null) {
                     for(var device of this.getDevices) {
                         if(device.hexagon && device.hexagon.substring(0, 6) == this.hovered_geo.get('id') && this.hovered_geo.get('id') != this.selected_county && device.vertical.includes(this.getVerticals[this.selected_vertical].name)){
@@ -531,7 +525,7 @@ export default {
                                 maxZoom: 18
                             }))
                         }
-                    })   
+                    })  
                 },0)
             } else if(e.selected.length > 1) {
                 const device_feature = e.selected[e.selected.length - 1]
@@ -577,6 +571,13 @@ export default {
                 this.map.getView().fit(this.geoJsonExtent, {
                     duration: 500
                 })
+                this.hoverPopup = document.getElementById('hover_popup');
+                this.hoverOverlay = new this.req.Ol.Overlay({
+                    element: this.hoverPopup,
+                    autoPan: false,
+                    positioning: 'center',
+                }) 
+                this.map.addOverlay(this.hoverOverlay)
             },0)
 
             this.current_time = this.getCurrentTimeHour()
@@ -706,13 +707,19 @@ export default {
             for(var mun of this.heatmap) {
                 const value = mun.average
                 const index = Math.round((value - stream.min) * 100 / (stream.max - stream.min))
+                const indexMin = Math.round((mun.min - stream.min) * 100 / (stream.max - stream.min))
+                const indexMax = Math.round((mun.max - stream.min) * 100 / (stream.max - stream.min))
+                console.log(index)
+                console.log(indexMax)
                 this.municipalityValues[mun.id] = {
                     ...this.municipalityValues[mun.id],
                     min: mun.min,
                     average: value,
                     max: mun.max,
                     count: mun.count,
-                    index
+                    index,
+                    indexMin,
+                    indexMax
                 }
                 this.municipalityValues[mun.id].color= '#' + this.rainbowHeatMap.colourAt(index) + 'D0',
                 this.municipalityValues[mun.id].style =  new this.req.style.Style({
@@ -734,7 +741,6 @@ export default {
                         max: hex.max,
                         count: hex.count,
                         index,
-
                     }
                     this.hexagonValues[hex.id].color = '#' + this.rainbowHeatMap.colourAt(index) + 'FF',
                     this.hexagonValues[hex.id].style =  new this.req.style.Style({
@@ -772,9 +778,8 @@ export default {
     filter: drop-shadow(0 1px 4px rgba(0,0,0,0.6));
     font-weight: 900;
     white-space: nowrap;
-    left: 50%;
     background-color: rgba(255, 255, 255, 0.589);
-    top: 50%;
+    left: 50%;
     &:not(.top) {
         transform: translate(-50%, -50%);
         width: max-content;
@@ -791,7 +796,6 @@ export default {
     border-radius: 12px;
 
     & > div {
-        position: relative;
         white-space: pre-wrap;
         width: 100%;
         height: max-content;
@@ -814,6 +818,8 @@ export default {
     @include flex(center, center);
     background-color: rgba(255, 255, 255, 0.856);
     & .measure-wrapper {
+        width: 80%;
+        height: 60%;
         color: white;
         font-weight: bold;
         background-color: rgba(0, 0, 0, 0.556);
@@ -1026,9 +1032,9 @@ export default {
     height: 2rem;
     @include flex(center, center);
     border-radius: 10px;
-    width: 30rem;
+    width: 35rem;
     & > div {
-        min-width: 1%;
+        min-width: calc(1% - 2%/97);
         &:not(.selected) {
             border-top: 1px solid white;
             border-bottom: 1px solid white;
@@ -1040,9 +1046,10 @@ export default {
             }
         }
         &.selected {
-            border: 3px solid darkred;
+            border: 1px solid white;
+            background-color: darkred;
             box-sizing: border-box;
-            width: 1%;
+            width: 2%;
             height: 3rem;
         }
         height: 100%;
