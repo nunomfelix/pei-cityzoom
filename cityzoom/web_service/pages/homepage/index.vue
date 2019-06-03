@@ -42,8 +42,8 @@
             -->
             
             <div class="small">
-              <div v-for="stream in streams" :key="stream">
-                <line-chart :ref="item.i" :name="item.i" :chart-data="stream" :options="options"/>
+              <div v-for="stream of streams_graphs" :key="stream">
+                <line-chart :ref="item.i" :chart-data="stream" :options="options"/>
                 <button @click="fillData()">Randomize</button>
               </div>
             </div>
@@ -55,7 +55,7 @@
 
           
           <div v-else-if="item.type" class="small">
-            <pie-chart :data="chartData"></pie-chart>
+            <pie-chart :data="pie_chartData"></pie-chart>
           </div>
     </div>
           <!--
@@ -89,7 +89,7 @@ var testLayout = [
   //{ x: 0, y: 0, w: 8, h: 5, i: "dfffd", type: 'widget_weather'},
   // { x: 8, y: 0, w: 4, h: 14, i: "series_c", type: 'series', data: 'fake' },
   // { x: 0, y: 14, w: 13, h: 14, i: "series_b", type: 'series', data: 'fake' },
-  { x: 0, y: 14, w: 13, h: 14, i: "bar_a", type: 'bar', data: 'humidity_stream' },
+  //{ x: 0, y: 14, w: 13, h: 14, i: "bar_a", type: 'bar', data: 'humidity_stream' },
   //{ x: 0, y: 14, w: 13, h: 14, i: "pie_a", type: 'pie', data: 'fake' }
 ];
 
@@ -99,7 +99,7 @@ export default {
       layout: testLayout,
       datacollection: null,
       position: null,
-      streams:null,
+      streams_graphs:null,
       options:{
         elements:{
           line:{
@@ -115,7 +115,7 @@ export default {
           }]
         }
     },
-    chartData: {
+    pie_chartData: {
         labels: ["Green", "Red", "Blue"],
         datasets: [
           {
@@ -144,8 +144,6 @@ export default {
 
     var labels = []
     var y_axis = []
-
-
 
     //console.log(this.data)
     // var streams = []
@@ -176,11 +174,11 @@ export default {
   //    //y axis ??
   //    //Array de streams 
   //  }
-    
-    console.log(y_axis)
-    console.log(labels)
+
     //this.fillData(labels,y_axis)
     this.fillGraphsWithStreams(res.data)
+    console.log('aqui\n')
+    console.log(this.streams_graphs)
   },
   methods: {
     onResize(i) {
@@ -212,28 +210,33 @@ export default {
       }
     },
     fillGraphsWithStreams(streams){
-      this.streams = []
-      var labels = []
-      var y_axis = []
-      for(var stream in streams){
-        console.log('souyo\n')
-        for(var value in streams[stream].values){
-          labels.push(value.createdAt)
-          y_axis.push(value.value)
+      this.streams_graphs = []
+      for(var stream of streams){
+        var labels = []
+        var y_axis = []
+
+        for(var value in stream){
+          labels.push(this.convertTimestamp(stream[value].createdAt))
+          y_axis.push(stream[value].value)
         }
+
         var datacollection = {
           labels: labels,
           datasets: [
             {
-              label: streams[stream]._id,
+              label: stream._id,
               backgroundColor: '#0099FF',
               fill: false,
               data: y_axis
             }
           ]
         }
+        console.log(datacollection)
+        this.streams_graphs.push(datacollection)
+
       }
-      this.streams.push(datacollection)
+      console.log('sim cheguei aqui')
+
       
     },
     getRandomInt () {
