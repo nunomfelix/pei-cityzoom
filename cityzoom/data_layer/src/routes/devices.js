@@ -86,6 +86,38 @@ router.delete('/:id', async (req, res) => {
 
 // get values by stream
 router.get('/:id/values', async (req,res) => {
+    const device = await devices.find({device_ID:req.params.id})
+    if (!device) { return res.status(404).send({'Status':'Not found'})}
+    var start = req.query.interval_start ? Number(req.query.interval_start) : Number(new Date(0))
+    var end = req.query.interval_end ? Number(req.query.interval_end) : Number(new Date())
+    console.log(start)
+    console.log(end)
+    if (end < start || start < 0) {
+        streamsDebug('[ERROR] Interval is wrong')
+        return res.status(400).send({error: 'Bad interval defined'})
+    }
+    var before = new Date()
+    console.log(device[0]['device_ID'] )
+    const tmp = await values.aggregate([{
+        $match:{
+            "device_ID": device[0]['device_ID'],
+            $and: [{created_at: {$gte: start}},{created_at: {$lt: end}}]
+        }
+    },{
+        $group:{
+                _id: "$stream_name",
+                values: {
+                  $push: {
+                      created_at: "$created_at",
+                      value: "$value"
+                  }
+                }
+              }
+    }])
+    var after = new Date()
+    console.log(after-before)
+    res.send(tmp)
+
     // const dev = await devices.findOne({device_ID:req.params.id})
     // if (!dev) { return res.status(404).send({'Status':'Not Found'}) }
     // const start = req.query.interval_start ? req.query.interval_start : 0
@@ -116,39 +148,6 @@ router.get('/:id/values', async (req,res) => {
     // console.log(result)
     // res.status(200).send(result)
 
-    const device = await devices.find({device_ID:req.params.id})
-    if (!device) { return res.status(404).send({'Status':'Not found'})}
-    var start = req.query.interval_start ? Number(req.query.interval_start) : Number(new Date(0))
-    var end = req.query.interval_end ? Number(req.query.interval_end) : Number(new Date())
-    console.log(start)
-    console.log(end)
-    if (end < start || start < 0) {
-        streamsDebug('[ERROR] Interval is wrong')
-        return res.status(400).send({error: 'Bad interval defined'})
-    }
-
-    var before = new Date()
-    console.log(device[0]['device_ID'] )
-    const tmp = await values.aggregate([{
-        $match:{
-            "device_ID": device[0]['device_ID'],
-            $and: [{created_at: {$gte: start}},{created_at: {$lt: end}}]
-        }
-    },{
-        $group:{
-                _id: "$stream_name",
-                values: {
-                  $push: "$value"
-                }
-              }
-    }])
-
-    console.log(tmp)
-
-    var after = new Date()
-    console.log(after-before)
-    
-    res.send(tmp)
 })
 
 module.exports = router

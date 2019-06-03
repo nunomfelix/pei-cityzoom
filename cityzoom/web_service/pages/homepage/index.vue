@@ -42,10 +42,11 @@
             -->
             
             <div class="small">
-              <line-chart :ref="item.i" :name="item.i" :chart-data="datacollection" :options="options"/>
-              <button @click="fillData()">Randomize</button>
+              <div v-for="stream in streams" :key="stream">
+                <line-chart :ref="item.i" :name="item.i" :chart-data="stream" :options="options"/>
+                <button @click="fillData()">Randomize</button>
+              </div>
             </div>
-            
           </div>
           
           <div v-else-if="item.type" class="small">
@@ -83,23 +84,22 @@ import moment from 'moment'
 const drone_stream = require('static/get_stream_values_response.json');
 
 var testLayout = [
-  { x: 0, y: 0, w: 14, h: 14, i: "line_a", type: 'lines', data:'fake' },
+  { x: 0, y: 0, w: 14, h: 14, i: "line_a", type: 'lines', data:'humidity_stream' },
   //{ x: 0, y: 0, w: 8, h: 14, i: "series_a", type: 'series', data:'fake' },
   //{ x: 0, y: 0, w: 8, h: 5, i: "dfffd", type: 'widget_weather'},
   // { x: 8, y: 0, w: 4, h: 14, i: "series_c", type: 'series', data: 'fake' },
   // { x: 0, y: 14, w: 13, h: 14, i: "series_b", type: 'series', data: 'fake' },
-  { x: 0, y: 14, w: 13, h: 14, i: "bar_a", type: 'bar', data: 'fake' },
-  { x: 0, y: 14, w: 13, h: 14, i: "pie_a", type: 'pie', data: 'fake' }
+  { x: 0, y: 14, w: 13, h: 14, i: "bar_a", type: 'bar', data: 'humidity_stream' },
+  //{ x: 0, y: 14, w: 13, h: 14, i: "pie_a", type: 'pie', data: 'fake' }
 ];
 
 export default {
-
-
   data() {
     return {
       layout: testLayout,
       datacollection: null,
       position: null,
+      streams:null,
       options:{
         elements:{
           line:{
@@ -141,11 +141,11 @@ export default {
 
     this.data=res.data
 
-    console.log('este aqui'+ this.res.data)
-    console.log('\n\n\n')
 
     var labels = []
     var y_axis = []
+
+
 
     //console.log(this.data)
     // var streams = []
@@ -158,21 +158,29 @@ export default {
     //   labels.push(this.convertTimestamp(streams[key].created_at))
     //   y_axis.push(streams[key].value)
     // });
+    /*
     const d = [Object.keys(res.data)[0]]
       for(var stream of res.data[d]){
         console.log(stream)
           y_axis.push(Math.round(stream.value))
           labels.push(this.convertTimestamp(stream.created_at))
         }
-    
-    
+    */
 
-    // var result = [{ x: "18:00", y: "230" }, { x: "19:00", y: "232" }, { x: "20:00", y: "236" }, { x: "22:00", y: "228" }];
-    // var labels = result.map(e => moment(e.x, 'HH:mm'));
-    // var data = result.map(e => +e.y);
+  //  for (var stream in res.data){
+  //    console.log(res.data[stream])
+  //    y_axis.push(Math.round())
+  //    //createWidget with chartData 
+  //    //and default configs depending on graph
+  //    //x axis time scale
+  //    //y axis ??
+  //    //Array de streams 
+  //  }
+    
     console.log(y_axis)
     console.log(labels)
-    this.fillData(labels,y_axis)
+    //this.fillData(labels,y_axis)
+    this.fillGraphsWithStreams(res.data)
   },
   methods: {
     onResize(i) {
@@ -203,6 +211,31 @@ export default {
         ]
       }
     },
+    fillGraphsWithStreams(streams){
+      this.streams = []
+      var labels = []
+      var y_axis = []
+      for(var stream in streams){
+        console.log('souyo\n')
+        for(var value in streams[stream].values){
+          labels.push(value.createdAt)
+          y_axis.push(value.value)
+        }
+        var datacollection = {
+          labels: labels,
+          datasets: [
+            {
+              label: streams[stream]._id,
+              backgroundColor: '#0099FF',
+              fill: false,
+              data: y_axis
+            }
+          ]
+        }
+      }
+      this.streams.push(datacollection)
+      
+    },
     getRandomInt () {
       return Math.floor(Math.random() * (50 - 5 + 1)) + 5
     },
@@ -212,6 +245,9 @@ export default {
       var hr = dt.getHours();
       var m = "0" + dt.getMinutes();
       return day+':'+hr+ ':' + m.substr(-2)
+    },
+    createWidget(stream){
+      this.testLayout.push({ x: 0, y: 14, w: 13, h: 14, i: "line_a", type: 'line', data: 'fake' })
     }
 
   }
