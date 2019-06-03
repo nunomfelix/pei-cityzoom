@@ -27,7 +27,11 @@
                 </div>
                 <div v-else-if="!loading_values && selected_county" class="normal">No Values</div>
                 <div class="scale-band-wrapper">
-                    <div :class="{selected: !loading_values && selected_county && selected_county.get('id') in municipalityValues ? index == municipalityValues[selected_county.get('id')].index : false}" v-for="index in 100" :key="index" :style="{'background-color': '#' + rainbowHeatMap.colourAt(index)}"></div>
+                    <div :class="{
+                        selected: (!loading_values && selected_county && selected_county.get('id') in municipalityValues) ? (index == municipalityValues[selected_county.get('id')].index || index == municipalityValues[selected_county.get('id')].indexMin || index == municipalityValues[selected_county.get('id')].indexMax) : false}" 
+                        v-for="index in 100" 
+                        :key="index" :style="{'background-color': '#' + rainbowHeatMap.colourAt(index)}">
+                        </div>
                 </div>
             </div>
         </div>
@@ -703,13 +707,19 @@ export default {
             for(var mun of this.heatmap) {
                 const value = mun.average
                 const index = Math.round((value - stream.min) * 100 / (stream.max - stream.min))
+                const indexMin = Math.round((mun.min - stream.min) * 100 / (stream.max - stream.min))
+                const indexMax = Math.round((mun.max - stream.min) * 100 / (stream.max - stream.min))
+                console.log(index)
+                console.log(indexMax)
                 this.municipalityValues[mun.id] = {
                     ...this.municipalityValues[mun.id],
                     min: mun.min,
                     average: value,
                     max: mun.max,
                     count: mun.count,
-                    index
+                    index,
+                    indexMin,
+                    indexMax
                 }
                 this.municipalityValues[mun.id].color= '#' + this.rainbowHeatMap.colourAt(index) + 'D0',
                 this.municipalityValues[mun.id].style =  new this.req.style.Style({
@@ -731,7 +741,6 @@ export default {
                         max: hex.max,
                         count: hex.count,
                         index,
-
                     }
                     this.hexagonValues[hex.id].color = '#' + this.rainbowHeatMap.colourAt(index) + 'FF',
                     this.hexagonValues[hex.id].style =  new this.req.style.Style({
@@ -1023,9 +1032,9 @@ export default {
     height: 2rem;
     @include flex(center, center);
     border-radius: 10px;
-    width: 30rem;
+    width: 35rem;
     & > div {
-        min-width: 1%;
+        min-width: calc(1% - 2%/97);
         &:not(.selected) {
             border-top: 1px solid white;
             border-bottom: 1px solid white;
@@ -1037,9 +1046,10 @@ export default {
             }
         }
         &.selected {
-            border: 3px solid darkred;
+            border: 1px solid white;
+            background-color: darkred;
             box-sizing: border-box;
-            width: 1%;
+            width: 2%;
             height: 3rem;
         }
         height: 100%;
