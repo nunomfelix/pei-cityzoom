@@ -61,7 +61,10 @@ const breezo_keys = [
     'ee2eb703a148472a812c22f866469888',
     '59e4eace0d5f4094b531d63b1a85244e',
     '763780a6d3f04267b3731eeffced0f9c',
-    '34a502f162b24ed485b859fc19f82e27',
+    '34a502f162b24ed485b859fc19f82e27', 
+    'be15ecb8cb74494987a058c651cb574f',
+    '8304cab9dfbb497783fa31b439296bc6',
+    '8ec5318839cf4d1c8b11c9ce8bf2be5d',
 ]
 
 const darksky_keys = [
@@ -123,6 +126,9 @@ const darksky_keys = [
     '76383e87904956e4ec65fa2bf8a0725c',
     'b2522b5cd36f15dc4dd5fb582024026a',
     'eca469d52049e580c30c2074967013c2',
+    '71e75bb6df6ddff6952eec41eb7f4c77',
+    'fea51fa4c623c8029ee4f5cf8339ef34',
+    '8fad431eb780aa026b67953778b05cae',
 ]
 
 
@@ -301,6 +307,7 @@ function sleep(ms) {
 
                 promises.push(() => {
                     return new Promise(async (resolve) => {
+                        let count = 0
                         let tryAgain = true
                         while(tryAgain) {
                             try {
@@ -314,7 +321,11 @@ function sleep(ms) {
                                 console.log("Failed breezo")
                                 breezo_keys.splice(breezo_i, 1);
                                 breezo_i = (breezo_i) % breezo_keys.length
-                                tryAgain = true
+                                count++
+                                if(count < 10)
+                                    tryAgain = true
+                                else 
+                                    tryAgain = false
                             }
                         }
                         resolve()        
@@ -324,6 +335,7 @@ function sleep(ms) {
     
                 promises.push(() => {
                     return new Promise(async (resolve) => {
+                        let count = 0
                         tryAgain = true
                         while(tryAgain) {
                             try {
@@ -337,21 +349,25 @@ function sleep(ms) {
                                 console.log("Failed darksy")
                                 darksky_keys.splice(darksky_i, 1);
                                 darksky_i = (darksky_i) % darksky_keys.length
-                                tryAgain = true
+                                count++
+                                if(count < 10)
+                                    tryAgain = true
+                                else 
+                                    tryAgain = false
                             }
                         }
                         resolve()
                     })
                 })
     
-                if(promises.length >= 10) {
+                if(promises.length >= 20) {
                     await Promise.all(promises.map(p => p()))
                     promises = []
                 }
             }
             
         }
-        await sleep(1800000 * .90)
+        await sleep(1800000)
     }
 
 
