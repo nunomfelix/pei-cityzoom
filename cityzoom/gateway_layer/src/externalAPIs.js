@@ -194,6 +194,8 @@ async function create_Stream(streamID, streamName, deviceID) {
         }).catch( (err)=> {console.log("Failed to create subscription with message: " + err)})
 } */
 
+counter = 1
+
 async function post_Values(streamID, value, lat, long) {
     console.log(lat, long)
     await axios.post('http://localhost:8001/czb/streams/' + streamID + '/values', {
@@ -201,7 +203,9 @@ async function post_Values(streamID, value, lat, long) {
         "value": value,
         "latitude": lat,
         "longitude": long,
-    }).catch( (err)=> {console.log("Failed to post value with message: " + err)})
+    })
+    .then((res) => {})
+    .catch(async (err)=> {console.log(err);})
 } 
 
 function sleep(ms) {
@@ -295,7 +299,7 @@ function sleep(ms) {
                         try {
                             var breezo_data = await get_breezometer_data(tmp.center_lat, tmp.center_long, breezo_keys[breezo_i])
                             for(var stream of breezo_devicesMap[tmp.device]) {
-                                post_Values(stream.stream, breezo_data[0][stream.stream], tmp.center_lat, tmp.center_long)
+                                await post_Values(stream.stream, breezo_data[0][stream.stream], tmp.center_lat, tmp.center_long)
                             }
                             breezo_i = (breezo_i + 1) % breezo_keys.length
                             tryAgain = false
@@ -318,7 +322,7 @@ function sleep(ms) {
                         try {
                             var darksky_data = await get_darksky_data(tmp.center_lat, tmp.center_long, darksky_keys[darksky_i])
                             for(var stream of darksky_devicesMap[tmp.device]) {
-                                post_Values(stream.stream, darksky_data[0][stream.stream], tmp.center_lat, tmp.center_long)
+                                await post_Values(stream.stream, darksky_data[0][stream.stream], tmp.center_lat, tmp.center_long)
                             }
                             darksky_i = (darksky_i + 1) % darksky_keys.length
                             tryAgain = false
@@ -333,9 +337,9 @@ function sleep(ms) {
                 })
             })
 
-            if(promises.length >= 10) {
+            if(promises.length >= 20) {
                 await Promise.all(promises.map(p => p()))
-                await sleep(2000)
+                await sleep(100)
                 promises = []
             }
 

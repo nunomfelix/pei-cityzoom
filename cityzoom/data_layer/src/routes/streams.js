@@ -227,7 +227,8 @@ router.post('/:stream_name/values', validation(validators.validatePostValue, 'bo
     }
 
     if(to_broker.satellite) {
-        await producer.publish('cityzoom/values',to_broker)
+        producer.publish('cityzoom/values',to_broker)
+        res.send(204)
     } else {
         await devices.countDocuments({device_ID :to_broker.device_ID}, async (err, count) => {
             if (count == 0) {
