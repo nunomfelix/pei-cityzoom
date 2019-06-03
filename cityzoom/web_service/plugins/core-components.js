@@ -10,7 +10,7 @@ import ModalResizable from "@/components/UI/Modal_Resizable"
 import VueWeatherWidget from 'vue-weather-widget';
 import LineChart from "@/components/UI/Graphs/new/line"
 import BarChart from "@/components/UI/Graphs/new/bar"
-import PieChart from "@/components/UI/Graphs/new/pie"
+//import PieChart from "@/components/UI/Graphs/new/pie"
 
 Vue.component("Navbar", Navbar);
 Vue.component("Header", Header);
@@ -23,4 +23,4 @@ Vue.component("ModalResizable",ModalResizable)
 Vue.component("WeatherWidget",VueWeatherWidget)
 Vue.component("LineChart",LineChart)
 Vue.component("BarChart",BarChart)
-Vue.component("PieChart",PieChart)
+//Vue.component("PieChart",PieChart)

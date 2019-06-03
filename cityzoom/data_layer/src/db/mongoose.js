@@ -5,6 +5,7 @@ const hexagons = require('./models/hexagons')
 const devices = require('./models/devices')
 const streams = require('./models/streams')
 const values = require('./models/values')
+const satellite = require('./models/satellite')
 const alerts = require('./models/alerts')
 const muns = require('./models/municipalities')
 const mongooseDebug = require('debug')('app:Mongoose')
@@ -16,17 +17,18 @@ mongoose.connect(connectionUrl+database, {
     useCreateIndex: true
 }, async () => {
 
-    //fs.writeFile('data_teste' + new Date(), JSON.stringify({alerts: await alerts.find(), verticals: await verticals.find(), devices: await devices.find(), streams: await streams.find(), values: await values.find(), hexagons: await hexagons.find(), muns: await muns.find()}), () => {})
+    //fs.writeFile('backup_main_2', JSON.stringify({satellite: await satellite.find(), alerts: await alerts.find(), verticals: await verticals.find(), devices: await devices.find(), streams: await streams.find(), values: await values.find(), hexagons: await hexagons.find(), muns: await muns.find()}), () => {})
     
     await hexagons.deleteMany({})
     await muns.deleteMany({})
     await devices.deleteMany({})
     await streams.deleteMany({})
     await values.deleteMany({})
+    await satellite.deleteMany({})
     await verticals.deleteMany({})
     await alerts.deleteMany({})
 
-    fs.readFile('backup_no_streams_75k', async(err, res) => {
+    fs.readFile('backup_main_', async(err, res) => {
         res = JSON.parse(res)
         mongooseDebug("Starting up")
         if(res.hexagons) {
@@ -58,6 +60,12 @@ mongoose.connect(connectionUrl+database, {
                 new values(v)    
             ))
             mongooseDebug("Loaded values")
+        }
+        if(res.satellite) {
+            await satellite.insertMany(res.satellite.map(v => 
+                new satellite(v)    
+            ))
+            mongooseDebug("Loaded satellite")
         }
         if(res.streams) {
             await streams.insertMany(res.streams.map(s => 

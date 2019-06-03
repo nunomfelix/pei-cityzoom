@@ -58,6 +58,10 @@ const breezo_keys = [
     'c0d6f9dbd02d47cea48aead9169149e2',
     '64c8cc1203c2406bad4a843ff35b6ce6',
     '1754f3a173f24dcbb63d9a1b880af16d',
+    'ee2eb703a148472a812c22f866469888',
+    '59e4eace0d5f4094b531d63b1a85244e',
+    '763780a6d3f04267b3731eeffced0f9c',
+    '34a502f162b24ed485b859fc19f82e27',
 ]
 
 const darksky_keys = [
@@ -114,11 +118,13 @@ const darksky_keys = [
     '00b3398a08c0a420ee410de24b484086',
     '91a6ad78cf2a02fa29c775f5c8646fa5',
     'bf323a3daaa64f6b4d1750a32390f4e5',
+    '1736c8b5667284684a3c33dc4d74284d',
+    'c6d67b702ed940799e44b7b36d7df5c9',
+    '76383e87904956e4ec65fa2bf8a0725c',
+    'b2522b5cd36f15dc4dd5fb582024026a',
+    'eca469d52049e580c30c2074967013c2',
 ]
 
-console.log("Breezo: ", breezo_keys.length)
-console.log("Darksy: ", darksky_keys.length)
-process.exit()
 
 async function get_breezometer_data(lat, long, key = 'f55cfd01f2ab42ccb517e40844a18797') {
 
@@ -188,14 +194,18 @@ async function create_Stream(streamID, streamName, deviceID) {
         }).catch( (err)=> {console.log("Failed to create subscription with message: " + err)})
 } */
 
-async function post_Values(device_ID, streamID, value, lat, long) {
-    await axios.post('http://localhost:8001/czb/streams/' + streamID + '/values', {
-            device_ID,
-            "value": value,
-            "latitude": lat,
-            "longitude": long,
+counter = 1
 
-        }).catch( (err)=> {console.log("Failed to post value with message: " + err)})
+async function post_Values(streamID, value, lat, long) {
+    console.log(lat, long)
+    await axios.post('http://localhost:8001/czb/streams/' + streamID + '/values', {
+        satellite: true,
+        "value": value,
+        "latitude": lat,
+        "longitude": long,
+    })
+    .then((res) => {})
+    .catch(async (err)=> {console.log(err);})
 } 
 
 function sleep(ms) {
@@ -203,6 +213,13 @@ function sleep(ms) {
 }
 
 (async function main() {
+
+    console.log("Breezo: ", breezo_keys.length)
+    console.log("Darksy: ", darksky_keys.length)
+    // console.log("Waiting 11 mins")
+    // await sleep(1000*60*11)
+    console.log("Starting")
+
     const devices = []
     var obj = JSON.parse(fs.readFileSync('hex_data.json', 'utf8'))
     let k = 0;
@@ -222,9 +239,10 @@ function sleep(ms) {
         
         var center_long = longMin + ((longMax - longMin)/2)
         var center_lat = latMin + ((latMax - latMin)/2)
+        console.log(center_long)
 
         var device = "device_APIs" +obj[hex]['id']
-        await create_Device(device, device, ["Weather", "AirQuality"], obj[hex]['municipality'])
+        //await create_Device(device, device, ["Weather", "AirQuality"], obj[hex]['municipality'])
         devices.push({
             device,
             center_long,
@@ -243,7 +261,7 @@ function sleep(ms) {
         const darksky_tmp = ['temperature_stream', 'ozone_stream', 'pressure_stream', 'humidity_stream']
         for(var stream of breezo_tmp) {
             const stream_id = devices[d].device + '_' + stream
-            //await create_Stream(stream_id, stream, devices[d].device)
+            //await create_Stream(stream_id, stream, devices[d]. Math.random() * 1device)
             streams.push({
                 stream,
                 stream_id
@@ -267,56 +285,73 @@ function sleep(ms) {
     var breezo_i = 0
     var darksky_i = 0
     let promises = []
+
+    const amount = devices.length / process.argv[2]
+    const start = amount * process.argv[3]
+    console.log(start, amount)
+
     while(true) {
 
-        for(var d of devices) {
-            const tmp = d
+        let promises = []
+        
+        for(var d in devices) {
 
-            // promises.push(() => {
-            //     return new Promise(async (resolve) => {
-                let tryAgain = true
-                while(tryAgain) {
-                    try {
-                        var breezo_data = await get_breezometer_data(d.center_lat, d.center_long, breezo_keys[breezo_i])
-                        for(var stream of breezo_devicesMap[d.device]) {
-                            post_Values(tmp.device, stream.stream, breezo_data[0][stream.stream], tmp.center_lat, tmp.center_long)
+            if(d >= start && d < start + amount) {
+                const tmp = devices[d]
+
+                promises.push(() => {
+                    return new Promise(async (resolve) => {
+                        let tryAgain = true
+                        while(tryAgain) {
+                            try {
+                                var breezo_data = await get_breezometer_data(tmp.center_lat, tmp.center_long, breezo_keys[breezo_i])
+                                for(var stream of breezo_devicesMap[tmp.device]) {
+                                    post_Values(stream.stream, breezo_data[0][stream.stream], tmp.center_lat, tmp.center_long)
+                                }
+                                breezo_i = (breezo_i + 1) % breezo_keys.length
+                                tryAgain = false
+                            } catch(err) {
+                                console.log("Failed breezo")
+                                breezo_keys.splice(breezo_i, 1);
+                                breezo_i = (breezo_i) % breezo_keys.length
+                                tryAgain = true
+                            }
                         }
-                        breezo_i = (breezo_i + 1) % breezo_keys.length
-                        tryAgain = false
-                    } catch(err) {
-                        console.log("Failed breezo")
-                        breezo_keys.splice(breezo_i, 1);
-                        breezo_i = (breezo_i + 1) % breezo_keys.length
-                        tryAgain = true
-                    }
-                }
-            //         resolve()
-            //     })
-            // })
+                        resolve()        
+                    })
+                })
+                
     
-            // promises.push(() => {
-            //     return new Promise(async (resolve) => {
-                tryAgain = true
-                while(tryAgain) {
-                    try {
-                        var darksky_data = await get_darksky_data(d.center_lat, d.center_long, darksky_keys[darksky_i])
-                        for(var stream of darksky_devicesMap[d.device]) {
-                            post_Values(tmp.device, stream.stream, darksky_data[0][stream.stream], tmp.center_lat, tmp.center_long)
-                        }
-                        darksky_i = (darksky_i + 1) % darksky_keys.length
-                        tryAgain = false
-                    } catch(err) {
-                        console.log("Failed darksy")
-                        darksky_keys.splice(darksky_i, 1);
-                        darksky_i = (darksky_i + 1) % darksky_keys.length
+                promises.push(() => {
+                    return new Promise(async (resolve) => {
                         tryAgain = true
-                    }
+                        while(tryAgain) {
+                            try {
+                                var darksky_data = await get_darksky_data(tmp.center_lat, tmp.center_long, darksky_keys[darksky_i])
+                                for(var stream of darksky_devicesMap[tmp.device]) {
+                                    post_Values(stream.stream, darksky_data[0][stream.stream], tmp.center_lat, tmp.center_long)
+                                }
+                                darksky_i = (darksky_i + 1) % darksky_keys.length
+                                tryAgain = false
+                            } catch(err) {
+                                console.log("Failed darksy")
+                                darksky_keys.splice(darksky_i, 1);
+                                darksky_i = (darksky_i) % darksky_keys.length
+                                tryAgain = true
+                            }
+                        }
+                        resolve()
+                    })
+                })
+    
+                if(promises.length >= 10) {
+                    await Promise.all(promises.map(p => p()))
+                    promises = []
                 }
-            //         resolve()
-            //     })
-            // })
+            }
+            
         }
-        await sleep(1800000 * .66)
+        await sleep(1800000 * .90)
     }
 
 
