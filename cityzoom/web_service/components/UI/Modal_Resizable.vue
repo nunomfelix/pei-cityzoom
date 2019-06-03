@@ -42,8 +42,7 @@
  
 var item = { x: 0, y: 0, w: 12, h: 14, i: "line_a", type: 'lines', data:'fake' };
 export default {
-  props:{values: Object}
-  ,
+  props:{values: Object},
   name: 'Modal_Resizable',
   
 
@@ -78,6 +77,8 @@ export default {
     })
 
     this.data=res.data
+
+    console.log(res.body)
 
     var labels = []
     var y_axis = []
