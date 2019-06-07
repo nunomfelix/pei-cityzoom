@@ -13,8 +13,13 @@ const munsSchema = new mongoose.Schema({
         required: true,
         default: {}
     },
+    hexagons: {
+        type: Array
+    },
+    satellite: {}
 })
 
+munsSchema.index({"hexagons.location": "2dsphere"}); // schema level
 munsSchema.plugin(uniqueValidator)
 
 const Municipality = mongoose.model('municipalities', munsSchema)

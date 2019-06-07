@@ -1,0 +1,8 @@
+{
+    "SERVICE_LAYER_URL": "http://localhost:8002",
+    "DATA_LAYER_URL": "http://localhost:8001",
+    "TOKEN_GENERATION_SECRET": "cityzoomsecret",
+    "BROKER_HOST": "localhost",
+    "BROKER_PORT": 1883,
+    "BROKER_ROOT_TOPIC": "cityzoom/"
+}

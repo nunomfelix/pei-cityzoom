@@ -14,7 +14,7 @@ const deviceSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    vertical: [{
+    verticals: [{
         type: String,
         required: true,
         trim: true
@@ -36,7 +36,7 @@ const deviceSchema = new mongoose.Schema({
         trim: true,
         default: Date.now
     },
-    locations: {
+    location: {
         type: Array,
         required: true,
         default: []
@@ -47,11 +47,7 @@ const deviceSchema = new mongoose.Schema({
         trim: true,
         default: ""
     },
-    hexagon: {
-        type: String,
-        required: false,
-        default: 0
-    }
+    streams: []
 })
 
 deviceSchema.plugin(uniqueValidator)

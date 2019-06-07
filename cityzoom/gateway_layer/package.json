@@ -1,10 +1,11 @@
 {
-  "name": "gateway",
+  "name": "gateway_layer",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "DEBUG=app:* nodemon src/index.js",
+    "start": "node src/index.js"
   },
   "keywords": [],
   "author": "",
@@ -18,5 +19,13 @@
     "sockjs-client": "^1.3.0",
     "stompjs": "^2.3.3",
     "ws": "^7.0.0"
+  },
+  "devDependencies": {
+    "colors": "^1.3.3",
+    "config": "^3.1.0",
+    "express-async-errors": "^3.1.1",
+    "helmet": "^3.18.0",
+    "jsonwebtoken": "^8.5.1",
+    "morgan": "^1.9.1"
   }
 }

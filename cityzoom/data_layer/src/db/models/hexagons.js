@@ -3,11 +3,6 @@ const uniqueValidator = require('mongoose-unique-validator')
 const config = require('config')
 
 const hexagonSchema = new mongoose.Schema({
-    coordinates: {
-        type: Array,
-        required: true,
-        default: []
-    },
     municipality: {
         type: String,
         required: true,
@@ -19,24 +14,10 @@ const hexagonSchema = new mongoose.Schema({
         default: "",
         unique: true
     },
-    streams: {
-        
-    },
-    hours: {
-        
-    }
-    // average: {
-    //     type: Number,
-    //     required: true,
-    //     default: 0
-    // },
-    // values_til_now: {
-    //     type: Number,
-    //     required: true,
-    //     default: 0
-    // }
+    location: {},
 })
 
+hexagonSchema.index({location: "2dsphere"}); // schema level
 hexagonSchema.plugin(uniqueValidator)
 
 const Hexagon = mongoose.model('hexagons', hexagonSchema)

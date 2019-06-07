@@ -42,14 +42,19 @@
             -->
             
             <div class="small">
-              <line-chart :ref="item.i" :name="item.i" :chart-data="datacollection" :options="options"/>
-              <button @click="fillData()">Randomize</button>
+              <div v-for="stream of streams_graphs" :key="stream">
+                <line-chart :ref="item.i" :chart-data="stream" :options="options"/>
+              </div>
             </div>
-            
           </div>
           
           <div v-else-if="item.type" class="small">
               <BarChart/>
+          </div>
+
+          
+          <div v-else-if="item.type" class="small">
+            <pie-chart :data="pie_chartData"></pie-chart>
           </div>
     </div>
           <!--
@@ -78,22 +83,22 @@ import moment from 'moment'
 const drone_stream = require('static/get_stream_values_response.json');
 
 var testLayout = [
-  { x: 0, y: 0, w: 14, h: 14, i: "line_a", type: 'lines', data:'fake' },
+  { x: 0, y: 0, w: 14, h: 14, i: "line_a", type: 'lines', data:'humidity_stream' },
   //{ x: 0, y: 0, w: 8, h: 14, i: "series_a", type: 'series', data:'fake' },
   //{ x: 0, y: 0, w: 8, h: 5, i: "dfffd", type: 'widget_weather'},
   // { x: 8, y: 0, w: 4, h: 14, i: "series_c", type: 'series', data: 'fake' },
   // { x: 0, y: 14, w: 13, h: 14, i: "series_b", type: 'series', data: 'fake' },
-  { x: 0, y: 14, w: 13, h: 14, i: "bar_a", type: 'bar', data: 'fake' }
+  //{ x: 0, y: 14, w: 13, h: 14, i: "bar_a", type: 'bar', data: 'humidity_stream' },
+  //{ x: 0, y: 14, w: 13, h: 14, i: "pie_a", type: 'pie', data: 'fake' }
 ];
 
 export default {
-
-
   data() {
     return {
       layout: testLayout,
       datacollection: null,
       position: null,
+      streams_graphs:null,
       options:{
         elements:{
           line:{
@@ -104,11 +109,21 @@ export default {
           xAxes: [{
               type: 'time',
           time: {
-              parser: "DD:HH:mm",
+              parser: "HH:mm:ss",
               unit: 'hour'}
           }]
         }
-    }
+    },
+    pie_chartData: {
+        labels: ["Green", "Red", "Blue"],
+        datasets: [
+          {
+            label: "Data One",
+            backgroundColor: ["#41B883", "#E46651", "#00D8FF"],
+            data: [1, 10, 5]
+          }
+        ]
+      }
     };
   }, 
   mounted: async function() {
@@ -117,41 +132,22 @@ export default {
     }, 0)
 
     
-    const res = await this.$axios.get(`http://193.136.93.14:8002/devices/device_APIs0105010/values`, {  
+    const res = await this.$axios.get(`http://localhost:8002/devices/device_APIs0105012/values`, {  
       headers: {
           Authorization: this.$store.state.jwt
       }
     })
 
-    this.data=res.data
 
-    var labels = []
-    var y_axis = []
-    // var streams = []
-    //console.log(res.data.config)
-    // Object.keys(data).forEach((key) => {
-    //   streams.push(res.data[key])
-    // });
-    // Object.keys(streams).forEach((key) => {
-    //   console.log(key,streams[key])
-    //   labels.push(this.convertTimestamp(streams[key].created_at))
-    //   y_axis.push(streams[key].value)
-    // });
-    const d = [Object.keys(res.data)[0]]
-      for(var stream of res.data[d]){
-        console.log(stream)
-          y_axis.push(Math.round(stream.value))
-          labels.push(this.convertTimestamp(stream.created_at))
-        }
-    
-    
+   //createWidget with chartData 
+   //and default configs depending on graph
+   //x axis time scale
+   //y axis ??
+   //Array de streams 
 
-    // var result = [{ x: "18:00", y: "230" }, { x: "19:00", y: "232" }, { x: "20:00", y: "236" }, { x: "22:00", y: "228" }];
-    // var labels = result.map(e => moment(e.x, 'HH:mm'));
-    // var data = result.map(e => +e.y);
-    console.log(y_axis)
-    console.log(labels)
-    this.fillData(labels,y_axis)
+    this.fillGraphsWithStreams(res.data)
+    console.log('aqui\n')
+    console.log(this.streams_graphs)
   },
   methods: {
     onResize(i) {
@@ -182,15 +178,56 @@ export default {
         ]
       }
     },
+    fillGraphsWithStreams(streams){
+      this.streams_graphs = []
+      for(var stream of streams){
+        var labels = []
+        var y_axis = []
+        console.log('esteaqui     ',stream.values[0].value,'\n')
+        for(var value in stream.values){
+          console.log(stream.values[value].created_at)
+          labels.push(this.convertTimestamp(stream.values[value].created_at))
+          y_axis.push(stream.values[value].value)
+        }
+
+        console.log(labels)
+        console.log(y_axis)
+
+        var datacollection = {
+          labels: labels,
+          datasets: [
+            {
+              label: stream._id,
+              backgroundColor: '#0099FF',
+              fill: false,
+              data: y_axis
+            }
+          ]
+        }
+        console.log(datacollection)
+        this.streams_graphs.push(datacollection)
+
+      }
+      console.log(this.streams_graphs)
+
+      
+    },
     getRandomInt () {
       return Math.floor(Math.random() * (50 - 5 + 1)) + 5
     },
     convertTimestamp(t){
+      console.log(t)
       var dt = new Date(t*1000);
       var day = dt.getDay();
       var hr = dt.getHours();
       var m = "0" + dt.getMinutes();
-      return day+':'+hr+ ':' + m.substr(-2)
+      var seconds = "0" + dt.getSeconds();
+      console.log('teste data ',day+':'+hr+ ':' + m.substr(-2))
+      //day + ':' + 
+      return hr+ ':' + m.substr(-2) + ':' + seconds.substr(-2);
+    },
+    createWidget(stream){
+      this.testLayout.push({ x: 0, y: 14, w: 13, h: 14, i: "line_a", type: 'line', data: 'fake' })
     }
 
   }
@@ -247,5 +284,3 @@ export default {
   }
 }
 </style>
-
-

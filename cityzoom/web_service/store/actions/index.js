@@ -155,5 +155,18 @@ export default{
             console.error('Error', err.message)
             return err
         }
+    },
+    get_heatmap: async function({commit, state}, {start_date, end_date}) {
+        try {
+            const res = await this.$axios.get(`http://localhost:8001/czb/streams/heatmap?interval_start=${Math.floor(start_date)}&interval_end=${Math.floor(end_date)}`, {
+                headers: {
+                    Authorization: state.jwt
+                }
+            })
+            commit('SET_STORE', { heatmap : {...res.data}})
+        } catch (err) {
+            console.error('Error', err.message)
+            return err
+        }
     }
 }
