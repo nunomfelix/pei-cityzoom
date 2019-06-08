@@ -5,7 +5,7 @@ function validateCreateDevice(object) {
         device_ID:  joi.string().required(),
         device_name: joi.string().required(),
         description: joi.string().optional(),
-        vertical: joi.array().required(),
+        verticals: joi.array().required(),
         mobile: joi.boolean().required(),
         provider: joi.string().required(),
         municipality: joi.string().optional()

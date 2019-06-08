@@ -57,4 +57,16 @@ router.get('/streams/:stream_name',async (req,res)=>{
     res.status(200).send(doc)
 })
 
+router.get('/triggered', async (req, res) => {
+    const start = req.query.interval_start ? req.query.interval_start : 0
+    const compass = Number(Date.now())
+    const end = req.query.interval_end ? req.query.interval_end : compass
+    if (end < start || start < 0) {
+        devicesDebug('[ERROR] Interval is wrong')
+        return res.status(400).send({error: 'Bad interval defined'})
+    }
+    const doc = await alerts.find({active:true})
+    res.status(200).send(doc)
+})
+
 module.exports = router

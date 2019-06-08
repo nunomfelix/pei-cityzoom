@@ -14,13 +14,9 @@ const router = new express.Router()
 router.post('', validation(validators.validateCreateDevice, 'body', 'Invalid device'), async (req, res) => {
     // convert request to broker-stuff
     const to_broker = {
-        device_ID: req.body['device_ID'],
-        device_name: req.body['device_name'],
-        mobile: req.body['mobile'],
-        provider: req.body['provider'],
+        ...req.body,
         created_at: Number(Date.now()), 
-        description: 'description' in req.body ? req.body.description : "",
-        locations: []
+        location: []
     }
     
     //Publishes the device in the broker
