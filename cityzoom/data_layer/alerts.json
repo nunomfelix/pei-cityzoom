@@ -3,6 +3,9 @@
         {
             "alert_ID"   : "pm25_stream_year",
             "alert_name" :  "alert_pm25_year",
+            "target_stream": "pm25_stream",
+            "target": "Global",
+            "target_id": [],
             "value": 25,
             "type": "MAX",
             "frequency": "YEAR",
@@ -13,6 +16,9 @@
         },{
             "alert_ID"   : "pm25_stream_hour",
             "alert_name" :  "alert_pm25_hour",
+            "target_stream": "pm25_stream",
+            "target": "Global",
+            "target_id": [],
             "value": 350,
             "type": "MAX",
             "frequency": "HOUR",
@@ -23,6 +29,9 @@
         },{
             "alert_ID"   : "pm10_stream_year",
             "alert_name" :  "alert_pm10_year",
+            "target_stream": "pm10_stream",
+            "target": "Global",
+            "target_id": [],
             "value": 40,
             "type": "MAX",
             "frequency": "YEAR",
@@ -33,6 +42,9 @@
         },{
             "alert_ID"   : "pm10_stream_day",
             "alert_name" :  "alert_pm10_day",
+            "target_stream": "pm10_stream",
+            "target": "Global",
+            "target_id": [],
             "value": 50,
             "type": "MAX",
             "frequency": "DAY",

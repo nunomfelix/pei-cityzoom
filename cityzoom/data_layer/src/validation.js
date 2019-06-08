@@ -38,15 +38,14 @@ function validateCreateAlert(object) {
     const schema = joi.object().keys({
         alert_ID: joi.string().required(),
         alert_name: joi.string().required(),
-        thresholds: joi.array().items(
-            joi.object().keys({
-                value: joi.number().required(),
-                type: joi.string().required().valid(['MAX','MIN','MINEQ','MAXEQ'])
-            }).required()
-        ),
+        value: joi.number().required(),
+        type: joi.string().required().valid('MAX','MAXEQ','MIN','MINEQ'),
+        frequency: joi.string().required().valid('YEAR','DAY','HOUR'),
+        target: joi.string().required().valid('Global','Municipality','Hexagon'),
+        target_stream: joi.string().required(),
         level: joi.string().required().valid('neutral','bad','really bad'),
+        target_id: joi.array().items(joi.string()).optional(),
         description: joi.string().optional(),
-        active: joi.boolean().optional(),
         notify_mail: joi.boolean().optional()
     })
     return joi.validate(object,schema)

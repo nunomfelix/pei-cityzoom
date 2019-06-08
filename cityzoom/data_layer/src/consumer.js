@@ -32,7 +32,7 @@ client.on('connect',()=>{
     
 client.on('message',async (topic,data,info)=>{
     const data_json = JSON.parse(data)
-    if(topic==rootTopic+'devices') {
+    if (topic==rootTopic+'devices') {
         Device.create(data_json)
             .then(() => {
                 consumerDebug('Device created with success')
@@ -40,14 +40,20 @@ client.on('message',async (topic,data,info)=>{
             .catch(() => {
                 consumerDebug(`Error publishing device`)
             })
-    } else if(topic == rootTopic+'streams') {
+    } else if (topic == rootTopic+'streams') {
         Stream.create(data_json).then(() => {
             consumerDebug('Stream created with success')
         }).catch((e) => {
             consumerDebug('Error publishing stream')
         })
-    } else if(topic == rootTopic+'values') {
+    } else if (topic == rootTopic+'values') {
         await updateValues(data_json)
+    } else if (topic == rootTopic+'alerts') {
+        Alerts.create(data_json).then( () => {
+            consumerDebug('Alert created with success')
+        }).catch(()=> {
+            consumerDebug('Error publiching Alert')
+        })
     }
     
 })

@@ -10,15 +10,10 @@ const producer = require('../producer')
 const router = new express.Router()
 
 /* Contains all alert endpoints */
-
-/*router.post('', validation(validateCreateAlert, 'body', 'Invalid alert'), async (req, res) => {
+router.post('', validation(validateCreateAlert, 'body', 'Invalid alert'), async (req, res) => {
     const to_broker ={
-        alert_ID   : req.body.alert_ID,
-        alert_name :  req.body.alert_name,
-        thresholds  :  req.body.thresholds,
-        level      :  req.body.level,
-        notify_mail : req.body.notify_mail!=undefined ? req.body.notify_mail : false,
-        description: req.body.description!=undefined ? req.body.description : "",
+        ...req.body,
+        activations: [],
         active: false,
         created_at: Date.now()
     }
@@ -30,7 +25,7 @@ const router = new express.Router()
         return res.status(409).send({'Error':`Alert ${to_broker.alert_ID} already exists`}) 
     }
     res.status(200).send(to_broker)
-})*/
+})
 
 //get all alerts
 router.get('/list',async (req,res)=>{
@@ -46,7 +41,7 @@ router.put('/:id', async (req,res) => {
     res.status(204).send()
 })
 
-/*//Read alert details
+//Read alert details
 router.get('/:alert_id',async (req,res)=>{
     const doc = await alerts.findOne({alert_ID:req.params.alert_id})
     if (!doc) { return res.status(404).send({'Status':'Not Found'}) }
@@ -55,8 +50,11 @@ router.get('/:alert_id',async (req,res)=>{
 })
 
 //Get details from alerts related to stream
-router.get('/:stream_name',async (req,res)=>{
-    
-})*/
+router.get('/streams/:stream_name',async (req,res)=>{
+    const doc = await alerts.find({target_stream: req.params.stream_name})
+    if (!doc) { return res.status(404).send({'Status':'Not Found'}) }
+
+    res.status(200).send(doc)
+})
 
 module.exports = router

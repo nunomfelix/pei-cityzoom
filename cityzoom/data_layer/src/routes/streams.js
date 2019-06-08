@@ -13,7 +13,7 @@ const producer = require('../producer')
 
 const router = new express.Router()
 
-// create a streams
+// create a streams -- Needed or can Delete?
 router.post('', validation(validators.validateCreateStream, 'body', 'Invalid stream'), async (req, res) => {
     // convert request to broker-stuff
     streamsDebug('[DEBUG] Creating streams')
@@ -47,7 +47,8 @@ router.post('', validation(validators.validateCreateStream, 'body', 'Invalid str
     })
 })
 
-// get all streams
+
+// get all streams -- needed or can delete ?
 router.get('', async (req, res) => {
     streamsDebug('[DEBUG] Fetching all Streams')
     var result = {}
@@ -81,6 +82,8 @@ router.get('', async (req, res) => {
     res.status(200).send(result)
 })
 
+
+// get heatmap data -- ABSOLUTELY NEEDED
 router.get('/heatmap', async (req, res) => {
     streamsDebug('[DEBUG] Fetching all stream values')
     var stream_name = req.query.stream_name ? {stream_name: req.query.stream_name} : {} 
@@ -160,7 +163,7 @@ router.get('/heatmap', async (req, res) => {
 
 })
 
-// get stream by ID
+// get stream by ID -- needed or can delete ?
 router.get('/:id', async (req, res) => {
     const doc = await streams.findOne({stream_ID:req.params.id})
     if (!doc) { return res.status(404).send({'Status':'Not Found'}) }
@@ -174,14 +177,14 @@ router.get('/:id', async (req, res) => {
     })
 })
 
-// delete streams by ID
+// delete streams by ID needed or can delete ?
 router.delete('/:id', async (req, res) => {
     const deletion = await streams.deleteOne({stream_ID:req.params.id})
     if (deletion.deletedCount == 0) { return res.status(404).send({'Status':'Not Found'})}
     res.status(204).send()
 })
 
-// get all values from stream
+// get all values from stream -- needed or can delete ?
 router.get('/:stream_id/values', async (req, res) => {
     streamsDebug('[DEBUG] Fetching all stream values')
     const start = req.query.interval_start ? req.query.interval_start : 0
@@ -215,7 +218,7 @@ router.get('/:stream_id/values', async (req, res) => {
     return res.status(200).send(sub_vals)
 })
 
-// post value to stream
+// post value to stream -- ABSOLUTELY NEEDED
 router.post('/:stream_name/values', validation(validators.validatePostValue, 'body', 'Invalid value'), async (req, res) => {
 
     streamsDebug('[DEBUG] Receiving Value')

@@ -55,7 +55,8 @@ const alertSchema = new mongoose.Schema({
     description: {
         type: String,
         required: false,
-        trim: true
+        trim: true,
+        default: ""
     },
     notify_mail: {
         type: Boolean,
