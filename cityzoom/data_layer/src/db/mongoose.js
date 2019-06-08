@@ -18,6 +18,7 @@ mongoose.connect(connectionUrl+database, {
 }, async () => {
 
     //fs.writeFile('backup_main_', JSON.stringify({satellite: await satellite.find(), alerts: await alerts.find(), verticals: await verticals.find(), devices: await devices.find(), streams: await streams.find(), values: await values.find(), hexagons: await hexagons.find(), muns: await muns.find()}), () => {})
+  
     
     await hexagons.deleteMany({})
     await muns.deleteMany({})
@@ -79,6 +80,7 @@ mongoose.connect(connectionUrl+database, {
             ))
             mongooseDebug("Loaded alerts")
         }
+        
     })
     
     mongooseDebug("Connected to mongo database!")

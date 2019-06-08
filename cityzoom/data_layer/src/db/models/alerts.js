@@ -46,9 +46,10 @@ const alertSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+    activations: [{}],
     active: {
         type: Boolean,
-        required: true,
+        required: false,
         default: false
     },
     description: {
@@ -60,6 +61,18 @@ const alertSchema = new mongoose.Schema({
         type: Boolean,
         required: true,
         default: false
+    },
+    target: {
+        type: String,
+        required: true,
+    },
+    target_id: [{
+        type: String
+    }],
+    target_stream: {
+        type: String,
+        required: true,
+        trim: true
     }
 })
 

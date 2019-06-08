@@ -93,7 +93,6 @@ router.get('/heatmap', async (req, res) => {
     }
 
     var before = new Date()
-
     const aggregation = [{
         $match: {
             ...stream_name,

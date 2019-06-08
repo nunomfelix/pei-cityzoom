@@ -114,10 +114,20 @@ router.get('/:id/values', async (req,res) => {
             }
         }
     }])
+    console.log(tmp)
     var after = new Date()
 
     console.log(after-before)
     res.send(tmp)
+})
+
+router.post('/:id/values', async (req,res)=>{
+    
+    const wasPublished = await producer.publish('cityzoom/values',req.body)
+
+    //console.log(value)
+    res.status(200).send('ok')
+
 })
 
 module.exports = router

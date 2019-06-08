@@ -1,6 +1,7 @@
 //Debug
 const config = require('config')
 const colors = require('colors')
+const mongoose = require('mongoose')
 const mqtt = require('mqtt')
 const turf = require('@turf/helpers')
 const booleanPointInPolygon = require('@turf/boolean-point-in-polygon').default
@@ -18,8 +19,6 @@ const Muns = require('./db/models/municipalities')
 const Satellites = require('./db/models/satellite')
 const Values = require('./db/models/values')
 const Alerts = require('./db/models/alerts')
-const Mutex = require('async-mutex').Mutex
-let mutex = new Mutex()
 
 client.on('connect',()=>{
     consumerDebug('Listening to MQTT broker!')
@@ -97,63 +96,277 @@ async function updateValues(data_json) {
         })
     }
 
-    //alert(stream, hexa)
+    alert(data_json.stream_name, hexa.id, hexa.municipality, data_json.satellite)
 }
 
-async function alert(stream, hexa) {
+async function alert(target_stream, hexa, mun, satellite) {
 
-    var alts = await Alerts.find({})
-    alts.forEach( async (element) => {
-        const now = new Date()
-        let date_id_start = 0
-        let date_id_end = 0
-        if (element.frequency == "YEAR"){
-            date_id_start = now.getTime() - (1000*60*60*24*365)
-            date_id_end = now.getTime()
-        }
-        else if (element.frequency == "DAY") {
-            date_id_start = now.getTime() - (1000*60*60*24)
-            date_id_end = now.getTime()
-        }
-        else if (element.frequency == "HOUR") {
-            date_id_start = now.getTime() - (1000*60*60)
-            date_id_end = now.getTime()
-        }
+    let alerts = await Alerts.find({target_stream})
 
-        var total_values = 0
-        var count = 0
-        if (hexa.streams && element.alert_ID.includes(stream.stream_name)) {
-            Object.keys(hexa.streams[stream.stream_name]).forEach(key => {
-                if (key >= date_id_start && key < date_id_end) {
-                    total_values = total_values + hexa.streams[stream.stream_name][key].total
-                    count = count + hexa.streams[stream.stream_name][key].count
+    const alarmChecker = {
+        MAX: '$gt',
+        MAXEQ: '$gte',
+        MIN: '$lt',
+        MINEQ: '$lte'
+    }
+
+    await alerts.forEach( async alert => {
+        let end = new Date().getTime();
+        let start = 0
+        alert.frequency=='HOUR' ? start=end-1000*60*60 : 
+            alert.frequency=='DAY' ?  start=end-1000*60*60*24 :
+                start=end-1000*60*60*24*365
+        if (alert.target=='Municipality') {
+            var aggregation = [
+                {
+                    '$match': {
+                        'stream_name': target_stream, 
+                        'created_at': {
+                            '$gte': start, 
+                            '$lte': end
+                        }, 
+                        'municipality': hexa
+                    }
+                }, {
+                    '$group': {
+                        '_id': {
+                            'id': '$hexagon', 
+                            'municipality': '$municipality'
+                        }, 
+                        'min': { '$min': '$value' }, 
+                        'max': { '$max': '$value' }, 
+                        'average': { '$avg': '$value' }, 
+                        'count': { '$sum': 1 }
+                    }
                 }
-            })
-            const med = total_values / count
-            if (element.type == "MAX") {
-                if (med > element.value) {
-                    await Alerts.updateOne({"alert_ID": element.alert_ID}, {"active":true})
-                }
-            } 
-            else if (element.type == "MIN") {
-                if (med < element.value) {
-                    await Alerts.updateOne({"alert_ID": element.alert_ID}, {"active":true})
-                }
-            } 
-            else if (element.type == "MINEQ") {
-                if (med <= element.value) {
-                    await Alerts.updateOne({"alert_ID": element.alert_ID}, {"active":true})
-                }
+            ]
+            if (alert.type=='MAX') {
+                aggregation.push({
+                    '$match': {
+                        average: {
+                            $gt: alert.value
+                        }
+                    }
+                })
+            } else if (alert.type=='MAXEQ') {
+                aggregation.push({
+                    '$match': {
+                        average: {
+                            $gte: alert.value
+                        }
+                    }
+                })
+            } else if (alert.type=='MIN') {
+                aggregation.push({
+                    '$match': {
+                        average: {
+                            $lt: alert.value
+                        }
+                    }
+                })
+            } else {
+                aggregation.push({
+                    '$match': {
+                        average: {
+                            $lte: alert.value
+                        }
+                    }
+                })
             }
-            else if (element.type == "MAXEQ") {
-                if (med >= element.value) {
-                    await Alerts.updateOne({"alert_ID": element.alert_ID}, {"active":true})
-                }
-            }    
-        } 
-    });
-}
 
-async function updateHex(dev, stream, data_json) {
+            let tmp = null
+            if (satellite) 
+                tmp = await Satellites.aggregate(aggregation)
+            else
+                tmp = await Values.aggregate(aggregation)
+            
+            if (tmp.length!=0) {
+                activation = {
+                    timestamp: (new Date()).getTime(),
+                    activations: tmp
+                }
+                await Alerts.updateOne({_id: mongoose.Types.ObjectId(alert._id) }, {$push: {activations: activation}, active: true})
+            }
+
+        }
+        else if (alert.target=='Hexagon') {
+            var aggregation = [
+                {
+                    '$match': {
+                        'stream_name': target_stream, 
+                        'created_at': {
+                            '$gte': start, 
+                            '$lte': end
+                        }, 
+                        'hexagon': hexagon
+                    }
+                }, {
+                    '$group': {
+                        '_id': {
+                            'id': '$hexagon', 
+                            'municipality': '$municipality'
+                        }, 
+                        'min': { '$min': '$value' }, 
+                        'max': { '$max': '$value' }, 
+                        'average': { '$avg': '$value' }, 
+                        'count': { '$sum': 1 }
+                    }
+                }
+            ]
+
+            if (alert.type=='MAX') {
+                aggregation.push({
+                    '$match': {
+                        average: {
+                            $gt: alert.value
+                        }
+                    }
+                })
+            } else if (alert.type=='MAXEQ') {
+                aggregation.push({
+                    '$match': {
+                        average: {
+                            $gte: alert.value
+                        }
+                    }
+                })
+            } else if (alert.type=='MIN') {
+                aggregation.push({
+                    '$match': {
+                        average: {
+                            $lt: alert.value
+                        }
+                    }
+                })
+            } else {
+                aggregation.push({
+                    '$match': {
+                        average: {
+                            $lte: alert.value
+                        }
+                    }
+                })
+            }
+
+            let tmp = null
+            if (satellite) 
+                tmp = await Satellites.aggregate(aggregation)
+            else
+                tmp = await Values.aggregate(aggregation)
+            
+            if (tmp.length!=0) {
+                activation = {
+                    timestamp: (new Date()).getTime(),
+                    activations: tmp
+                }
+                await Alerts.updateOne({_id: mongoose.Types.ObjectId(alert._id) }, {$push: {activations: activation}, active: true})
+            }
+        }
+        else {
+            var aggregation = [
+                {
+                    '$match': {
+                        'stream_name': target_stream, 
+                        'created_at': {
+                            '$gte': start, 
+                            '$lte': end
+                        }
+                    }
+                }, {
+                    '$group': {
+                        '_id': {
+                            'id': '$hexagon', 
+                            'municipality': '$municipality'
+                        }, 
+                        'min': { '$min': '$value' }, 
+                        'max': { '$max': '$value' }, 
+                        'average': { '$avg': '$value' }, 
+                        'count': { '$sum': 1 }
+                    }
+                }
+            ]
+
+            if (alert.type=='MAX') {
+                aggregation.push({
+                    '$match': {
+                        average: {
+                            $gt: alert.value
+                        }
+                    }
+                })
+            } else if (alert.type=='MAXEQ') {
+                aggregation.push({
+                    '$match': {
+                        average: {
+                            $gte: alert.value
+                        }
+                    }
+                })
+            } else if (alert.type=='MIN') {
+                aggregation.push({
+                    '$match': {
+                        average: {
+                            $lt: alert.value
+                        }
+                    }
+                })
+            } else {
+                aggregation.push({
+                    '$match': {
+                        average: {
+                            $lte: alert.value
+                        }
+                    }
+                })
+            }
+
+            console.log(aggregation)
+            let tmp = null
+            if (satellite) 
+                tmp = await Satellites.aggregate(aggregation)
+            else
+                tmp = await Values.aggregate(aggregation)
+            
+            console.log(tmp)
+
+            if (tmp.length!=0) {
+                activation = {
+                    timestamp: (new Date()).getTime(),
+                    activations: tmp
+                }
+                await Alerts.updateOne({_id: mongoose.Types.ObjectId(alert._id) }, {$push: {activations: activation}, active: true})
+            }
+        }
+    })
+
+    /*
+    need to get all alerts
+    for each alert: 
+        -> check corresponding stream via alert_ID           (now called stream_name)
+        -> check frequency                                   (now called freq)
+        -> check if range is global, municipality or hexagon (now called range)
+            -> range = 'Global', no check           (range=range)
+            -> range = 'Municipality', check mun_ID (range=rMun_ID)
+            -> range = 'Hexagon', check hex_ID      (range=rHex_ID)
+        -> aggregate all values by stream, frequency and range
+        [global alerts]:
+            -> match {stream_name, freq}
+            -> group by {hexagon, municipality}
+            -> match {average gt, gte, lt, lte than alarm_limit}
+            -> count
+            if count >= 0 update active to true
+        [hexagon alerts]:
+            -> match {stream_name, freq, rHex_ID}
+            -> group by {0}
+            -> match {average gt, gte, lt, lte than alarm_limit}
+            -> count
+            if count >= 0 update active to true
+        [municipalities alerts]:
+            -> match {stream_name, freq, rMun_ID}
+            -> group by {0}
+            -> match {average gt, gte, lt, lte than alarm_limit}
+            -> count
+            if count >= 0 update active to true
+    */
 
 }
