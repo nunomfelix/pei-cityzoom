@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity
     final String USERNAME = "superuser";
     final String PASSWORD = "12345";
     String URL_LOGIN = "http://"+IP_ADDRESS+":8002/user/login";
-    String URL_POST = "http://"+IP_ADDRESS+":8001/mobileapp/values";
+    String URL_POST = "http://"+IP_ADDRESS+":8002/mobileapp/values";
 
     int proximityValue;
     int batteryValue;
@@ -192,14 +192,11 @@ public class MainActivity extends AppCompatActivity
             //token = loginRequest();
         }catch(Exception e){}
         String encoded = encode(token.getBytes());
-        System.out.println("encoded:"+encoded);
         con.setRequestProperty("Authorization", "Basic "+encoded);
         con.setRequestProperty ("content-type", "application/json");
         // For POST only - START
         con.setDoOutput(true);
-        System.out.println("Sending request!!");
         OutputStream os = con.getOutputStream();
-        System.out.println("Success!");
         String POST_PARAMS = "{\"proximity\":"+proximityValue+",\"battery\":"+batteryValue+",\"latitude\":"+latitudeValue+", \"longitude\":"+longitudeValue+"}";
         System.out.println(POST_PARAMS);
         os.write(POST_PARAMS.getBytes());
