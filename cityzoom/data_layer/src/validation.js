@@ -32,7 +32,7 @@ function validatePostValue(object) {
         timestamp: joi.number().optional(),
         device_ID: joi.string().optional(),
         satellite: joi.boolean().optional()
-    })
+    }).xor('satellite','device_ID')
     return joi.validate(object, schema)
 }
 
