@@ -46,7 +46,8 @@ function validateCreateAlert(object) {
         level: joi.string().required().valid('neutral','bad','really bad'),
         target_id: joi.array().items(joi.string()).optional(),
         description: joi.string().optional(),
-        notify_mail: joi.boolean().optional()
+        notify_mail: joi.boolean().optional(),
+        users: joi.array().items(joi.string()).required()
     })
     return joi.validate(object,schema)
 }

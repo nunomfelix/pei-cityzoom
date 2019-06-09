@@ -4,14 +4,18 @@ const config = require('config')
 
 /*
     {
-        "alert_ID": <alert_ID> (int)
+        "alert_ID": <alert_ID> (string)
         "alert_name": <stream_name> (string),
-        "created_at": <creation_time_mark> (string),
         "value": <value> (number),
         "type": <type> (string)
         "level": <alert_level> (string),
         "description": <description> (string),
-        "state": <alert_state> (boolean)
+        "notify_mail": <notify_via_mail> (boolean),
+        "target": <target_table> (specific string),
+        "target_ID": <ID_in_table> (string),
+        "target_stream": <trigger_stream> (string),
+        "users": <users_array_for_permissions> (stringArray),
+        "frequency": <frequency_to_validate> (string)
     }
 */
 
@@ -46,12 +50,6 @@ const alertSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    activations: [{}],
-    active: {
-        type: Boolean,
-        required: false,
-        default: false
-    },
     description: {
         type: String,
         required: false,
@@ -67,13 +65,21 @@ const alertSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    target_id: [{
+    target_ID: [{
         type: String
     }],
     target_stream: {
         type: String,
         required: true,
         trim: true
+    },
+    users: [{
+        type: String 
+    }],
+    lastOKRead: {
+        type: Number,
+        required: false,
+        default: null
     }
 })
 
