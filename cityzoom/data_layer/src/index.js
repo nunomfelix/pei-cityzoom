@@ -12,8 +12,8 @@ require('./db/mongoose')
 
 //Imports routes
 const deviceRouter = require('./routes/devices')
-const streamRouter = require('./routes/streams')
 const alertRouter = require('./routes/alerts')
+const valueRouter = require('./routes/values')
 
 //Uses the express framework
 const app = express()
@@ -49,7 +49,7 @@ app.use(express.json())
 
 // Routes setup
 app.use('/czb/devices', deviceRouter)
-app.use('/czb/streams', streamRouter)
+app.use('/czb/values', valueRouter)
 app.use('/czb/alerts', alertRouter)
 
 // error middleware

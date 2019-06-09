@@ -3,7 +3,6 @@ const fs = require('fs')
 const verticals = require('./models/verticals')
 const hexagons = require('./models/hexagons')
 const devices = require('./models/devices')
-const streams = require('./models/streams')
 const values = require('./models/values')
 const satellite = require('./models/satellite')
 const alerts = require('./models/alerts')
@@ -67,12 +66,6 @@ mongoose.connect(connectionUrl+database, {
                 new satellite(v)    
             ))
             mongooseDebug("Loaded satellite")
-        }
-        if(res.streams) {
-            await streams.insertMany(res.streams.map(s => 
-                new streams(s)    
-            ))
-            mongooseDebug("Loaded streams")
         }
         if(res.alerts) {
             await alerts.insertMany(res.alerts.map(a => 

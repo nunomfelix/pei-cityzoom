@@ -3,7 +3,6 @@ const validators = require('../validation')
 const { validation } = require('../middleware')
 const devicesDebug = require('debug')('app:Devices')
 const devices = require('../db/models/devices')
-const streams = require('../db/models/streams')
 const values = require('../db/models/values')
 //Broker producer and consumer
 const producer = require('../producer')
@@ -36,6 +35,7 @@ router.post('', validation(validators.validateCreateDevice, 'body', 'Invalid dev
     })
 })
 
+// get all devices
 router.get('', async (req, res) => {
     devicesDebug('[DEBUG] Fetching all Devices')
     const start = req.query.interval_start ? req.query.interval_start : 0

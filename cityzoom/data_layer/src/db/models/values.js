@@ -24,23 +24,14 @@ const valuesSchema = new mongoose.Schema({
         trim: true,
         default: Date.now
     },
-    hexagon: {},
-    municipality: {},
-    satellite: {
-        type: Boolean,
-        required: true,
-        default: false
+    latitude: {
+        type: Number,
+        trim: true
+    },
+    longitude: {
+        type: Number,
+        trim: true
     }
-    // latitude: {
-    //     type: Number,
-    //     required: true,
-    //     trim: true
-    // },
-    // longitude: {
-    //     type: Number,
-    //     required: true,
-    //     trim: true
-    // }
 })
 
 valuesSchema.index({ stream_name: 1, created_at: 1 }, { name: 'heatmap_index' })

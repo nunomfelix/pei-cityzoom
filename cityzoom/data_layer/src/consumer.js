@@ -13,7 +13,6 @@ const rootTopic = config.get('BROKER_ROOT_TOPIC')
 require('./db/mongoose_consumer') 
 const Device = require('./db/models/devices')
 const Verticals = require('./db/models/verticals')
-const Stream = require('./db/models/streams')
 const Hexas = require('./db/models/hexagons')
 const Muns = require('./db/models/municipalities')
 const Satellites = require('./db/models/satellite')
@@ -41,12 +40,6 @@ client.on('message',async (topic,data,info)=>{
             .catch(() => {
                 consumerDebug(`Error publishing device`)
             })
-    } else if (topic == rootTopic+'streams') {
-        Stream.create(data_json).then(() => {
-            consumerDebug('Stream created with success')
-        }).catch((e) => {
-            consumerDebug('Error publishing stream')
-        })
     } else if (topic == rootTopic+'values') {
         await updateValues(data_json)
     } else if (topic == rootTopic+'alerts') {
@@ -108,9 +101,8 @@ async function updateValues(data_json) {
 
 async function alert_checker(target_stream, hexa, mun, satellite) {
 
+    consumerDebug('[DEBUG] Checking all alarms, this one needs to go to effing threads m8s')
     let alerts = await Alerts.find({target_stream})
-    console.log(alerts.length)
-    console.log(target_stream)
 
     for (var i = 0; i < alerts.length; i++) {
         alert = alerts[i]
@@ -119,8 +111,8 @@ async function alert_checker(target_stream, hexa, mun, satellite) {
         alert.frequency=='HOUR' ? start=end-1000*60*60 : 
             alert.frequency=='DAY' ?  start=end-1000*60*60*24 :
                 start=end-1000*60*60*24*365
-        console.log('asdfcxzvz')
         if (alert.target=='Municipality') {
+            consumerDebug('[DEBUG] Checking municipality alert')
             var aggregation = [
                 {
                     '$match': {
@@ -170,6 +162,7 @@ async function alert_checker(target_stream, hexa, mun, satellite) {
 
         }
         else if (alert.target=='Hexagon') {
+            consumerDebug('[DEBUG] Checking hexagon alert')
             var aggregation = [
                 {
                     '$match': {
@@ -218,7 +211,7 @@ async function alert_checker(target_stream, hexa, mun, satellite) {
             }
         }
         else {
-            console.log('sdafasdfsa')
+            consumerDebug('[DEBUG] Checking global alert')
             var aggregation = [
                 {
                     '$match': {
@@ -254,7 +247,6 @@ async function alert_checker(target_stream, hexa, mun, satellite) {
             else
                 tmp = await Values.aggregate(aggregation)
             
-            console.log(tmp.length)
             if (tmp.length!=0 && !alert.active) {
                 var count  = await Triggers.countDocuments({})
                 await Triggers.create({

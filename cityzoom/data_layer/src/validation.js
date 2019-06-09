@@ -29,7 +29,9 @@ function validatePostValue(object) {
         value: joi.number().required(),
         latitude: joi.number().required(),
         longitude: joi.number().required(),
-        timestamp: joi.number().optional()
+        timestamp: joi.number().optional(),
+        device_ID: joi.string().optional(),
+        satellite: joi.boolean().optional()
     })
     return joi.validate(object, schema)
 }
