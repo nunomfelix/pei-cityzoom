@@ -110,7 +110,7 @@ export default {
               type: 'time',
           time: {
               parser: "HH:mm:ss",
-              unit: 'hour'}
+              unit: 'minute'}
           }]
         }
     },
@@ -132,7 +132,7 @@ export default {
     }, 0)
 
     
-    const res = await this.$axios.get(`http://localhost:8002/devices/device_APIs0105012/values`, {  
+    const res = await this.$axios.get(`http://localhost:8002/devices/mobile_app_device_id_superuser/values`, {  
       headers: {
           Authorization: this.$store.state.jwt
       }
@@ -146,7 +146,7 @@ export default {
    //Array de streams 
 
     this.fillGraphsWithStreams(res.data)
-    console.log('aqui\n')
+    //console.log('aqui\n')
     console.log(this.streams_graphs)
   },
   methods: {
@@ -183,10 +183,10 @@ export default {
       for(var stream of streams){
         var labels = []
         var y_axis = []
-        console.log('esteaqui     ',stream.values[0].value,'\n')
+        //console.log('esteaqui     ',stream.values[0].value,'\n')
         for(var value in stream.values){
-          console.log(stream.values[value].created_at)
-          labels.push(this.convertTimestamp(stream.values[value].created_at))
+          console.log(stream.values[value].timestamp)
+          labels.push(this.convertTimestamp(stream.values[value].timestamp))
           y_axis.push(stream.values[value].value)
         }
 
@@ -217,12 +217,12 @@ export default {
     },
     convertTimestamp(t){
       console.log(t)
-      var dt = new Date(t*1000);
+      var dt = new Date(t);
       var day = dt.getDay();
       var hr = dt.getHours();
       var m = "0" + dt.getMinutes();
       var seconds = "0" + dt.getSeconds();
-      console.log('teste data ',day+':'+hr+ ':' + m.substr(-2))
+      console.log('teste data '+hr+ ':' + m.substr(-2)+ ':' + seconds.substr(-2))
       //day + ':' + 
       return hr+ ':' + m.substr(-2) + ':' + seconds.substr(-2);
     },

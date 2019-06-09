@@ -31,7 +31,9 @@ const valuesSchema = new mongoose.Schema({
     longitude: {
         type: Number,
         trim: true
-    }
+    },
+    hexagon: {},
+    municipality: {}
 })
 
 valuesSchema.index({ stream_name: 1, created_at: 1 }, { name: 'heatmap_index' })
