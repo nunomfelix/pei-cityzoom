@@ -62,10 +62,18 @@ function validatePatchAlert(object){
     return joi.validate(object,schema)
 }
 
+function validateDismissAlert(object) {
+    const schema = joi.object().keys({
+        user: joi.string().required()
+    })
+    return joi.validate(object, schema)
+}
+
 module.exports = {
     validateCreateDevice,
     validateCreateStream,
     validatePostValue,
     validateCreateAlert,
-    validatePatchAlert
+    validatePatchAlert,
+    validateDismissAlert
 }

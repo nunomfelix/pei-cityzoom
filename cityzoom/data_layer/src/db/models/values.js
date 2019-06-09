@@ -18,11 +18,11 @@ const valuesSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    created_at: {
+    timestamp: {
         type: Number,
         required: true,
         trim: true,
-        default: Date.now
+        default: new Date().getTime()
     },
     latitude: {
         type: Number,

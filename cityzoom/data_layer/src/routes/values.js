@@ -14,8 +14,8 @@ router.post('/:stream_name',validation(validatePostValue,'body','Invalid Stream'
     valuesDebug('[DEBUG] Receiving Value')
     const to_broker = {
         ...req.body,
+        timestamp: req.body.timestamp ? req.body.timestamp : new Date().getTime(),
         stream_name: req.params.stream_name,
-        created_at: Number(new Date()),
     }
 
     if(to_broker.satellite) {

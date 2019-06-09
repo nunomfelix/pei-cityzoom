@@ -4,7 +4,7 @@ const triggers = require('../db/models/triggers')
 const alertDebug = require('debug')('app:Alerts')
 const axios = require('axios')
 const config = require('config')
-const {validateCreateAlert} = require('../validation')
+const {validateCreateAlert, validateDismissAlert} = require('../validation')
 const { validation } = require('../middleware')
 const producer = require('../producer')
 
@@ -45,10 +45,11 @@ router.get('/triggered', async (req, res) => {
 })
 
 // dismiss trigger 
-router.put('/:id/dismiss', async (req,res) => {
+router.put('/:id/dismiss', validation(validateDismissAlert, 'body', 'Invalid alert'), async (req,res) => {
+    alertDebug('[DEBUG] Dismissing alert '+req.params.id)
     var exists = triggers.findOne({trigger_ID: req.params.id})
     if (!exists) { return res.status(404).send({'Status':'Alert not found'})}
-    await triggers.update({trigger_ID: req.params.id},{$pull: { users: req.body.user }})
+    await triggers.updateOne({trigger_ID: req.params.id},{$pull: { users: req.body.user }})
     res.status(204).send()
 })
 
