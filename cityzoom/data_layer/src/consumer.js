@@ -79,7 +79,9 @@ async function updateValues(data_json) {
         Values.create({
             ...rest,
             hexagon: hexa ? hexa.id : null,
-            municipality: hexa ? hexa.municipality : null
+            municipality: hexa ? hexa.municipality : null,
+            latitude,
+            longitude
         })
     
         Device.updateOne({device_ID: data_json.device_ID}, {

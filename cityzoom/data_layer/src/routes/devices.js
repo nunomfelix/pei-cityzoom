@@ -83,6 +83,8 @@ router.delete('/:id', async (req, res) => {
 // get values by stream
 router.get('/:id/values', async (req,res) => {
     const device = await devices.findOne({device_ID:req.params.id})
+
+    console.log(device)
     if (!device) { return res.status(404).send({'Status':'Not found'})}
     var start = req.query.interval_start ? Number(req.query.interval_start) : Number(new Date(0))
     var end = req.query.interval_end ? Number(req.query.interval_end) : Number(new Date())
@@ -96,21 +98,25 @@ router.get('/:id/values', async (req,res) => {
     var before = new Date()
     const tmp = await values.aggregate([{
         $match:{
-            device_ID: device.device_ID,
-            $and: [{created_at: {$gte: start}},{created_at: {$lt: end}}]
+            device_ID: device.device_ID
+            //$and: [{created_at: {$gte: start}},{created_at: {$lt: end}}]
         }
     },{
         $group:{
             _id: "$stream_name",
             values: {
                 $push: {
-                    created_at: "$created_at",
-                    value: "$value"
+                    timestamp: "$timestamp",
+                    value: "$value",
+                    longitude: "$longitude",
+                    latitude: "$latitude"
                 }
             }
         }
     }])
+    console.log('este ')
     console.log(tmp)
+    console.log('\n\n')
     var after = new Date()
 
     console.log(after-before)
