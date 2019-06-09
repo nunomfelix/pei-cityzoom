@@ -20,6 +20,7 @@ router.post('/:stream_name',validation(validatePostValue,'body','Invalid Stream'
 
     if(to_broker.satellite) {
         await producer.publish('cityzoom/values',to_broker)
+        return res.status(200).send(to_broker)
     } else {
         await devices.countDocuments({device_ID :to_broker.device_ID}, async (err, count) => {
             if (count == 0) {
@@ -29,10 +30,9 @@ router.post('/:stream_name',validation(validatePostValue,'body','Invalid Stream'
             valuesDebug(`[DEBUG] Device ${to_broker.device_ID} exists`)
             await producer.publish('cityzoom/values',to_broker)
             valuesDebug('[DEBUG] Value created with success')
-            return res.status(204).send()
         })
+        return res.status(204).send()
     } 
-    res.send(to_broker)
 
 })
 
