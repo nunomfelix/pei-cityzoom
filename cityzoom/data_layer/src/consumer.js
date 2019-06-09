@@ -79,7 +79,9 @@ async function updateValues(data_json) {
         Values.create({
             ...rest,
             hexagon: hexa ? hexa.id : null,
-            municipality: hexa ? hexa.municipality : null
+            municipality: hexa ? hexa.municipality : null,
+            latitude,
+            longitude
         })
     
         Device.updateOne({device_ID: data_json.device_ID}, {
@@ -149,7 +151,8 @@ async function alert_checker(target_stream, hexa, mun, satellite) {
             else
                 tmp = await Values.aggregate(aggregation)
             
-            if (tmp.length!=0 && !alert.active) {
+            if (tmp.length!=0 && !alert.active && alert.lastOKRead!=null) {
+                consumerDebug('[DEBUG] Alert!!!')
                 var count  = await Triggers.countDocuments({})
                 await Triggers.create({
                     trigger_ID: count,
@@ -158,6 +161,10 @@ async function alert_checker(target_stream, hexa, mun, satellite) {
                     causes: tmp,
                     users: alert.users
                 })
+                consumerDebug('[DEBUG] Alert last OK READ: '+tmp[0].average)
+                await Alerts.updateOne({alert_ID:alert.alert_ID},{lastOKRead:tmp[0].average})
+            } else if (tmp.length==0) {
+                await Alerts.updateOne({alert_ID:alert.alert_ID},{lastOKRead:null})
             }
 
         }
@@ -199,7 +206,8 @@ async function alert_checker(target_stream, hexa, mun, satellite) {
             else
                 tmp = await Values.aggregate(aggregation)
             
-            if (tmp.length!=0 && !alert.active) {
+            if (tmp.length!=0 && !alert.active && alert.lastOKRead!=null) {
+                consumerDebug('[DEBUG] Alert!!!')
                 var count  = await Triggers.countDocuments({})
                 await Triggers.create({
                     trigger_ID: count,
@@ -208,6 +216,10 @@ async function alert_checker(target_stream, hexa, mun, satellite) {
                     causes: tmp,
                     users: alert.users
                 })
+                consumerDebug('[DEBUG] Alert last OK READ: '+tmp[0].average)
+                await Alerts.updateOne({alert_ID:alert.alert_ID},{lastOKRead:tmp[0].average})
+            } else if (tmp.length==0) {
+                await Alerts.updateOne({alert_ID:alert.alert_ID},{lastOKRead:null})
             }
         }
         else {
@@ -247,7 +259,9 @@ async function alert_checker(target_stream, hexa, mun, satellite) {
             else
                 tmp = await Values.aggregate(aggregation)
             
-            if (tmp.length!=0 && !alert.active) {
+            if (tmp.length!=0 && !alert.active && alert.lastOKRead==null) {
+                consumerDebug('[DEBUG] Alert!!!')
+                consumerDebug('[DEBUG] last OK Read: '+alert.lastOKRead)
                 var count  = await Triggers.countDocuments({})
                 await Triggers.create({
                     trigger_ID: count,
@@ -256,6 +270,10 @@ async function alert_checker(target_stream, hexa, mun, satellite) {
                     causes: tmp,
                     users: alert.users
                 })
+                consumerDebug('[DEBUG] Alert last OK READ: '+tmp[0].average)
+                await Alerts.updateOne({alert_ID:alert.alert_ID},{lastOKRead:tmp[0].average})
+            } else if (tmp.length==0) {
+                await Alerts.updateOne({alert_ID:alert.alert_ID},{lastOKRead:null})
             }
         }
     }
