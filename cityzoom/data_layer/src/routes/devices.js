@@ -3,7 +3,6 @@ const {validateCreateDevice} = require('../validation')
 const { validation } = require('../middleware')
 const devicesDebug = require('debug')('app:Devices')
 const devices = require('../db/models/devices')
-const streams = require('../db/models/streams')
 const values = require('../db/models/values')
 //Broker producer and consumer
 const producer = require('../producer')
@@ -14,13 +13,9 @@ const router = new express.Router()
 router.post('', validation(validateCreateDevice, 'body', 'Invalid device'), async (req, res) => {
     // convert request to broker-stuff
     const to_broker = {
-        device_ID: req.body['device_ID'],
-        device_name: req.body['device_name'],
-        mobile: req.body['mobile'],
-        provider: req.body['provider'],
+        ...req.body,
         created_at: Number(Date.now()), 
-        description: 'description' in req.body ? req.body.description : "",
-        locations: []
+        location: []
     }
     
     //Publishes the device in the broker
@@ -40,6 +35,7 @@ router.post('', validation(validateCreateDevice, 'body', 'Invalid device'), asyn
     })
 })
 
+// get all devices
 router.get('', async (req, res) => {
     devicesDebug('[DEBUG] Fetching all Devices')
     const start = req.query.interval_start ? req.query.interval_start : 0
@@ -114,6 +110,7 @@ router.get('/:id/values', async (req,res) => {
             }
         }
     }])
+    console.log(tmp)
     var after = new Date()
 
     console.log(after-before)

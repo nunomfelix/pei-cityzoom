@@ -6,7 +6,6 @@ const client = mqtt.connect('mqtt://'+config.get('BROKER_HOST')+':'+config.get('
 const rootTopic = config.get('BROKER_ROOT_TOPIC')
 //MongoDB
 const Device = require('./db/models/devices')
-const Stream = require('./db/models/streams')
 const Value = require('./db/models/values')
 const Alert = require('./db/models/alerts')
 

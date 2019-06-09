@@ -5,41 +5,53 @@
             "alert_name" :  "alert_pm25_year",
             "value": 25,
             "type": "MAX",
-            "frequency": "YEAR",
             "level":  "bad",
-            "notify_mail" : true,
             "description": "PM25 particle alert yearly. Permitted exceedences each day by the european commission",
-            "active": false
+            "notify_mail" : true,
+            "target": "Global",
+            "target_ID": [],
+            "target_stream": "pm25_stream",
+            "users": [], 
+            "frequency": "YEAR"
         },{
             "alert_ID"   : "pm25_stream_hour",
             "alert_name" :  "alert_pm25_hour",
+            "target_stream": "pm25_stream",
+            "target": "Global",
+            "target_id": [],
             "value": 350,
             "type": "MAX",
             "frequency": "HOUR",
             "level":  "really bad",
             "notify_mail" : true,
             "description": "PM25 particle alert hourly. Permitted exceedences each day by the european commission",
-            "active": false
+            "users": [] 
         },{
             "alert_ID"   : "pm10_stream_year",
             "alert_name" :  "alert_pm10_year",
+            "target_stream": "pm10_stream",
+            "target": "Global",
+            "target_id": [],
             "value": 40,
             "type": "MAX",
             "frequency": "YEAR",
             "level":  "really bad",
             "notify_mail" : true,
             "description": "PM10 particle alert yearly. Permitted exceedences each day by the european commission",
-            "active": false
+            "users": [] 
         },{
             "alert_ID"   : "pm10_stream_day",
             "alert_name" :  "alert_pm10_day",
+            "target_stream": "pm10_stream",
+            "target": "Global",
+            "target_id": [],
             "value": 50,
             "type": "MAX",
             "frequency": "DAY",
             "level":  "really bad",
             "notify_mail" : true,
             "description": "PM10 particle alert daily. Permitted exceedences each day by the european commission",
-            "active": false
+            "users": []
         }
     ]
 }
