@@ -11,9 +11,11 @@ const rootTopic = config.get('BROKER_ROOT_TOPIC')
 //Connection to MongoDB
 require('./db/mongoose_consumer') 
 const Device = require('./db/models/devices')
+const Verticals = require('./db/models/verticals')
 const Stream = require('./db/models/streams')
 const Hexas = require('./db/models/hexagons')
 const Muns = require('./db/models/municipalities')
+const Satellites = require('./db/models/satellite')
 const Values = require('./db/models/values')
 const Alerts = require('./db/models/alerts')
 const Mutex = require('async-mutex').Mutex
@@ -46,91 +48,56 @@ client.on('message',async (topic,data,info)=>{
             consumerDebug('Error publishing stream')
         })
     } else if(topic == rootTopic+'values') {
-        data_json.created_at = data_json.timestamp
-        const {stream, ...rest} = data_json
-        await updateValues(stream, rest)
+        await updateValues(data_json)
     }
     
 })
 
-async function updateValues(stream, data_json) {
+async function updateValues(data_json) {
 
-    //alert(stream, hexa)
-    Values.create(data_json)
-    
-    const date = new Date(data_json.timestamp)
-    const time_id = Math.floor(date / (1000*60*60)) * (1000*60*60)
+    const {longitude, latitude, ...rest} = data_json
 
-    const hex = await Hexas.findOneAndUpdate({
+    const hexa = await Hexas.findOne({
         location: {
             $geoIntersects: {
                 $geometry: {
                     type: "Point",
-                    coordinates: [data_json.longitude, data_json.latitude]
+                    coordinates: [longitude, latitude]
                 }
             }
         }
-    }, {
-        $inc: {
-            [`streams.${stream.stream_name}.${time_id}.total`]: data_json.value,
-            [`streams.${stream.stream_name}.${time_id}.count`]: 1
-        },
-        $max: {
-            [`streams.${stream.stream_name}.${time_id}.max`]: data_json.value
-        },
-        $min: {
-            [`streams.${stream.stream_name}.${time_id}.min`]: data_json.value
-        }
-    }, {
-        useFindAndModify: false
     })
 
-    const tmp = await Hexas.find({
-        location: {
-            $geoIntersects: {
-                $geometry: {
-                    type: "Point",
-                    coordinates: [data_json.longitude, data_json.latitude]
-                }
-            }
+    if(data_json.satellite) {
+        if(hexa) {
+            Satellites.create({
+                ...rest,
+                hexagon: hexa.id,
+                municipality: hexa.municipality
+            })
         }
-    }).explain("executionStats")
-
-    await Muns.updateOne({id: hex.municipality}, {
-        $inc: { 
-            [`streams.${stream.stream_name}.${time_id}.total`]: data_json.value,
-            [`streams.${stream.stream_name}.${time_id}.count`]: 1
-        },
-        $max: {
-            [`streams.${stream.stream_name}.${time_id}.max`]: data_json.value
-        },
-        $min: {
-            [`streams.${stream.stream_name}.${time_id}.min`]: data_json.value
-        }
-    })
-    
-    let dev = await Device.findOne({device_ID: stream.device_ID})
-
-    if(dev.mobile) {
-        await Device.updateOne({device_ID: stream.device_ID}, {
-            $push: {
-                locations: {
-                    timestamp: data_json.timestamp, 
-                    latitude: data_json.latitude, 
-                    longitude: data_json.longitude
-                }
-            }
-        })
     } else {
-        await Device.updateOne({device_ID: stream.device_ID}, {
-            locations: [{
-                timestamp: data_json.timestamp, 
-                latitude: data_json.latitude, 
-                longitude: data_json.longitude
-            }]
+        Values.create({
+            ...rest,
+            hexagon: hexa ? hexa.id : null,
+            municipality: hexa ? hexa.municipality : null
+        })
+    
+        Device.updateOne({device_ID: data_json.device_ID}, {
+            $set: {
+                location: [
+                    longitude,
+                    latitude
+                ]
+            },
+            $addToSet: {
+                verticals: (await Verticals.findOne({"streams.name": data_json.stream_name})).name,
+                streams: data_json.stream_name,
+            }
         })
     }
 
+    //alert(stream, hexa)
 }
 
 async function alert(stream, hexa) {
