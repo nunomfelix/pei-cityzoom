@@ -8,7 +8,9 @@ const errorDebug = require('debug')('app:Error')
 
 function validation(method, object, message=null, code=400) {
     return function (req, res, next) {
+        valDebug('[DEBUG] REquest: ' + req)
         const { err } = method(req[object])
+        valDebug('[DEBUG] Fuck')
         if (err) {
             valDebug(`Error validating: ${JSON.stringify(req[object])}`)
             res.status(code).send(message ? message : err.message)

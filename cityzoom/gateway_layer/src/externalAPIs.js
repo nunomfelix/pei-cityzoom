@@ -61,7 +61,10 @@ const breezo_keys = [
     'ee2eb703a148472a812c22f866469888',
     '59e4eace0d5f4094b531d63b1a85244e',
     '763780a6d3f04267b3731eeffced0f9c',
-    '34a502f162b24ed485b859fc19f82e27',
+    '34a502f162b24ed485b859fc19f82e27', 
+    'be15ecb8cb74494987a058c651cb574f',
+    '8304cab9dfbb497783fa31b439296bc6',
+    '8ec5318839cf4d1c8b11c9ce8bf2be5d',
 ]
 
 const darksky_keys = [
@@ -123,10 +126,11 @@ const darksky_keys = [
     '76383e87904956e4ec65fa2bf8a0725c',
     'b2522b5cd36f15dc4dd5fb582024026a',
     'eca469d52049e580c30c2074967013c2',
+    '71e75bb6df6ddff6952eec41eb7f4c77',
+    'fea51fa4c623c8029ee4f5cf8339ef34',
+    '8fad431eb780aa026b67953778b05cae',
 ]
 
-console.log("Breezo: ", breezo_keys.length)
-console.log("Darksy: ", darksky_keys.length)
 
 async function get_breezometer_data(lat, long, key = 'f55cfd01f2ab42ccb517e40844a18797') {
 
@@ -196,14 +200,18 @@ async function create_Stream(streamID, streamName, deviceID) {
         }).catch( (err)=> {console.log("Failed to create subscription with message: " + err)})
 } */
 
+counter = 1
+
 async function post_Values(streamID, value, lat, long) {
     console.log(lat, long)
     await axios.post('http://localhost:8001/czb/streams/' + streamID + '/values', {
-            satellite: true,
-            "value": value,
-            "latitude": lat,
-            "longitude": long,
-        }).catch( (err)=> {console.log("Failed to post value with message: " + err)})
+        satellite: true,
+        "value": value,
+        "latitude": lat,
+        "longitude": long,
+    })
+    .then((res) => {})
+    .catch(async (err)=> {console.log(err);})
 } 
 
 function sleep(ms) {
@@ -211,6 +219,13 @@ function sleep(ms) {
 }
 
 (async function main() {
+
+    console.log("Breezo: ", breezo_keys.length)
+    console.log("Darksy: ", darksky_keys.length)
+    // console.log("Waiting 11 mins")
+    // await sleep(1000*60*11)
+    console.log("Starting")
+
     const devices = []
     var obj = JSON.parse(fs.readFileSync('hex_data.json', 'utf8'))
     let k = 0;
@@ -239,9 +254,9 @@ function sleep(ms) {
             center_long,
             center_lat
         })
-        k++
-        if(k == 10)
-            break;
+        // k++
+        // if(k == 10)
+        //     break;
     }
     await sleep(200);
     const breezo_devicesMap = {}
@@ -252,7 +267,7 @@ function sleep(ms) {
         const darksky_tmp = ['temperature_stream', 'ozone_stream', 'pressure_stream', 'humidity_stream']
         for(var stream of breezo_tmp) {
             const stream_id = devices[d].device + '_' + stream
-            //await create_Stream(stream_id, stream, devices[d].device)
+            //await create_Stream(stream_id, stream, devices[d]. Math.random() * 1device)
             streams.push({
                 stream,
                 stream_id
@@ -276,46 +291,83 @@ function sleep(ms) {
     var breezo_i = 0
     var darksky_i = 0
     let promises = []
+
+    const amount = devices.length / process.argv[2]
+    const start = amount * process.argv[3]
+    console.log(start, amount)
+
     while(true) {
 
-        console.log(devices)
-        for(var d of devices) {
+        let promises = []
+        
+        for(var d in devices) {
 
-                let tryAgain = true
-                while(tryAgain) {
-                    try {
-                        //var breezo_data = await get_breezometer_data(d.center_lat, d.center_long, breezo_keys[breezo_i])
-                        for(var stream of breezo_devicesMap[d.device]) {
-                            post_Values(stream.stream, Math.random() * 1, d.center_lat, d.center_long)
-                        }
-                        breezo_i = (breezo_i + 1) % breezo_keys.length
-                        tryAgain = false
-                    } catch(err) {
-                        console.log("Failed breezo")
-                        breezo_keys.splice(breezo_i, 1);
-                        breezo_i = (breezo_i + 1) % breezo_keys.length
-                        tryAgain = true
-                    }
-                }
+            if(d >= start && d < start + amount) {
+                const tmp = devices[d]
 
-                tryAgain = true
-                while(tryAgain) {
-                    try {
-                        //var darksky_data = await get_darksky_data(d.center_lat, d.center_long, darksky_keys[darksky_i])
-                        for(var stream of darksky_devicesMap[d.device]) {
-                            post_Values(stream.stream, Math.random() * 1, d.center_lat, d.center_long)
+                promises.push(() => {
+                    return new Promise(async (resolve) => {
+                        let count = 0
+                        let tryAgain = true
+                        while(tryAgain) {
+                            try {
+                                var breezo_data = await get_breezometer_data(tmp.center_lat, tmp.center_long, breezo_keys[breezo_i])
+                                for(var stream of breezo_devicesMap[tmp.device]) {
+                                    post_Values(stream.stream, breezo_data[0][stream.stream], tmp.center_lat, tmp.center_long)
+                                }
+                                breezo_i = (breezo_i + 1) % breezo_keys.length
+                                tryAgain = false
+                            } catch(err) {
+                                console.log("Failed breezo")
+                                breezo_keys.splice(breezo_i, 1);
+                                breezo_i = (breezo_i) % breezo_keys.length
+                                count++
+                                if(count < 10)
+                                    tryAgain = true
+                                else 
+                                    tryAgain = false
+                            }
                         }
-                        darksky_i = (darksky_i + 1) % darksky_keys.length
-                        tryAgain = false
-                    } catch(err) {
-                        console.log("Failed darksy")
-                        darksky_keys.splice(darksky_i, 1);
-                        darksky_i = (darksky_i + 1) % darksky_keys.length
+                        resolve()        
+                    })
+                })
+                
+    
+                promises.push(() => {
+                    return new Promise(async (resolve) => {
+                        let count = 0
                         tryAgain = true
-                    }
+                        while(tryAgain) {
+                            try {
+                                var darksky_data = await get_darksky_data(tmp.center_lat, tmp.center_long, darksky_keys[darksky_i])
+                                for(var stream of darksky_devicesMap[tmp.device]) {
+                                    post_Values(stream.stream, darksky_data[0][stream.stream], tmp.center_lat, tmp.center_long)
+                                }
+                                darksky_i = (darksky_i + 1) % darksky_keys.length
+                                tryAgain = false
+                            } catch(err) {
+                                console.log("Failed darksy")
+                                darksky_keys.splice(darksky_i, 1);
+                                darksky_i = (darksky_i) % darksky_keys.length
+                                count++
+                                if(count < 10)
+                                    tryAgain = true
+                                else 
+                                    tryAgain = false
+                            }
+                        }
+                        resolve()
+                    })
+                })
+    
+                if(promises.length >= 20) {
+                    await Promise.all(promises.map(p => p()))
+                    promises = []
                 }
+            }
+            
         }
-        await sleep(1800000 * .66)
+        await sleep(1800000)
     }
 
 

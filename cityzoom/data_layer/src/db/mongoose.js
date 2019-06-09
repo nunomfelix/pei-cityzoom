@@ -3,7 +3,6 @@ const fs = require('fs')
 const verticals = require('./models/verticals')
 const hexagons = require('./models/hexagons')
 const devices = require('./models/devices')
-const streams = require('./models/streams')
 const values = require('./models/values')
 const satellite = require('./models/satellite')
 const alerts = require('./models/alerts')
@@ -18,7 +17,8 @@ mongoose.connect(connectionUrl+database, {
 }, async () => {
 
     //fs.writeFile('backup_main_', JSON.stringify({satellite: await satellite.find(), alerts: await alerts.find(), verticals: await verticals.find(), devices: await devices.find(), streams: await streams.find(), values: await values.find(), hexagons: await hexagons.find(), muns: await muns.find()}), () => {})
-    
+  
+    /*
     await hexagons.deleteMany({})
     await muns.deleteMany({})
     await devices.deleteMany({})
@@ -67,19 +67,15 @@ mongoose.connect(connectionUrl+database, {
             ))
             mongooseDebug("Loaded satellite")
         }
-        if(res.streams) {
-            await streams.insertMany(res.streams.map(s => 
-                new streams(s)    
-            ))
-            mongooseDebug("Loaded streams")
-        }
         if(res.alerts) {
             await alerts.insertMany(res.alerts.map(a => 
                 new alerts(a)    
             ))
             mongooseDebug("Loaded alerts")
         }
+        
     })
+    */
     
     mongooseDebug("Connected to mongo database!")
 })
