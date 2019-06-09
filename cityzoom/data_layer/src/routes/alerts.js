@@ -49,7 +49,14 @@ router.put('/:id/dismiss', validation(validateDismissAlert, 'body', 'Invalid ale
     alertDebug('[DEBUG] Dismissing alert '+req.params.id)
     var exists = triggers.findOne({trigger_ID: req.params.id})
     if (!exists) { return res.status(404).send({'Status':'Alert not found'})}
-    await triggers.updateOne({trigger_ID: req.params.id},{$pull: { users: req.body.user }})
+    const alert = await triggers.findOneAndUpdate({trigger_ID: req.params.id},{$pull: { users: req.body.user }})
+    alertDebug('[DEBUG] Alert: '+alert)
+    //const alert = await triggers.findOne({trigger_ID:req.params.id})
+    if (alert==null) {
+        alertDebug('[DEBUG] deleting trigger')
+        await triggers.deleteOne({trigger_ID:req.params.id})
+        res.status(200).send({'status': 'Alert'+trigger_id})
+    }
     res.status(204).send()
 })
 
