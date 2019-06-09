@@ -12,6 +12,7 @@ uncaughtDebug = require('debug')('app:Uncaught')
 require('./db/mongoose')
 
 //Imports routes
+const mobileappRouter = require('../../gateway_layer/src/mobileapp/mobileapp')
 const accountRouter = require('./routes/user')
 const alertRouter = require('./routes/alert')
 const streamRouter = require('./routes/stream')
@@ -72,7 +73,8 @@ app.use('/user', accountRouter)
 app.use('/alerts', alertRouter)
 app.use('/streams', streamRouter)
 app.use('/devices', deviceRouter)
-app.use('/vertical',verticalRouter)
+app.use('/vertical', verticalRouter)
+app.use('/mobileapp', mobileappRouter)
 
 //Error middleware, para excessoes causadas em funcoes assincronas do express
 app.use(error)
