@@ -144,41 +144,14 @@ async function alert(target_stream, hexa, mun, satellite) {
                         'average': { '$avg': '$value' }, 
                         'count': { '$sum': 1 }
                     }
+                }, {
+                    '$match': {
+                        'average': {
+                            [`${alert.type=='MAX' ? '$gt' : alert.type=='MAXEQ' ? '$gte' : alert.type=='MIN' ? '$lt' : '$lte'}`]: alert.value
+                        }
+                    }
                 }
             ]
-            if (alert.type=='MAX') {
-                aggregation.push({
-                    '$match': {
-                        average: {
-                            $gt: alert.value
-                        }
-                    }
-                })
-            } else if (alert.type=='MAXEQ') {
-                aggregation.push({
-                    '$match': {
-                        average: {
-                            $gte: alert.value
-                        }
-                    }
-                })
-            } else if (alert.type=='MIN') {
-                aggregation.push({
-                    '$match': {
-                        average: {
-                            $lt: alert.value
-                        }
-                    }
-                })
-            } else {
-                aggregation.push({
-                    '$match': {
-                        average: {
-                            $lte: alert.value
-                        }
-                    }
-                })
-            }
 
             let tmp = null
             if (satellite) 
@@ -186,7 +159,7 @@ async function alert(target_stream, hexa, mun, satellite) {
             else
                 tmp = await Values.aggregate(aggregation)
             
-            if (tmp.length!=0) {
+            if (tmp.length!=0 && !alert.active) {
                 activation = {
                     timestamp: (new Date()).getTime(),
                     activations: tmp
@@ -217,42 +190,14 @@ async function alert(target_stream, hexa, mun, satellite) {
                         'average': { '$avg': '$value' }, 
                         'count': { '$sum': 1 }
                     }
+                }, {
+                    '$match': {
+                        'average': {
+                            [`${alert.type=='MAX' ? '$gt' : alert.type=='MAXEQ' ? '$gte' : alert.type=='MIN' ? '$lt' : '$lte'}`]: alert.value
+                        }
+                    }
                 }
             ]
-
-            if (alert.type=='MAX') {
-                aggregation.push({
-                    '$match': {
-                        average: {
-                            $gt: alert.value
-                        }
-                    }
-                })
-            } else if (alert.type=='MAXEQ') {
-                aggregation.push({
-                    '$match': {
-                        average: {
-                            $gte: alert.value
-                        }
-                    }
-                })
-            } else if (alert.type=='MIN') {
-                aggregation.push({
-                    '$match': {
-                        average: {
-                            $lt: alert.value
-                        }
-                    }
-                })
-            } else {
-                aggregation.push({
-                    '$match': {
-                        average: {
-                            $lte: alert.value
-                        }
-                    }
-                })
-            }
 
             let tmp = null
             if (satellite) 
@@ -260,7 +205,7 @@ async function alert(target_stream, hexa, mun, satellite) {
             else
                 tmp = await Values.aggregate(aggregation)
             
-            if (tmp.length!=0) {
+            if (tmp.length!=0 && !alert.active) {
                 activation = {
                     timestamp: (new Date()).getTime(),
                     activations: tmp
@@ -289,9 +234,16 @@ async function alert(target_stream, hexa, mun, satellite) {
                         'average': { '$avg': '$value' }, 
                         'count': { '$sum': 1 }
                     }
+                }, {
+                    '$match': {
+                        'average': {
+                            [`${alert.type=='MAX' ? '$gt' : alert.type=='MAXEQ' ? '$gte' : alert.type=='MIN' ? '$lt' : '$lte'}`]: alert.value
+                        }
+                    }
                 }
             ]
 
+            /*
             if (alert.type=='MAX') {
                 aggregation.push({
                     '$match': {
@@ -325,7 +277,7 @@ async function alert(target_stream, hexa, mun, satellite) {
                     }
                 })
             }
-
+            */
             console.log(aggregation)
             let tmp = null
             if (satellite) 
@@ -335,7 +287,7 @@ async function alert(target_stream, hexa, mun, satellite) {
             
             console.log(tmp)
 
-            if (tmp.length!=0) {
+            if (tmp.length!=0 && !alert.active) {
                 activation = {
                     timestamp: (new Date()).getTime(),
                     activations: tmp
