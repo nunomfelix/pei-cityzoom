@@ -65,6 +65,9 @@ const breezo_keys = [
     'be15ecb8cb74494987a058c651cb574f',
     '8304cab9dfbb497783fa31b439296bc6',
     '8ec5318839cf4d1c8b11c9ce8bf2be5d',
+    '668b77c5edb143f7be010fe272754e9c',
+    '6f1b68c2398b4168aeabcfcdba30cd13',
+    '6f1b68c2398b4168aeabcfcdba30cd13'
 ]
 
 const darksky_keys = [
@@ -129,6 +132,9 @@ const darksky_keys = [
     '71e75bb6df6ddff6952eec41eb7f4c77',
     'fea51fa4c623c8029ee4f5cf8339ef34',
     '8fad431eb780aa026b67953778b05cae',
+    '3f4148820c57f43f275b1d8a296997de',
+    'fcb336d6821f83964f5ecab0c1f9e23c',
+    'ae9a54c4c0ed2db9dc466a678cf30a2a'
 ]
 
 
