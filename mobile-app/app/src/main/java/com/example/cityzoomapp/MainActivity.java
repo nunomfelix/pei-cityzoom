@@ -44,11 +44,11 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     /* Endpoints to where the data will be sent */
-    final String IP_ADDRESS = "192.168.1.71";
+    final String IP_ADDRESS = "193.136.93.14";
     final String USERNAME = "superuser";
     final String PASSWORD = "12345";
     String URL_LOGIN = "http://"+IP_ADDRESS+":8002/user/login";
-    String URL_POST = "http://"+IP_ADDRESS+":8003/mobileapp/values";
+    String URL_POST = "http://"+IP_ADDRESS+":8001/mobileapp/values";
 
     int proximityValue;
     int batteryValue;
@@ -197,7 +197,9 @@ public class MainActivity extends AppCompatActivity
         con.setRequestProperty ("content-type", "application/json");
         // For POST only - START
         con.setDoOutput(true);
+        System.out.println("Sending request!!");
         OutputStream os = con.getOutputStream();
+        System.out.println("Success!");
         String POST_PARAMS = "{\"proximity\":"+proximityValue+",\"battery\":"+batteryValue+",\"latitude\":"+latitudeValue+", \"longitude\":"+longitudeValue+"}";
         System.out.println(POST_PARAMS);
         os.write(POST_PARAMS.getBytes());

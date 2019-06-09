@@ -11,6 +11,7 @@ const expressDebug = require('debug')('app:express')
 require('./db/mongoose')
 
 //Imports routes
+const mobileappRouter = require('../../gateway_layer/src/mobileapp/mobileapp')
 const deviceRouter = require('./routes/devices')
 const streamRouter = require('./routes/streams')
 const alertRouter = require('./routes/alerts')
@@ -51,6 +52,7 @@ app.use(express.json())
 app.use('/czb/devices', deviceRouter)
 app.use('/czb/streams', streamRouter)
 app.use('/czb/alerts', alertRouter)
+app.use('/mobileapp', mobileappRouter)
 
 // error middleware
 //app.use(error)
