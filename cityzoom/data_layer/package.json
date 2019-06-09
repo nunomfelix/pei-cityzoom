@@ -9,7 +9,11 @@
     "index": "DEBUG=app:Mongoose nodemon --watch routes/ --watch index.js --watch db/ --watch middleware.js --watch validation.js --watch producer.js src/index.js",
     "consumer": "DEBUG=app:Consumer nodemon --watch consumer.js src/consumer.js",
     "dev": "npm-run-all --parallel index consumer",
-    "all": "gnome-terminal --tab -e \"npm run broker\" & gnome-terminal --tab -e \"npm run dev\""
+    "all": "gnome-terminal --tab -e \"npm run broker\" & gnome-terminal --tab -e \"npm run dev\"",
+    "windows": "npm-run-all --parallel index-windows consumer-windows",
+    "broker-windows": "nodemon --watch broker.js src/broker.js",
+    "index-windows": "nodemon --watch routes/ --watch index.js --watch db/ --watch middleware.js --watch validation.js --watch producer.js src/index.js",
+    "consumer-windows": "nodemon --watch consumer.js src/consumer.js"
   },
   "author": "andremourato@ua.pt&ZePaiva",
   "license": "MIT",
