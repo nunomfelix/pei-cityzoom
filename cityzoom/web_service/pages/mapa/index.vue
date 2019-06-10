@@ -128,7 +128,7 @@
         </div>
 
         <div class="map-menu show bottom" :class="{show: selected_county != null, active: selected_county == null}">
-            <div class="map-menu_button" @click="sensor_mode = !sensor_mode" :title="sensor_mode ? 'Toggle satellite view' : 'Toggle sensor view'">
+            <div class="map-menu_button" @click="sensor_mode = !sensor_mode; updateValues()" :title="sensor_mode ? 'Toggle satellite view' : 'Toggle sensor view'">
                 <img :src="sensor_mode ? 'icons/sensor.png' : 'icons/satellite.png'" alt="">
             </div>
         </div>

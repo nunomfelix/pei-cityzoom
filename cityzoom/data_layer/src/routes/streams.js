@@ -84,7 +84,7 @@ router.get('', async (req, res) => {
 router.get('/heatmap', async (req, res) => {
     streamsDebug('[DEBUG] Fetching all stream values')
     var stream_name = req.query.stream_name ? {stream_name: req.query.stream_name} : {} 
-    var satellite = req.query.satellite ? true : false
+    var satellite = req.query.satellite == "true"
     var start = req.query.interval_start ? Number(req.query.interval_start) : Number(new Date(0))
     var end = req.query.interval_end ? Number(req.query.interval_end) : Number(new Date())
     if (end < start || start < 0) {
