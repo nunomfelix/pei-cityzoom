@@ -44,8 +44,9 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     /* Endpoints to where the data will be sent */
-    final String IP_ADDRESS = "193.136.93.14";
-    //final String IP_ADDRESS = "192.168.50.100";
+    final String IP_ADDRESS = "193.136.93.14"; //IT CITYZOOM SERVER
+    //final String IP_ADDRESS = "192.168.50.100"; //FELIX IP
+    //final String IP_ADDRESS = "192.168.43.106"; //MOURATO IP
     final String USERNAME = "superuser";
     final String PASSWORD = "12345";
     String URL_LOGIN = "http://"+IP_ADDRESS+":8002/user/login";
