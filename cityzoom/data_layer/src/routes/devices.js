@@ -45,9 +45,12 @@ router.get('', async (req, res) => {
         devicesDebug('[ERROR] Interval is wrong')
         return res.status(400).send({error: 'Bad interval defined'})
     }
-    //var allDevices = await devices.find({created_at: { $gte: start, $lte: end}})
-    //res.status(200).send(allDevices)
+    var allDevices = await devices.find({created_at: { $gte: start, $lte: end}})
+    res.status(200).send(allDevices)
+})
 
+router.get("/location", async(req,res) => {
+    devicesDebug('[DEBUG] Fetching last device locations')
     const tmp = await values.aggregate([{
         $group:{
             _id: {
