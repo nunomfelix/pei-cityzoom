@@ -22,16 +22,15 @@ router.post('/:stream_name',validation(validatePostValue,'body','Invalid Stream'
         await producer.publish('cityzoom/values',to_broker)
         return res.status(200).send(to_broker)
     } else {
-        await devices.countDocuments({device_ID :to_broker.device_ID}, async (err, count) => {
-            if (count == 0) {
-                valuesDebug(`[ERROR] Device ${to_broker.device_ID} not found`)
-                return res.status(404).send({'Error':`Device ${to_broker.device_ID} not found`})
-            }
-            valuesDebug(`[DEBUG] Device ${to_broker.device_ID} exists`)
-            await producer.publish('cityzoom/values',to_broker)
-            valuesDebug('[DEBUG] Value created with success')
-        })
-        return res.status(204).send()
+        const count = await devices.countDocuments({device_ID :to_broker.device_ID})
+        if (count == 0) {
+            valuesDebug(`[ERROR] Device ${to_broker.device_ID} not found`)
+            return res.status(404).send({'Error':`Device ${to_broker.device_ID} not found`})
+        }
+        valuesDebug(`[DEBUG] Device ${to_broker.device_ID} exists`)
+        await producer.publish('cityzoom/values',to_broker)
+        valuesDebug('[DEBUG] Published Value')
+        return res.status(200).send(to_broker)
     } 
 
 })

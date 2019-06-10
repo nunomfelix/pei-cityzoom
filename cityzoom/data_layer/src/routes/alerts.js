@@ -2,8 +2,8 @@ const express = require('express')
 const alerts = require('../db/models/alerts')
 const triggers = require('../db/models/triggers')
 const alertDebug = require('debug')('app:Alerts')
-const axios = require('axios')
 const config = require('config')
+const mongoose = require('mongoose')
 const {validateCreateAlert, validateDismissAlert} = require('../validation')
 const { validation } = require('../middleware')
 const producer = require('../producer')
@@ -47,15 +47,15 @@ router.get('/triggered', async (req, res) => {
 // dismiss trigger 
 router.put('/:id/dismiss', validation(validateDismissAlert, 'body', 'Invalid alert'), async (req,res) => {
     alertDebug('[DEBUG] Dismissing alert '+req.params.id)
-    var exists = triggers.findOne({trigger_ID: req.params.id})
+    var exists = await triggers.findById( req.params.id )
     if (!exists) { return res.status(404).send({'Status':'Alert not found'})}
-    const alert = await triggers.findOneAndUpdate({trigger_ID: req.params.id},{$pull: { users: req.body.user }})
+    const alert = await triggers.findByIdAndUpdate(req.params.id,{$pull: { users: req.body.user }})
     alertDebug('[DEBUG] Alert: '+alert)
-    //const alert = await triggers.findOne({trigger_ID:req.params.id})
-    if (alert==null) {
+    alertDebug('[DEBUG] Users: '+alert.users.length)
+    if (alert.users.length==0) {
         alertDebug('[DEBUG] deleting trigger')
-        await triggers.deleteOne({trigger_ID:req.params.id})
-        res.status(200).send({'status': 'Alert'+trigger_id})
+        await triggers.findByIdAndDelete( req.params.id )
+        res.status(200).send({'status': 'Alert '+req.params.id})
     }
     res.status(204).send()
 })

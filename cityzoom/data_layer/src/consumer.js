@@ -97,8 +97,10 @@ async function updateValues(data_json) {
             }
         })
     }
-    console.log('checking alerts')
-    alert_checker(data_json.stream_name, hexa.id, hexa.municipality, data_json.satellite)
+    consumerDebug('[DEBUG] Checking alerts')
+    if (hexa != null) {
+        alert_checker(data_json.stream_name, hexa.id, hexa.municipality, data_json.satellite)
+    }
 }
 
 async function alert_checker(target_stream, hexa, mun, satellite) {
@@ -144,29 +146,6 @@ async function alert_checker(target_stream, hexa, mun, satellite) {
                     }
                 }
             ]
-
-            let tmp = null
-            if (satellite) 
-                tmp = await Satellites.aggregate(aggregation)
-            else
-                tmp = await Values.aggregate(aggregation)
-            
-            if (tmp.length!=0 && !alert.active && alert.lastOKRead!=null) {
-                consumerDebug('[DEBUG] Alert!!!')
-                var count  = await Triggers.countDocuments({})
-                await Triggers.create({
-                    trigger_ID: count,
-                    alert_ID: alert.alert_ID,
-                    timestamp: (new Date()).getTime(),
-                    causes: tmp,
-                    users: alert.users
-                })
-                consumerDebug('[DEBUG] Alert last OK READ: '+tmp[0].average)
-                await Alerts.updateOne({alert_ID:alert.alert_ID},{lastOKRead:tmp[0].average})
-            } else if (tmp.length==0) {
-                await Alerts.updateOne({alert_ID:alert.alert_ID},{lastOKRead:null})
-            }
-
         }
         else if (alert.target=='Hexagon') {
             consumerDebug('[DEBUG] Checking hexagon alert')
@@ -199,28 +178,6 @@ async function alert_checker(target_stream, hexa, mun, satellite) {
                     }
                 }
             ]
-
-            let tmp = null
-            if (satellite) 
-                tmp = await Satellites.aggregate(aggregation)
-            else
-                tmp = await Values.aggregate(aggregation)
-            
-            if (tmp.length!=0 && !alert.active && alert.lastOKRead!=null) {
-                consumerDebug('[DEBUG] Alert!!!')
-                var count  = await Triggers.countDocuments({})
-                await Triggers.create({
-                    trigger_ID: count,
-                    alert_ID: alert.alert_ID,
-                    timestamp: (new Date()).getTime(),
-                    causes: tmp,
-                    users: alert.users
-                })
-                consumerDebug('[DEBUG] Alert last OK READ: '+tmp[0].average)
-                await Alerts.updateOne({alert_ID:alert.alert_ID},{lastOKRead:tmp[0].average})
-            } else if (tmp.length==0) {
-                await Alerts.updateOne({alert_ID:alert.alert_ID},{lastOKRead:null})
-            }
         }
         else {
             consumerDebug('[DEBUG] Checking global alert')
@@ -252,29 +209,27 @@ async function alert_checker(target_stream, hexa, mun, satellite) {
                     }
                 }
             ]
+        }
 
-            let tmp = null
-            if (satellite) 
-                tmp = await Satellites.aggregate(aggregation)
-            else
-                tmp = await Values.aggregate(aggregation)
-            
-            if (tmp.length!=0 && !alert.active && alert.lastOKRead==null) {
-                consumerDebug('[DEBUG] Alert!!!')
-                consumerDebug('[DEBUG] last OK Read: '+alert.lastOKRead)
-                var count  = await Triggers.countDocuments({})
-                await Triggers.create({
-                    trigger_ID: count,
-                    alert_ID: alert.alert_ID,
-                    timestamp: (new Date()).getTime(),
-                    causes: tmp,
-                    users: alert.users
-                })
-                consumerDebug('[DEBUG] Alert last OK READ: '+tmp[0].average)
-                await Alerts.updateOne({alert_ID:alert.alert_ID},{lastOKRead:tmp[0].average})
-            } else if (tmp.length==0) {
-                await Alerts.updateOne({alert_ID:alert.alert_ID},{lastOKRead:null})
-            }
+        let tmp = null
+        if (satellite) 
+            tmp = await Satellites.aggregate(aggregation)
+        else
+            tmp = await Values.aggregate(aggregation)
+        
+        if (tmp.length!=0 && !alert.active && alert.lastOKRead==null) {
+            consumerDebug('[DEBUG] Alert!!!')
+            consumerDebug('[DEBUG] last OK Read: '+alert.lastOKRead)
+            await Triggers.create({
+                alert_ID: alert.alert_ID,
+                timestamp: (new Date()).getTime(),
+                causes: tmp,
+                users: alert.users
+            })
+            consumerDebug('[DEBUG] Alert last OK READ: '+tmp[0].average)
+            await Alerts.updateOne({alert_ID:alert.alert_ID},{lastOKRead:tmp[0].average})
+        } else if (tmp.length==0) {
+            await Alerts.updateOne({alert_ID:alert.alert_ID},{lastOKRead:null})
         }
     }
 }
