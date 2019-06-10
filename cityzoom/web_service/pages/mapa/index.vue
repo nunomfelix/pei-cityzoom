@@ -182,7 +182,6 @@ const helpers =  require('@turf/helpers')
 export default {
     data() {
         return {
-            values: drone_stream,
             req: {
                 Ol: null,
                 etent: null,
@@ -280,6 +279,12 @@ export default {
         const { Feature } = require( 'ol')
         const { click, pointerMove, altKeyOnly, noModifierKeys, altShiftKeysOnly, platformModifierKeyOnly } = require( 'ol/events/condition.js');
         
+
+
+        // var last_element = device[device.length - 1];
+        // console.log('ultimo elemento '+ last_element)
+
+
         for(var style in this.devicesStyle.templates) {
             for(var vertical of this.getVerticals) {
                 if(!(vertical.name in this.devicesStyle.styles))
@@ -349,6 +354,24 @@ export default {
             updateWhileAnimating: true,
         }) 
 
+        this.device_interval = setInterval( async () => {
+            const res = await this.$axios.get(`http://193.136.93.14:8002/devices/mobile_app_device_id_superuser/values`, {  
+                headers: {
+                    Authorization: this.$store.state.jwt
+                }
+            })
+            this.device = res.data[1]['values']
+            var last = this.device[this.device.length - 1]
+            this.devices_layer.getSource().clear()
+            this.devices_layer.getSource().addFeature(new Feature({
+                    geometry: new this.req.geom.Point(this.req.proj.transform([last.longitude,last.latitude], 'EPSG:4326', 'EPSG:3857')),
+                    //id: device.id
+                    name: 'teste'
+            }));
+        }, 1000)
+
+
+
         this.hex_layer = new layer.Vector({
             source: new source.Vector({
                 projection : 'EPSG:3857',
@@ -384,7 +407,7 @@ export default {
                 zoom: 8,
                 center,
                 minZoom: 6,
-                maxZoom: 14
+                maxZoom: 20
             })
         })
 

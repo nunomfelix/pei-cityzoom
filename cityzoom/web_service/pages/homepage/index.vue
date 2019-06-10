@@ -132,7 +132,7 @@ export default {
     }, 0)
 
     
-    const res = await this.$axios.get(`http://localhost:8002/devices/mobile_app_device_id_superuser/values`, {  
+    const res = await this.$axios.get(`http://193.136.93.14:8002/devices/mobile_app_device_id_superuser/values`, {  
       headers: {
           Authorization: this.$store.state.jwt
       }
