@@ -143,7 +143,7 @@ router.get('/locations', async (req, res) => {
         }, {
             '$group': {
                 '_id': {
-                    'id': '$stream_name', 
+                    'stream_name': '$stream_name', 
                     'hex': '$hexagon'
                 }, 
                 'average': { '$avg': '$value' }, 
