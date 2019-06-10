@@ -184,25 +184,6 @@ async function get_darksky_data(lat, long, key = 'b91f7d76e6e8638fa72345c58bce52
     return deviceName + "_device"
 }
  */
-/* async function create_Stream(streamID, streamName, deviceID) {
-    await axios.post('http://localhost:8001/czb/streams', {
-        "stream_ID": streamID,
-        "stream_name" : streamName,
-        "description": "",
-        "device_ID": deviceID
-    }).catch( (err)=> {console.log("Failed to create stream with message: " + err)})
-}
- */
-/* async function create_Subscription(subID, subName, streamID, deviceID) {
-    await axios.post('http://localhost:8001/czb/subscriptions', {
-            "subscription_ID": subID,
-            "subscription_name" : subName,
-            "description": "",
-            "stream_ID": streamID,
-            "device_ID": deviceID
-        }).catch( (err)=> {console.log("Failed to create subscription with message: " + err)})
-} */
-
 async function post_Values(streamName, value, lat, long) {
     console.log(lat, long)
     await axios.post('http://localhost:8001/czb/values/' + streamName, {
@@ -381,38 +362,4 @@ function sleep(ms) {
         }
         await sleep(1800000)
     }
-
-
-    // while(true) {
-    //     const time = promises.length / 5
-    //     for(var i = 0 ; i < 4; i++) {
-    //         const tmp = []
-    //         for(var j = 0; j < time; j++) {
-    //             tmp[j] = promises[(i * time) + j]
-    //         }
-    //         if(tmp[0]) 
-    //             Promise.all(tmp.map(p => p()))
-    //         await sleep(2000)
-    //     }
-    //     await sleep(1800000 * .9)
-    // }
-        
-
 })()
-
-
-/* async function test_posts() {
-    await create_Device("12345qwerty", "12345qwerty", "Temperature", "Aveiro")
-    await sleep(2000)
-    await create_Stream("12345qwerty", "12345qwerty" ,"12345qwerty", "Temperature")
-    await sleep(2000)
-    await post_Values("12345qwerty", 25, 41.2373, -8.401238)
-    var i = 0
-    for(var k=0; k<20; k++) {
-        var data = await get_breezometer_data('40.633317', '-8.659720', keys[i])
-        console.log(data[0])
-        i = (i+1) % keys.length
-    }
-}
-
-test_posts()*/
