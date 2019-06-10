@@ -131,7 +131,7 @@
             <div class="map-menu_button" @click="sensor_mode = !sensor_mode; updateValues()" :title="sensor_mode ? 'Toggle satellite view' : 'Toggle sensor view'">
                 <img :src="sensor_mode ? 'icons/sensor.png' : 'icons/satellite.png'" alt="">
             </div>
-            <div v-if="sensor_mode" class="map-menu_button" @click="hexagon_mode = sensor_mode ? !hexagon_mode : hexagon_mode; hex_layer.getSource().dispatchEvent('change');" :class="{selected: hexagon_mode}" >
+            <div v-if="sensor_mode" class="map-menu_button" @click="hexagon_mode = sensor_mode ? !hexagon_mode : hexagon_mode; hex_layer.getSource().dispatchEvent('change'); devices_layer.getSource().dispatchEvent('change');" :class="{selected: hexagon_mode}" >
                 <img src="icons/hex.png" alt="">
             </div>
         </div>
@@ -289,6 +289,7 @@ export default {
         this.req.geom = require( 'ol/geom');
         const interaction = require( 'ol/interaction');
         const { Feature } = require( 'ol')
+        this.req.Feature = Feature
         const { click, pointerMove, altKeyOnly, noModifierKeys, altShiftKeysOnly, platformModifierKeyOnly } = require( 'ol/events/condition.js');
         
 
@@ -308,7 +309,7 @@ export default {
                         anchorYUnits: 'fraction',
                         scale: this.devicesStyle.templates[style].scale,
                         opacity: 1,
-                        src: `icons/${vertical.name}_map.png`
+                        src: `icons/${vertical.name}.png`
                     }))
                 })
             }
@@ -360,11 +361,13 @@ export default {
         this.devices_layer = new layer.Vector({
             source: new source.Vector(),
             style: (feature) => {
-                return !hexagon_mode ? null : this.devicesStyle.styles[this.getVerticals[this.selected_vertical].name].default
+                return this.hexagon_mode || !this.sensor_mode ? null : this.devicesStyle.styles[this.getVerticals[this.selected_vertical].name].default
             },
             renderBuffer: window.innerWidth,
             updateWhileAnimating: true,
         }) 
+
+        console.log(this.devicesStyle)
 
         // this.device_interval = setInterval( async () => {
         //     const res = await this.$axios.get(`http://localhost:8002/devices/mobile_app_device_id_nuno/values`, {  
@@ -399,7 +402,7 @@ export default {
                 format: new this.req.format.GeoJSON()
             }),
             style: (feature) => {
-                return !this.hexagon_mode || this.loading_values || !(feature.get('id') in this.heatmapValues) ? null 
+                return (this.sensor_mode && !this.hexagon_mode) || this.loading_values || !(feature.get('id') in this.heatmapValues) ? null 
                     : (feature.get('opac') ? this.heatmapValues[feature.get('id')].styleOpac : ((feature.get('selected') ? this.heatmapValues[feature.get('id')].styleSel : this.heatmapValues[feature.get('id')].style)))
             },
             renderBuffer: window.innerWidth,
@@ -531,7 +534,6 @@ export default {
                 this.hovered_geo = null
                 this.selected_county = geo_feature 
                 this.shown_features = []
-                this.devices_layer.getSource().clear()
 
                 // for(var device of this.getDevices) {
                 //     if(device.hexagon && device.hexagon.substring(0, 6) == this.selected_county.get('id') && device.vertical.includes(this.getVerticals[this.selected_vertical].name)) {
@@ -612,11 +614,9 @@ export default {
             })
 
             for(var device of this.getDevices) {
-                var location = [device.locations[device.locations.length - 1].latitude, device.locations[device.locations.length - 1].longitude]
-                const feat = new Feature({
-                    geometry: new this.req.geom.Point(this.req.proj.transform([location[1],location[0]], 'EPSG:4326', 'EPSG:3857')),
-                    id: device.device_id,
-                    hexagon: device.hexagon
+                const feat = new this.req.Feature({
+                    geometry: new this.req.geom.Point(this.req.proj.transform([device.location[0],device.location[1]], 'EPSG:4326', 'EPSG:3857')),
+                    id: device.device_ID
                 })
                 this.devices_layer.getSource().addFeature(feat)
                 this.shown_features.push(feat);
@@ -703,12 +703,6 @@ export default {
         },
         selectVertical(i) {
             this.selected_vertical = i
-            for(var feature in this.shown_features) {
-                if(!(this.getDevices.find(d => d.device_id == this.shown_features[feature].get('id')).vertical.includes(this.getVerticals[this.selected_vertical].name))) {
-                    this.devices_layer.getSource().removeFeature(this.shown_features[feature])
-                    this.shown_features.splice(feature, 1)
-                }
-            }
             this.devices_layer.getSource().dispatchEvent('change');
             this.selectStream(0)
         },
@@ -791,6 +785,7 @@ export default {
             this.map.updateSize()  
             this.loading_values = false
             this.hex_layer.getSource().dispatchEvent('change');
+            this.devices_layer.getSource().dispatchEvent('change');
             this.modifier++
 
         }

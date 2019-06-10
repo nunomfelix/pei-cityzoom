@@ -14,12 +14,13 @@ router.post('/:stream_name',validation(validatePostValue,'body','Invalid Stream'
     valuesDebug('[DEBUG] Receiving Value')
     const to_broker = {
         ...req.body,
-        timestamp: req.body.timestamp ? req.body.timestamp : new Date().getTime(),
+        created_at: req.body.timestamp ? req.body.timestamp : new Date().getTime(),
         stream_name: req.params.stream_name,
     } 
 
     if(to_broker.satellite) {
         await producer.publish('cityzoom/values',to_broker)
+        res.send(204)
     } else {
         await devices.countDocuments({device_ID :to_broker.device_ID}, async (err, count) => {
             if (count == 0) {
@@ -32,7 +33,6 @@ router.post('/:stream_name',validation(validatePostValue,'body','Invalid Stream'
             return res.status(204).send()
         })
     } 
-    res.send(to_broker)
 
 })
 

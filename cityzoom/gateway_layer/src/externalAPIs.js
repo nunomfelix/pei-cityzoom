@@ -1,5 +1,6 @@
 const axios = require('axios')
 const fs = require('fs')
+const Mutex = require('async-mutex').Mutex
 
 //193.136.93.14
 const breezo_keys = [
@@ -65,6 +66,9 @@ const breezo_keys = [
     'be15ecb8cb74494987a058c651cb574f',
     '8304cab9dfbb497783fa31b439296bc6',
     '8ec5318839cf4d1c8b11c9ce8bf2be5d',
+    '668b77c5edb143f7be010fe272754e9c',
+    '6f1b68c2398b4168aeabcfcdba30cd13',
+    '6f1b68c2398b4168aeabcfcdba30cd13'
 ]
 
 const darksky_keys = [
@@ -129,6 +133,9 @@ const darksky_keys = [
     '71e75bb6df6ddff6952eec41eb7f4c77',
     'fea51fa4c623c8029ee4f5cf8339ef34',
     '8fad431eb780aa026b67953778b05cae',
+    '3f4148820c57f43f275b1d8a296997de',
+    'fcb336d6821f83964f5ecab0c1f9e23c',
+    'ae9a54c4c0ed2db9dc466a678cf30a2a'
 ]
 
 
@@ -136,12 +143,10 @@ async function get_breezometer_data(lat, long, key = 'f55cfd01f2ab42ccb517e40844
 
     var tmp = {}
     var city_info = await axios.get('https://api.breezometer.com/air-quality/v2/current-conditions?lat='+lat+'&lon='+long+'&key='+key+'&features=pollutants_concentrations')
-    // tmp['co_stream'] = city_info.data.data.pollutants.co.concentration.value
     tmp['no2_stream'] = city_info.data.data.pollutants.no2.concentration.value
     tmp['ozone_stream'] = city_info.data.data.pollutants.o3.concentration.value
     tmp['pm10_stream'] = city_info.data.data.pollutants.pm10.concentration.value
     tmp['pm25_stream'] = city_info.data.data.pollutants.pm25.concentration.value
-    //tmp['so2_stream'] = city_info.data.data.pollutants.so2.concentration.value
 
     location = {
         'lat': lat,
@@ -157,8 +162,7 @@ async function get_darksky_data(lat, long, key = 'b91f7d76e6e8638fa72345c58bce52
     tmp['temperature_stream'] = city_info.data.hourly.data[0].temperature
     tmp['pressure_stream'] = city_info.data.hourly.data[0].pressure
     tmp['humidity_stream'] = city_info.data.hourly.data[0].humidity
-    tmp['ozone_stream'] = city_info.data.hourly.data[0].ozone
-    
+    tmp['ozone_stream'] = city_info.data.hourly.data[0].ozone  
 
     location = {
         'lat': lat,
@@ -168,8 +172,7 @@ async function get_darksky_data(lat, long, key = 'b91f7d76e6e8638fa72345c58bce52
 }
 
 //localhost:8001
-async function create_Device(deviceID, deviceName, verticals, municipality) {
-    //console.log(municipality)
+/* async function create_Device(deviceID, deviceName, verticals, municipality) {
     await axios.post('http://localhost:8001/czb/devices', {
         "device_ID": deviceID,
         "device_name" : deviceName,
@@ -180,8 +183,8 @@ async function create_Device(deviceID, deviceName, verticals, municipality) {
     }).catch((err) => {console.log("Failed to create device with error message: " + err)})
     return deviceName + "_device"
 }
-
-async function create_Stream(streamID, streamName, deviceID) {
+ */
+/* async function create_Stream(streamID, streamName, deviceID) {
     await axios.post('http://localhost:8001/czb/streams', {
         "stream_ID": streamID,
         "stream_name" : streamName,
@@ -189,7 +192,7 @@ async function create_Stream(streamID, streamName, deviceID) {
         "device_ID": deviceID
     }).catch( (err)=> {console.log("Failed to create stream with message: " + err)})
 }
-
+ */
 /* async function create_Subscription(subID, subName, streamID, deviceID) {
     await axios.post('http://localhost:8001/czb/subscriptions', {
             "subscription_ID": subID,
@@ -200,11 +203,9 @@ async function create_Stream(streamID, streamName, deviceID) {
         }).catch( (err)=> {console.log("Failed to create subscription with message: " + err)})
 } */
 
-counter = 1
-
-async function post_Values(streamID, value, lat, long) {
+async function post_Values(streamName, value, lat, long) {
     console.log(lat, long)
-    await axios.post('http://localhost:8001/czb/streams/' + streamID + '/values', {
+    await axios.post('http://localhost:8001/czb/values/' + streamName, {
         satellite: true,
         "value": value,
         "latitude": lat,
@@ -222,13 +223,10 @@ function sleep(ms) {
 
     console.log("Breezo: ", breezo_keys.length)
     console.log("Darksy: ", darksky_keys.length)
-    // console.log("Waiting 11 mins")
-    // await sleep(1000*60*11)
     console.log("Starting")
 
     const devices = []
     var obj = JSON.parse(fs.readFileSync('hex_data.json', 'utf8'))
-    let k = 0;
     for(hex in obj){
         var latMin = 90
         var latMax = -90
@@ -245,7 +243,6 @@ function sleep(ms) {
         
         var center_long = longMin + ((longMax - longMin)/2)
         var center_lat = latMin + ((latMax - latMin)/2)
-        console.log(center_long)
 
         var device = "device_APIs" +obj[hex]['id']
         await create_Device(device, device, ["Weather", "AirQuality"], obj[hex]['municipality'])
@@ -254,9 +251,9 @@ function sleep(ms) {
             center_long,
             center_lat
         })
-        k++
-        if(k == 10)
-            break;
+        // k++
+        // if(k == 10)
+        //     break;
     }
     await sleep(200);
     const breezo_devicesMap = {}
@@ -296,6 +293,8 @@ function sleep(ms) {
     const start = amount * process.argv[3]
     console.log(start, amount)
 
+    const mutex = new Mutex()
+
     while(true) {
 
         let promises = []
@@ -315,17 +314,25 @@ function sleep(ms) {
                                 for(var stream of breezo_devicesMap[tmp.device]) {
                                     post_Values(stream.stream, breezo_data[0][stream.stream], tmp.center_lat, tmp.center_long)
                                 }
-                                breezo_i = (breezo_i + 1) % breezo_keys.length
-                                tryAgain = false
+                                await mutex.acquire().then((release)=>{
+                                    breezo_i = (breezo_i + 1) % breezo_keys.length
+                                    tryAgain = false
+                                    release()
+                                })
+                                .catch()                               
                             } catch(err) {
                                 console.log("Failed breezo")
                                 breezo_keys.splice(breezo_i, 1);
-                                breezo_i = (breezo_i) % breezo_keys.length
-                                count++
-                                if(count < 10)
-                                    tryAgain = true
-                                else 
-                                    tryAgain = false
+                                await mutex.acquire().then((release)=>{
+                                    breezo_i = (breezo_i) % breezo_keys.length
+                                    count++
+                                    if(count < 10)
+                                        tryAgain = true
+                                    else 
+                                        tryAgain = false
+                                    release()
+                                })
+                                .catch()
                             }
                         }
                         resolve()        
@@ -343,17 +350,25 @@ function sleep(ms) {
                                 for(var stream of darksky_devicesMap[tmp.device]) {
                                     post_Values(stream.stream, darksky_data[0][stream.stream], tmp.center_lat, tmp.center_long)
                                 }
-                                darksky_i = (darksky_i + 1) % darksky_keys.length
-                                tryAgain = false
+                                await mutex.acquire().then((release)=>{
+                                    darksky_i = (darksky_i + 1) % darksky_keys.length
+                                    tryAgain = false
+                                    release()
+                                })
+                                .catch()                           
                             } catch(err) {
                                 console.log("Failed darksy")
                                 darksky_keys.splice(darksky_i, 1);
-                                darksky_i = (darksky_i) % darksky_keys.length
-                                count++
-                                if(count < 10)
-                                    tryAgain = true
-                                else 
-                                    tryAgain = false
+                                await mutex.acquire().then((release)=>{
+                                    darksky_i = (darksky_i) % darksky_keys.length
+                                    count++
+                                    if(count < 10)
+                                        tryAgain = true
+                                    else 
+                                        tryAgain = false
+                                    release()
+                                })
+                                .catch()
                             }
                         }
                         resolve()
