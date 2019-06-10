@@ -9,6 +9,7 @@
         android:icon="@drawable/cityzoom_logo_filled"
         android:label="CityZoom"
         android:roundIcon="@mipmap/ic_launcher_round"
+        android:usesCleartextTraffic="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
