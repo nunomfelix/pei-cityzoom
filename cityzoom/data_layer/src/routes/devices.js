@@ -53,24 +53,8 @@ router.get('', async (req, res) => {
 router.get('/:id', async (req, res) => {
     const doc = await devices.findOne({device_ID:req.params.id})
     if (!doc) { return res.status(404).send({'Status':'Not Found'}) }
-    // get all device streams
-    var allDeviceStreams = await streams.find({device_ID: doc.device_ID})
-    devStreams = []
-    allDeviceStreams.forEach((stream) => {
-        devStreams.push(stream.stream_ID)
-    })
 
-    res.status(200).send({
-        device_ID: doc.device_ID,
-        device_name: doc.device_name,
-        mobile: doc.mobile,
-        provider: doc.provider,
-        created_at: Number(doc.created_at),
-        verticals: doc.verticals,
-        description: doc.description,
-        locations: doc.locations,
-        streams: devStreams
-    })
+    res.status(200).send(doc)
 })
 
 // delete device by ID
