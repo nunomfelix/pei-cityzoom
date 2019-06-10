@@ -128,7 +128,7 @@
         </div>
 
         <div class="map-menu show bottom" :class="{show: selected_county != null, active: selected_county == null}">
-            <div class="map-menu_button" @click="sensor_mode = !sensor_mode; updateValues()" :title="sensor_mode ? 'Toggle satellite view' : 'Toggle sensor view'">
+            <div class="map-menu_button" @click="sensor_mode = !sensor_mode; updateValues(sensor = sensor_mode)" :title="sensor_mode ? 'Toggle satellite view' : 'Toggle sensor view'">
                 <img :src="sensor_mode ? 'icons/sensor.png' : 'icons/satellite.png'" alt="">
             </div>
             <div v-if="sensor_mode" class="map-menu_button" @click="hexagon_mode = sensor_mode ? !hexagon_mode : hexagon_mode; hex_layer.getSource().dispatchEvent('change'); devices_layer.getSource().dispatchEvent('change');" :class="{selected: hexagon_mode}" >
@@ -649,7 +649,7 @@ export default {
         getCurrentTimeHour() {
             return Math.ceil((new Date()).getTime() / 3600000) * 3600000
         },
-        async updateValues(refresh = false, load = true) {
+        async updateValues(refresh = false, load = true, sensor = false) {
             if(load) {
                 this.loading_values = true
                 this.hex_layer.getSource().dispatchEvent('change');
@@ -660,7 +660,8 @@ export default {
                 }
             })
             delete this.heatmap
-            this.heatmap = res.data
+            if(sensor == this.sensor_mode)
+                this.heatmap = res.data
             this.updateHeatMap(refresh)
         },
         clearHoverPopup() {
