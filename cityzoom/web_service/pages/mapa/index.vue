@@ -660,8 +660,7 @@ export default {
                 }
             })
             delete this.heatmap
-            if(sensor == this.sensor_mode)
-                this.heatmap = res.data
+            this.heatmap = res.data
             this.updateHeatMap(refresh)
         },
         clearHoverPopup() {
