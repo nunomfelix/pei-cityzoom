@@ -1,6 +1,7 @@
 //Debug
 const config = require('config')
 const colors = require('colors')
+const mongoose = require('mongoose')
 const mqtt = require('mqtt')
 const turf = require('@turf/helpers')
 const booleanPointInPolygon = require('@turf/boolean-point-in-polygon').default
@@ -12,14 +13,12 @@ const rootTopic = config.get('BROKER_ROOT_TOPIC')
 require('./db/mongoose_consumer') 
 const Device = require('./db/models/devices')
 const Verticals = require('./db/models/verticals')
-const Stream = require('./db/models/streams')
 const Hexas = require('./db/models/hexagons')
 const Muns = require('./db/models/municipalities')
 const Satellites = require('./db/models/satellite')
 const Values = require('./db/models/values')
 const Alerts = require('./db/models/alerts')
-const Mutex = require('async-mutex').Mutex
-let mutex = new Mutex()
+const Triggers = require('./db/models/triggers')
 
 client.on('connect',()=>{
     consumerDebug('Listening to MQTT broker!')
@@ -33,7 +32,7 @@ client.on('connect',()=>{
     
 client.on('message',async (topic,data,info)=>{
     const data_json = JSON.parse(data)
-    if(topic==rootTopic+'devices') {
+    if (topic==rootTopic+'devices') {
         Device.create(data_json)
             .then(() => {
                 consumerDebug('Device created with success')
@@ -41,14 +40,14 @@ client.on('message',async (topic,data,info)=>{
             .catch(() => {
                 consumerDebug(`Error publishing device`)
             })
-    } else if(topic == rootTopic+'streams') {
-        Stream.create(data_json).then(() => {
-            consumerDebug('Stream created with success')
-        }).catch((e) => {
-            consumerDebug('Error publishing stream')
-        })
-    } else if(topic == rootTopic+'values') {
+    } else if (topic == rootTopic+'values') {
         await updateValues(data_json)
+    } else if (topic == rootTopic+'alerts') {
+        Alerts.create(data_json).then( () => {
+            consumerDebug('Alert created with success')
+        }).catch(()=> {
+            consumerDebug('Error publiching Alert')
+        })
     }
     
 })
@@ -80,7 +79,9 @@ async function updateValues(data_json) {
         Values.create({
             ...rest,
             hexagon: hexa ? hexa.id : null,
-            municipality: hexa ? hexa.municipality : null
+            municipality: hexa ? hexa.municipality : null,
+            latitude,
+            longitude
         })
     
         Device.updateOne({device_ID: data_json.device_ID}, {
@@ -96,64 +97,168 @@ async function updateValues(data_json) {
             }
         })
     }
-
-    //alert(stream, hexa)
+    console.log('checking alerts')
+    alert_checker(data_json.stream_name, hexa.id, hexa.municipality, data_json.satellite)
 }
 
-async function alert(stream, hexa) {
+async function alert_checker(target_stream, hexa, mun, satellite) {
 
-    var alts = await Alerts.find({})
-    alts.forEach( async (element) => {
-        const now = new Date()
-        let date_id_start = 0
-        let date_id_end = 0
-        if (element.frequency == "YEAR"){
-            date_id_start = now.getTime() - (1000*60*60*24*365)
-            date_id_end = now.getTime()
-        }
-        else if (element.frequency == "DAY") {
-            date_id_start = now.getTime() - (1000*60*60*24)
-            date_id_end = now.getTime()
-        }
-        else if (element.frequency == "HOUR") {
-            date_id_start = now.getTime() - (1000*60*60)
-            date_id_end = now.getTime()
-        }
+    consumerDebug('[DEBUG] Checking all alarms, this one needs to go to effing threads m8s')
+    let alerts = await Alerts.find({target_stream})
 
-        var total_values = 0
-        var count = 0
-        if (hexa.streams && element.alert_ID.includes(stream.stream_name)) {
-            Object.keys(hexa.streams[stream.stream_name]).forEach(key => {
-                if (key >= date_id_start && key < date_id_end) {
-                    total_values = total_values + hexa.streams[stream.stream_name][key].total
-                    count = count + hexa.streams[stream.stream_name][key].count
+    for (var i = 0; i < alerts.length; i++) {
+        alert = alerts[i]
+        let end = new Date().getTime();
+        let start = 0
+        alert.frequency=='HOUR' ? start=end-1000*60*60 : 
+            alert.frequency=='DAY' ?  start=end-1000*60*60*24 :
+                start=end-1000*60*60*24*365
+        if (alert.target=='Municipality') {
+            consumerDebug('[DEBUG] Checking municipality alert')
+            var aggregation = [
+                {
+                    '$match': {
+                        'stream_name': target_stream, 
+                        'created_at': {
+                            '$gte': start, 
+                            '$lte': end
+                        }, 
+                        'municipality': mun 
+                    }
+                }, {
+                    '$group': {
+                        '_id': {
+                            'id': '$hexagon', 
+                            'municipality': '$municipality'
+                        }, 
+                        'min': { '$min': '$value' }, 
+                        'max': { '$max': '$value' }, 
+                        'average': { '$avg': '$value' }, 
+                        'count': { '$sum': 1 }
+                    }
+                }, {
+                    '$match': {
+                        'average': {
+                            [`${alert.type=='MAX' ? '$gt' : alert.type=='MAXEQ' ? '$gte' : alert.type=='MIN' ? '$lt' : '$lte'}`]: alert.value
+                        }
+                    }
                 }
-            })
-            const med = total_values / count
-            if (element.type == "MAX") {
-                if (med > element.value) {
-                    await Alerts.updateOne({"alert_ID": element.alert_ID}, {"active":true})
-                }
-            } 
-            else if (element.type == "MIN") {
-                if (med < element.value) {
-                    await Alerts.updateOne({"alert_ID": element.alert_ID}, {"active":true})
-                }
-            } 
-            else if (element.type == "MINEQ") {
-                if (med <= element.value) {
-                    await Alerts.updateOne({"alert_ID": element.alert_ID}, {"active":true})
-                }
+            ]
+
+            let tmp = null
+            if (satellite) 
+                tmp = await Satellites.aggregate(aggregation)
+            else
+                tmp = await Values.aggregate(aggregation)
+            
+            if (tmp.length!=0 && !alert.active) {
+                var count  = await Triggers.countDocuments({})
+                await Triggers.create({
+                    trigger_ID: count,
+                    alert_ID: alert.alert_ID,
+                    timestamp: (new Date()).getTime(),
+                    causes: tmp,
+                    users: alert.users
+                })
             }
-            else if (element.type == "MAXEQ") {
-                if (med >= element.value) {
-                    await Alerts.updateOne({"alert_ID": element.alert_ID}, {"active":true})
+
+        }
+        else if (alert.target=='Hexagon') {
+            consumerDebug('[DEBUG] Checking hexagon alert')
+            var aggregation = [
+                {
+                    '$match': {
+                        'stream_name': target_stream, 
+                        'created_at': {
+                            '$gte': start, 
+                            '$lte': end
+                        }, 
+                        'hexagon': hexa
+                    }
+                }, {
+                    '$group': {
+                        '_id': {
+                            'id': '$hexagon', 
+                            'municipality': '$municipality'
+                        }, 
+                        'min': { '$min': '$value' }, 
+                        'max': { '$max': '$value' }, 
+                        'average': { '$avg': '$value' }, 
+                        'count': { '$sum': 1 }
+                    }
+                }, {
+                    '$match': {
+                        'average': {
+                            [`${alert.type=='MAX' ? '$gt' : alert.type=='MAXEQ' ? '$gte' : alert.type=='MIN' ? '$lt' : '$lte'}`]: alert.value
+                        }
+                    }
                 }
-            }    
-        } 
-    });
-}
+            ]
 
-async function updateHex(dev, stream, data_json) {
+            let tmp = null
+            if (satellite) 
+                tmp = await Satellites.aggregate(aggregation)
+            else
+                tmp = await Values.aggregate(aggregation)
+            
+            if (tmp.length!=0 && !alert.active) {
+                var count  = await Triggers.countDocuments({})
+                await Triggers.create({
+                    trigger_ID: count,
+                    alert_ID: alert.alert_ID,
+                    timestamp: (new Date()).getTime(),
+                    causes: tmp,
+                    users: alert.users
+                })
+            }
+        }
+        else {
+            consumerDebug('[DEBUG] Checking global alert')
+            var aggregation = [
+                {
+                    '$match': {
+                        'stream_name': target_stream, 
+                        'created_at': {
+                            '$gte': start, 
+                            '$lte': end
+                        }
+                    }
+                }, {
+                    '$group': {
+                        '_id': {
+                            'id': '$hexagon', 
+                            'municipality': '$municipality'
+                        }, 
+                        'min': { '$min': '$value' }, 
+                        'max': { '$max': '$value' }, 
+                        'average': { '$avg': '$value' }, 
+                        'count': { '$sum': 1 }
+                    }
+                }, {
+                    '$match': {
+                        'average': {
+                            [`${alert.type=='MAX' ? '$gt' : alert.type=='MAXEQ' ? '$gte' : alert.type=='MIN' ? '$lt' : '$lte'}`]: alert.value
+                        }
+                    }
+                }
+            ]
 
+            let tmp = null
+            if (satellite) 
+                tmp = await Satellites.aggregate(aggregation)
+            else
+                tmp = await Values.aggregate(aggregation)
+            
+            if (tmp.length!=0 && !alert.active) {
+                var count  = await Triggers.countDocuments({})
+                await Triggers.create({
+                    trigger_ID: count,
+                    alert_ID: alert.alert_ID,
+                    timestamp: (new Date()).getTime(),
+                    causes: tmp,
+                    users: alert.users
+                })
+            }
+        }
+    }
 }

@@ -131,6 +131,9 @@
             <div class="map-menu_button" @click="sensor_mode = !sensor_mode; updateValues()" :title="sensor_mode ? 'Toggle satellite view' : 'Toggle sensor view'">
                 <img :src="sensor_mode ? 'icons/sensor.png' : 'icons/satellite.png'" alt="">
             </div>
+            <div v-if="sensor_mode" class="map-menu_button" @click="hexagon_mode = sensor_mode ? !hexagon_mode : hexagon_mode; hex_layer.getSource().dispatchEvent('change');" :class="{selected: hexagon_mode}" >
+                <img src="icons/hex.png" alt="">
+            </div>
         </div>
 
         <div class="map-menu noBack show">
@@ -235,6 +238,7 @@ export default {
             shown_features: [],
             opac_hex: [],
             sensor_mode: false,
+            hexagon_mode: true,
 
             heatmap: {},
             measure_selected: 'average',
@@ -287,6 +291,12 @@ export default {
         const { Feature } = require( 'ol')
         const { click, pointerMove, altKeyOnly, noModifierKeys, altShiftKeysOnly, platformModifierKeyOnly } = require( 'ol/events/condition.js');
         
+
+
+        // var last_element = device[device.length - 1];
+        // console.log('ultimo elemento '+ last_element)
+
+
         for(var style in this.devicesStyle.templates) {
             for(var vertical of this.getVerticals) {
                 if(!(vertical.name in this.devicesStyle.styles))
@@ -350,11 +360,37 @@ export default {
         this.devices_layer = new layer.Vector({
             source: new source.Vector(),
             style: (feature) => {
-                return this.devicesStyle.styles[this.getVerticals[this.selected_vertical].name].default
+                return !hexagon_mode ? null : this.devicesStyle.styles[this.getVerticals[this.selected_vertical].name].default
             },
             renderBuffer: window.innerWidth,
             updateWhileAnimating: true,
         }) 
+
+        // this.device_interval = setInterval( async () => {
+        //     const res = await this.$axios.get(`http://localhost:8002/devices/mobile_app_device_id_nuno/values`, {  
+        //         headers: {
+        //             Authorization: this.$store.state.jwt
+        //         }
+        //     })
+
+        //     const res2 = await this.$axios.get(`http://localhost:8002/devices/`, {
+        //         headers: {
+        //             Authorization: this.$store.state.jwt
+        //         }
+        //     })
+
+        //     console.log('louco\n\n')
+        //     console.log(res2.data)
+
+        //     this.device = res.data[1]['values']
+        //     var last = this.device[this.device.length - 1]
+        //     this.devices_layer.getSource().clear()
+        //     this.devices_layer.getSource().addFeature(new Feature({
+        //             geometry: new this.req.geom.Point(this.req.proj.transform([last.longitude,last.latitude], 'EPSG:4326', 'EPSG:3857')),
+        //             //id: device.id
+        //             name: 'teste'
+        //     }));
+        // }, 1000)
 
         this.hex_layer = new layer.Vector({
             source: new source.Vector({
@@ -363,7 +399,7 @@ export default {
                 format: new this.req.format.GeoJSON()
             }),
             style: (feature) => {
-                return this.loading_values || !(feature.get('id') in this.heatmapValues) ? null 
+                return !this.hexagon_mode || this.loading_values || !(feature.get('id') in this.heatmapValues) ? null 
                     : (feature.get('opac') ? this.heatmapValues[feature.get('id')].styleOpac : ((feature.get('selected') ? this.heatmapValues[feature.get('id')].styleSel : this.heatmapValues[feature.get('id')].style)))
             },
             renderBuffer: window.innerWidth,
@@ -375,7 +411,6 @@ export default {
         const center = this.req.proj.transform(centerpos, 'EPSG:4326', 'EPSG:3857');
         const maxExtent = [-9.5, 37, -6.2, 42.5];
         //const maxExtent = [-180, -90, 180, 90];
-
 
         this.map = new this.req.Ol.Map({
             target: 'map',
@@ -392,7 +427,7 @@ export default {
                 zoom: 8,
                 center,
                 minZoom: 6,
-                maxZoom: 14
+                maxZoom: 20
             })
         })
 
@@ -575,6 +610,18 @@ export default {
             this.geo_layer.getSource().getFeatures().forEach(feature => {
                 this.geoJsonExtent = this.req.extent.extend(this.geoJsonExtent, feature.getGeometry().getExtent())
             })
+
+            for(var device of this.getDevices) {
+                var location = [device.locations[device.locations.length - 1].latitude, device.locations[device.locations.length - 1].longitude]
+                const feat = new Feature({
+                    geometry: new this.req.geom.Point(this.req.proj.transform([location[1],location[0]], 'EPSG:4326', 'EPSG:3857')),
+                    id: device.device_id,
+                    hexagon: device.hexagon
+                })
+                this.devices_layer.getSource().addFeature(feat)
+                this.shown_features.push(feat);
+            }
+
             setTimeout(() => {
                 this.map.getView().fit(this.geoJsonExtent, {
                     duration: 500
@@ -607,7 +654,7 @@ export default {
                 this.loading_values = true
                 this.hex_layer.getSource().dispatchEvent('change');
             }
-            const res = await this.$axios.get(`http://localhost:8001/czb/streams/heatmap?interval_start=${Math.floor(this.getStartDate)}&interval_end=${Math.floor(this.getCurrentDate)}&stream_name=${this.getStream.name}&satellite=${!this.sensor_mode}`, {
+            const res = await this.$axios.get(`http://localhost:8001/czb/values/heatmap?interval_start=${Math.floor(this.getStartDate)}&interval_end=${Math.floor(this.getCurrentDate)}&stream_name=${this.getStream.name}&satellite=${!this.sensor_mode}`, {
                 headers: {
                     Authorization: this.$store.state.jwt
                 }
@@ -1023,7 +1070,7 @@ export default {
                 transform: scale(1);
             }
         }
-        &.active {
+        &.active, &.selected {
             @include shadow(0px, 0px, 0px, 0px, rgba(0,0,0,0));
             background-color: rgb(201, 201, 201);
         }

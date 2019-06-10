@@ -248,15 +248,15 @@ function sleep(ms) {
         console.log(center_long)
 
         var device = "device_APIs" +obj[hex]['id']
-        //await create_Device(device, device, ["Weather", "AirQuality"], obj[hex]['municipality'])
+        await create_Device(device, device, ["Weather", "AirQuality"], obj[hex]['municipality'])
         devices.push({
             device,
             center_long,
             center_lat
         })
-        // k++
-        // if(k == 10)
-        //     break;
+        k++
+        if(k == 10)
+            break;
     }
     await sleep(200);
     const breezo_devicesMap = {}

@@ -1,9 +1,8 @@
 const express = require('express')
-const validators = require('../validation')
+const {validateCreateDevice} = require('../validation')
 const { validation } = require('../middleware')
 const devicesDebug = require('debug')('app:Devices')
 const devices = require('../db/models/devices')
-const streams = require('../db/models/streams')
 const values = require('../db/models/values')
 //Broker producer and consumer
 const producer = require('../producer')
@@ -11,16 +10,12 @@ const producer = require('../producer')
 const router = new express.Router()
 
 // create a device
-router.post('', validation(validators.validateCreateDevice, 'body', 'Invalid device'), async (req, res) => {
+router.post('', validation(validateCreateDevice, 'body', 'Invalid device'), async (req, res) => {
     // convert request to broker-stuff
     const to_broker = {
-        device_ID: req.body['device_ID'],
-        device_name: req.body['device_name'],
-        mobile: req.body['mobile'],
-        provider: req.body['provider'],
+        ...req.body,
         created_at: Number(Date.now()), 
-        description: 'description' in req.body ? req.body.description : "",
-        locations: []
+        location: []
     }
     
     //Publishes the device in the broker
@@ -40,6 +35,7 @@ router.post('', validation(validators.validateCreateDevice, 'body', 'Invalid dev
     })
 })
 
+// get all devices
 router.get('', async (req, res) => {
     devicesDebug('[DEBUG] Fetching all Devices')
     const start = req.query.interval_start ? req.query.interval_start : 0
@@ -51,6 +47,24 @@ router.get('', async (req, res) => {
     }
     var allDevices = await devices.find({created_at: { $gte: start, $lte: end}})
     res.status(200).send(allDevices)
+})
+
+router.get("/location", async(req,res) => {
+    devicesDebug('[DEBUG] Fetching last device locations')
+    const tmp = await values.aggregate([{
+        $group:{
+            _id: {
+              device_id: "$device_ID",
+              longitude: "$longitude",
+              latitude: "$latitude"
+            },
+            last: {
+              $max: "$timestamp"
+            }
+          }
+    }])
+    console.log(tmp)
+    res.send(tmp)
 })
 
 // get device by ID
@@ -87,6 +101,8 @@ router.delete('/:id', async (req, res) => {
 // get values by stream
 router.get('/:id/values', async (req,res) => {
     const device = await devices.findOne({device_ID:req.params.id})
+
+    console.log(device)
     if (!device) { return res.status(404).send({'Status':'Not found'})}
     var start = req.query.interval_start ? Number(req.query.interval_start) : Number(new Date(0))
     var end = req.query.interval_end ? Number(req.query.interval_end) : Number(new Date())
@@ -100,24 +116,30 @@ router.get('/:id/values', async (req,res) => {
     var before = new Date()
     const tmp = await values.aggregate([{
         $match:{
-            device_ID: device.device_ID,
-            $and: [{created_at: {$gte: start}},{created_at: {$lt: end}}]
+            device_ID: device.device_ID
+            //$and: [{created_at: {$gte: start}},{created_at: {$lt: end}}]
         }
     },{
         $group:{
             _id: "$stream_name",
             values: {
                 $push: {
-                    created_at: "$created_at",
-                    value: "$value"
+                    timestamp: "$timestamp",
+                    value: "$value",
+                    longitude: "$longitude",
+                    latitude: "$latitude"
                 }
             }
         }
     }])
+    console.log('este ')
+    console.log(tmp)
+    console.log('\n\n')
     var after = new Date()
 
     console.log(after-before)
     res.send(tmp)
 })
+
 
 module.exports = router
