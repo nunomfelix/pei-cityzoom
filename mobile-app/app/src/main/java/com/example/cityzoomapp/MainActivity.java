@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity
 
     /* Endpoints to where the data will be sent */
     final String IP_ADDRESS = "193.136.93.14";
+    //final String IP_ADDRESS = "192.168.50.100";
     final String USERNAME = "superuser";
     final String PASSWORD = "12345";
     String URL_LOGIN = "http://"+IP_ADDRESS+":8002/user/login";
@@ -135,6 +136,10 @@ public class MainActivity extends AppCompatActivity
         }
         locationManager.requestLocationUpdates(
                 LocationManager.GPS_PROVIDER, 100, 0, locationListener);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
+            Log.d("app","No permission for internet");
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.INTERNET}, 101);
+        }
         //Button
         final Button clickButton = (Button) findViewById(R.id.sendButton);
         clickButton.setOnClickListener( new View.OnClickListener() {
