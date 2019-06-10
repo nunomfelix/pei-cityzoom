@@ -49,6 +49,24 @@ router.get('', async (req, res) => {
     res.status(200).send(allDevices)
 })
 
+router.get("/location", async(req,res) => {
+    devicesDebug('[DEBUG] Fetching last device locations')
+    const tmp = await values.aggregate([{
+        $group:{
+            _id: {
+              device_id: "$device_ID",
+              longitude: "$longitude",
+              latitude: "$latitude"
+            },
+            last: {
+              $max: "$timestamp"
+            }
+          }
+    }])
+    console.log(tmp)
+    res.send(tmp)
+})
+
 // get device by ID
 router.get('/:id', async (req, res) => {
     const doc = await devices.findOne({device_ID:req.params.id})
@@ -122,5 +140,6 @@ router.get('/:id/values', async (req,res) => {
     console.log(after-before)
     res.send(tmp)
 })
+
 
 module.exports = router
