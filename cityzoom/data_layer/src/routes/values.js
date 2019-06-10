@@ -1,6 +1,7 @@
 const express = require('express')
 const devices = require('../db/models/devices')
 const Value = require('../db/models/values')
+const Hexas = require('../db/models/hexagons')
 const Satellites = require('../db/models/satellite')
 const producer = require('../producer')
 const {validation} = require('../middleware')
@@ -113,6 +114,49 @@ router.get('/heatmap', async (req, res) => {
     
     res.send(tmp)
 
+})
+
+router.get('/locations', async (req, res) => {
+    valuesDebug('[DEBUG] Fetching values from hexagon in location')
+    if (!req.query.latitude || !req.query.longitude) {
+        valuesDebug('[DEBUG] Bad query string')
+        return res.status(400).send({Status: 'Bad query'})
+    } 
+    var latitude = Number(req.query.latitude)
+    var longitude = Number(req.query.longitude)
+  
+    const hexa = await Hexas.findOne({
+        location: {
+            $geoIntersects: {
+                $geometry: {
+                    type: "Point",
+                    coordinates: [longitude, latitude]
+                }
+            }
+        }
+    })
+
+    const agg = [{
+            '$match': {
+                'hexagon': '0105010'
+            }
+        }, {
+            '$group': {
+                '_id': {
+                    'id': '$stream_name', 
+                    'hex': '$hexagon'
+                }, 
+                'average': { '$avg': '$value' }, 
+                'min': { '$min': '$value' }, 
+                'max': { '$max': '$value' }, 
+                'count': { '$sum': 1 }
+            }
+        }
+    ]
+
+    const agreg = await Value.aggregate(agg)
+
+    return res.status(200).send(agreg)
 })
 
 module.exports = router
