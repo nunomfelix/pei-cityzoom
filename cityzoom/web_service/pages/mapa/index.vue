@@ -361,14 +361,14 @@ export default {
                 }
             })
 
-            const res2 = await this.$axios.get(`http://localhost:8002/devices/`, {
-                headers: {
-                    Authorization: this.$store.state.jwt
-                }
-            })
+            // const res2 = await this.$axios.get(`http://localhost:8002/devices/`, {
+            //     headers: {
+            //         Authorization: this.$store.state.jwt
+            //     }
+            // })
 
-            console.log('louco\n\n')
-            console.log(res2.data)
+            // console.log('louco\n\n')
+            // console.log(res2.data)
 
             this.device = res.data[1]['values']
             var last = this.device[this.device.length - 1]
