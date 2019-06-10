@@ -45,8 +45,23 @@ router.get('', async (req, res) => {
         devicesDebug('[ERROR] Interval is wrong')
         return res.status(400).send({error: 'Bad interval defined'})
     }
-    var allDevices = await devices.find({created_at: { $gte: start, $lte: end}})
-    res.status(200).send(allDevices)
+    //var allDevices = await devices.find({created_at: { $gte: start, $lte: end}})
+    //res.status(200).send(allDevices)
+
+    const tmp = await values.aggregate([{
+        $group:{
+            _id: {
+              device_id: "$device_ID",
+              longitude: "$longitude",
+              latitude: "$latitude"
+            },
+            last: {
+              $max: "$timestamp"
+            }
+          }
+    }])
+    console.log(tmp)
+    res.send(tmp)
 })
 
 // get device by ID
@@ -122,5 +137,6 @@ router.get('/:id/values', async (req,res) => {
     console.log(after-before)
     res.send(tmp)
 })
+
 
 module.exports = router

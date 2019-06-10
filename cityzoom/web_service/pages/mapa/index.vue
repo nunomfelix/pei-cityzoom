@@ -355,11 +355,21 @@ export default {
         }) 
 
         this.device_interval = setInterval( async () => {
-            const res = await this.$axios.get(`http://193.136.93.14:8002/devices/mobile_app_device_id_superuser/values`, {  
+            const res = await this.$axios.get(`http://localhost:8002/devices/mobile_app_device_id_nuno/values`, {  
                 headers: {
                     Authorization: this.$store.state.jwt
                 }
             })
+
+            const res2 = await this.$axios.get(`http://localhost:8002/devices/`, {
+                headers: {
+                    Authorization: this.$store.state.jwt
+                }
+            })
+
+            console.log('louco\n\n')
+            console.log(res2.data)
+
             this.device = res.data[1]['values']
             var last = this.device[this.device.length - 1]
             this.devices_layer.getSource().clear()
