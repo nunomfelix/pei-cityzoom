@@ -453,21 +453,6 @@ export default {
                 setTimeout(() => {
                     this.hoverOverlay.setPosition([center[0], center[1]])
                 }, 0)
-                // if(this.selected_county != null) {
-                //     for(var device of this.devices) {
-                //         if(device.hexagon && device.hexagon.substring(0, 6) == this.hovered_geo.get('id') && this.hovered_geo.get('id') != this.selected_county && device.vertical.includes(this.getVerticals[this.selected_vertical].name)){
-                //             var location = device.mobile ? [device.locations[device.locations.length - 1].latitude, device.locations[device.locations.length - 1].longitude] :
-                //                                 [device.locations[0].latitude, device.locations[0].longitude]
-                //             const feat = new Feature({
-                //                 geometry: new this.req.geom.Point(this.req.proj.transform([location[1],location[0]], 'EPSG:4326', 'EPSG:3857')),
-                //                 id: device.device_id,
-                //                 hexagon: device.hexagon
-                //             })
-                //             this.devices_layer.getSource().addFeature(feat)
-                //             this.shown_features.push(feat);
-                //         }
-                //     }
-                // }
                 for(var feat of this.hex_layer.getSource().getFeatures()) {
                     if(feat.get('municipality') == this.hovered_geo.get('id')) {
                         feat.set('opac',true)
@@ -494,6 +479,7 @@ export default {
 
             document.body.style.cursor = "default"
             const geo_feature = e.selected[0]
+            console.log(geo_feature)
             if(geo_feature.get('FREGUESIA') && geo_feature != this.selected_county) {
                 this.map.setView(new this.req.Ol.View({
                     center: this.map.getView().getCenter(),
@@ -506,19 +492,6 @@ export default {
                     this.addHiddenHex(this.selected_county)
                 this.hovered_geo = null
                 this.selected_county = geo_feature 
-                // for(var device of this.devices) {
-                //     if(device.hexagon && device.hexagon.substring(0, 6) == this.selected_county.get('id') && device.vertical.includes(this.getVerticals[this.selected_vertical].name)) {
-                //         var location = [device.locations[device.locations.length - 1].latitude, device.locations[device.locations.length - 1].longitude]
-                //         const feat = new Feature({
-                //             geometry: new this.req.geom.Point(this.req.proj.transform([location[1],location[0]], 'EPSG:4326', 'EPSG:3857')),
-                //             id: device.device_id,
-                //             hexagon: device.hexagon
-                //         })
-                //         this.devices_layer.getSource().addFeature(feat)
-                //         this.shown_features.push(feat);
-                //     }
-                // }
-
                 for(var feat of this.hex_layer.getSource().getFeatures()) {
                     if(!feat.get('opac') && feat.get('municipality') == this.selected_county.get('id')) {
                         feat.set('opac',true)
@@ -543,7 +516,7 @@ export default {
                         }
                     })  
                 },0)
-            } else if(e.selected.length > 1) {
+            } else {
                 this.selected_device = e.selected[e.selected.length - 1].get('id')
                 this.showModal = true
             }

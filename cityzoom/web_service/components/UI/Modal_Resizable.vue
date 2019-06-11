@@ -15,9 +15,8 @@
             </div>
               -->
               <div  v-for="(stream, index) of streams" :key="index">
-                <line-chart style="overflow: visible" :height="300" :chart-data="datacollections[stream]" :options="options"/>
+                <line-chart style="overflow: visible" :height="300" :chart-data="datacollections[stream]" :options="options[stream]"/>
               </div>
-              {{getStreams}}
             </slot>
           </div>
 
@@ -52,21 +51,7 @@ export default {
       item: item,
       datacollections: {},
       position: null,
-      options: {
-        responsive: true,
-        elements: {
-          line: {
-            tension: 0
-          }
-        },
-        scales: {
-          xAxes: [
-            {
-              type: "time",
-            }
-          ]
-        }
-      }
+      options: {}
     };
   },
   computed: {
@@ -91,7 +76,6 @@ export default {
     );
     this.streams = res.data.map(r => r._id);
 
-    console.log(res.data)
     for (var stream of res.data) {
       var labels = [];
       var y_axis = [];
@@ -100,22 +84,40 @@ export default {
         labels.push(value.timestamp);
       }
       this.fillData(labels, y_axis, stream._id);
-    }
 
-    console.log(this.datacollections)
+    this.options[stream._id] = {
+        elements: {
+          line: {
+            tension: 0
+          }
+        },
+        scales: {
+          xAxes: [
+            {
+              type: "time",
+            }
+          ],
+          yAxes: [{
+            display: true,
+            ticks: {
+              max: this.getStreams[stream._id].max + (this.getStreams[stream._id].max - this.getStreams[stream._id].min) * .05,
+              min: this.getStreams[stream._id].min - (this.getStreams[stream._id].max - this.getStreams[stream._id].min) * .05,    // minimum will be 0, unless there is a lower value.
+            }
+        }]
+        }
+      }
+    }
 
     this.show = true;
   },
 
   methods: {
     fillData(labels, y_axis, stream) {
-      console.log(stream)
-      console.log("lkahdsf", this.getStreams)
       this.datacollections[stream] = {
         labels: labels,
         datasets: [
           {
-            label: this.getStreams[stream],
+            label: this.getStreams[stream].display,
             backgroundColor: "#0099FF",
             data: y_axis
           }
