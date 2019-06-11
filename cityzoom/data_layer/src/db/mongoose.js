@@ -16,9 +16,9 @@ mongoose.connect(connectionUrl+database, {
     useCreateIndex: true
 }, async () => {
 
-    //fs.writeFile('backup_main_', JSON.stringify({satellite: await satellite.find(), alerts: await alerts.find(), verticals: await verticals.find(), devices: await devices.find(), values: await values.find(), hexagons: await hexagons.find(), muns: await muns.find()}), () => {})
-    
+    //fs.writeFile('backup_main_2', JSON.stringify({satellite: await satellite.find(), alerts: await alerts.find(), verticals: await verticals.find(), devices: await devices.find(), values: await values.find(), hexagons: await hexagons.find(), muns: await muns.find()}), () => {})
 
+    
     await hexagons.deleteMany({})
     await muns.deleteMany({})
     await devices.deleteMany({})
@@ -27,7 +27,7 @@ mongoose.connect(connectionUrl+database, {
     await verticals.deleteMany({})
     await alerts.deleteMany({})
 
-    fs.readFile('backup_main_', async(err, res) => {
+    fs.readFile('backup_main_2', async(err, res) => {
         res = JSON.parse(res)
         mongooseDebug("Starting up")
         if(res.hexagons) {
@@ -73,6 +73,8 @@ mongoose.connect(connectionUrl+database, {
             mongooseDebug("Loaded alerts")
         }
     })
+
+
     
     mongooseDebug("Connected to mongo database!")
 })
