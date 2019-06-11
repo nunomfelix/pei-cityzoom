@@ -24,12 +24,10 @@ async function get_breezometer_data(lat, long, key = 'f55cfd01f2ab42ccb517e40844
     var tmp = {}
     console.log('https://api.breezometer.com/air-quality/v2/current-conditions?lat='+lat+'&lon='+long+'&key='+key+'&features=pollutants_concentrations')
     var city_info = await axios.get('https://api.breezometer.com/air-quality/v2/current-conditions?lat='+lat+'&lon='+long+'&key='+key+'&features=pollutants_concentrations')
-    tmp['co_stream'] = city_info.data.data.pollutants.co.concentration.value
     tmp['no2_stream'] = city_info.data.data.pollutants.no2.concentration.value
     tmp['o3_stream'] = city_info.data.data.pollutants.o3.concentration.value
     tmp['pm10_stream'] = city_info.data.data.pollutants.pm10.concentration.value
     tmp['pm25_stream'] = city_info.data.data.pollutants.pm25.concentration.value
-    tmp['so2_stream'] = city_info.data.data.pollutants.so2.concentration.value
 
     location = {
         'lat': lat,
@@ -40,106 +38,82 @@ async function get_breezometer_data(lat, long, key = 'f55cfd01f2ab42ccb517e40844
 
 //193.136.93.14:8001
 async function create_Device(deviceID, deviceName, verticals, municipality) {
-    //console.log(municipality)
-    await axios.post('http://193.136.93.14:8001/czb/devices', {
+    console.log('Creating device at ' + municipality + 'with ID: ' + deviceID)
+    await axios.post('http://localhost:8001/czb/devices', {
         "device_ID": deviceID,
         "device_name" : deviceName,
         "description": "",
         "vertical": verticals,
         "mobile": false,
-        "provider": "beezometer",
+        "provider": "DarkSkyAPI",
         "municipality": municipality
     }).catch((err) => {console.log("Failed to create device with error message: " + err)})
     return deviceName + "_device"
 }
 
-async function create_Stream(streamID, streamName, deviceID) {
-    await axios.post('http://193.136.93.14:8001/czb/streams', {
-        "stream_ID": streamID,
-        "stream_name" : streamName,
-        "description": "",
-        "device_ID": deviceID
-    }).catch( (err)=> {console.log("Failed to create stream with message: " + err)})
-}
-
-/* async function create_Subscription(subID, subName, streamID, deviceID) {
-    await axios.post('http://localhost:8001/czb/subscriptions', {
-            "subscription_ID": subID,
-            "subscription_name" : subName,
-            "description": "",
-            "stream_ID": streamID,
-            "device_ID": deviceID
-        }).catch( (err)=> {console.log("Failed to create subscription with message: " + err)})
-} */
-
-async function post_Values(streamID, value, lat, long) {
-    await axios.post('http://193.136.93.14:8001/czb/streams/' + streamID + '/values', {
-            "value": value,
-            "latitude": lat,
-            "longitude": long,
-        }).catch( (err)=> {console.log("Failed to post value with message: " + err)})
+async function post_Values(streamName, value, lat, long, device) {
+    console.log(lat, long, value, device)
+    await axios.post('http://localhost:8001/czb/values/' + streamName, {
+        device_ID: device,
+        value : value,
+        latitude : lat,
+        longitude : long,
+    })
+    .then((res) => {})
+    .catch(async (err)=> {console.log(err);})
 } 
 
 function sleep(ms) {
 return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-/* async function test_posts() {
-    await create_Device("12345qwerty", "12345qwerty", "Temperature", "Aveiro")
-    await sleep(2000)
-    await create_Stream("12345qwerty", "12345qwerty" ,"12345qwerty", "Temperature")
-    await sleep(2000)
-    await post_Values("12345qwerty", 25, 41.2373, -8.401238)
-    var i = 0
-    for(var k=0; k<20; k++) {
-        var data = await get_breezometer_data('40.633317', '-8.659720', keys[i])
-        console.log(data[0])
-        i = (i+1) % keys.length
-    }
-}
-
-test_posts()*/
-
 (async function main() {
+    if(!process.argv[2] | process.argv[2] > 1725){
+        console.log('Instructions of use: \n'+
+                    'node breezometer.js n [name] \n' + 
+                    'n --> number of devices to create, up to 1725 \n'+ 
+                    'name (optinonal) --> base name of the devices to create \n'+ 
+                    'Run inside src folder in gateway_layer!')
+        return 
+    }
     const devices = []
     var obj = JSON.parse(fs.readFileSync('hex_data.json', 'utf8'))
     let k = 0;
     for(hex in obj){
-        var latMin = 90
-        var latMax = -90
-        var longMin = 180
-        var longMax = -180
-        for(i in obj[hex]['coordinates']){
-            var long = obj[hex]['coordinates'][i][0]
-            var lat = obj[hex]['coordinates'][i][1]
-            if(lat < latMin) latMin = lat
-            if(lat > latMax) latMax = lat
-            if(long < longMin) longMin = long
-            if(long > longMax) longMax = long
-        }
-        
-        var center_long = longMin + ((longMax - longMin)/2)
-        var center_lat = latMin + ((latMax - latMin)/2)
+        if(k < process.argv[2]) {
+            var latMin = 90
+            var latMax = -90
+            var longMin = 180
+            var longMax = -180
+            for(i in obj[hex]['coordinates']){
+                var long = obj[hex]['coordinates'][i][0]
+                var lat = obj[hex]['coordinates'][i][1]
+                if(lat < latMin) latMin = lat
+                if(lat > latMax) latMax = lat
+                if(long < longMin) longMin = long
+                if(long > longMax) longMax = long
+            }
+            
+            var center_long = longMin + ((longMax - longMin)/2)
+            var center_lat = latMin + ((latMax - latMin)/2)
 
-        var device = "device_breezometer" +obj[hex]['id']
-        await create_Device(device, device, ["AirQuality"], obj[hex]['municipality'])
-        devices.push({
-            device,
-            center_long,
-            center_lat
-        })
-        // k++
-        // if(k == 2)
-        //break;
+            var device = process.argv[3] ? process.argv[3] + obj[hex]['id'] : "device_breezometer" +obj[hex]['id']
+            await create_Device(device, device, ["AirQuality"], obj[hex]['municipality'])
+            devices.push({
+                device,
+                center_long,
+                center_lat
+            })
+            k++
+        }
     }
-    await sleep(2000);
+
     const devicesMap = {}
     for(var d in devices) {
         const streams = []
-        const tmp = ['co_stream','no2_stream','o3_stream','pm10_stream','pm25_stream','so2_stream']
+        const tmp = ['no2_stream','o3_stream','pm10_stream','pm25_stream']
         for(var stream of tmp) {
             const stream_id = devices[d].device + '_' + stream
-            await create_Stream(stream_id, stream, devices[d].device)
             streams.push({
                 stream,
                 stream_id
@@ -147,18 +121,21 @@ test_posts()*/
         }
         devicesMap[devices[d].device] = streams
     }
-    //i is a circular buffer that goes arround our API keys.
-    //This way we can make a request with one key at a time.
-    var i = 0
+
     for(var d of devices) {
-        try {
-            var data = await get_breezometer_data(d.center_lat, d.center_long, keys[i])
-            for(var stream of devicesMap[d.device]) {
-                await post_Values(stream.stream_id, data[0][stream.stream], d.center_lat, d.center_long)
-            }
-            i = (i+1) % keys.length
-        }catch {
-            console.log('Failed to fetch data from API!')
+        //var data = await get_breezometer_data(d.center_lat, d.center_long, keys[i])
+        var data = [{
+                        'no2_stream': Math.random() * (100),
+                        'o3_stream': Math.random() * (100),
+                        'pm10_stream': Math.random() * (100),
+                        'pm25_stream': Math.random() * (100)},
+                    {
+                        'lat' : d.center_lat,
+                        'long': d.center_long
+                    }]
+        for(var stream of devicesMap[d.device]) {
+            await post_Values(stream.stream, data[0][stream.stream], d.center_lat, d.center_long, d.device)
+
         }
     }
 })()
