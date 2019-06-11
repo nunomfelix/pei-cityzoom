@@ -595,7 +595,7 @@ export default {
             }
 
             setInterval( async () => {
-                const res = await this.$axios.get(`http://193.136.93.14:8001/czb/devices/location`, {
+                const res = await this.$axios.get(`http://localhost:8001/czb/devices/location`, {
                     headers: {
                         Authorization: this.$store.state.jwt
                     }
@@ -643,7 +643,7 @@ export default {
                 this.loading_values = true
                 this.hex_layer.getSource().dispatchEvent('change');
             }
-            const res = await this.$axios.get(`http://193.136.93.14:8001/czb/values/heatmap?interval_start=${Math.floor(this.getStartDate)}&interval_end=${Math.floor(this.getCurrentDate)}&stream_name=${this.getStream.name}&satellite=${!this.sensor_mode}`, {
+            const res = await this.$axios.get(`http://localhost:8001/czb/values/heatmap?interval_start=${Math.floor(this.getStartDate)}&interval_end=${Math.floor(this.getCurrentDate)}&stream_name=${this.getStream.name}&satellite=${!this.sensor_mode}`, {
                 headers: {
                     Authorization: this.$store.state.jwt
                 }

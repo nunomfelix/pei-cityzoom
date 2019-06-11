@@ -27,7 +27,7 @@ export default {
   },
   mounted() {
     setInterval(async() => {
-      const res = await this.$axios.get('http://http://193.136.93.14:8001/czb/alerts/list')
+      const res = await this.$axios.get('http://localhost:8001/czb/alerts/list')
       for(var alert in res.data) {
         if(alert.active)
           alerts.push(alert)
