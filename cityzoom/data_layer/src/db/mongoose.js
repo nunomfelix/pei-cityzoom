@@ -16,7 +16,7 @@ mongoose.connect(connectionUrl+database, {
     useCreateIndex: true
 }, async () => {
 
-    fs.writeFile('backup_main_', JSON.stringify({satellite: await satellite.find(), alerts: await alerts.find(), verticals: await verticals.find(), devices: await devices.find(), values: await values.find(), hexagons: await hexagons.find(), muns: await muns.find()}), () => {})
+    //fs.writeFile('backup_main_', JSON.stringify({satellite: await satellite.find(), alerts: await alerts.find(), verticals: await verticals.find(), devices: await devices.find(), values: await values.find(), hexagons: await hexagons.find(), muns: await muns.find()}), () => {})
     
     //fs.writeFile('backup_main_asdf', JSON.stringify({alerts: await alerts.find()}), () => {})
 

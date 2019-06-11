@@ -128,7 +128,7 @@
         </div>
 
         <div class="map-menu show bottom" :class="{show: selected_county != null, active: selected_county == null}">
-            <div class="map-menu_button" @click="sensor_mode = !sensor_mode; updateValues(sensor = sensor_mode)" :title="sensor_mode ? 'Toggle satellite view' : 'Toggle sensor view'">
+            <div class="map-menu_button" @click="sensor_mode = !sensor_mode; updateValues()" :title="sensor_mode ? 'Toggle satellite view' : 'Toggle sensor view'">
                 <img :src="sensor_mode ? 'icons/sensor.png' : 'icons/satellite.png'" alt="">
             </div>
             <div v-if="sensor_mode" class="map-menu_button" @click="hexagon_mode = sensor_mode ? !hexagon_mode : hexagon_mode; hex_layer.getSource().dispatchEvent('change'); devices_layer.getSource().dispatchEvent('change');" :class="{selected: hexagon_mode}" >
@@ -367,34 +367,6 @@ export default {
             updateWhileAnimating: true,
         }) 
 
-        console.log(this.devicesStyle)
-
-        // this.device_interval = setInterval( async () => {
-        //     const res = await this.$axios.get(`http://localhost:8002/devices/mobile_app_device_id_nuno/values`, {  
-        //         headers: {
-        //             Authorization: this.$store.state.jwt
-        //         }
-        //     })
-
-        //     const res2 = await this.$axios.get(`http://localhost:8002/devices/`, {
-        //         headers: {
-        //             Authorization: this.$store.state.jwt
-        //         }
-        //     })
-
-        //     console.log('louco\n\n')
-        //     console.log(res2.data)
-
-        //     this.device = res.data[1]['values']
-        //     var last = this.device[this.device.length - 1]
-        //     this.devices_layer.getSource().clear()
-        //     this.devices_layer.getSource().addFeature(new Feature({
-        //             geometry: new this.req.geom.Point(this.req.proj.transform([last.longitude,last.latitude], 'EPSG:4326', 'EPSG:3857')),
-        //             //id: device.id
-        //             name: 'teste'
-        //     }));
-        // }, 1000)
-
         this.hex_layer = new layer.Vector({
             source: new source.Vector({
                 projection : 'EPSG:3857',
@@ -622,6 +594,23 @@ export default {
                 this.shown_features.push(feat);
             }
 
+            setInterval( async () => {
+                const res = await this.$axios.get(`http://193.136.93.14:8001/czb/devices/location`, {
+                    headers: {
+                        Authorization: this.$store.state.jwt
+                    }
+                })
+
+                console.log(res)
+
+                const features = this.devices_layer.getSource().getFeatures()
+                for(var device of res.data) {
+                    const feature = features.find(f => f.get('id') == device.device_ID)
+                    if(feature)
+                        feature.getGeometry().setCoordinates(this.req.proj.transform(device.location, 'EPSG:4326', 'EPSG:3857'));
+                }
+            }, 1000)
+
             setTimeout(() => {
                 this.map.getView().fit(this.geoJsonExtent, {
                     duration: 500
@@ -649,19 +638,18 @@ export default {
         getCurrentTimeHour() {
             return Math.ceil((new Date()).getTime() / 3600000) * 3600000
         },
-        async updateValues(refresh = false, load = true, sensor = false) {
+        async updateValues(refresh = false, load = true) {
             if(load) {
                 this.loading_values = true
                 this.hex_layer.getSource().dispatchEvent('change');
             }
-            const res = await this.$axios.get(`http://localhost:8001/czb/values/heatmap?interval_start=${Math.floor(this.getStartDate)}&interval_end=${Math.floor(this.getCurrentDate)}&stream_name=${this.getStream.name}&satellite=${!this.sensor_mode}`, {
+            const res = await this.$axios.get(`http://193.136.93.14:8001/czb/values/heatmap?interval_start=${Math.floor(this.getStartDate)}&interval_end=${Math.floor(this.getCurrentDate)}&stream_name=${this.getStream.name}&satellite=${!this.sensor_mode}`, {
                 headers: {
                     Authorization: this.$store.state.jwt
                 }
             })
             delete this.heatmap
-            if(sensor == this.sensor_mode)
-                this.heatmap = res.data
+            this.heatmap = res.data
             this.updateHeatMap(refresh)
         },
         clearHoverPopup() {
