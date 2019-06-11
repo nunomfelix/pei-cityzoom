@@ -1,36 +1,29 @@
 <template>
-    <transition name="modal">
-    <div class="modal-mask">
+  <transition name="modal">
+    <div @click="$emit('close')" class="modal-mask">
       <div class="modal-wrapper">
         <div class="modal-container">
-
           <div class="modal-header">
-            <slot name="header">
-              Device Information
-            </slot>
-
-              
+            <span class="normal">Device Information</span> 
           </div>
 
           <div class="modal-body">
             <slot name="body">
-            <!--
+              <!--
             <div v-if="item.type=='lines'">
                 <LineGraph :ref="item.i" :name="item.i" :values="values"/>
             </div>
-            -->
-            <div v-if="show" class="small">
-              <line-chart  :chart-data="datacollection" :options="options"/>
-            </div>
+              -->
+              <div  v-for="(stream, index) of streams" :key="index">
+                <line-chart style="overflow: visible" :height="300" :chart-data="datacollections[stream]" :options="options"/>
+              </div>
+              {{getStreams}}
             </slot>
           </div>
 
           <div class="modal-footer">
             <slot name="footer">
-              
-              <button class="modal-default-button" @click="$emit('close')">
-                Close
-              </button>
+              <button class="modal-default-button" @click="$emit('close')">Close</button>
             </slot>
           </div>
         </div>
@@ -39,90 +32,120 @@
   </transition>
 </template>
 <script>
- 
-var item = { x: 0, y: 0, w: 12, h: 14, i: "line_a", type: 'lines', data:'fake' };
+var item = {
+  x: 0,
+  y: 0,
+  w: 12,
+  h: 14,
+  i: "line_a",
+  type: "lines",
+  data: "fake"
+};
 export default {
-  props:{device: String},
-  name: 'Modal_Resizable',
-  
+  props: { device: String },
+  name: "Modal_Resizable",
 
-  data(){
-      return {
+  data() {
+    return {
       show: false,
+      streams: [],
       item: item,
-      datacollection: null,
+      datacollections: {},
       position: null,
-      options:{
-        elements:{
-          line:{
-            tension:0
+      options: {
+        responsive: true,
+        elements: {
+          line: {
+            tension: 0
           }
-        }, 
+        },
         scales: {
-          xAxes: [{
-              type: 'time',
-          time: {
-              parser: "DD:HH:mm",
-              unit: 'hour'}
-          }]
+          xAxes: [
+            {
+              type: "time",
+            }
+          ]
         }
-    }
+      }
+    };
+  },
+  computed: {
+    getStreams() {
+      return this.$store.state.verticals.reduce((map, vertical) => {
+        vertical.streams.forEach(s => {
+          const {name, ...rest} = s
+          map[name] = rest
+        })
+        return map
+        }, {})
     }
   },
   mounted: async function() {
-   const res = await this.$axios.get(`http://193.136.93.14:8002/devices/${this.device}/values`, {  
-      headers: {
+    const res = await this.$axios.get(
+      `http://193.136.93.14:8002/devices/${this.device}/values`,
+      {
+        headers: {
           Authorization: this.$store.state.jwt
+        }
       }
-    })
-
-    this.data=res.data
+    );
+    this.streams = res.data.map(r => r._id);
 
     console.log(res.data)
+    for (var stream of res.data) {
+      var labels = [];
+      var y_axis = [];
+      for (var value of stream.values) {
+        y_axis.push(value.value);
+        labels.push(value.timestamp);
+      }
+      this.fillData(labels, y_axis, stream._id);
+    }
 
-    var labels = []
-    var y_axis = []
-    const d = [Object.keys(res.data)[0]]
-      for(var stream of res.data[d]){
-          y_axis.push(Math.round(stream.value))
-          labels.push(this.convertTimestamp(stream.created_at))
-        }
+    console.log(this.datacollections)
 
-    console.log(y_axis)
-    console.log(labels)
-    this.fillData(labels,y_axis)
-    this.show = true
+    this.show = true;
   },
-  
-  methods:{
-    fillData (labels,y_axis) {
-      this.datacollection = {
+
+  methods: {
+    fillData(labels, y_axis, stream) {
+      console.log(stream)
+      console.log("lkahdsf", this.getStreams)
+      this.datacollections[stream] = {
         labels: labels,
         datasets: [
           {
-            label: 'Humidity',
-            backgroundColor: '#0099FF',
+            label: this.getStreams[stream],
+            backgroundColor: "#0099FF",
             data: y_axis
           }
         ]
-      }
+      };
     },
-    getRandomInt () {
-      return Math.floor(Math.random() * (50 - 5 + 1)) + 5
+    getRandomInt() {
+      return Math.floor(Math.random() * (50 - 5 + 1)) + 5;
     },
-    convertTimestamp(t){
+    convertTimestamp(t) {
       var dt = new Date(t);
-      var day = dt.getDate().toString().padStart(2, '0');
-      var hr = dt.getHours().toString().padStart(2, '0');
-      var m = dt.getMinutes().toString().padStart(2, '0');
-      return day+':'+hr+ ':' + m.substr(-2)
+      var day = dt
+        .getDate()
+        .toString()
+        .padStart(2, "0");
+      var hr = dt
+        .getHours()
+        .toString()
+        .padStart(2, "0");
+      var m = dt
+        .getMinutes()
+        .toString()
+        .padStart(2, "0");
+      return day + ":" + hr + ":" + m.substr(-2);
     }
-
-  },
-}
+  }
+};
 </script>
 
-<style>
+<style lang="scss">
 .modal-mask {
   position: fixed;
   z-index: 9998;
@@ -130,9 +153,9 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, .5);
+  background-color: rgba(0, 0, 0, 0.5);
   display: table;
-  transition: opacity .3s ease;
+  transition: opacity 0.3s ease;
 }
 
 .modal-wrapper {
@@ -141,13 +164,15 @@ export default {
 }
 
 .modal-container {
+  height: 70vh;
+  overflow: auto;
   width: 600px;
   margin: 0px auto;
   padding: 20px 30px;
   background-color: #fff;
   border-radius: 2px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
-  transition: all .3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
+  transition: all 0.3s ease;
   font-family: Helvetica, Arial, sans-serif;
 }
 
@@ -162,6 +187,22 @@ export default {
 
 .modal-default-button {
   float: right;
+}
+
+::-webkit-scrollbar {
+
+width: .75rem;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: blue;
+  -webkit-box-shadow: inset 1px 1px 0 rgba(0,0,0,0.10),inset 0 -1px 0 rgba(0,0,0,0.07); 
+  &:hover {
+    background-color: rgb(0, 0, 179);
+    &:active {
+      background-color: rgb(0, 0, 129);
+    }
+  }
 }
 
 /*

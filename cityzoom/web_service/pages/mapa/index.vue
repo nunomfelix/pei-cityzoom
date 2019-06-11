@@ -363,7 +363,7 @@ export default {
         this.devices_layer = new layer.Vector({
             source: new source.Vector(),
             style: (feature) => {
-                return this.hexagon_mode || !this.sensor_mode || !this.getVertical || !this.getDevices[feature.get('id')].verticals.includes(this.getVertical.name) ? null : this.devicesStyle.styles[this.getVerticals[this.selected_vertical].name].default
+                return this.hexagon_mode || !this.sensor_mode || !this.getVertical || !this.devices[feature.get('id')].verticals.includes(this.getVertical.name) ? null : this.devicesStyle.styles[this.getVerticals[this.selected_vertical].name].default
             },
             renderBuffer: window.innerWidth,
             updateWhileAnimating: true,
@@ -454,7 +454,7 @@ export default {
                     this.hoverOverlay.setPosition([center[0], center[1]])
                 }, 0)
                 // if(this.selected_county != null) {
-                //     for(var device of this.getDevices) {
+                //     for(var device of this.devices) {
                 //         if(device.hexagon && device.hexagon.substring(0, 6) == this.hovered_geo.get('id') && this.hovered_geo.get('id') != this.selected_county && device.vertical.includes(this.getVerticals[this.selected_vertical].name)){
                 //             var location = device.mobile ? [device.locations[device.locations.length - 1].latitude, device.locations[device.locations.length - 1].longitude] :
                 //                                 [device.locations[0].latitude, device.locations[0].longitude]
@@ -506,7 +506,7 @@ export default {
                     this.addHiddenHex(this.selected_county)
                 this.hovered_geo = null
                 this.selected_county = geo_feature 
-                // for(var device of this.getDevices) {
+                // for(var device of this.devices) {
                 //     if(device.hexagon && device.hexagon.substring(0, 6) == this.selected_county.get('id') && device.vertical.includes(this.getVerticals[this.selected_vertical].name)) {
                 //         var location = [device.locations[device.locations.length - 1].latitude, device.locations[device.locations.length - 1].longitude]
                 //         const feat = new Feature({
@@ -584,9 +584,9 @@ export default {
                 this.geoJsonExtent = this.req.extent.extend(this.geoJsonExtent, feature.getGeometry().getExtent())
             })
 
-            for(var device in this.getDevices) {
+            for(var device in this.devices) {
                 const feat = new this.req.Feature({
-                    geometry: new this.req.geom.Point(this.req.proj.transform([this.getDevices[device].location.longitude, this.getDevices[device].location.latitude], 'EPSG:4326', 'EPSG:3857')),
+                    geometry: new this.req.geom.Point(this.req.proj.transform([this.devices[device].location.longitude, this.devices[device].location.latitude], 'EPSG:4326', 'EPSG:3857')),
                     id: device
                 })
                 this.devices_layer.getSource().addFeature(feat)
