@@ -42,7 +42,7 @@
  
 var item = { x: 0, y: 0, w: 12, h: 14, i: "line_a", type: 'lines', data:'fake' };
 export default {
-  props:{values: Object},
+  props:{device: String},
   name: 'Modal_Resizable',
   
 
@@ -70,7 +70,7 @@ export default {
     }
   },
   mounted: async function() {
-   const res = await this.$axios.get(`http://193.136.93.14:8002/devices/device_APIs0105010/values`, {  
+   const res = await this.$axios.get(`http://193.136.93.14:8002/devices/${this.device}/values`, {  
       headers: {
           Authorization: this.$store.state.jwt
       }
@@ -78,7 +78,7 @@ export default {
 
     this.data=res.data
 
-    console.log(res.body)
+    console.log(res.data)
 
     var labels = []
     var y_axis = []

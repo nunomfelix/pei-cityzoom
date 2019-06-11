@@ -43,7 +43,12 @@ export default{
             //         Authorization: payload
             //     }
             // })
-            commit('SET_STORE', { verticals: verticals.data, devices: devices.data }) //, heatmap: heatmap.data
+            commit('SET_STORE', { verticals: verticals.data, devices: devices.data.reduce((map, device) => {
+                const {device_ID, ...rest} = device
+                    map[device_ID] = rest
+                    return map
+                }, {}) 
+            }) //, heatmap: heatmap.data
         } catch (err) {
             console.error('Error', err.message)
             return err.message

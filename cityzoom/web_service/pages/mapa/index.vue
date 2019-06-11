@@ -152,7 +152,7 @@
             </div>
         </div>
         <Loading :show="!loaded || loading_values" type="absolute"/> 
-        <!-- <ModalResizable v-if="false || loading_values" @close="showModal = false" :values="values"/> -->
+        <ModalResizable v-if="showModal" @close="showModal = false" :device="selected_device"/>
     </div>
     
 </template>
@@ -227,15 +227,16 @@ export default {
             selected_vertical: null,
             selected_stream: null,
             selected_county: null,
+            selected_device: null,
             hovered_geo: null,
 
             geoJsonExtent: null,
             showModal: false,
 
+            devices : {},
             geo_layer: null,
             hex_layer: null,
             devices_layer: null,
-            shown_features: [],
             opac_hex: [],
             sensor_mode: false,
             hexagon_mode: true,
@@ -297,6 +298,7 @@ export default {
         // var last_element = device[device.length - 1];
         // console.log('ultimo elemento '+ last_element)
 
+        this.devices = {...this.getDevices}
 
         for(var style in this.devicesStyle.templates) {
             for(var vertical of this.getVerticals) {
@@ -361,7 +363,7 @@ export default {
         this.devices_layer = new layer.Vector({
             source: new source.Vector(),
             style: (feature) => {
-                return this.hexagon_mode || !this.sensor_mode ? null : this.devicesStyle.styles[this.getVerticals[this.selected_vertical].name].default
+                return this.hexagon_mode || !this.sensor_mode || !this.getVertical || !this.getDevices[feature.get('id')].verticals.includes(this.getVertical.name) ? null : this.devicesStyle.styles[this.getVerticals[this.selected_vertical].name].default
             },
             renderBuffer: window.innerWidth,
             updateWhileAnimating: true,
@@ -422,8 +424,7 @@ export default {
                     this.load()
             }
         })
-        
-        this.showModal = true
+    
 
         this.hover_interaction = new interaction.Select({
             condition: (e) => {
@@ -493,7 +494,7 @@ export default {
 
             document.body.style.cursor = "default"
             const geo_feature = e.selected[0]
-            if(geo_feature.get('id') && geo_feature != this.selected_county) {
+            if(geo_feature.get('FREGUESIA') && geo_feature != this.selected_county) {
                 this.map.setView(new this.req.Ol.View({
                     center: this.map.getView().getCenter(),
                     zoom: this.map.getView().getZoom(),
@@ -505,8 +506,6 @@ export default {
                     this.addHiddenHex(this.selected_county)
                 this.hovered_geo = null
                 this.selected_county = geo_feature 
-                this.shown_features = []
-
                 // for(var device of this.getDevices) {
                 //     if(device.hexagon && device.hexagon.substring(0, 6) == this.selected_county.get('id') && device.vertical.includes(this.getVerticals[this.selected_vertical].name)) {
                 //         var location = [device.locations[device.locations.length - 1].latitude, device.locations[device.locations.length - 1].longitude]
@@ -545,7 +544,7 @@ export default {
                     })  
                 },0)
             } else if(e.selected.length > 1) {
-                const device_feature = e.selected[e.selected.length - 1]
+                this.selected_device = e.selected[e.selected.length - 1].get('id')
                 this.showModal = true
             }
             this.click_interaction.getFeatures().clear()
@@ -585,13 +584,12 @@ export default {
                 this.geoJsonExtent = this.req.extent.extend(this.geoJsonExtent, feature.getGeometry().getExtent())
             })
 
-            for(var device of this.getDevices) {
+            for(var device in this.getDevices) {
                 const feat = new this.req.Feature({
-                    geometry: new this.req.geom.Point(this.req.proj.transform([device.location.longitude, device.location.latitude], 'EPSG:4326', 'EPSG:3857')),
-                    id: device.device_ID
+                    geometry: new this.req.geom.Point(this.req.proj.transform([this.getDevices[device].location.longitude, this.getDevices[device].location.latitude], 'EPSG:4326', 'EPSG:3857')),
+                    id: device
                 })
                 this.devices_layer.getSource().addFeature(feat)
-                this.shown_features.push(feat);
             }
 
             setInterval( async () => {
@@ -607,6 +605,8 @@ export default {
                     if(feature)
                         feature.getGeometry().setCoordinates(this.req.proj.transform([device.location.longitude, device.location.latitude], 'EPSG:4326', 'EPSG:3857'));
                     else {
+                        const {device_ID, ...rest} = device
+                        this.devices[device_ID] = rest
                         const feat = new this.req.Feature({
                             geometry: new this.req.geom.Point(this.req.proj.transform([device.location.longitude, device.location.latitude], 'EPSG:4326', 'EPSG:3857')),
                             id: device.device_ID
@@ -662,15 +662,6 @@ export default {
             document.body.style.cursor = "default"
             this.hoverOverlay.setPosition(null)
         },
-        clearGeoDevices(geo) {
-            const tmp = [...this.shown_features]
-            for(var feature of tmp) {
-                if(feature.get('hexagon').substring(0, 6) == geo.get('id')) {
-                    this.devices_layer.getSource().removeFeature(feature)
-                    this.shown_features.splice(this.shown_features.findIndex(f => f == feature), 1)
-                }
-            }
-        },
         addHiddenHex(geo) {
             const tmp = [...this.opac_hex]
             for(var feature of tmp) {
@@ -692,8 +683,6 @@ export default {
             })
             this.addHiddenHex(this.selected_county)
             this.selected_county = null
-            this.devices_layer.getSource().clear()
-            this.shown_features = []
         },
         selectVertical(i) {
             this.selected_vertical = i

@@ -48,17 +48,10 @@ router.get("/location", async(req,res) => {
         {
             $match: {
                 mobile: true,
-		        timestamp: { $gte: 0 } 
+		        "location.timestamp": { $gte: new Date() - 2000 }  
             },
         },
-        {
-            $project: {
-                location: 1,
-                device_ID: 1
-            }
-        }
     ])
-    console.log("HERE", tmp)
     res.send(tmp)
 })
 
@@ -119,10 +112,8 @@ router.get('/:id/values', async (req,res) => {
             _id: "$stream_name",
             values: {
                 $push: {
-                    timestamp: "$timestamp",
-                    value: "$value",
-                    longitude: "$longitude",
-                    latitude: "$latitude"
+                    timestamp: "$created_at",
+                    value: "$value"
                 }
             }
         }
