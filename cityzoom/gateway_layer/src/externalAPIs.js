@@ -17,7 +17,7 @@ const breezo_keys = [
     //THE KEYS ABOVE DON'T WORK ANYMORE//
     '3fd5da64b8494c5e9247cb89393f7152',
     '18cff0fa345d47c191ea62ed7c884f88',
-    'e2922410f76e4a93bae7beea7757d8a7',
+    'e2922410f76e4a93bae7beea7757d8a7', 
     'c0c8d52c93dc4267a550f6622b8bfd0c',
     '51e7d40fca2349bf808fe62c655bff49',
     'db0d510ed58f4bcb9364e2daf2d01095',
@@ -195,14 +195,14 @@ async function get_darksky_data(lat, long, key = 'b91f7d76e6e8638fa72345c58bce52
  */
 async function post_Values(streamName, value, lat, long) {
     console.log(lat, long)
-    await axios.post('http://localhost:8001/czb/values/' + streamName, {
+    await axios.post('http://193.136.93.14:8001/czb/values/' + streamName, {
         satellite: true,
         "value": value,
         "latitude": lat,
         "longitude": long,
     })
     .then((res) => {})
-    .catch(async (err)=> {console.log(err);})
+    .catch(async (err)=> {console.log('Failed to post value to' + streamName);})
 } 
 
 function sleep(ms) {
@@ -276,10 +276,6 @@ function sleep(ms) {
     var darksky_i = 0
     let promises = []
 
-    const amount = devices.length / process.argv[2]
-    const start = amount * process.argv[3]
-    console.log(start, amount)
-
     const mutex = new Mutex()
 
     while(true) {
@@ -287,87 +283,83 @@ function sleep(ms) {
         let promises = []
         
         for(var d in devices) {
+            const tmp = devices[d]
 
-            if(d >= start && d < start + amount) {
-                const tmp = devices[d]
-
-                promises.push(() => {
-                    return new Promise(async (resolve) => {
-                        let count = 0
-                        let tryAgain = true
-                        while(tryAgain) {
-                            try {
-                                var breezo_data = await get_breezometer_data(tmp.center_lat, tmp.center_long, breezo_keys[breezo_i])
-                                for(var stream of breezo_devicesMap[tmp.device]) {
-                                    post_Values(stream.stream, breezo_data[0][stream.stream], tmp.center_lat, tmp.center_long)
-                                }
-                                await mutex.acquire().then((release)=>{
-                                    breezo_i = (breezo_i + 1) % breezo_keys.length
-                                    tryAgain = false
-                                    release()
-                                })
-                                .catch()                               
-                            } catch(err) {
-                                console.log("Failed breezo")
-                                breezo_keys.splice(breezo_i, 1);
-                                await mutex.acquire().then((release)=>{
-                                    breezo_i = (breezo_i) % breezo_keys.length
-                                    count++
-                                    if(count < 10)
-                                        tryAgain = true
-                                    else 
-                                        tryAgain = false
-                                    release()
-                                })
-                                .catch()
+            promises.push(() => {
+                return new Promise(async (resolve) => {
+                    let count = 0
+                    let tryAgain = true
+                    while(tryAgain) {
+                        try {
+                            var breezo_data = await get_breezometer_data(tmp.center_lat, tmp.center_long, breezo_keys[breezo_i])
+                            for(var stream of breezo_devicesMap[tmp.device]) {
+                                post_Values(stream.stream, breezo_data[0][stream.stream], tmp.center_lat, tmp.center_long)
                             }
-                        }
-                        resolve()        
-                    })
-                })
-                
-    
-                promises.push(() => {
-                    return new Promise(async (resolve) => {
-                        let count = 0
-                        tryAgain = true
-                        while(tryAgain) {
-                            try {
-                                var darksky_data = await get_darksky_data(tmp.center_lat, tmp.center_long, darksky_keys[darksky_i])
-                                for(var stream of darksky_devicesMap[tmp.device]) {
-                                    post_Values(stream.stream, darksky_data[0][stream.stream], tmp.center_lat, tmp.center_long)
-                                }
-                                await mutex.acquire().then((release)=>{
-                                    darksky_i = (darksky_i + 1) % darksky_keys.length
+                            await mutex.acquire().then((release)=>{
+                                breezo_i = (breezo_i + 1) % breezo_keys.length
+                                tryAgain = false
+                                release()
+                            })
+                            .catch()                               
+                        } catch(err) {
+                            console.log("Failed breezo")
+                            breezo_keys.splice(breezo_i, 1);
+                            await mutex.acquire().then((release)=>{
+                                breezo_i = (breezo_i) % breezo_keys.length
+                                count++
+                                if(count < 10)
+                                    tryAgain = true
+                                else 
                                     tryAgain = false
-                                    release()
-                                })
-                                .catch()                           
-                            } catch(err) {
-                                console.log("Failed darksy")
-                                darksky_keys.splice(darksky_i, 1);
-                                await mutex.acquire().then((release)=>{
-                                    darksky_i = (darksky_i) % darksky_keys.length
-                                    count++
-                                    if(count < 10)
-                                        tryAgain = true
-                                    else 
-                                        tryAgain = false
-                                    release()
-                                })
-                                .catch()
-                            }
+                                release()
+                            })
+                            .catch()
                         }
-                        resolve()
-                    })
+                    }
+                    resolve()        
                 })
-    
-                if(promises.length >= 20) {
-                    await Promise.all(promises.map(p => p()))
-                    promises = []
-                }
-            }
+            })
             
+
+            promises.push(() => {
+                return new Promise(async (resolve) => {
+                    let count = 0
+                    tryAgain = true
+                    while(tryAgain) {
+                        try {
+                            var darksky_data = await get_darksky_data(tmp.center_lat, tmp.center_long, darksky_keys[darksky_i])
+                            for(var stream of darksky_devicesMap[tmp.device]) {
+                                post_Values(stream.stream, darksky_data[0][stream.stream], tmp.center_lat, tmp.center_long)
+                            }
+                            await mutex.acquire().then((release)=>{
+                                darksky_i = (darksky_i + 1) % darksky_keys.length
+                                tryAgain = false
+                                release()
+                            })
+                            .catch()                           
+                        } catch(err) {
+                            console.log("Failed darksy")
+                            darksky_keys.splice(darksky_i, 1);
+                            await mutex.acquire().then((release)=>{
+                                darksky_i = (darksky_i) % darksky_keys.length
+                                count++
+                                if(count < 10)
+                                    tryAgain = true
+                                else 
+                                    tryAgain = false
+                                release()
+                            })
+                            .catch()
+                        }
+                    }
+                    resolve()
+                })
+            })
+
+            if(promises.length >= 20) {
+                await Promise.all(promises.map(p => p()))
+                promises = []
+            }
         }
         await sleep(1800000)
     }
