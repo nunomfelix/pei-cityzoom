@@ -362,5 +362,6 @@ function sleep(ms) {
             }
         }
         await sleep(1800000)
+	console.log('Waiting 30 minutes...')
     }
 })()
