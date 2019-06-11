@@ -47,7 +47,8 @@ router.get("/location", async(req,res) => {
     const tmp = await devices.aggregate([
         {
             $match: {
-                mobile: true
+                mobile: true,
+		timestamp: { $gte: 0 } 
             },
         },
         {
@@ -57,7 +58,7 @@ router.get("/location", async(req,res) => {
             }
         }
     ])
-    console.log(tmp)
+    console.log("HERE", tmp)
     res.send(tmp)
 })
 

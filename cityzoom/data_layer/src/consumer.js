@@ -53,7 +53,6 @@ client.on('message',async (topic,data,info)=>{
 })
 
 async function updateValues(data_json) {
-
     const {longitude, latitude, ...rest} = data_json
     console.log(rest)
 
@@ -88,10 +87,11 @@ async function updateValues(data_json) {
     
         await Device.updateOne({device_ID: data_json.device_ID}, {
             $set: {
-                location: [
+                location: {
                     longitude,
-                    latitude
-                ]
+                    latitude,
+		    timestamp: data_json.timestamp
+		}
             },
             $addToSet: {
                 verticals: (await Verticals.findOne({"streams.name": data_json.stream_name})).name,
@@ -99,7 +99,7 @@ async function updateValues(data_json) {
             }
         })
     }
-    alert_checker(data_json.stream_name, hexa.id, hexa.municipality, data_json.satellite)
+    //alert_checker(data_json.stream_name, hexa.id, hexa.municipality, data_json.satellite)
 }
 
 async function alert_checker(target_stream, hexa, mun, satellite) {
