@@ -55,17 +55,19 @@ client.on('message',async (topic,data,info)=>{
 async function updateValues(data_json) {
 
     const {longitude, latitude, ...rest} = data_json
+    console.log(rest)
 
     const hexa = await Hexas.findOne({
         location: {
             $geoIntersects: {
                 $geometry: {
                     type: "Point",
-                    coordinates: [longitude, latitude]
+                    coordinates: [Number(longitude), Number(latitude)]
                 }
             }
         }
     })
+
 
     if(data_json.satellite) {
         if(hexa) {
@@ -84,7 +86,7 @@ async function updateValues(data_json) {
             longitude
         })
     
-        Device.updateOne({device_ID: data_json.device_ID}, {
+        await Device.updateOne({device_ID: data_json.device_ID}, {
             $set: {
                 location: [
                     longitude,
@@ -97,7 +99,6 @@ async function updateValues(data_json) {
             }
         })
     }
-    console.log('checking alerts')
     alert_checker(data_json.stream_name, hexa.id, hexa.municipality, data_json.satellite)
 }
 

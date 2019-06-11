@@ -37,7 +37,7 @@ process.on('unhandledRejection', (ex) => {
 })
 
 app.use((req, res, next) => {
-    var allowedOrigins = ['http://127.0.0.1:3000', 'http://localhost:3000', 'http://193.136.93.14:3000',];
+    var allowedOrigins = ['http://127.0.0.1:3000', 'http://localhost:3000', 'http://localhost:3000',];
     var origin = req.headers.origin;
     // if (allowedOrigins.indexOf(origin) > -1) {
     //     res.setHeader('Access-Control-Allow-Origin', origin);

@@ -16,19 +16,27 @@ mongoose.connect(connectionUrl+database, {
     useCreateIndex: true
 }, async () => {
 
-    //fs.writeFile('backup_main_', JSON.stringify({satellite: await satellite.find(), alerts: await alerts.find(), verticals: await verticals.find(), devices: await devices.find(), streams: await streams.find(), values: await values.find(), hexagons: await hexagons.find(), muns: await muns.find()}), () => {})
-  
-    /*
+    await verticals.deleteMany({})
+    fs.readFile('verticals.json', async(err, res) => {
+        res = JSON.parse(res)
+        for(var vertical in res.vertical) {
+            await verticals.create({
+                ...res.vertical[vertical],
+                name: vertical
+            })
+        }
+    })
+
+    //fs.writeFile('backup_main_2', JSON.stringify({satellite: await satellite.find(), alerts: await alerts.find(), devices: await devices.find(), values: await values.find(), hexagons: await hexagons.find(), muns: await muns.find()}), () => {})
+    
     await hexagons.deleteMany({})
     await muns.deleteMany({})
     await devices.deleteMany({})
-    await streams.deleteMany({})
     await values.deleteMany({})
-    await satellite.deleteMany({})
-    await verticals.deleteMany({})
+    //await satellite.deleteMany({})
     await alerts.deleteMany({})
 
-    fs.readFile('backup_main_', async(err, res) => {
+    fs.readFile('backup_main_2', async(err, res) => {
         res = JSON.parse(res)
         mongooseDebug("Starting up")
         if(res.hexagons) {
@@ -43,12 +51,6 @@ mongoose.connect(connectionUrl+database, {
             ))
             mongooseDebug("Loaded municipalities")
         }
-        if(res.verticals) {
-            await verticals.insertMany(res.verticals.map(v => 
-                new verticals(v)    
-            ))
-            mongooseDebug("Loaded verticals")
-        }
         if(res.devices) {
             await devices.insertMany(res.devices.map(d => 
                 new devices(d)    
@@ -61,21 +63,19 @@ mongoose.connect(connectionUrl+database, {
             ))
             mongooseDebug("Loaded values")
         }
-        if(res.satellite) {
-            await satellite.insertMany(res.satellite.map(v => 
-                new satellite(v)    
-            ))
-            mongooseDebug("Loaded satellite")
-        }
+        // if(res.satellite) {
+        //     await satellite.insertMany(res.satellite.map(v => 
+        //         new satellite(v)    
+        //     ))
+        //     mongooseDebug("Loaded satellite")
+        // }
         if(res.alerts) {
             await alerts.insertMany(res.alerts.map(a => 
                 new alerts(a)    
             ))
             mongooseDebug("Loaded alerts")
         }
-        
     })
-    */
     
     mongooseDebug("Connected to mongo database!")
 })

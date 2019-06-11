@@ -57,9 +57,8 @@ export default {
     setTimeout(() => {
       this.getLocation()
     }, 0)
-
     
-    const res = await this.$axios.get(`http://localhost:8002/devices/mobile_app_device_id_nuno/values`, {  
+    const res = await this.$axios.get(`http://localhost:8002/devices/device_APIs0105010/values`, {  
       headers: {
           Authorization: this.$store.state.jwt
       }
