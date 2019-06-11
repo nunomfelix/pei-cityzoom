@@ -20,7 +20,7 @@ router.post('/values', async (req, res) => {
         device_name: "mobile_app_device_name_" + username,
         mobile: true,
         vertical: "mobileapp",
-        provider: "Mobile app",
+        provider: req.body.username,
         description: "This is a device from the mobile app"
     }
     try {
