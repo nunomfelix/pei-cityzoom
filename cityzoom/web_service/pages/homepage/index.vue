@@ -1,80 +1,6 @@
 <template>
   <div class="mainMargin">
-    <grid-layout
-      :layout="layout"
-      :col-num="12"
-      :row-height="30"
-      :is-draggable="true"
-      :is-resizable="false"
-      :vertical-compact="true"
-      :margin="[20, 20]"
-      :use-css-transforms="false"
-    >
-      <grid-item
-        v-for="item in layout"
-        :key="item.i"
-        :x="item.x"
-        :y="item.y"
-        :w="item.w"
-        :h="item.h"
-        :i="item.i"
-        :minW="2"
-        :minH="14"
-        :maxH="14"
-        drag-allow-from=".widget_handle"
-        @resize="onResize(item.i)"
-        @resized="onResize(item.i)"
-      >
-        <div class="widget">
-          <div class="widget_handle">
-            <img src="icons/widgets/handler.png">
-          </div>
-          
-          <div v-if="item.type=='series'">
-            <SeriesGraph :ref="item.i" :data="item.data && item.data == 'fake' ? null : data" :name="item.i"/>
-          </div>
-          <div v-else-if="item.type=='stacked'">
-            <StackedBar :ref="item.i" :name="item.i"/>
-          </div>
-          <div v-else-if="item.type=='lines'">
-            <!--
-            <LineGraph :ref="item.i" :name="item.i" :values="values"/>
-            -->
-            
-            <div class="small">
-              <div v-for="stream of streams_graphs" :key="stream">
-                <line-chart :ref="item.i" :chart-data="stream" :options="options"/>
-              </div>
-            </div>
-          </div>
-          
-          <div v-else-if="item.type" class="small">
-              <BarChart/>
-          </div>
-
-          
-          <div v-else-if="item.type" class="small">
-            <pie-chart :data="pie_chartData"></pie-chart>
-          </div>
-    </div>
-          <!--
-          <div v-if="item.type=='widget_weather'">
-            <no-ssr>
-              <WeatherWidget 
-                :ref="item.i"
-                api-key="7fbda2874f6ebf17ef4d31443696cd68"
-                title="Weather"
-                :latitude="position ? position.coords.latitude.toString() : null"
-                :longitude="position ? position.coords.longitude.toString(): null"
-                language="pt"
-                units="uk">
-              </WeatherWidget>
-            </no-ssr>
-          </div>
-          -->
-        
-      </grid-item>
-    </grid-layout>
+    <Dashboard></Dashboard>
   </div>
 </template>
 
@@ -93,6 +19,7 @@ var testLayout = [
 ];
 
 export default {
+  name: 'Homepage',
   data() {
     return {
       layout: testLayout,
@@ -282,5 +209,17 @@ export default {
       }
     }
   }
+}
+
+.info-box {
+  cursor: pointer;
+}
+.info-box-content {
+  text-align: center;
+  vertical-align: middle;
+  display: inherit;
+}
+.fullCanvas {
+  width: 100%;
 }
 </style>

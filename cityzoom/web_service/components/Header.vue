@@ -2,7 +2,7 @@
   <div class="header">
     <div class="rowr header_buttons horizontalMargin">
       <div class="bell-wrapper">
-        <img src="icons/header/bell.png" @click="alert()">
+        <notifications-menu></notifications-menu>
         <div class="bell-count small">{{alerts.length}}</div>
         <img src="icons/header/logout-512.png" @click="logout()">   
       </div>

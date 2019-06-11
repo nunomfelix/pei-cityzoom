@@ -1,5 +1,6 @@
 <template>
   <div class="mainMargin fontSize" >
+    
     <b-table :items="items" :fields="fields" :tbody-tr-class="rowClass">
       <template slot="streams" slot-scope="data">
         <div class="img">
@@ -17,6 +18,9 @@
         </div>
       </template>
     </b-table>
+    <!--
+    <TablesView></TablesView>
+    -->
   </div>
 </template>
 
