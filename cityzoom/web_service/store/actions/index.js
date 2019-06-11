@@ -36,7 +36,6 @@ export default{
                     Authorization: payload
                 }
             })
-            console.log(devices)
             // const heatmap = await axios({
             //     method: 'get',
             //     url: getUrl() + '/streams/heatmap',
