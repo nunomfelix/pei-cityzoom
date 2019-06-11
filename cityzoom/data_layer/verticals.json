@@ -125,7 +125,7 @@
 			"display": "Aplicação Móvel",
 			"streams": [
 				{
-					"name": "mobile_app_stream_id_proximity_",
+					"name": "mobile_proximity_stream",
 					"display": "Sensor de proximidade",
 					"unit": "",
 					"fullunit": "",
@@ -135,7 +135,7 @@
 					"max": 1
 				},
 				{
-					"name": "mobile_app_stream_id_battery_",
+					"name": "mobile_battery_stream",
 					"display": "Percentagem de bateria",
 					"unit": "%",
 					"fullunit": "Percentagem",
