@@ -402,7 +402,7 @@ export default {
                 zoom: 8,
                 center,
                 minZoom: 6,
-                maxZoom: 20
+                maxZoom: 24
             })
         })
 
@@ -587,7 +587,7 @@ export default {
 
             for(var device of this.getDevices) {
                 const feat = new this.req.Feature({
-                    geometry: new this.req.geom.Point(this.req.proj.transform([device.location[0],device.location[1]], 'EPSG:4326', 'EPSG:3857')),
+                    geometry: new this.req.geom.Point(this.req.proj.transform([device.location.longitude, device.location.latitude], 'EPSG:4326', 'EPSG:3857')),
                     id: device.device_ID
                 })
                 this.devices_layer.getSource().addFeature(feat)
@@ -601,13 +601,18 @@ export default {
                     }
                 })
 
-                console.log(res)
-
                 const features = this.devices_layer.getSource().getFeatures()
                 for(var device of res.data) {
                     const feature = features.find(f => f.get('id') == device.device_ID)
                     if(feature)
-                        feature.getGeometry().setCoordinates(this.req.proj.transform(device.location, 'EPSG:4326', 'EPSG:3857'));
+                        feature.getGeometry().setCoordinates(this.req.proj.transform([device.location.longitude, device.location.latitude], 'EPSG:4326', 'EPSG:3857'));
+                    else {
+                        const feat = new this.req.Feature({
+                            geometry: new this.req.geom.Point(this.req.proj.transform([device.location.longitude, device.location.latitude], 'EPSG:4326', 'EPSG:3857')),
+                            id: device.device_ID
+                        })
+                        this.devices_layer.getSource().addFeature(feat)
+                    }
                 }
             }, 1000)
 
