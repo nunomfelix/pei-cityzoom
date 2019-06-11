@@ -87,7 +87,7 @@ export default {
         navigator.geolocation.getCurrentPosition(async (position) => { 
           this.position = position.coords; 
           console.log(position.coords)
-          // const res = await this.$axios.get(`http://193.136.93.14:8001/czb/values/locations?latitude=` + this.position.latitude + '&longitude=' + this.position.longitude)  
+          // const res = await this.$axios.get(`http://localhost:8001/czb/values/locations?latitude=` + this.position.latitude + '&longitude=' + this.position.longitude)  
           const res = await this.$axios.get(`http://localhost:8001/czb/values/locations?latitude=` + this.position.latitude + '&longitude=' + this.position.longitude)
           console.log('alooo',res.data)
           this.hexagon = res.data.hexagon

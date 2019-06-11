@@ -93,7 +93,7 @@ export default {
     },
     async update() {
       const res = await this.$axios.get(
-        `http://193.136.93.14:8002/devices/${this.device.device_ID}/values`,
+        `http://localhost:8002/devices/${this.device.device_ID}/values`,
         {
           headers: {
             Authorization: this.$store.state.jwt
