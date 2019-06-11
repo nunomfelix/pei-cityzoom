@@ -38,8 +38,8 @@ router.post('', validation(validateCreateDevice, 'body', 'Invalid device'), asyn
 // get all devices
 router.get('', async (req, res) => {
     devicesDebug('[DEBUG] Fetching all Devices')
-    const devices = await devices.find()
-    res.status(200).send(devices)
+    var allDevices = await devices.find({})
+    res.status(200).send(allDevices)
 })
 
 router.get("/location", async(req,res) => {
