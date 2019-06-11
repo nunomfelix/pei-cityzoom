@@ -245,6 +245,7 @@ function sleep(ms) {
         }
         console.log('Waiting 30 mins...')
         await sleep(1800000)
+	console.log('Waiting 30 minutes...')
     }
 })()
 //BREEZO KEYS
