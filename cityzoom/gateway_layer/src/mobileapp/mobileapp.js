@@ -14,10 +14,13 @@ router.post('/values', async (req, res) => {
     let encoded = req.headers.authorization.replace("Basic ", "")
     let decoded = new Buffer.from(encoded, 'base64').toString('ascii').split(":")
     let username = decoded[0]
+    var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    console.log('ip:', ip)
+    var identifier = ip
     //Creates a device in the DATA LAYER if it doesn't exist
     const createDeviceBody = {
-        device_ID: "mobile_app_device_id_" + username, //Uses the user's username has unique identifier of the mobile device
-        device_name: "mobile_app_device_name_" + username,
+        device_ID: "mobile_app_device_id_" + identifier, //Uses the user's device unique identifier
+        device_name: "mobile_app_device_name_" + identifier,
         mobile: true,
         vertical: "mobileapp",
         provider: req.body.username,
@@ -40,8 +43,8 @@ router.post('/values', async (req, res) => {
         //Creates stream
         const requestCreateStreamBody = {
             device_ID: createDeviceBody.device_ID,
-            stream_ID: "mobile_app_stream_id_" + streams[i] + "_" + username,
-            stream_name: "mobile_app_stream_name_" + streams[i] + "_" + username
+            stream_ID: "mobile_" + streams[i] + "_" + identifier,
+            stream_name: "mobile_" + streams[i]+"_stream"
         }
         /*try {
             const responseCreateStream = await axios.post(config.get('DATA_LAYER_URL') + "/czb/streams", requestCreateStreamBody)

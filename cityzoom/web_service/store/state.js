@@ -2,6 +2,6 @@ export default () => ({
     user: {},
     jwt: '',
     verticals: [],
-    devices: [],
+    devices: {},
     heatmap: {},
 })

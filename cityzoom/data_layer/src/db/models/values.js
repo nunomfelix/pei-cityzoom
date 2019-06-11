@@ -18,21 +18,13 @@ const valuesSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    timestamp: {
+    created_at: {
         type: Number,
         required: true,
         trim: true,
         default: new Date().getTime()
     },
-    latitude: {
-        type: Number,
-        trim: true
-    },
-    longitude: {
-        type: Number,
-        trim: true
-    },
-    hexagon:{},
+    hexagon: {},
     municipality: {}
 })
 

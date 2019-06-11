@@ -16,6 +16,7 @@ mongoose.connect(connectionUrl+database, {
     useCreateIndex: true
 }, async () => {
 
+<<<<<<< HEAD
     // fs.writeFile('backup_main_', JSON.stringify({
     //     satellite: await satellite.find(), 
     //     alerts: await alerts.find(), 
@@ -81,6 +82,68 @@ mongoose.connect(connectionUrl+database, {
     //     }
     //     
     // })
+=======
+    await verticals.deleteMany({})
+    fs.readFile('verticals.json', async(err, res) => {
+        res = JSON.parse(res)
+        for(var vertical in res.vertical) {
+            await verticals.create({
+                ...res.vertical[vertical],
+                name: vertical
+            })
+        }
+    })
+
+    //fs.writeFile('backup_main_2', JSON.stringify({satellite: await satellite.find(), alerts: await alerts.find(), devices: await devices.find(), values: await values.find(), hexagons: await hexagons.find(), muns: await muns.find()}), () => {})
+    
+    await hexagons.deleteMany({})
+    await muns.deleteMany({})
+    await devices.deleteMany({})
+    await values.deleteMany({})
+    //await satellite.deleteMany({})
+    await alerts.deleteMany({})
+
+    fs.readFile('backup_main_2', async(err, res) => {
+        res = JSON.parse(res)
+        mongooseDebug("Starting up")
+        if(res.hexagons) {
+            await hexagons.insertMany(res.hexagons.map(h => 
+                new hexagons(h)    
+            ))
+            mongooseDebug("Loaded hexagons")
+        }
+        if(res.muns) {
+            await muns.insertMany(res.muns.map(m => 
+                new muns(m)    
+            ))
+            mongooseDebug("Loaded municipalities")
+        }
+        if(res.devices) {
+            await devices.insertMany(res.devices.map(d => 
+                new devices(d)    
+            ))
+            mongooseDebug("Loaded devices")
+        }
+        if(res.values) {
+            await values.insertMany(res.values.map(v => 
+                new values(v)    
+            ))
+            mongooseDebug("Loaded values")
+        }
+        // if(res.satellite) {
+        //     await satellite.insertMany(res.satellite.map(v => 
+        //         new satellite(v)    
+        //     ))
+        //     mongooseDebug("Loaded satellite")
+        // }
+        if(res.alerts) {
+            await alerts.insertMany(res.alerts.map(a => 
+                new alerts(a)    
+            ))
+            mongooseDebug("Loaded alerts")
+        }
+    })
+>>>>>>> origin/deployment
     
     mongooseDebug("Connected to mongo database!")
 })

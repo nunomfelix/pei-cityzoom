@@ -37,9 +37,9 @@ const deviceSchema = new mongoose.Schema({
         default: Date.now
     },
     location: {
-        type: Array,
+        type: Object,
         required: true,
-        default: []
+        default: {}
     },
     description: {
         type: String,

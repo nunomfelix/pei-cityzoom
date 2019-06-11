@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 function getUrl(){
-    return process.client ? "http://193.136.93.14:8002" : "http://localhost:8002";
+    return process.client ? "http://193.136.93.14:8002" : "http://193.136.93.14:8002";
 }
 
 export default{
@@ -43,7 +43,12 @@ export default{
             //         Authorization: payload
             //     }
             // })
-            commit('SET_STORE', { verticals: verticals.data, devices: devices.data }) //, heatmap: heatmap.data
+            commit('SET_STORE', { verticals: verticals.data, devices: devices.data.reduce((map, device) => {
+                const {device_ID, ...rest} = device
+                    map[device_ID] = rest
+                    return map
+                }, {}) 
+            }) //, heatmap: heatmap.data
         } catch (err) {
             console.error('Error', err.message)
             return err.message
@@ -158,7 +163,7 @@ export default{
     },
     get_heatmap: async function({commit, state}, {start_date, end_date}) {
         try {
-            const res = await this.$axios.get(`http://localhost:8001/czb/streams/heatmap?interval_start=${Math.floor(start_date)}&interval_end=${Math.floor(end_date)}`, {
+            const res = await this.$axios.get(`http://193.136.93.14:8001/czb/streams/heatmap?interval_start=${Math.floor(start_date)}&interval_end=${Math.floor(end_date)}`, {
                 headers: {
                     Authorization: state.jwt
                 }
