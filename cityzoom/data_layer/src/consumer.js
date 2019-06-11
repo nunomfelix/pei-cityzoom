@@ -90,7 +90,7 @@ async function updateValues(data_json) {
                 location: {
                     longitude,
                     latitude,
-		    timestamp: data_json.timestamp
+		            timestamp: data_json.created_at
 		}
             },
             $addToSet: {
