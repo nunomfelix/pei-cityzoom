@@ -947,6 +947,7 @@ export default {
 
 .map-menu {
 
+    display: flex !important;
     @include flex(center, center, row);
     @include transition(opacity, .5s, ease, 0s);
     z-index: 3600;
