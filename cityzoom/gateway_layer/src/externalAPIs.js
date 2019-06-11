@@ -4,7 +4,7 @@ const Mutex = require('async-mutex').Mutex
 
 //193.136.93.14
 const breezo_keys = [
-    'f55cfd01f2ab42ccb517e40844a18797',
+    /* 'f55cfd01f2ab42ccb517e40844a18797',
     'f4e445e5a9ed4269ab75a95fd5ca1558',
     '9db2eccd0bfb4d74a86c13cb177c8f84',
     '965c452864bd4dff902e08a4d93799f0',
@@ -13,7 +13,8 @@ const breezo_keys = [
     'f7bab5c50ffb49218bd4750284df006e',
     'db69e8084d414d7fbe4ea16b0c2a86e5',
     'a61869cdc9ee4893a5200ddbf35f2442',
-    'fc78b642ea0c43978a1f80b7b529b8f3',
+    'fc78b642ea0c43978a1f80b7b529b8f3', */
+    //THE KEYS ABOVE DON'T WORK ANYMORE//
     '3fd5da64b8494c5e9247cb89393f7152',
     '18cff0fa345d47c191ea62ed7c884f88',
     'e2922410f76e4a93bae7beea7757d8a7',
@@ -21,7 +22,6 @@ const breezo_keys = [
     '51e7d40fca2349bf808fe62c655bff49',
     'db0d510ed58f4bcb9364e2daf2d01095',
     '0c434581acc54ecc91ef8db18b7cfc64',
-    '6f1a3af505ab43efa4d18eb6f7bab653',
     'a70edc6b1b0b4033bad557bf0de3d249',
     'ceb05e0ba10246369635f5b5cc36f244',
     'cf1c63b379a44a2e890c5bce8b60e4ab',
@@ -62,13 +62,22 @@ const breezo_keys = [
     'ee2eb703a148472a812c22f866469888',
     '59e4eace0d5f4094b531d63b1a85244e',
     '763780a6d3f04267b3731eeffced0f9c',
-    '34a502f162b24ed485b859fc19f82e27', 
+    '34a502f162b24ed485b859fc19f82e27',
     'be15ecb8cb74494987a058c651cb574f',
     '8304cab9dfbb497783fa31b439296bc6',
     '8ec5318839cf4d1c8b11c9ce8bf2be5d',
     '668b77c5edb143f7be010fe272754e9c',
     '6f1b68c2398b4168aeabcfcdba30cd13',
-    '6f1b68c2398b4168aeabcfcdba30cd13'
+    '6f1b68c2398b4168aeabcfcdba30cd13',
+    '153639693573411392b24e0b3dca10ff',
+    'b80183ee898945cf92c653dcf2bc64ab',
+    'ec559cfe4e1c46b2b85a6a005f6815bd',
+    '0dc55c9b6a5f4a10af1500d35821c7b4',
+    '2164502f90214397bda9fef5504c92eb',
+    '87a4ad9a13b04605aeb3f6ea37468d24',
+    '7406e7fd8fba4a3891d74eceae537626',
+    '17ac35a93e44420995cd69cd03a5cd6e',
+    '7a52e770e6244ca98e03948e46c16aca'
 ]
 
 const darksky_keys = [
@@ -139,7 +148,7 @@ const darksky_keys = [
 ]
 
 
-async function get_breezometer_data(lat, long, key = 'f55cfd01f2ab42ccb517e40844a18797') {
+async function get_breezometer_data(lat, long, key = '7a52e770e6244ca98e03948e46c16aca') {
 
     var tmp = {}
     var city_info = await axios.get('https://api.breezometer.com/air-quality/v2/current-conditions?lat='+lat+'&lon='+long+'&key='+key+'&features=pollutants_concentrations')
