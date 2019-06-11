@@ -1,86 +1,11 @@
 <template>
-  <div class="mainMargin">
-    <grid-layout
-      :layout="layout"
-      :col-num="12"
-      :row-height="30"
-      :is-draggable="true"
-      :is-resizable="false"
-      :vertical-compact="true"
-      :margin="[20, 20]"
-      :use-css-transforms="false"
-    >
-      <grid-item
-        v-for="item in layout"
-        :key="item.i"
-        :x="item.x"
-        :y="item.y"
-        :w="item.w"
-        :h="item.h"
-        :i="item.i"
-        :minW="2"
-        :minH="14"
-        :maxH="14"
-        drag-allow-from=".widget_handle"
-        @resize="onResize(item.i)"
-        @resized="onResize(item.i)"
-      >
-        <div class="widget">
-          <div class="widget_handle">
-            <img src="icons/widgets/handler.png">
-          </div>
-          
-          <div v-if="item.type=='series'">
-            <SeriesGraph :ref="item.i" :data="item.data && item.data == 'fake' ? null : data" :name="item.i"/>
-          </div>
-          <div v-else-if="item.type=='stacked'">
-            <StackedBar :ref="item.i" :name="item.i"/>
-          </div>
-          <div v-else-if="item.type=='lines'">
-            <!--
-            <LineGraph :ref="item.i" :name="item.i" :values="values"/>
-            -->
-            
-            <div class="small">
-              <div v-for="stream of streams_graphs" :key="stream">
-                <line-chart :ref="item.i" :chart-data="stream" :options="options"/>
-              </div>
-            </div>
-          </div>
-          
-          <div v-else-if="item.type" class="small">
-              <BarChart/>
-          </div>
-
-          
-          <div v-else-if="item.type" class="small">
-            <pie-chart :data="pie_chartData"></pie-chart>
-          </div>
-    </div>
-          <!--
-          <div v-if="item.type=='widget_weather'">
-            <no-ssr>
-              <WeatherWidget 
-                :ref="item.i"
-                api-key="7fbda2874f6ebf17ef4d31443696cd68"
-                title="Weather"
-                :latitude="position ? position.coords.latitude.toString() : null"
-                :longitude="position ? position.coords.longitude.toString(): null"
-                language="pt"
-                units="uk">
-              </WeatherWidget>
-            </no-ssr>
-          </div>
-          -->
-        
-      </grid-item>
-    </grid-layout>
+  <div class="mainMargin" v-if="hexagon_tuples && hexagon_tuples.length">
+    <Dashboard :hexagon="hexagon" :hexagon_tuples="hexagon_tuples" :municipality="municipality" :municipality_tuples="municipality_tuples"></Dashboard>
   </div>
 </template>
 
 <script>
 import moment from 'moment'
-const drone_stream = require('static/get_stream_values_response.json');
 
 var testLayout = [
   { x: 0, y: 0, w: 14, h: 14, i: "line_a", type: 'lines', data:'humidity_stream' },
@@ -93,11 +18,17 @@ var testLayout = [
 ];
 
 export default {
+  name: 'Homepage',
   data() {
     return {
       layout: testLayout,
       datacollection: null,
       position: null,
+      data:null,
+      hexagon:null,
+      hexagon_tuples:null,
+      municipality:null,
+      municipality_tuples:null,
       streams_graphs:null,
       options:{
         elements:{
@@ -127,15 +58,12 @@ export default {
     };
   }, 
   mounted: async function() {
-    setTimeout(() => {
       this.getLocation()
-    }, 0)
-    
-    const res = await this.$axios.get(`http://193.136.93.14:8002/devices/device_APIs0105010/values`, {  
-      headers: {
-          Authorization: this.$store.state.jwt
-      }
-    })
+
+    console.log('aquiiii\n\n\n')
+
+
+
 
 
    //createWidget with chartData 
@@ -144,9 +72,9 @@ export default {
    //y axis ??
    //Array de streams 
 
-    this.fillGraphsWithStreams(res.data)
+    //this.fillGraphsWithStreams(res.data)
     //console.log('aqui\n')
-    console.log(this.streams_graphs)
+    //console.log(this.streams_graphs)
   },
   methods: {
     onResize(i) {
@@ -156,11 +84,17 @@ export default {
     },
     getLocation(){
       if (navigator.geolocation){
-        navigator.geolocation.getCurrentPosition((position) => { 
-          this.position = position; 
-          this.position.coords.latitude = this.position.coords.latitude.toString()
-          this.position.coords.longitude = this.position.Coordinates.longitude.toString()
-          });
+        navigator.geolocation.getCurrentPosition(async (position) => { 
+          this.position = position.coords; 
+          console.log(position.coords)
+          // const res = await this.$axios.get(`http://193.136.93.14:8001/czb/values/locations?latitude=` + this.position.latitude + '&longitude=' + this.position.longitude)  
+          const res = await this.$axios.get(`http://localhost:8001/czb/values/locations?latitude=` + this.position.latitude + '&longitude=' + this.position.longitude)
+          console.log('alooo',res.data)
+          this.hexagon = res.data.hexagon
+          this.hexagon_tuples = res.data.hexagon_tuples
+          this.municipality = res.data.municipality
+          this.municipality_tuples = res.data.municipality_tuples
+        });
       }
     },
     fillData (labels,y_axis) {
@@ -184,13 +118,9 @@ export default {
         var y_axis = []
         //console.log('esteaqui     ',stream.values[0].value,'\n')
         for(var value in stream.values){
-          console.log(stream.values[value].timestamp)
           labels.push(this.convertTimestamp(stream.values[value].timestamp))
           y_axis.push(stream.values[value].value)
         }
-
-        console.log(labels)
-        console.log(y_axis)
 
         var datacollection = {
           labels: labels,
@@ -203,11 +133,9 @@ export default {
             }
           ]
         }
-        console.log(datacollection)
         this.streams_graphs.push(datacollection)
 
       }
-      console.log(this.streams_graphs)
 
       
     },
@@ -281,5 +209,17 @@ export default {
       }
     }
   }
+}
+
+.info-box {
+  cursor: pointer;
+}
+.info-box-content {
+  text-align: center;
+  vertical-align: middle;
+  display: inherit;
+}
+.fullCanvas {
+  width: 100%;
 }
 </style>

@@ -32,8 +32,18 @@ module.exports = {
     { src: '~/assets/charts.scss', lang: 'scss' },
     { src: '~/assets/animations.scss', lang: 'scss' },
     { src: '~/assets/tables.scss', lang: 'scss' },
+    { src: '~/assets/AdminLTE.min.css'},
+    { src: '~/assets/skin-blue.min.css'},
+    { src: '~/assets/bootstrap.min.css'},
+    { src: '~/assets/bootstrap.min.css.map.css'},
     { src: '~/node_modules/dc/style/dc.scss', lang: 'scss' },
     { src: '~/node_modules/ol/ol.css', lang: 'css' },
+
+  ],
+  script: [
+    { src: '~/assets/bootstrap.min.js' , type: 'text/javascript'},
+    { src: '~/assets/app.min.js' , type: 'text/javascript'},
+    { src: '~/assets/jQuery-2.2.0.min.js' , type: 'text/javascript'}
   ],
   
   router: {
@@ -56,6 +66,17 @@ module.exports = {
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
+    ['nuxt-fontawesome', {
+      imports: [
+       {
+         set: '@fortawesome/free-solid-svg-icons',
+         icons: ['fas']
+       },
+       {
+         set:'@fortawesome/free-brands-svg-icons',
+         icons: ['fab']
+      }],
+    }],
     // Doc: https://bootstrap-vue.js.org/docs/
     'bootstrap-vue/nuxt',
   ],
@@ -65,6 +86,10 @@ module.exports = {
   axios: {
     // See https://github.com/nuxt-community/axios-module#options
     debug:true
+  },
+
+  fontawesome:{
+    components:'fa'
   },
 
   /*

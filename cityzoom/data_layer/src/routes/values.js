@@ -1,7 +1,9 @@
 const express = require('express')
 const devices = require('../db/models/devices')
 const Value = require('../db/models/values')
+const Hexas = require('../db/models/hexagons')
 const Satellites = require('../db/models/satellite')
+const Municipalities = require('../db/models/municipalities')
 const producer = require('../producer')
 const {validation} = require('../middleware')
 const {validatePostValue} = require('../validation')
@@ -9,7 +11,7 @@ const valuesDebug = require('debug')('app:Values')
 
 const router = new express.Router()
 
-//post value to broker
+//post value to brokers
 router.post('/:stream_name',validation(validatePostValue,'body','Invalid Stream'), async (req,res)=>{
     valuesDebug('[DEBUG] Receiving Value')
     const to_broker = {
@@ -20,18 +22,17 @@ router.post('/:stream_name',validation(validatePostValue,'body','Invalid Stream'
 
     if(to_broker.satellite) {
         await producer.publish('cityzoom/values',to_broker)
-        res.send(204)
+        return res.status(200).send(to_broker)
     } else {
-        await devices.countDocuments({device_ID :to_broker.device_ID}, async (err, count) => {
-            if (count == 0) {
-                valuesDebug(`[ERROR] Device ${to_broker.device_ID} not found`)
-                return res.status(404).send({'Error':`Device ${to_broker.device_ID} not found`})
-            }
-            valuesDebug(`[DEBUG] Device ${to_broker.device_ID} exists`)
-            await producer.publish('cityzoom/values',to_broker)
-            valuesDebug('[DEBUG] Value created with success')
-            return res.status(204).send()
-        })
+        const count = await devices.countDocuments({device_ID :to_broker.device_ID})
+        if (count == 0) {
+            valuesDebug(`[ERROR] Device ${to_broker.device_ID} not found`)
+            return res.status(404).send({'Error':`Device ${to_broker.device_ID} not found`})
+        }
+        valuesDebug(`[DEBUG] Device ${to_broker.device_ID} exists`)
+        await producer.publish('cityzoom/values',to_broker)
+        valuesDebug('[DEBUG] Published Value')
+        return res.status(200).send(to_broker)
     } 
 
 })
@@ -114,6 +115,72 @@ router.get('/heatmap', async (req, res) => {
     
     res.send(tmp)
 
+})
+
+router.get('/locations', async (req, res) => {
+    valuesDebug('[DEBUG] Fetching values from hexagon in location')
+    if (!req.query.latitude || !req.query.longitude) {
+        valuesDebug('[DEBUG] Bad query string')
+        return res.status(400).send({Status: 'Bad query'})
+    } 
+    var latitude = Number(req.query.latitude)
+    var longitude = Number(req.query.longitude)
+  
+    const hexa = await Hexas.findOne({
+        location: {
+            $geoIntersects: {
+                $geometry: {
+                    type: "Point",
+                    coordinates: [longitude, latitude]
+                }
+            }
+        }
+    })
+
+    const hagg = [{
+            '$match': {
+                'hexagon': hexa ? hexa.id : '01050168'
+            }
+        }, {
+            '$group': {
+                '_id': {
+                    'stream_name': '$stream_name', 
+                    'hex': '$hexagon',
+                }, 
+                'average': { '$avg': '$value' }, 
+                'min': { '$min': '$value' }, 
+                'max': { '$max': '$value' }, 
+                'count': { '$sum': 1 }
+            }
+        }
+    ]
+    const magg = [{
+            '$match': {
+                'municipality': hexa ? hexa.municipality : "010501"
+            }
+        }, {
+            '$group': {
+                '_id': {
+                    'stream_name': '$stream_name',
+                    'mun': '$municipality'
+                }, 
+                'average': { '$avg': '$value' }, 
+                'min': { '$min': '$value' }, 
+                'max': { '$max': '$value' }, 
+                'count': { '$sum': 1 }
+            }
+        }
+    ]
+    const hexAgg = await Satellites.aggregate(hagg)
+    const munAgg = await Satellites.aggregate(magg)
+    // console.log('mun: '+hexa.municipality+'\nhexagon: '+hexa.id)
+    const end = new Date().getTime()
+    const start = end-1000*60*60
+    console.log(start+'  '+end)
+    const hexagonVals = await Satellites.find({hexagon: hexa ? hexa.id : '010517354', created_at: { $gte: start, $lte: end} })
+    const municipeVals = await Satellites.find({municipality: hexa ? hexa.municipality : '010517', created_at: { $gte: start, $lte: end} })
+
+    return res.status(200).send({ hexagon: hexagonVals, municipality: municipeVals, hexagon_tuples: hexAgg, municipality_tuples: munAgg})
 })
 
 module.exports = router
