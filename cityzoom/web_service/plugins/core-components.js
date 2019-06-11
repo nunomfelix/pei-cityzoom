@@ -31,7 +31,7 @@ import Dash from '@/components/tmp/Dash.vue'
 import Dashboard from '@/components/New_UI/views/Dashboard.vue'
 import TempSideBar from '@/components/New_UI/Sidebar.vue'
 import SidebarMenu from '@/components/New_UI/SidebarMenu.vue'
-import TablesView from '@/components/New_UI/views/Tables.vue'
+//import TablesView from '@/components/New_UI/views/Tables.vue'
 // import TasksView from '@/components/views/Tasks.vue'
 // import SettingView from '@/components/views/Setting.vue'
 // import AccessView from '@/components/views/Access.vue'
@@ -69,4 +69,4 @@ Vue.component("Dash",Dash)
 Vue.component("Dashboard",Dashboard)
 Vue.component("Sidebar",TempSideBar)
 Vue.component("sidebar-menu",SidebarMenu)
-Vue.component("tables-view",TablesView)
+//Vue.component("tables-view",TablesView)
