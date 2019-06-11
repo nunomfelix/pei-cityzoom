@@ -60,7 +60,7 @@
         <info-box color-class="bg-green"
                   :icon-classes="['fas', 'smog']"
                   text="Pressão"
-                  :number="hexagon_tuples.find(h => h._id.stream_name == 'pressure_stream').average.toFixed(2) + 'bar'"></info-box>
+                  :number="hexagon_tuples.find(h => h._id.stream_name == 'pressure_stream').average.toFixed(2) + 'hPa'"></info-box>
       </div>
       <!-- /.col -->
 
@@ -94,7 +94,7 @@
     </div>
     <!-- /.row -->
     <div class="col-xs-12">
-      <small><b>Hexagon Information</b></small>
+      <small><b>Current Location Data</b></small>
       <p></p> 
     </div>
     <!-- Main row -->
@@ -194,27 +194,27 @@ export default {
     console.log(this.hexagon_tuples)
     console.log('municipality: '+JSON.stringify(this.municipality[0]))
     console.log(this.municipality[0].created_at)
-    console.log(this.municipality.find(h => h.stream_name=='ozone_stream'))
+    console.log(this.municipality.filter(h => h.stream_name=='ozone_stream'))
     console.log('este aki memo',this.coPilotNumbers)
       this.$nextTick(() => {
       var ctx = document.getElementById('trafficBar').getContext('2d')
       var config = {
         type: 'line',
         data: {
-          labels: this.municipality.find( h => h.stream_name == 'ozone_stream').map(k => k.created_at),
+          labels: this.municipality.filter( h => h.stream_name == 'ozone_stream').map(k => k.created_at),
           datasets: [{
             label: 'Temperatura Munícipio',
             fill: false,
             borderColor: '#284184',
             pointBackgroundColor: '#284184',
             backgroundColor: 'rgba(0, 0, 0, 0)',
-            data: this.coPilotNumbers
+            data: this.municipality.filter( h => h.stream_name == 'ozone_stream').map(k => k.value)
           }, {
             label: 'A sua localização',
             borderColor: '#4BC0C0',
             pointBackgroundColor: '#4BC0C0',
             backgroundColor: 'rgba(0, 0, 0, 0)',
-            data: this.personalNumbers
+            data: []
           }]
         },
         options: {
