@@ -11,11 +11,10 @@ const router = new express.Router()
 
 router.post('/values', async (req, res) => {
     //Gets the user by decoding the authorization header
-    let encoded = req.headers.authorization.replace("Basic ", "")
+    /*let encoded = req.headers.authorization.replace("Basic ", "")
     let decoded = new Buffer.from(encoded, 'base64').toString('ascii').split(":")
-    let username = decoded[0]
+    let username = decoded[0]*/
     var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-    console.log('ip:', ip)
     var identifier = ip
     //Creates a device in the DATA LAYER if it doesn't exist
     const createDeviceBody = {
@@ -26,6 +25,7 @@ router.post('/values', async (req, res) => {
         provider: req.body.username,
         description: "This is a device from the mobile app"
     }
+    console.log(createDeviceBody)
     try {
         const responseCreateDevice = await axios.post(config.get('DATA_LAYER_URL') + "/czb/devices/", createDeviceBody)
         console.log('Created device', colors.blue(createDeviceBody.device_ID), '!')
