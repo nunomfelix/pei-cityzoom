@@ -138,7 +138,7 @@ router.get('/locations', async (req, res) => {
 
     const agg = [{
             '$match': {
-                'hexagon': '0105010'
+                'hexagon': hexa.id
             }
         }, {
             '$group': {
