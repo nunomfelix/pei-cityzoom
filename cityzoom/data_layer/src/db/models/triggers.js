@@ -13,11 +13,6 @@ const config = require('config')
 */
 
 const triggerSchema = new mongoose.Schema({
-    trigger_ID: {
-        type: Number,
-        unique: true,
-        required: true
-    },
     alert_ID: {
         type: String,
         required: true,

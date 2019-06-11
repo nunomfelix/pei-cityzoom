@@ -30,9 +30,9 @@ function validatePostValue(object) {
         latitude: joi.number().required(),
         longitude: joi.number().required(),
         timestamp: joi.number().optional(),
-        device_ID: joi.string().optional(),
-        satellite: joi.boolean().optional()
-    })
+        device_ID: joi.string().required(),
+        satellite: joi.boolean().required()
+    }).xor('satellite','device_ID')
     return joi.validate(object, schema)
 }
 

@@ -32,7 +32,7 @@ const valuesSchema = new mongoose.Schema({
         type: Number,
         trim: true
     },
-    hexagon: {},
+    hexagon:{},
     municipality: {}
 })
 
