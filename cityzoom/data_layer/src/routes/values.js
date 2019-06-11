@@ -137,26 +137,33 @@ router.get('/locations', async (req, res) => {
         }
     })
 
-    const mun = await Municipalities.findOne({
-        location: {
-            $geoIntersects: {
-                $geometry: {
-                    type: "Point",
-                    coordinates: [longitude, latitude]
-                }
-            }
-        }
-    })
+    console.log('hexa'+hexa)
 
-    const agg = [{
+    const hagg = [{
             '$match': {
-                'hexagon': hexa.id
+                'hexagon': hexa ? hexa.id : '01050168'
             }
         }, {
             '$group': {
                 '_id': {
                     'stream_name': '$stream_name', 
                     'hex': '$hexagon',
+                }, 
+                'average': { '$avg': '$value' }, 
+                'min': { '$min': '$value' }, 
+                'max': { '$max': '$value' }, 
+                'count': { '$sum': 1 }
+            }
+        }
+    ]
+    const magg = [{
+            '$match': {
+                'municipality': hexa ? hexa.municipality : "010501"
+            }
+        }, {
+            '$group': {
+                '_id': {
+                    'stream_name': '$stream_name',
                     'mun': '$municipality'
                 }, 
                 'average': { '$avg': '$value' }, 
@@ -166,10 +173,11 @@ router.get('/locations', async (req, res) => {
             }
         }
     ]
+    const hexAgg = await Satellites.aggregate(hagg)
+    const munAgg = await Satellites.aggregate(magg)
 
-    const agreg = await Value.aggregate(agg)
-
-    return res.status(200).send(agreg)
+    const agregg = hexAgg.concat(munAgg)
+    return res.status(200).send(agregg)
 })
 
 module.exports = router

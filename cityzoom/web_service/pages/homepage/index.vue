@@ -54,15 +54,12 @@ export default {
     };
   }, 
   mounted: async function() {
-    setTimeout(() => {
       this.getLocation()
-    }, 0)
-    
-    const res = await this.$axios.get(`http://localhost:8002/devices/device_APIs0105010/values`, {  
-      headers: {
-          Authorization: this.$store.state.jwt
-      }
-    })
+
+    console.log('aquiiii\n\n\n')
+
+
+
 
 
    //createWidget with chartData 
@@ -71,9 +68,9 @@ export default {
    //y axis ??
    //Array de streams 
 
-    this.fillGraphsWithStreams(res.data)
+    //this.fillGraphsWithStreams(res.data)
     //console.log('aqui\n')
-    console.log(this.streams_graphs)
+    //console.log(this.streams_graphs)
   },
   methods: {
     onResize(i) {
@@ -83,11 +80,13 @@ export default {
     },
     getLocation(){
       if (navigator.geolocation){
-        navigator.geolocation.getCurrentPosition((position) => { 
-          this.position = position; 
-          this.position.coords.latitude = this.position.coords.latitude.toString()
-          this.position.coords.longitude = this.position.Coordinates.longitude.toString()
-          });
+        navigator.geolocation.getCurrentPosition(async (position) => { 
+          this.position = [40.6331731,-8.6594933]; 
+          console.log(position.coords)
+          //const res = await this.$axios.get(`http://193.136.93.14:8001/czb/values/locations?latitude=` + this.position[0] + '&longitude=' + this.position[1])  
+          const res = await this.$axios.get(`http://localhost:8001/czb/values/locations?latitude=` + this.position[0] + '&longitude=' + this.position[1])
+          console.log('alooo',res)
+        });
       }
     },
     fillData (labels,y_axis) {
