@@ -29,6 +29,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import org.json.JSONObject;
@@ -44,7 +45,8 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     /* Endpoints to where the data will be sent */
-    final String IP_ADDRESS = "193.136.93.14";
+    final String IP_ADDRESS = "192.168.1.116"; //PC LUCAS
+    //final String IP_ADDRESS = "193.136.93.14"; //SERVER IT CITYZOOM
     final String USERNAME = "superuser";
     final String PASSWORD = "12345";
     String URL_LOGIN = "http://"+IP_ADDRESS+":8002/user/login";
@@ -54,6 +56,7 @@ public class MainActivity extends AppCompatActivity
     int batteryValue;
     String longitudeValue;
     String latitudeValue;
+    String username;
 
     Sensor proximitySensor;
     TextView proximityText;
@@ -141,6 +144,8 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View v) {
                 if(!sendingData) {
                     sendingData = true;
+                    EditText usernameText = (EditText) findViewById(R.id.usernameText);
+                    username = usernameText.getText().toString();
                     clickButton.setText("STOP");
                     clickButton.setBackgroundColor(Color.RED);
                    //Launches new thread that waits for the cancel
@@ -195,7 +200,7 @@ public class MainActivity extends AppCompatActivity
         // For POST only - START
         con.setDoOutput(true);
         OutputStream os = con.getOutputStream();
-        String POST_PARAMS = "{\"proximity\":"+proximityValue+",\"battery\":"+batteryValue+",\"latitude\":"+latitudeValue+", \"longitude\":"+longitudeValue+"}";
+        String POST_PARAMS = "{\"username\":\""+username+ "\",\"proximity\":"+proximityValue+",\"battery\":"+batteryValue+",\"latitude\":"+latitudeValue+", \"longitude\":"+longitudeValue+"}";
         System.out.println(POST_PARAMS);
         os.write(POST_PARAMS.getBytes());
         os.flush();
