@@ -97,8 +97,4 @@ async function updateValues(data_json) {
             }
         })
     }
-    consumerDebug('[DEBUG] Checking alerts')
-    if (hexa != null) {
-        alert_checker(data_json.stream_name, hexa.id, hexa.municipality, data_json.satellite)
-    }
 }
