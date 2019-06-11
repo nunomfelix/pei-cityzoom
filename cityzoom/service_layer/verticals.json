@@ -121,21 +121,16 @@
 					"max": 1084
 				}
 			]
-		},
-		"MobileApp": {
+		},"MobileApp":{
 			"display": "Aplicação Móvel",
 			"streams": [
 				{
 					"name": "mobile_app_stream_id_proximity_",
-					"display": "Sensor da proximidade",
+					"display": "Sensor de proximidade",
 					"unit": "",
 					"fullunit": "",
 					"type": "value",
-					"colors": [
-						"green",
-						"red",
-						"white"
-					],
+					"colors": ["green", "red", "white"],
 					"min": 0,
 					"max": 1
 				},
