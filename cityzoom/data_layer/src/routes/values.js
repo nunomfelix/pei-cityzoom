@@ -137,8 +137,6 @@ router.get('/locations', async (req, res) => {
         }
     })
 
-    console.log('hexa'+hexa)
-
     const hagg = [{
             '$match': {
                 'hexagon': hexa ? hexa.id : '01050168'
@@ -175,9 +173,14 @@ router.get('/locations', async (req, res) => {
     ]
     const hexAgg = await Satellites.aggregate(hagg)
     const munAgg = await Satellites.aggregate(magg)
+    // console.log('mun: '+hexa.municipality+'\nhexagon: '+hexa.id)
+    const end = new Date().getTime()
+    const start = end-1000*60*60
+    console.log(start+'  '+end)
+    const hexagonVals = await Satellites.find({hexagon: hexa ? hexa.id : '010517354', created_at: { $gte: start, $lte: end} })
+    const municipeVals = await Satellites.find({municipality: hexa ? hexa.municipality : '010517', created_at: { $gte: start, $lte: end} })
 
-    const agregg = hexAgg.concat(munAgg)
-    return res.status(200).send(agregg)
+    return res.status(200).send({ hexagon: hexagonVals, municipality: municipeVals, hexagon_tuples: hexAgg, municipality_tuples: munAgg})
 })
 
 module.exports = router

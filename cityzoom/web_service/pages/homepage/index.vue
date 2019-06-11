@@ -1,12 +1,11 @@
 <template>
-  <div class="mainMargin">
-    <Dashboard></Dashboard>
+  <div class="mainMargin" v-if="hexagon_tuples && hexagon_tuples.length">
+    <Dashboard :hexagon="hexagon" :hexagon_tuples="hexagon_tuples" :municipality="municipality" :municipality_tuples="municipality_tuples"></Dashboard>
   </div>
 </template>
 
 <script>
 import moment from 'moment'
-const drone_stream = require('static/get_stream_values_response.json');
 
 var testLayout = [
   { x: 0, y: 0, w: 14, h: 14, i: "line_a", type: 'lines', data:'humidity_stream' },
@@ -25,6 +24,11 @@ export default {
       layout: testLayout,
       datacollection: null,
       position: null,
+      data:null,
+      hexagon:null,
+      hexagon_tuples:null,
+      municipality:null,
+      municipality_tuples:null,
       streams_graphs:null,
       options:{
         elements:{
@@ -81,11 +85,15 @@ export default {
     getLocation(){
       if (navigator.geolocation){
         navigator.geolocation.getCurrentPosition(async (position) => { 
-          this.position = [40.6331731,-8.6594933]; 
+          this.position = position.coords; 
           console.log(position.coords)
-          //const res = await this.$axios.get(`http://193.136.93.14:8001/czb/values/locations?latitude=` + this.position[0] + '&longitude=' + this.position[1])  
-          const res = await this.$axios.get(`http://localhost:8001/czb/values/locations?latitude=` + this.position[0] + '&longitude=' + this.position[1])
-          console.log('alooo',res)
+          // const res = await this.$axios.get(`http://193.136.93.14:8001/czb/values/locations?latitude=` + this.position.latitude + '&longitude=' + this.position.longitude)  
+          const res = await this.$axios.get(`http://localhost:8001/czb/values/locations?latitude=` + this.position.latitude + '&longitude=' + this.position.longitude)
+          console.log('alooo',res.data)
+          this.hexagon = res.data.hexagon
+          this.hexagon_tuples = res.data.hexagon_tuples
+          this.municipality = res.data.municipality
+          this.municipality_tuples = res.data.municipality_tuples
         });
       }
     },

@@ -2,32 +2,21 @@
   <!-- Main content -->
   <section class="content">
     <!-- GitHub hint -->
-    <div class="row">
-      <div class="col-xs-12">
-        <alerts :dismissible="true"
-               type="success"
-               :iconClasses="['fa', 'fa-check']"
-               title="CityZoom is online!">
-          <span>Click on icon to check it out on github.</span>
-          <a href="https://github.com/andremourato/pei-cityzoom" target="_blank">
-            <i class="fa fa-github fa-2x"></i>
-          </a>
-        </alerts>
-      </div>
+    <div class="row" v-if="hexagon_tuples && hexagon_tuples.length">
 
       <!-- Info boxes -->
       <div class="col-md-3 col-sm-6 col-xs-12">
         <info-box color-class="bg-aqua"
                   :icon-classes="['fas', 'cloud']"
                   text="Humidade"
-                  number="90%"></info-box>
+                  :number="(hexagon_tuples.find(h => h._id.stream_name == 'humidity_stream').average * 100).toFixed(2) + '%'"></info-box>
       </div>
       <!-- /.col -->
       <div class="col-md-3 col-sm-6 col-xs-12">
         <info-box color-class="bg-red"
                   :icon-classes="['fas', 'thermometer-half']"
                   text="Temperatura"
-                  number="41,410"></info-box>
+                  :number="hexagon_tuples.find(h => h._id.stream_name == 'temperature_stream').average.toFixed(2) + 'ºC'"></info-box>
       </div>
       <!-- /.col -->
 
@@ -38,16 +27,43 @@
         <info-box color-class="bg-green"
                   :icon-classes="['fas', 'smog']"
                   text="PM 10 "
-                  number="760"></info-box>
+                  :number="hexagon_tuples.find(h => h._id.stream_name == 'pm10_stream').average.toFixed(2) + 'µg/m3'"></info-box>
       </div>
       <!-- /.col -->
       <div class="col-md-3 col-sm-6 col-xs-12">
         <info-box color-class="bg-yellow"
                   :icon-classes="['fas', 'smog']"
-                  text="PM 2.5"
-                  number="2,000"></info-box>
+                  text="PM 25"
+                  :number="hexagon_tuples.find(h => h._id.stream_name == 'pm25_stream').average.toFixed(2) + 'µg/m3'"></info-box>
       </div>
       <!-- /.col -->
+       <div class="col-md-3 col-sm-6 col-xs-12">
+        <info-box color-class="bg-purple"
+                  :icon-classes="['fas', 'cloud']"  
+                  text="Dióxido de Azoto"
+                  :number="(hexagon_tuples.find(h => h._id.stream_name == 'no2_stream').average * 100).toFixed(2) + 'ppb'"></info-box>
+      </div>
+      <!-- /.col -->
+      <div class="col-md-3 col-sm-6 col-xs-12">
+        <info-box color-class="bg-yellow"
+                  :icon-classes="['fas', 'thermometer-half']"
+                  text="Ozono"
+                  :number="hexagon_tuples.find(h => h._id.stream_name == 'ozone_stream').average.toFixed(2) + 'µg/m3'"></info-box>
+      </div>
+      <!-- /.col -->
+
+
+      <!-- fix for small devices only -->
+      <div class="clearfix visible-sm-block"></div>
+      
+      <div class="col-md-3 col-sm-6 col-xs-12">
+        <info-box color-class="bg-green"
+                  :icon-classes="['fas', 'smog']"
+                  text="Pressão"
+                  :number="hexagon_tuples.find(h => h._id.stream_name == 'pressure_stream').average.toFixed(2) + 'bar'"></info-box>
+      </div>
+      <!-- /.col -->
+
     </div>
     <!-- /.row -->
 
@@ -58,7 +74,7 @@
           <div class="box-body">
             <div class="col-sm-6 col-xs-12">
               <p class="text-center">
-                <strong>Web Traffic Overview</strong>
+                <strong>Histórico Temperatura</strong>
               </p>
               <canvas id="trafficBar" ></canvas>
             </div>
@@ -144,9 +160,15 @@
 
 export default {
   name: 'Dashboard',
-
+    props:{
+      hexagon: Array,
+      hexagon_tuples: Array,
+      municipality: Array,
+      municipality_tuples: Array
+    },
   data () {
     return {
+
       generateRandomNumbers (numbers, max, min) {
         var a = []
         for (var i = 0; i < numbers; i++) {
@@ -168,21 +190,27 @@ export default {
     }
   },
   mounted () {
-    this.$nextTick(() => {
+    console.log('é da prozis', this.hexagon)
+    console.log(this.hexagon_tuples)
+    console.log('municipality: '+JSON.stringify(this.municipality[0]))
+    console.log(this.municipality[0].created_at)
+    console.log(this.municipality.find(h => h.stream_name=='ozone_stream'))
+    console.log('este aki memo',this.coPilotNumbers)
+      this.$nextTick(() => {
       var ctx = document.getElementById('trafficBar').getContext('2d')
       var config = {
         type: 'line',
         data: {
-          labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+          labels: this.municipality.find( h => h.stream_name == 'ozone_stream').map(k => k.created_at),
           datasets: [{
-            label: 'CoPilot',
+            label: 'Temperatura Munícipio',
             fill: false,
             borderColor: '#284184',
             pointBackgroundColor: '#284184',
             backgroundColor: 'rgba(0, 0, 0, 0)',
             data: this.coPilotNumbers
           }, {
-            label: 'Personal Site',
+            label: 'A sua localização',
             borderColor: '#4BC0C0',
             pointBackgroundColor: '#4BC0C0',
             backgroundColor: 'rgba(0, 0, 0, 0)',
@@ -211,11 +239,11 @@ export default {
       var pieConfig = {
         type: 'pie',
         data: {
-          labels: ['HTML', 'JavaScript', 'CSS'],
+          labels: ['Neutro', 'Mau', 'Muito Mau'],
           datasets: [{
             data: [56.6, 37.7, 4.1],
-            backgroundColor: ['#00a65a', '#f39c12', '#00c0ef'],
-            hoverBackgroundColor: ['#00a65a', '#f39c12', '#00c0ef']
+            backgroundColor: ['#00a65a', '#f39c12', '#FF0000'],
+            hoverBackgroundColor: ['#00a65a', '#f39c12', '#FF0000']
           }]
         },
         options: {
