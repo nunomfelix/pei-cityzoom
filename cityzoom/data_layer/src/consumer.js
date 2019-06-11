@@ -62,7 +62,7 @@ async function updateValues(data_json) {
             $geoIntersects: {
                 $geometry: {
                     type: "Point",
-                    coordinates: [longitude, latitude]
+                    coordinates: [Number(longitude), Number(latitude)]
                 }
             }
         }
