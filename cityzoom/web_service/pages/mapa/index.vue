@@ -479,8 +479,7 @@ export default {
 
             document.body.style.cursor = "default"
             const geo_feature = e.selected[0]
-            console.log(geo_feature)
-            if(geo_feature.get('FREGUESIA') && geo_feature != this.selected_county) {
+            if(geo_feature.get('Freguesia') && geo_feature != this.selected_county) {
                 this.map.setView(new this.req.Ol.View({
                     center: this.map.getView().getCenter(),
                     zoom: this.map.getView().getZoom(),
@@ -517,7 +516,8 @@ export default {
                     })  
                 },0)
             } else {
-                this.selected_device = e.selected[e.selected.length - 1].get('id')
+                this.selected_device = {...this.getDevices[e.selected[e.selected.length - 1].get('id')], device_ID: e.selected[e.selected.length - 1].get('id')}
+                console.log(this.selected_device)
                 this.showModal = true
             }
             this.click_interaction.getFeatures().clear()

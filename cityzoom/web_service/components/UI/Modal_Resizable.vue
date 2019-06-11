@@ -14,8 +14,11 @@
                 <LineGraph :ref="item.i" :name="item.i" :values="values"/>
             </div>
               -->
-              <div  v-for="(stream, index) of streams" :key="index">
-                <line-chart style="overflow: visible" :height="300" :chart-data="datacollections[stream]" :options="options[stream]"/>
+              <div v-for="(stream, index) of device.streams" :key="index">
+                <div style="position: relative; height: 400px">
+                  <line-chart v-if="show" :height="300" :collection="datacollections[stream]" :options="options[stream]"/>
+                  <Loading :show="!show" type="absolute" />
+                </div>
               </div>
             </slot>
           </div>
@@ -41,7 +44,7 @@ var item = {
   data: "fake"
 };
 export default {
-  props: { device: String },
+  props: { device: Object },
   name: "Modal_Resizable",
 
   data() {
@@ -66,49 +69,10 @@ export default {
     }
   },
   mounted: async function() {
-    const res = await this.$axios.get(
-      `http://193.136.93.14:8002/devices/${this.device}/values`,
-      {
-        headers: {
-          Authorization: this.$store.state.jwt
-        }
-      }
-    );
-    this.streams = res.data.map(r => r._id);
-
-    for (var stream of res.data) {
-      var labels = [];
-      var y_axis = [];
-      for (var value of stream.values) {
-        y_axis.push(value.value);
-        labels.push(value.timestamp);
-      }
-      this.fillData(labels, y_axis, stream._id);
-
-    this.options[stream._id] = {
-        elements: {
-          line: {
-            tension: 0
-          }
-        },
-        scales: {
-          xAxes: [
-            {
-              type: "time",
-            }
-          ],
-          yAxes: [{
-            display: true,
-            ticks: {
-              max: this.getStreams[stream._id].max + (this.getStreams[stream._id].max - this.getStreams[stream._id].min) * .05,
-              min: this.getStreams[stream._id].min - (this.getStreams[stream._id].max - this.getStreams[stream._id].min) * .05,    // minimum will be 0, unless there is a lower value.
-            }
-        }]
-        }
-      }
-    }
-
-    this.show = true;
+    await this.update()
+    setInterval(async () => {
+      await this.update()
+    }, 5000)
   },
 
   methods: {
@@ -126,6 +90,57 @@ export default {
     },
     getRandomInt() {
       return Math.floor(Math.random() * (50 - 5 + 1)) + 5;
+    },
+    async update() {
+      const res = await this.$axios.get(
+        `http://193.136.93.14:8002/devices/${this.device.device_ID}/values`,
+        {
+          headers: {
+            Authorization: this.$store.state.jwt
+          }
+        }
+      );
+      this.streams = res.data.map(r => r._id);
+
+      for (var stream of res.data) {
+        var labels = [];
+        var y_axis = [];
+        for (var value of stream.values) {
+          y_axis.push(value.value);
+          labels.push(value.timestamp);
+        }
+        this.fillData(labels, y_axis, stream._id);
+
+      this.options[stream._id] = {
+          elements: {
+            line: {
+              tension: 0
+            }
+          },
+          scales: {
+            xAxes: [
+              {
+                type: "time",
+              }
+            ],
+            yAxes: [{
+              display: true,
+              ticks: {
+                max: this.getStreams[stream._id].max + (this.getStreams[stream._id].max - this.getStreams[stream._id].min) * .05,
+                min: this.getStreams[stream._id].min - (this.getStreams[stream._id].max - this.getStreams[stream._id].min) * .05,    // minimum will be 0, unless there is a lower value.
+              }
+          }]
+          
+          }
+        }
+      }
+
+    this.show = false
+    setTimeout(() => {
+
+      this.show = true;
+    }, 0)
+
     },
     convertTimestamp(t) {
       var dt = new Date(t);
