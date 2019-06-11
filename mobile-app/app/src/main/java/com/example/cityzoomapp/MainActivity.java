@@ -152,6 +152,7 @@ public class MainActivity extends AppCompatActivity
                     sendingData = true;
                     EditText usernameText = (EditText) findViewById(R.id.usernameText);
                     username = usernameText.getText().toString();
+                    usernameText.setEnabled(false);
                     clickButton.setText("STOP");
                     clickButton.setBackgroundColor(Color.RED);
                    //Launches new thread that waits for the cancel
@@ -160,7 +161,13 @@ public class MainActivity extends AppCompatActivity
                         public void run(){
                             try{
                                 while(sendingData){
-                                    sendHTTPRequest();
+                                    int responseCode = sendHTTPRequest();
+                                    /*TextView statusText = (TextView) findViewById(R.id.statusText);
+                                    statusText.setText(responseCode);
+                                    if(responseCode == 204)
+                                        statusText.setTextColor(Color.GREEN);
+                                    else
+                                        statusText.setTextColor(Color.RED);*/
                                     System.out.println("SENDING HTTP REQUEST");
                                     Thread.sleep(PERIOD);
                                 }
@@ -173,6 +180,8 @@ public class MainActivity extends AppCompatActivity
                     waitingForCancel.start();
                 }else{
                     sendingData = false;
+                    EditText usernameText = (EditText) findViewById(R.id.usernameText);
+                    usernameText.setEnabled(true);
                     waitingForCancel.interrupt();
                     clickButton.setText("SEND");
                     clickButton.setBackgroundColor(Color.GREEN);
@@ -188,7 +197,7 @@ public class MainActivity extends AppCompatActivity
         “timestamp”: 1559322280399
     }
     */
-    public void sendHTTPRequest() throws IOException{
+    public int sendHTTPRequest() throws IOException{
         String url = URL_POST;
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -226,6 +235,7 @@ public class MainActivity extends AppCompatActivity
         in.close();
         //print in String
         System.out.println(response.toString());
+        return responseCode;
     }
 
     /* Returns the session token */
