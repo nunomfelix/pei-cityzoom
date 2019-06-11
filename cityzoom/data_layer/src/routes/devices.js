@@ -38,31 +38,25 @@ router.post('', validation(validateCreateDevice, 'body', 'Invalid device'), asyn
 // get all devices
 router.get('', async (req, res) => {
     devicesDebug('[DEBUG] Fetching all Devices')
-    const start = req.query.interval_start ? req.query.interval_start : 0
-    const compass = Number(Date.now())
-    const end = req.query.interval_end ? req.query.interval_end : compass
-    if (end < start || start < 0) {
-        devicesDebug('[ERROR] Interval is wrong')
-        return res.status(400).send({error: 'Bad interval defined'})
-    }
-    var allDevices = await devices.find({created_at: { $gte: start, $lte: end}})
-    res.status(200).send(allDevices)
+    const devices = await devices.find()
+    res.status(200).send(devices)
 })
 
 router.get("/location", async(req,res) => {
     devicesDebug('[DEBUG] Fetching last device locations')
-    const tmp = await values.aggregate([{
-        $group:{
-            _id: {
-              device_id: "$device_ID",
-              longitude: "$longitude",
-              latitude: "$latitude"
+    const tmp = await devices.aggregate([
+        {
+            $match: {
+                mobile: true
             },
-            last: {
-              $max: "$timestamp"
+        },
+        {
+            $project: {
+                location: 1,
+                device_ID: 1
             }
-          }
-    }])
+        }
+    ])
     console.log(tmp)
     res.send(tmp)
 })

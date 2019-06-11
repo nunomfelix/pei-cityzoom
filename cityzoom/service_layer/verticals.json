@@ -136,11 +136,15 @@
 				},
 				{
 					"name": "mobile_app_stream_id_battery_",
-					"display": "Percentagem de bateria",
+					"display": "Bateria do dispositivo",
 					"unit": "%",
 					"fullunit": "Percentagem",
 					"type": "relative",
-					"colors": ["darkblue", "red", "grey"],
+					"colors": [
+						"darkblue",
+						"red",
+						"grey"
+					],
 					"min": 0,
 					"max": 100
 				}
