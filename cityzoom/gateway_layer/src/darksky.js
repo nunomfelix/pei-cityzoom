@@ -115,6 +115,7 @@ return new Promise(resolve => setTimeout(resolve, ms));
         devicesMap[devices[d].device] = streams
     }
 
+    await sleep(1000);
     for(var d of devices) {
         //var data = await get_darksky_data(d.center_lat, d.center_long)
         var data = [{
