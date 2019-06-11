@@ -51,18 +51,19 @@ router.get('', async (req, res) => {
 
 router.get("/location", async(req,res) => {
     devicesDebug('[DEBUG] Fetching last device locations')
-    const tmp = await values.aggregate([{
-        $group:{
-            _id: {
-              device_id: "$device_ID",
-              longitude: "$longitude",
-              latitude: "$latitude"
+    const tmp = await devices.aggregate([
+        {
+            $match: {
+                mobile: true
             },
-            last: {
-              $max: "$timestamp"
+        },
+        {
+            $project: {
+                location: 1,
+                device_ID: 1
             }
-          }
-    }])
+        }
+    ])
     console.log(tmp)
     res.send(tmp)
 })
