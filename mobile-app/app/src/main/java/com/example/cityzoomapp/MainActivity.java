@@ -29,6 +29,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import org.json.JSONObject;
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     /* Endpoints to where the data will be sent */
+    //final String IP_ADDRESS = "192.168.1.116"; //PC LUCAS
     final String IP_ADDRESS = "193.136.93.14"; //IT CITYZOOM SERVER
     //final String IP_ADDRESS = "192.168.50.100"; //FELIX IP
     //final String IP_ADDRESS = "192.168.43.106"; //MOURATO IP
@@ -56,6 +58,7 @@ public class MainActivity extends AppCompatActivity
     int batteryValue;
     String longitudeValue;
     String latitudeValue;
+    String username;
 
     Sensor proximitySensor;
     TextView proximityText;
@@ -79,12 +82,10 @@ public class MainActivity extends AppCompatActivity
         //Toolbar toolbar = findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
         //ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
         //        this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         //drawer.addDrawerListener(toggle);
         //toggle.syncState();
-        navigationView.setNavigationItemSelectedListener(this);
 
         //Sensor manager
         sensorManager =
@@ -149,6 +150,9 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View v) {
                 if(!sendingData) {
                     sendingData = true;
+                    EditText usernameText = (EditText) findViewById(R.id.usernameText);
+                    username = usernameText.getText().toString();
+                    usernameText.setEnabled(false);
                     clickButton.setText("STOP");
                     clickButton.setBackgroundColor(Color.RED);
                    //Launches new thread that waits for the cancel
@@ -157,7 +161,13 @@ public class MainActivity extends AppCompatActivity
                         public void run(){
                             try{
                                 while(sendingData){
-                                    sendHTTPRequest();
+                                    int responseCode = sendHTTPRequest();
+                                    /*TextView statusText = (TextView) findViewById(R.id.statusText);
+                                    statusText.setText(responseCode);
+                                    if(responseCode == 204)
+                                        statusText.setTextColor(Color.GREEN);
+                                    else
+                                        statusText.setTextColor(Color.RED);*/
                                     System.out.println("SENDING HTTP REQUEST");
                                     Thread.sleep(PERIOD);
                                 }
@@ -170,6 +180,8 @@ public class MainActivity extends AppCompatActivity
                     waitingForCancel.start();
                 }else{
                     sendingData = false;
+                    EditText usernameText = (EditText) findViewById(R.id.usernameText);
+                    usernameText.setEnabled(true);
                     waitingForCancel.interrupt();
                     clickButton.setText("SEND");
                     clickButton.setBackgroundColor(Color.GREEN);
@@ -185,7 +197,7 @@ public class MainActivity extends AppCompatActivity
         “timestamp”: 1559322280399
     }
     */
-    public void sendHTTPRequest() throws IOException{
+    public int sendHTTPRequest() throws IOException{
         String url = URL_POST;
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -203,7 +215,7 @@ public class MainActivity extends AppCompatActivity
         // For POST only - START
         con.setDoOutput(true);
         OutputStream os = con.getOutputStream();
-        String POST_PARAMS = "{\"proximity\":"+proximityValue+",\"battery\":"+batteryValue+",\"latitude\":"+latitudeValue+", \"longitude\":"+longitudeValue+"}";
+        String POST_PARAMS = "{\"username\":\""+username+ "\",\"proximity\":"+proximityValue+",\"battery\":"+batteryValue+",\"latitude\":"+latitudeValue+", \"longitude\":"+longitudeValue+"}";
         System.out.println(POST_PARAMS);
         os.write(POST_PARAMS.getBytes());
         os.flush();
@@ -223,6 +235,7 @@ public class MainActivity extends AppCompatActivity
         in.close();
         //print in String
         System.out.println(response.toString());
+        return responseCode;
     }
 
     /* Returns the session token */

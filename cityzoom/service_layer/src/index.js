@@ -18,6 +18,7 @@ const alertRouter = require('./routes/alert')
 const streamRouter = require('./routes/stream')
 const deviceRouter = require('./routes/device')
 const verticalRouter = require('./routes/vertical')
+const valuesRouter = require('./routes/values')
 const expressDebug = require('debug')('app:express')
 
 //Uses the express framework
@@ -75,6 +76,7 @@ app.use('/streams', streamRouter)
 app.use('/devices', deviceRouter)
 app.use('/vertical', verticalRouter)
 app.use('/mobileapp', mobileappRouter)
+app.use('/values', valuesRouter)
 
 //Error middleware, para excessoes causadas em funcoes assincronas do express
 app.use(error)

@@ -16,6 +16,7 @@ const config = require('config')
         "target_stream": <trigger_stream> (string),
         "users": <users_array_for_permissions> (stringArray),
         "frequency": <frequency_to_validate> (string)
+        "lastOKRead": <last_good_reading> (real)
     }
 */
 

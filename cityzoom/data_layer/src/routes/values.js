@@ -137,15 +137,25 @@ router.get('/locations', async (req, res) => {
         }
     })
 
+<<<<<<< HEAD
     const hagg = [{
             '$match': {
                 'hexagon': hexa ? hexa.id : '01050168'
+=======
+    const agg = [{
+            '$match': {
+                'hexagon': hexa.id
+>>>>>>> e987f38d1d82e768d44328f7462883d77f427aac
             }
         }, {
             '$group': {
                 '_id': {
                     'stream_name': '$stream_name', 
+<<<<<<< HEAD
                     'hex': '$hexagon',
+=======
+                    'hex': '$hexagon'
+>>>>>>> e987f38d1d82e768d44328f7462883d77f427aac
                 }, 
                 'average': { '$avg': '$value' }, 
                 'min': { '$min': '$value' }, 
@@ -154,6 +164,7 @@ router.get('/locations', async (req, res) => {
             }
         }
     ]
+<<<<<<< HEAD
     const magg = [{
             '$match': {
                 'municipality': hexa ? hexa.municipality : "010501"
@@ -181,6 +192,12 @@ router.get('/locations', async (req, res) => {
     const municipeVals = await Satellites.find({municipality: hexa ? hexa.municipality : '010517', created_at: { $gte: start, $lte: end} })
 
     return res.status(200).send({ hexagon: hexagonVals, municipality: municipeVals, hexagon_tuples: hexAgg, municipality_tuples: munAgg})
+=======
+
+    const agreg = await Value.aggregate(agg)
+
+    return res.status(200).send(agreg)
+>>>>>>> e987f38d1d82e768d44328f7462883d77f427aac
 })
 
 module.exports = router
