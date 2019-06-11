@@ -97,5 +97,8 @@ async function updateValues(data_json) {
             }
         })
     }
+<<<<<<< HEAD
     consumerDebug('[DEBUG] Checking alerts')
+=======
+>>>>>>> 956c07f54e37aba0a29a273de6a2080c4ed55d4a
 }
