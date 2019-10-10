@@ -27,16 +27,16 @@ mongoose.connect(connectionUrl+database, {
         }
     })
 
-    //fs.writeFile('backup_main_2', JSON.stringify({satellite: await satellite.find(), alerts: await alerts.find(), devices: await devices.find(), values: await values.find(), hexagons: await hexagons.find(), muns: await muns.find()}), () => {})
+    fs.writeFile('backup', JSON.stringify({satellite: await satellite.find(), alerts: await alerts.find(), devices: await devices.find(), values: await values.find(), hexagons: await hexagons.find(), muns: await muns.find()}), () => {})
     
     await hexagons.deleteMany({})
     await muns.deleteMany({})
     await devices.deleteMany({})
     await values.deleteMany({})
-    //await satellite.deleteMany({})
+    await satellite.deleteMany({})
     await alerts.deleteMany({})
 
-    fs.readFile('backup_main_2', async(err, res) => {
+    fs.readFile('backup', async(err, res) => {
         res = JSON.parse(res)
         mongooseDebug("Starting up")
         if(res.hexagons) {
@@ -63,12 +63,12 @@ mongoose.connect(connectionUrl+database, {
             ))
             mongooseDebug("Loaded values")
         }
-        // if(res.satellite) {
-        //     await satellite.insertMany(res.satellite.map(v => 
-        //         new satellite(v)    
-        //     ))
-        //     mongooseDebug("Loaded satellite")
-        // }
+        if(res.satellite) {
+            await satellite.insertMany(res.satellite.map(v => 
+                new satellite(v)    
+            ))
+            mongooseDebug("Loaded satellite")
+        }
         if(res.alerts) {
             await alerts.insertMany(res.alerts.map(a => 
                 new alerts(a)    

@@ -67,7 +67,7 @@ export default {
   },
   mounted: async function() {
     const res = await this.$axios.get(
-      `http://193.136.93.14:8002/devices/${this.device}/values`,
+      `http://localhost:8002/devices/${this.device}/values`,
       {
         headers: {
           Authorization: this.$store.state.jwt
